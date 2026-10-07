@@ -1,0 +1,6 @@
+{
+  "name": "fujin-pair-programmer",
+  "private": true,
+  "dependencies": { "pi-pair-programmer": "0.1.7" },
+  "omp": { "extensions": ["./node_modules/pi-pair-programmer/src/index.ts"] }
+}
