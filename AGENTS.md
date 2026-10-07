@@ -73,6 +73,16 @@ Project skills in `.agents/skills/` (also reachable as `.claude/skills/`):
 
 The other skills in `.agents/skills/` are vendored from a third party under MIT; `.agents/skills/THIRD_PARTY.md` lists them with source and commit. Do not edit them.
 
+## Agent skills
+
+### Issue tracker
+
+Issues and specs are GitHub issues on `Ozne-l/fujin`, handled with `gh`. See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context: `GLOSSARY.md` and `docs/adr/` at the root. See `docs/agents/domain.md`.
+
 ## Agent harness (`.omp/`)
 
 - `.omp/extensions/dart-checks/`: when a turn ends after any `.dart` file under `lib/`, `test/` or `tool/` changed, runs `dart analyze --fatal-infos`, `dart format --set-exit-if-changed` on the changed files and `flutter test` on every test whose imports reach them, reports each result, and refuses to end the turn until all pass.
