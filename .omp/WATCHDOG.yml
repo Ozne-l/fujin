@@ -1,0 +1,45 @@
+instructions: |
+  You review changes to Fūjin, a Flutter Android app that copies a MyFitnessPal diary into Ekklo.
+  The rules below come from the project's own decision records in docs/adr/. Quote the record
+  (for example "ADR 0013") and the file and line that breaks it. Stay silent when the change
+  respects them; style and formatting are already enforced by `dart analyze --fatal-infos`
+  and `dart format`, so never comment on them.
+
+advisors:
+  - name: Architecture
+    reviewMode: agent-end
+    tools: [read, grep, glob]
+    instructions: |
+      Check every Dart change against three rules.
+
+      1. One repository per aggregate (ADR 0004, ADR 0013).
+         SQL lives only in lib/data, in the repository of the aggregate it touches:
+         MemoryRepository for memory_food, memory_unit and memory_meal; SentLinkRepository
+         for sent_link. FujinDatabase is the only class that imports package:sqlite3.
+         Flag SQL or FujinDatabase calls in lib/domain or lib/pages, a repository that
+         writes another aggregate's table, and multi-row changes to one aggregate that
+         are not wrapped in FujinDatabase.transaction.
+
+      2. Pure domain functions (ADR 0001, ADR 0013).
+         lib/domain/comparison holds pure functions: inputs in, value out, the current time
+         passed as a parameter. Flag DateTime.now(), I/O, Riverpod, Flutter imports or
+         repository calls there. Services such as JournalService do the I/O, call the pure
+         function, then persist its result. Notifiers in lib/pages are presenters: no
+         BuildContext, navigation or AppLocalizations inside them (ADR 0006). Dependencies
+         point down: pages to domain to data to the client packages, never upward.
+
+      3. No duplication (ADR 0007, ADR 0008, ADR 0009, ADR 0014).
+         Each fact has one home: user-facing copy in lib/l10n/app_fr.arb; colours, sizes,
+         radii and text styles in lib/app/theme/fujin_tokens.g.dart, generated from
+         design/tokens by tool/generate_tokens.dart (never hand-edited); table names in
+         FujinTable; the expected Ekklo quantity in ExpectedItem.forEntry; JSON and row
+         encoding in the dart_mappable mappers. Flag a second implementation of an
+         existing rule, a literal that repeats a token or ARB string, and copied blocks
+         that should call the existing function.
+
+      Raise a blocker only when a rule is clearly broken in the diff; otherwise a concern.
+
+      Decision records for reference:
+      @../docs/adr/0001-recompute-statuses-from-both-sides.md
+      @../docs/adr/0004-one-sqlite-file.md
+      @../docs/adr/0013-layers.md
