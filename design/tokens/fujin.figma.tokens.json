@@ -1,0 +1,412 @@
+{
+  "couleur": {
+    "sumi": {
+      "$type": "color",
+      "$value": "#1B1A17"
+    },
+    "hai": {
+      "$type": "color",
+      "$value": "#6F6857"
+    },
+    "hai-clair": {
+      "$type": "color",
+      "$value": "#8A826C"
+    },
+    "usuzumi": {
+      "$type": "color",
+      "$value": "#BDB49C"
+    },
+    "kinari": {
+      "$type": "color",
+      "$value": "#E3DAC0"
+    },
+    "washi": {
+      "$type": "color",
+      "$value": "#F7F1E0"
+    },
+    "kinu": {
+      "$type": "color",
+      "$value": "#FFFCF4"
+    },
+    "fujin": {
+      "$type": "color",
+      "$value": "#2F5E34"
+    },
+    "matcha": {
+      "$type": "color",
+      "$value": "#DCE8D5"
+    },
+    "sora": {
+      "$type": "color",
+      "$value": "#3F6A82"
+    },
+    "sora-clair": {
+      "$type": "color",
+      "$value": "#DDE7EC"
+    },
+    "kin": {
+      "$type": "color",
+      "$value": "#D4A548"
+    },
+    "kin-clair": {
+      "$type": "color",
+      "$value": "#F3E6C4"
+    },
+    "kin-fonce": {
+      "$type": "color",
+      "$value": "#8C6418"
+    },
+    "shu": {
+      "$type": "color",
+      "$value": "#B23A26"
+    },
+    "shu-clair": {
+      "$type": "color",
+      "$value": "#F4DDD6"
+    },
+    "mfp": {
+      "$type": "color",
+      "$value": "#1E6BD6"
+    },
+    "mfp-moyen": {
+      "$type": "color",
+      "$value": "#BBD0EB"
+    },
+    "ekklo": {
+      "$type": "color",
+      "$value": "#7A4BC9"
+    },
+    "ekklo-clair": {
+      "$type": "color",
+      "$value": "#ECE5F7"
+    },
+    "ekklo-fonce": {
+      "$type": "color",
+      "$value": "#5B3A99"
+    },
+    "mfp-clair": {
+      "$type": "color",
+      "$value": "#DCE6F7"
+    }
+  },
+  "espace": {
+    "1": {
+      "$type": "dimension",
+      "$value": "4px"
+    },
+    "2": {
+      "$type": "dimension",
+      "$value": "8px"
+    },
+    "3": {
+      "$type": "dimension",
+      "$value": "12px"
+    },
+    "4": {
+      "$type": "dimension",
+      "$value": "16px"
+    },
+    "5": {
+      "$type": "dimension",
+      "$value": "20px"
+    },
+    "6": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "8": {
+      "$type": "dimension",
+      "$value": "32px"
+    }
+  },
+  "rayon": {
+    "barre": {
+      "$type": "dimension",
+      "$value": "2px"
+    },
+    "carte": {
+      "$type": "dimension",
+      "$value": "20px"
+    },
+    "bouton": {
+      "$type": "dimension",
+      "$value": "28px"
+    },
+    "feuille": {
+      "$type": "dimension",
+      "$value": "28px"
+    },
+    "pastille": {
+      "$type": "dimension",
+      "$value": "999px"
+    },
+    "champ": {
+      "$type": "dimension",
+      "$value": "16px"
+    }
+  },
+  "trait": {
+    "carte": {
+      "$type": "dimension",
+      "$value": "1px"
+    },
+    "icone": {
+      "$type": "dimension",
+      "$value": "1.75px"
+    },
+    "anneau-jour": {
+      "$type": "dimension",
+      "$value": "1.5px"
+    },
+    "anneau-macro": {
+      "$type": "dimension",
+      "$value": "2px"
+    }
+  },
+  "taille": {
+    "marge-ecran": {
+      "$type": "dimension",
+      "$value": "16px"
+    },
+    "retrait-texte": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "bouton-hauteur": {
+      "$type": "dimension",
+      "$value": "56px"
+    },
+    "icone": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "barre-kcal": {
+      "$type": "dimension",
+      "$value": "6px"
+    },
+    "barre-macro": {
+      "$type": "dimension",
+      "$value": "4px"
+    },
+    "anneau-jour": {
+      "$type": "dimension",
+      "$value": "38px"
+    },
+    "anneau-macro": {
+      "$type": "dimension",
+      "$value": "52px"
+    },
+    "pastille-jour": {
+      "$type": "dimension",
+      "$value": "26px"
+    },
+    "zone-tactile": {
+      "$type": "dimension",
+      "$value": "48px"
+    },
+    "bouton-moyen": {
+      "$type": "dimension",
+      "$value": "48px"
+    },
+    "pastille": {
+      "$type": "dimension",
+      "$value": "26px"
+    },
+    "pastille-petite": {
+      "$type": "dimension",
+      "$value": "20px"
+    }
+  },
+  "role": {
+    "fond": {
+      "page": {
+        "$type": "color",
+        "$value": "{couleur.washi}"
+      },
+      "carte": {
+        "$type": "color",
+        "$value": "{couleur.kinu}"
+      },
+      "info": {
+        "$type": "color",
+        "$value": "{couleur.sora-clair}"
+      },
+      "alerte": {
+        "$type": "color",
+        "$value": "{couleur.shu-clair}"
+      },
+      "succes": {
+        "$type": "color",
+        "$value": "{couleur.matcha}"
+      },
+      "voile": {
+        "$type": "color",
+        "$value": "{couleur.sumi}"
+      },
+      "sombre": {
+        "$type": "color",
+        "$value": "{couleur.sumi}"
+      }
+    },
+    "bordure": {
+      "carte": {
+        "$type": "color",
+        "$value": "{couleur.kinari}"
+      },
+      "filet": {
+        "$type": "color",
+        "$value": "{couleur.kinari}"
+      },
+      "separateur": {
+        "$type": "color",
+        "$value": "{couleur.kin}"
+      }
+    },
+    "texte": {
+      "principal": {
+        "$type": "color",
+        "$value": "{couleur.sumi}"
+      },
+      "secondaire": {
+        "$type": "color",
+        "$value": "{couleur.hai}"
+      },
+      "tertiaire": {
+        "$type": "color",
+        "$value": "{couleur.hai-clair}"
+      },
+      "inactif": {
+        "$type": "color",
+        "$value": "{couleur.usuzumi}"
+      },
+      "lien": {
+        "$type": "color",
+        "$value": "{couleur.fujin}"
+      },
+      "or": {
+        "$type": "color",
+        "$value": "{couleur.kin-fonce}"
+      },
+      "alerte": {
+        "$type": "color",
+        "$value": "{couleur.shu}"
+      },
+      "sur-sombre": {
+        "$type": "color",
+        "$value": "{couleur.kinu}"
+      }
+    },
+    "bouton": {
+      "principal-fond": {
+        "$type": "color",
+        "$value": "{couleur.sumi}"
+      },
+      "principal-texte": {
+        "$type": "color",
+        "$value": "{couleur.kinu}"
+      },
+      "inactif-fond": {
+        "$type": "color",
+        "$value": "{couleur.kinari}"
+      },
+      "inactif-texte": {
+        "$type": "color",
+        "$value": "{couleur.hai-clair}"
+      },
+      "alerte-fond": {
+        "$type": "color",
+        "$value": "{couleur.shu}"
+      },
+      "alerte-texte": {
+        "$type": "color",
+        "$value": "{couleur.kinu}"
+      }
+    },
+    "source": {
+      "mfp": {
+        "$type": "color",
+        "$value": "{couleur.mfp}"
+      },
+      "ekklo": {
+        "$type": "color",
+        "$value": "{couleur.ekklo}"
+      },
+      "ekklo-fond": {
+        "$type": "color",
+        "$value": "{couleur.ekklo-clair}"
+      },
+      "ekklo-texte": {
+        "$type": "color",
+        "$value": "{couleur.ekklo-fonce}"
+      }
+    },
+    "objectif": {
+      "piste": {
+        "$type": "color",
+        "$value": "{couleur.kinari}"
+      },
+      "en-cours": {
+        "$type": "color",
+        "$value": "{couleur.mfp}"
+      },
+      "atteint": {
+        "$type": "color",
+        "$value": "{couleur.fujin}"
+      },
+      "atteint-fond": {
+        "$type": "color",
+        "$value": "{couleur.matcha}"
+      },
+      "depasse": {
+        "$type": "color",
+        "$value": "{couleur.shu}"
+      },
+      "depasse-fond": {
+        "$type": "color",
+        "$value": "{couleur.shu-clair}"
+      },
+      "minimum-reste": {
+        "$type": "color",
+        "$value": "{couleur.mfp-moyen}"
+      },
+      "jour-choisi": {
+        "$type": "color",
+        "$value": "{couleur.sumi}"
+      },
+      "non-atteint": {
+        "$type": "color",
+        "$value": "{couleur.mfp}"
+      },
+      "non-atteint-fond": {
+        "$type": "color",
+        "$value": "{couleur.mfp-clair}"
+      }
+    }
+  },
+  "police": {
+    "famille": {
+      "hina": {
+        "$type": "fontFamily",
+        "$value": "Hina Mincho"
+      },
+      "inter": {
+        "$type": "fontFamily",
+        "$value": "Inter"
+      }
+    },
+    "graisse": {
+      "regular": {
+        "$type": "number",
+        "$value": 400
+      },
+      "medium": {
+        "$type": "number",
+        "$value": 500
+      },
+      "semibold": {
+        "$type": "number",
+        "$value": 600
+      }
+    }
+  }
+}

@@ -1,0 +1,1295 @@
+{
+  "$description": "Fūjin, design tokens (DTCG 2025.10). Primitives japonaises, rôles en alias.",
+  "couleur": {
+    "sumi": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.1059,
+          0.102,
+          0.0902
+        ],
+        "alpha": 1,
+        "hex": "#1B1A17"
+      },
+      "$description": "Encre. Texte principal, bouton principal.",
+      "$type": "color"
+    },
+    "hai": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.4353,
+          0.4078,
+          0.3412
+        ],
+        "alpha": 1,
+        "hex": "#6F6857"
+      },
+      "$description": "Texte secondaire.",
+      "$type": "color"
+    },
+    "hai-clair": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.5412,
+          0.5098,
+          0.4235
+        ],
+        "alpha": 1,
+        "hex": "#8A826C"
+      },
+      "$description": "Texte tertiaire, objectifs « / 160 ».",
+      "$type": "color"
+    },
+    "usuzumi": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.7412,
+          0.7059,
+          0.6118
+        ],
+        "alpha": 1,
+        "hex": "#BDB49C"
+      },
+      "$description": "Encre diluée. Dates à venir, poignée de feuille, texte inactif.",
+      "$type": "color"
+    },
+    "kinari": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8902,
+          0.8549,
+          0.7529
+        ],
+        "alpha": 1,
+        "hex": "#E3DAC0"
+      },
+      "$description": "Écru. Bordures de carte, filets, pistes de progression.",
+      "$type": "color"
+    },
+    "washi": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9686,
+          0.9451,
+          0.8784
+        ],
+        "alpha": 1,
+        "hex": "#F7F1E0"
+      },
+      "$description": "Papier. Fond de page.",
+      "$type": "color"
+    },
+    "kinu": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          0.9882,
+          0.9569
+        ],
+        "alpha": 1,
+        "hex": "#FFFCF4"
+      },
+      "$description": "Soie. Fond de carte.",
+      "$type": "color"
+    },
+    "fujin": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.1843,
+          0.3686,
+          0.2039
+        ],
+        "alpha": 1,
+        "hex": "#2F5E34"
+      },
+      "$description": "Vert Fūjin. Accent, liens, objectif atteint.",
+      "$type": "color"
+    },
+    "matcha": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8627,
+          0.9098,
+          0.8353
+        ],
+        "alpha": 1,
+        "hex": "#DCE8D5"
+      },
+      "$description": "Fond vert clair : atteint, « Dans Ekklo ».",
+      "$type": "color"
+    },
+    "sora": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.2471,
+          0.4157,
+          0.5098
+        ],
+        "alpha": 1,
+        "hex": "#3F6A82"
+      },
+      "$description": "Bleu ciel. Information.",
+      "$type": "color"
+    },
+    "sora-clair": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8667,
+          0.9059,
+          0.9255
+        ],
+        "alpha": 1,
+        "hex": "#DDE7EC"
+      },
+      "$description": "Fond des notes d’information.",
+      "$type": "color"
+    },
+    "kin": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8314,
+          0.6471,
+          0.2824
+        ],
+        "alpha": 1,
+        "hex": "#D4A548"
+      },
+      "$description": "Or. Filets, séparateurs, Rafale. Jamais en texte.",
+      "$type": "color"
+    },
+    "kin-clair": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9529,
+          0.902,
+          0.7686
+        ],
+        "alpha": 1,
+        "hex": "#F3E6C4"
+      },
+      "$description": "Fond or clair.",
+      "$type": "color"
+    },
+    "kin-fonce": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.549,
+          0.3922,
+          0.0941
+        ],
+        "alpha": 1,
+        "hex": "#8C6418"
+      },
+      "$description": "Or lisible : seul or autorisé en texte.",
+      "$type": "color"
+    },
+    "shu": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.698,
+          0.2275,
+          0.149
+        ],
+        "alpha": 1,
+        "hex": "#B23A26"
+      },
+      "$description": "Vermillon. Alerte, objectif dépassé.",
+      "$type": "color"
+    },
+    "shu-clair": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9569,
+          0.8667,
+          0.8392
+        ],
+        "alpha": 1,
+        "hex": "#F4DDD6"
+      },
+      "$description": "Fond vermillon clair.",
+      "$type": "color"
+    },
+    "mfp": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.1176,
+          0.4196,
+          0.8392
+        ],
+        "alpha": 1,
+        "hex": "#1E6BD6"
+      },
+      "$description": "Couleur source MyFitnessPal : points et progression.",
+      "$type": "color"
+    },
+    "mfp-moyen": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.7333,
+          0.8157,
+          0.9216
+        ],
+        "alpha": 1,
+        "hex": "#BBD0EB"
+      },
+      "$description": "Reste incertain d’un minimum (fibres ≥).",
+      "$type": "color"
+    },
+    "ekklo": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.4784,
+          0.2941,
+          0.7882
+        ],
+        "alpha": 1,
+        "hex": "#7A4BC9"
+      },
+      "$description": "Couleur source Ekklo : points seulement.",
+      "$type": "color"
+    },
+    "ekklo-clair": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9255,
+          0.898,
+          0.9686
+        ],
+        "alpha": 1,
+        "hex": "#ECE5F7"
+      },
+      "$type": "color"
+    },
+    "ekklo-fonce": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.3569,
+          0.2275,
+          0.6
+        ],
+        "alpha": 1,
+        "hex": "#5B3A99"
+      },
+      "$type": "color"
+    },
+    "mfp-clair": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8627,
+          0.902,
+          0.9686
+        ],
+        "alpha": 1,
+        "hex": "#DCE6F7"
+      },
+      "$type": "color"
+    }
+  },
+  "espace": {
+    "1": {
+      "$value": {
+        "value": 4,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "2": {
+      "$value": {
+        "value": 8,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "3": {
+      "$value": {
+        "value": 12,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "4": {
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      },
+      "$description": "Marge horizontale des écrans.",
+      "$type": "dimension"
+    },
+    "5": {
+      "$value": {
+        "value": 20,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "6": {
+      "$value": {
+        "value": 24,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "8": {
+      "$value": {
+        "value": 32,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    }
+  },
+  "rayon": {
+    "barre": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "carte": {
+      "$value": {
+        "value": 20,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "bouton": {
+      "$value": {
+        "value": 28,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "feuille": {
+      "$value": {
+        "value": 28,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "pastille": {
+      "$value": {
+        "value": 999,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "champ": {
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      },
+      "$description": "Champs de saisie. Les champs de recherche restent en pilule.",
+      "$type": "dimension"
+    }
+  },
+  "trait": {
+    "carte": {
+      "$value": {
+        "value": 1,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "icone": {
+      "$value": {
+        "value": 1.75,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "anneau-jour": {
+      "$value": {
+        "value": 1.5,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "anneau-macro": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    }
+  },
+  "taille": {
+    "marge-ecran": {
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "retrait-texte": {
+      "$value": {
+        "value": 24,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "bouton-hauteur": {
+      "$value": {
+        "value": 56,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "icone": {
+      "$value": {
+        "value": 24,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "barre-kcal": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "barre-macro": {
+      "$value": {
+        "value": 4,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "anneau-jour": {
+      "$value": {
+        "value": 38,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "anneau-macro": {
+      "$value": {
+        "value": 52,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "pastille-jour": {
+      "$value": {
+        "value": 26,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "zone-tactile": {
+      "$value": {
+        "value": 48,
+        "unit": "px"
+      },
+      "$description": "Zone tactile minimale de tout élément interactif (48 dp).",
+      "$type": "dimension"
+    },
+    "bouton-moyen": {
+      "$value": {
+        "value": 48,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "pastille": {
+      "$value": {
+        "value": 26,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "pastille-petite": {
+      "$value": {
+        "value": 20,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    }
+  },
+  "role": {
+    "fond": {
+      "page": {
+        "$value": "{couleur.washi}",
+        "$type": "color"
+      },
+      "carte": {
+        "$value": "{couleur.kinu}",
+        "$type": "color"
+      },
+      "info": {
+        "$value": "{couleur.sora-clair}",
+        "$type": "color"
+      },
+      "alerte": {
+        "$value": "{couleur.shu-clair}",
+        "$type": "color"
+      },
+      "succes": {
+        "$value": "{couleur.matcha}",
+        "$type": "color"
+      },
+      "voile": {
+        "$value": "{couleur.sumi}",
+        "$description": "Voile modal sous les feuilles, posé à 50 % d’opacité.",
+        "$type": "color"
+      },
+      "sombre": {
+        "$value": "{couleur.sumi}",
+        "$description": "Fond des écrans caméra et des pastilles sombres.",
+        "$type": "color"
+      }
+    },
+    "bordure": {
+      "carte": {
+        "$value": "{couleur.kinari}",
+        "$type": "color"
+      },
+      "filet": {
+        "$value": "{couleur.kinari}",
+        "$type": "color"
+      },
+      "separateur": {
+        "$value": "{couleur.kin}",
+        "$type": "color"
+      }
+    },
+    "texte": {
+      "principal": {
+        "$value": "{couleur.sumi}",
+        "$type": "color"
+      },
+      "secondaire": {
+        "$value": "{couleur.hai}",
+        "$type": "color"
+      },
+      "tertiaire": {
+        "$value": "{couleur.hai-clair}",
+        "$type": "color"
+      },
+      "inactif": {
+        "$value": "{couleur.usuzumi}",
+        "$type": "color"
+      },
+      "lien": {
+        "$value": "{couleur.fujin}",
+        "$type": "color"
+      },
+      "or": {
+        "$value": "{couleur.kin-fonce}",
+        "$type": "color"
+      },
+      "alerte": {
+        "$value": "{couleur.shu}",
+        "$type": "color"
+      },
+      "sur-sombre": {
+        "$value": "{couleur.kinu}",
+        "$type": "color"
+      }
+    },
+    "bouton": {
+      "principal-fond": {
+        "$value": "{couleur.sumi}",
+        "$type": "color"
+      },
+      "principal-texte": {
+        "$value": "{couleur.kinu}",
+        "$type": "color"
+      },
+      "inactif-fond": {
+        "$value": "{couleur.kinari}",
+        "$type": "color"
+      },
+      "inactif-texte": {
+        "$value": "{couleur.hai-clair}",
+        "$type": "color"
+      },
+      "alerte-fond": {
+        "$value": "{couleur.shu}",
+        "$type": "color"
+      },
+      "alerte-texte": {
+        "$value": "{couleur.kinu}",
+        "$type": "color"
+      }
+    },
+    "source": {
+      "mfp": {
+        "$value": "{couleur.mfp}",
+        "$type": "color"
+      },
+      "ekklo": {
+        "$value": "{couleur.ekklo}",
+        "$type": "color"
+      },
+      "ekklo-fond": {
+        "$value": "{couleur.ekklo-clair}",
+        "$type": "color"
+      },
+      "ekklo-texte": {
+        "$value": "{couleur.ekklo-fonce}",
+        "$type": "color"
+      }
+    },
+    "objectif": {
+      "piste": {
+        "$value": "{couleur.kinari}",
+        "$type": "color"
+      },
+      "en-cours": {
+        "$value": "{couleur.mfp}",
+        "$type": "color"
+      },
+      "atteint": {
+        "$value": "{couleur.fujin}",
+        "$type": "color"
+      },
+      "atteint-fond": {
+        "$value": "{couleur.matcha}",
+        "$type": "color"
+      },
+      "depasse": {
+        "$value": "{couleur.shu}",
+        "$type": "color"
+      },
+      "depasse-fond": {
+        "$value": "{couleur.shu-clair}",
+        "$type": "color"
+      },
+      "minimum-reste": {
+        "$value": "{couleur.mfp-moyen}",
+        "$type": "color"
+      },
+      "jour-choisi": {
+        "$value": "{couleur.sumi}",
+        "$type": "color"
+      },
+      "non-atteint": {
+        "$value": "{couleur.mfp}",
+        "$description": "Arc d’un jour passé resté sous 98 % de l’objectif. Sa longueur montre la part atteinte.",
+        "$type": "color"
+      },
+      "non-atteint-fond": {
+        "$value": "{couleur.mfp-clair}",
+        "$description": "Fond d’un jour passé resté sous 98 % de l’objectif.",
+        "$type": "color"
+      }
+    }
+  },
+  "police": {
+    "famille": {
+      "hina": {
+        "$value": [
+          "Hina Mincho",
+          "serif"
+        ],
+        "$description": "Nommer : app, dates, états, titres. Une seule graisse, 20 px et plus.",
+        "$type": "fontFamily"
+      },
+      "inter": {
+        "$value": [
+          "Inter",
+          "sans-serif"
+        ],
+        "$description": "Compter : kcal, macros, heures, boutons.",
+        "$type": "fontFamily"
+      }
+    },
+    "graisse": {
+      "regular": {
+        "$value": 400,
+        "$type": "fontWeight"
+      },
+      "medium": {
+        "$value": 500,
+        "$type": "fontWeight"
+      },
+      "semibold": {
+        "$value": 600,
+        "$description": "kcal et bouton principal seulement.",
+        "$type": "fontWeight"
+      }
+    }
+  },
+  "texte": {
+    "inter-15-semibold": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 15,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.semibold}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$description": "kcal, bouton principal.",
+      "$type": "typography"
+    },
+    "inter-12-medium": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 12,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.medium}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$type": "typography"
+    },
+    "inter-15-medium": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 15,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.medium}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$description": "Texte fort.",
+      "$type": "typography"
+    },
+    "inter-14-medium": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 14,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.medium}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$type": "typography"
+    },
+    "inter-11-medium": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 11,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.medium}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$type": "typography"
+    },
+    "inter-20-regular": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 20,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$type": "typography"
+    },
+    "inter-15-regular": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 15,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$type": "typography"
+    },
+    "inter-22-regular": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 22,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$type": "typography"
+    },
+    "inter-16-regular": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 16,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$type": "typography"
+    },
+    "inter-14-regular": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 14,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$type": "typography"
+    },
+    "inter-13-medium": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 13,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.medium}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$description": "Libellé, lien.",
+      "$type": "typography"
+    },
+    "inter-10-regular": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 10,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$description": "Objectif dans un anneau.",
+      "$type": "typography"
+    },
+    "inter-11-regular": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 11,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$description": "Jours du bandeau, notes.",
+      "$type": "typography"
+    },
+    "inter-16-medium": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 16,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.medium}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$type": "typography"
+    },
+    "inter-13-regular": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 13,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$description": "Texte courant.",
+      "$type": "typography"
+    },
+    "inter-14-semibold": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 14,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.semibold}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$type": "typography"
+    },
+    "inter-12-regular": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 12,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$description": "Texte secondaire.",
+      "$type": "typography"
+    },
+    "hina-44": {
+      "$value": {
+        "fontFamily": "{police.famille.hina}",
+        "fontSize": {
+          "value": 44,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.2000000476837158
+      },
+      "$description": "Grand titre, écran d’accueil.",
+      "$type": "typography"
+    },
+    "hina-22": {
+      "$value": {
+        "fontFamily": "{police.famille.hina}",
+        "fontSize": {
+          "value": 22,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.2000000476837158
+      },
+      "$description": "Nom de l’app.",
+      "$type": "typography"
+    },
+    "hina-30": {
+      "$value": {
+        "fontFamily": "{police.famille.hina}",
+        "fontSize": {
+          "value": 30,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.2000000476837158
+      },
+      "$description": "Titre d’écran, date, état.",
+      "$type": "typography"
+    },
+    "hina-28": {
+      "$value": {
+        "fontFamily": "{police.famille.hina}",
+        "fontSize": {
+          "value": 28,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.2000000476837158
+      },
+      "$type": "typography"
+    },
+    "hina-26": {
+      "$value": {
+        "fontFamily": "{police.famille.hina}",
+        "fontSize": {
+          "value": 26,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.231
+      },
+      "$type": "typography"
+    },
+    "inter-17-medium": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 17,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.medium}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$description": "Titre de feuille ou de carte.",
+      "$type": "typography"
+    },
+    "inter-22-semibold": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 22,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.semibold}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$type": "typography"
+    },
+    "inter-11-semibold": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 11,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.semibold}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$type": "typography"
+    },
+    "inter-13-semibold": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 13,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.semibold}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$type": "typography"
+    },
+    "inter-12-semibold": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 12,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.semibold}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$type": "typography"
+    },
+    "inter-13-regular-l19": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 13,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.462
+      },
+      "$description": "Texte courant.",
+      "$type": "typography"
+    },
+    "inter-12-regular-l16": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 12,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.333
+      },
+      "$description": "Texte secondaire.",
+      "$type": "typography"
+    },
+    "hina-24": {
+      "$value": {
+        "fontFamily": "{police.famille.hina}",
+        "fontSize": {
+          "value": 24,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.25
+      },
+      "$type": "typography"
+    },
+    "inter-18-medium": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 18,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.medium}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$type": "typography"
+    },
+    "inter-15-regular-l22": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 15,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.467
+      },
+      "$type": "typography"
+    },
+    "inter-28-semibold": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 28,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.semibold}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.21
+      },
+      "$type": "typography"
+    },
+    "inter-14-regular-l20": {
+      "$value": {
+        "fontFamily": "{police.famille.inter}",
+        "fontSize": {
+          "value": 14,
+          "unit": "px"
+        },
+        "fontWeight": "{police.graisse.regular}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        },
+        "lineHeight": 1.429
+      },
+      "$type": "typography"
+    }
+  }
+}

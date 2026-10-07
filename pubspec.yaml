@@ -42,3 +42,11 @@ dev_dependencies:
 flutter:
   generate: true
   uses-material-design: true
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/inter/Inter-Variable.ttf
+    - family: Hina Mincho
+      fonts:
+        - asset: assets/fonts/hinamincho/HinaMincho-Regular.ttf
+          weight: 400

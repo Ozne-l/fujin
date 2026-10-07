@@ -1,0 +1,10 @@
+{
+  "name": "Fūjin",
+  "collections": {
+    "Fūjin": {
+      "modes": {
+        "Clair": ["fujin.figma.tokens.json"]
+      }
+    }
+  }
+}
