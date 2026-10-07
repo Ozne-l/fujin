@@ -18,7 +18,7 @@ class WeekBand extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: FujinSize.margeEcran),
+    padding: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
     child: Row(
       children: [
         for (final day in week)
@@ -55,49 +55,49 @@ class _Day extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final label = switch (state) {
       _DayState.selected => FujinText.inter11Semibold.copyWith(
-        color: FujinRole.textePrincipal,
+        color: FujinColorRole.textPrimary,
       ),
       _DayState.past || _DayState.upcoming => FujinText.inter11Regular.copyWith(
-        color: FujinRole.texteSecondaire,
+        color: FujinColorRole.textSecondary,
       ),
     };
     final date = FujinText.inter13Medium.copyWith(
       color: switch (state) {
-        _DayState.selected => FujinRole.fondPage,
-        _DayState.past => FujinRole.textePrincipal,
-        _DayState.upcoming => FujinRole.texteInactif,
+        _DayState.selected => FujinColorRole.backgroundPage,
+        _DayState.past => FujinColorRole.textPrimary,
+        _DayState.upcoming => FujinColorRole.textDisabled,
       },
     );
     return InkResponse(
       onTap: onTap,
-      radius: FujinSize.anneauJour / 2,
+      radius: FujinSize.dayRing / 2,
       child: Column(
         spacing: FujinSpace.s2,
         children: [
           Text(l10n.weekdayShort(day), style: label),
           Container(
-            width: FujinSize.anneauJour,
-            height: FujinSize.anneauJour,
+            width: FujinSize.dayRing,
+            height: FujinSize.dayRing,
             alignment: Alignment.center,
             decoration: switch (state) {
               _DayState.upcoming => null,
               _DayState.selected || _DayState.past => BoxDecoration(
                 shape: BoxShape.circle,
-                color: FujinRole.fondCarte,
+                color: FujinColorRole.backgroundCard,
                 border: Border.all(
-                  color: FujinRole.objectifPiste,
-                  width: FujinStroke.anneauJour,
+                  color: FujinColorRole.goalTrack,
+                  width: FujinStroke.dayRing,
                 ),
               ),
             },
             child: Container(
-              width: FujinSize.pastilleJour,
-              height: FujinSize.pastilleJour,
+              width: FujinSize.dayPill,
+              height: FujinSize.dayPill,
               alignment: Alignment.center,
               decoration: switch (state) {
                 _DayState.selected => const BoxDecoration(
                   shape: BoxShape.circle,
-                  color: FujinRole.objectifJourChoisi,
+                  color: FujinColorRole.goalSelectedDay,
                 ),
                 _DayState.past || _DayState.upcoming => null,
               },

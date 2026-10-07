@@ -7,13 +7,13 @@ class GoldSeparator extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const Padding(
     padding: EdgeInsets.symmetric(
-      horizontal: FujinSize.margeEcran,
+      horizontal: FujinSize.screenMargin,
       vertical: FujinSpace.s4,
     ),
     child: Divider(
-      color: FujinRole.bordureSeparateur,
-      thickness: FujinStroke.anneauJour,
-      height: FujinStroke.anneauJour,
+      color: FujinColorRole.borderDivider,
+      thickness: FujinStroke.dayRing,
+      height: FujinStroke.dayRing,
     ),
   );
 }

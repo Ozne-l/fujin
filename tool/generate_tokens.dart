@@ -8,6 +8,8 @@ const _valueKey = r'$value';
 const _typeKey = r'$type';
 const _meta = r'$';
 const _colorClass = 'FujinColor';
+const _colorGroup = 'color';
+const _fontFamilyGroup = 'font/family';
 const _fontClass = 'FujinFont';
 
 typedef _Token = ({String type, Object? value});
@@ -53,27 +55,27 @@ Future<void> main() async {
 
   final groups = [
     _Group(
-      path: 'couleur',
+      path: _colorGroup,
       className: _colorClass,
       render: (name, token) =>
           'static const $name = Color(${_color(token.value)});',
     ),
     _Group(
       path: 'role',
-      className: 'FujinRole',
+      className: 'FujinColorRole',
       render: (name, token) => switch (token.value) {
         final String alias when _isAlias(alias) =>
           'static const Color $name = '
-              '$_colorClass.${member(resolvePath(alias), 'couleur')};',
+              '$_colorClass.${member(resolvePath(alias), _colorGroup)};',
         _ => 'static const $name = Color(${_color(token.value)});',
       },
     ),
-    _Group(path: 'espace', className: 'FujinSpace', render: dimension),
-    _Group(path: 'rayon', className: 'FujinRadius', render: dimension),
-    _Group(path: 'trait', className: 'FujinStroke', render: dimension),
-    _Group(path: 'taille', className: 'FujinSize', render: dimension),
+    _Group(path: 'space', className: 'FujinSpace', render: dimension),
+    _Group(path: 'radius', className: 'FujinRadius', render: dimension),
+    _Group(path: 'stroke', className: 'FujinStroke', render: dimension),
+    _Group(path: 'size', className: 'FujinSize', render: dimension),
     _Group(
-      path: 'police/famille',
+      path: _fontFamilyGroup,
       className: _fontClass,
       render: (name, token) => switch (token.value) {
         [final String family, ...] => "static const $name = '$family';",
@@ -82,7 +84,7 @@ Future<void> main() async {
       },
     ),
     _Group(
-      path: 'texte',
+      path: 'text',
       className: 'FujinText',
       render: (name, token) => switch (token.value) {
         final Map<String, Object?> style => _textStyle(
@@ -90,7 +92,7 @@ Future<void> main() async {
           style: style,
           family: member(
             resolvePath('${style['fontFamily']}'),
-            'police/famille',
+            _fontFamilyGroup,
           ),
           weight: resolveValue(style['fontWeight']),
         ),

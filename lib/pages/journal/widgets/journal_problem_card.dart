@@ -28,11 +28,11 @@ class JournalProblemCard extends StatelessWidget {
       _ => (null, l10n.readFailed, l10n.readFailedDetail),
     };
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: FujinSize.margeEcran),
+      margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
       padding: const EdgeInsets.all(FujinSpace.s5),
       decoration: BoxDecoration(
-        color: FujinRole.fondAlerte,
-        borderRadius: BorderRadius.circular(FujinRadius.carte),
+        color: FujinColorRole.backgroundAlert,
+        borderRadius: BorderRadius.circular(FujinRadius.card),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,13 +43,13 @@ class JournalProblemCard extends StatelessWidget {
           Text(
             title,
             style: FujinText.inter15Medium.copyWith(
-              color: FujinRole.textePrincipal,
+              color: FujinColorRole.textPrimary,
             ),
           ),
           Text(
             detail,
             style: FujinText.inter13RegularL19.copyWith(
-              color: FujinRole.texteSecondaire,
+              color: FujinColorRole.textSecondary,
             ),
           ),
         ],

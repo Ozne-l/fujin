@@ -4,68 +4,68 @@ import 'package:flutter/painting.dart';
 
 abstract final class FujinColor {
   static const ekklo = Color(0xFF7A4BC9);
-  static const ekkloClair = Color(0xFFECE5F7);
-  static const ekkloFonce = Color(0xFF5B3A99);
+  static const ekkloDark = Color(0xFF5B3A99);
+  static const ekkloLight = Color(0xFFECE5F7);
   static const fujin = Color(0xFF2F5E34);
   static const hai = Color(0xFF6F6857);
-  static const haiClair = Color(0xFF8A826C);
+  static const haiLight = Color(0xFF8A826C);
   static const kin = Color(0xFFD4A548);
-  static const kinClair = Color(0xFFF3E6C4);
-  static const kinFonce = Color(0xFF8C6418);
+  static const kinDark = Color(0xFF8C6418);
+  static const kinLight = Color(0xFFF3E6C4);
   static const kinari = Color(0xFFE3DAC0);
   static const kinu = Color(0xFFFFFCF4);
   static const matcha = Color(0xFFDCE8D5);
   static const mfp = Color(0xFF1E6BD6);
-  static const mfpClair = Color(0xFFDCE6F7);
-  static const mfpMoyen = Color(0xFFBBD0EB);
+  static const mfpLight = Color(0xFFDCE6F7);
+  static const mfpMedium = Color(0xFFBBD0EB);
   static const shu = Color(0xFFB23A26);
-  static const shuClair = Color(0xFFF4DDD6);
+  static const shuLight = Color(0xFFF4DDD6);
   static const sora = Color(0xFF3F6A82);
-  static const soraClair = Color(0xFFDDE7EC);
+  static const soraLight = Color(0xFFDDE7EC);
   static const sumi = Color(0xFF1B1A17);
   static const usuzumi = Color(0xFFBDB49C);
   static const washi = Color(0xFFF7F1E0);
 }
 
-abstract final class FujinRole {
-  static const Color bordureCarte = FujinColor.kinari;
-  static const Color bordureFilet = FujinColor.kinari;
-  static const Color bordureSeparateur = FujinColor.kin;
-  static const Color boutonAlerteFond = FujinColor.shu;
-  static const Color boutonAlerteTexte = FujinColor.kinu;
-  static const Color boutonInactifFond = FujinColor.kinari;
-  static const Color boutonInactifTexte = FujinColor.haiClair;
-  static const Color boutonPrincipalFond = FujinColor.sumi;
-  static const Color boutonPrincipalTexte = FujinColor.kinu;
-  static const Color fondAlerte = FujinColor.shuClair;
-  static const Color fondCarte = FujinColor.kinu;
-  static const Color fondInfo = FujinColor.soraClair;
-  static const Color fondPage = FujinColor.washi;
-  static const Color fondSombre = FujinColor.sumi;
-  static const Color fondSucces = FujinColor.matcha;
-  static const Color fondVoile = FujinColor.sumi;
-  static const Color objectifAtteint = FujinColor.fujin;
-  static const Color objectifAtteintFond = FujinColor.matcha;
-  static const Color objectifDepasse = FujinColor.shu;
-  static const Color objectifDepasseFond = FujinColor.shuClair;
-  static const Color objectifEnCours = FujinColor.mfp;
-  static const Color objectifJourChoisi = FujinColor.sumi;
-  static const Color objectifMinimumReste = FujinColor.mfpMoyen;
-  static const Color objectifNonAtteint = FujinColor.mfp;
-  static const Color objectifNonAtteintFond = FujinColor.mfpClair;
-  static const Color objectifPiste = FujinColor.kinari;
+abstract final class FujinColorRole {
+  static const Color backgroundAlert = FujinColor.shuLight;
+  static const Color backgroundCard = FujinColor.kinu;
+  static const Color backgroundDark = FujinColor.sumi;
+  static const Color backgroundInfo = FujinColor.soraLight;
+  static const Color backgroundPage = FujinColor.washi;
+  static const Color backgroundScrim = FujinColor.sumi;
+  static const Color backgroundSuccess = FujinColor.matcha;
+  static const Color borderCard = FujinColor.kinari;
+  static const Color borderDivider = FujinColor.kin;
+  static const Color borderHairline = FujinColor.kinari;
+  static const Color buttonAlertBackground = FujinColor.shu;
+  static const Color buttonAlertText = FujinColor.kinu;
+  static const Color buttonDisabledBackground = FujinColor.kinari;
+  static const Color buttonDisabledText = FujinColor.haiLight;
+  static const Color buttonPrimaryBackground = FujinColor.sumi;
+  static const Color buttonPrimaryText = FujinColor.kinu;
+  static const Color goalExceeded = FujinColor.shu;
+  static const Color goalExceededBackground = FujinColor.shuLight;
+  static const Color goalInProgress = FujinColor.mfp;
+  static const Color goalMinimumLeft = FujinColor.mfpMedium;
+  static const Color goalMissed = FujinColor.mfp;
+  static const Color goalMissedBackground = FujinColor.mfpLight;
+  static const Color goalReached = FujinColor.fujin;
+  static const Color goalReachedBackground = FujinColor.matcha;
+  static const Color goalSelectedDay = FujinColor.sumi;
+  static const Color goalTrack = FujinColor.kinari;
   static const Color sourceEkklo = FujinColor.ekklo;
-  static const Color sourceEkkloFond = FujinColor.ekkloClair;
-  static const Color sourceEkkloTexte = FujinColor.ekkloFonce;
+  static const Color sourceEkkloBackground = FujinColor.ekkloLight;
+  static const Color sourceEkkloText = FujinColor.ekkloDark;
   static const Color sourceMfp = FujinColor.mfp;
-  static const Color texteAlerte = FujinColor.shu;
-  static const Color texteInactif = FujinColor.usuzumi;
-  static const Color texteLien = FujinColor.fujin;
-  static const Color texteOr = FujinColor.kinFonce;
-  static const Color textePrincipal = FujinColor.sumi;
-  static const Color texteSecondaire = FujinColor.hai;
-  static const Color texteSurSombre = FujinColor.kinu;
-  static const Color texteTertiaire = FujinColor.haiClair;
+  static const Color textAlert = FujinColor.shu;
+  static const Color textDisabled = FujinColor.usuzumi;
+  static const Color textGold = FujinColor.kinDark;
+  static const Color textLink = FujinColor.fujin;
+  static const Color textOnDark = FujinColor.kinu;
+  static const Color textPrimary = FujinColor.sumi;
+  static const Color textSecondary = FujinColor.hai;
+  static const Color textTertiary = FujinColor.haiLight;
 }
 
 abstract final class FujinSpace {
@@ -79,35 +79,35 @@ abstract final class FujinSpace {
 }
 
 abstract final class FujinRadius {
-  static const double barre = 2;
-  static const double bouton = 28;
-  static const double carte = 20;
-  static const double champ = 16;
-  static const double feuille = 28;
-  static const double pastille = 999;
+  static const double bar = 2;
+  static const double button = 28;
+  static const double card = 20;
+  static const double field = 16;
+  static const double pill = 999;
+  static const double sheet = 28;
 }
 
 abstract final class FujinStroke {
-  static const double anneauJour = 1.5;
-  static const double anneauMacro = 2;
-  static const double carte = 1;
-  static const double icone = 1.75;
+  static const double card = 1;
+  static const double dayRing = 1.5;
+  static const double icon = 1.75;
+  static const double macroRing = 2;
 }
 
 abstract final class FujinSize {
-  static const double anneauJour = 38;
-  static const double anneauMacro = 52;
-  static const double barreKcal = 6;
-  static const double barreMacro = 4;
-  static const double boutonHauteur = 56;
-  static const double boutonMoyen = 48;
-  static const double icone = 24;
-  static const double margeEcran = 16;
-  static const double pastille = 26;
-  static const double pastilleJour = 26;
-  static const double pastillePetite = 20;
-  static const double retraitTexte = 24;
-  static const double zoneTactile = 48;
+  static const double buttonHeight = 56;
+  static const double buttonMedium = 48;
+  static const double dayPill = 26;
+  static const double dayRing = 38;
+  static const double icon = 24;
+  static const double kcalBar = 6;
+  static const double macroBar = 4;
+  static const double macroRing = 52;
+  static const double pill = 26;
+  static const double pillSmall = 20;
+  static const double screenMargin = 16;
+  static const double textInset = 24;
+  static const double touchTarget = 48;
 }
 
 abstract final class FujinFont {

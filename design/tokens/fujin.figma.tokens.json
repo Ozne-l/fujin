@@ -1,95 +1,114 @@
 {
-  "couleur": {
+  "color": {
     "sumi": {
       "$type": "color",
-      "$value": "#1B1A17"
+      "$value": "#1B1A17",
+      "$description": "Ink. Primary text, primary button."
     },
     "hai": {
       "$type": "color",
-      "$value": "#6F6857"
+      "$value": "#6F6857",
+      "$description": "Secondary text."
     },
-    "hai-clair": {
+    "hai-light": {
       "$type": "color",
-      "$value": "#8A826C"
+      "$value": "#8A826C",
+      "$description": "Tertiary text, goal denominators (\"/ 160\")."
     },
     "usuzumi": {
       "$type": "color",
-      "$value": "#BDB49C"
+      "$value": "#BDB49C",
+      "$description": "Diluted ink. Upcoming dates, sheet handle, disabled text."
     },
     "kinari": {
       "$type": "color",
-      "$value": "#E3DAC0"
+      "$value": "#E3DAC0",
+      "$description": "Unbleached cloth. Card borders, hairlines, progress tracks."
     },
     "washi": {
       "$type": "color",
-      "$value": "#F7F1E0"
+      "$value": "#F7F1E0",
+      "$description": "Paper. Page background."
     },
     "kinu": {
       "$type": "color",
-      "$value": "#FFFCF4"
+      "$value": "#FFFCF4",
+      "$description": "Silk. Card background."
     },
     "fujin": {
       "$type": "color",
-      "$value": "#2F5E34"
+      "$value": "#2F5E34",
+      "$description": "Fūjin green. Accent, links, goal reached."
     },
     "matcha": {
       "$type": "color",
-      "$value": "#DCE8D5"
+      "$value": "#DCE8D5",
+      "$description": "Light green background: goal reached, the \"in Ekklo\" status."
     },
     "sora": {
       "$type": "color",
-      "$value": "#3F6A82"
+      "$value": "#3F6A82",
+      "$description": "Sky blue. Information."
     },
-    "sora-clair": {
+    "sora-light": {
       "$type": "color",
-      "$value": "#DDE7EC"
+      "$value": "#DDE7EC",
+      "$description": "Background of information notes."
     },
     "kin": {
       "$type": "color",
-      "$value": "#D4A548"
+      "$value": "#D4A548",
+      "$description": "Gold. Hairlines, dividers. Never used for text."
     },
-    "kin-clair": {
+    "kin-light": {
       "$type": "color",
-      "$value": "#F3E6C4"
+      "$value": "#F3E6C4",
+      "$description": "Light gold background."
     },
-    "kin-fonce": {
+    "kin-dark": {
       "$type": "color",
-      "$value": "#8C6418"
+      "$value": "#8C6418",
+      "$description": "Readable gold: the only gold allowed for text."
     },
     "shu": {
       "$type": "color",
-      "$value": "#B23A26"
+      "$value": "#B23A26",
+      "$description": "Vermilion. Alert, goal exceeded."
     },
-    "shu-clair": {
+    "shu-light": {
       "$type": "color",
-      "$value": "#F4DDD6"
+      "$value": "#F4DDD6",
+      "$description": "Light vermilion background."
     },
     "mfp": {
       "$type": "color",
-      "$value": "#1E6BD6"
+      "$value": "#1E6BD6",
+      "$description": "MyFitnessPal source colour: dots and progress."
     },
-    "mfp-moyen": {
+    "mfp-medium": {
       "$type": "color",
-      "$value": "#BBD0EB"
+      "$value": "#BBD0EB",
+      "$description": "Uncertain remainder of a minimum goal (fibre ≥)."
     },
     "ekklo": {
       "$type": "color",
-      "$value": "#7A4BC9"
+      "$value": "#7A4BC9",
+      "$description": "Ekklo source colour: dots only."
     },
-    "ekklo-clair": {
+    "ekklo-light": {
       "$type": "color",
       "$value": "#ECE5F7"
     },
-    "ekklo-fonce": {
+    "ekklo-dark": {
       "$type": "color",
       "$value": "#5B3A99"
     },
-    "mfp-clair": {
+    "mfp-light": {
       "$type": "color",
       "$value": "#DCE6F7"
     }
   },
-  "espace": {
+  "space": {
     "1": {
       "$type": "dimension",
       "$value": "4px"
@@ -104,7 +123,8 @@
     },
     "4": {
       "$type": "dimension",
-      "$value": "16px"
+      "$value": "16px",
+      "$description": "Horizontal screen margin."
     },
     "5": {
       "$type": "dimension",
@@ -119,282 +139,290 @@
       "$value": "32px"
     }
   },
-  "rayon": {
-    "barre": {
+  "radius": {
+    "bar": {
       "$type": "dimension",
       "$value": "2px"
     },
-    "carte": {
+    "card": {
       "$type": "dimension",
       "$value": "20px"
     },
-    "bouton": {
+    "button": {
       "$type": "dimension",
       "$value": "28px"
     },
-    "feuille": {
+    "sheet": {
       "$type": "dimension",
       "$value": "28px"
     },
-    "pastille": {
+    "pill": {
       "$type": "dimension",
       "$value": "999px"
     },
-    "champ": {
+    "field": {
       "$type": "dimension",
-      "$value": "16px"
+      "$value": "16px",
+      "$description": "Input fields. Search fields stay pill-shaped."
     }
   },
-  "trait": {
-    "carte": {
+  "stroke": {
+    "card": {
       "$type": "dimension",
       "$value": "1px"
     },
-    "icone": {
+    "icon": {
       "$type": "dimension",
       "$value": "1.75px"
     },
-    "anneau-jour": {
+    "day-ring": {
       "$type": "dimension",
       "$value": "1.5px"
     },
-    "anneau-macro": {
+    "macro-ring": {
       "$type": "dimension",
       "$value": "2px"
     }
   },
-  "taille": {
-    "marge-ecran": {
+  "size": {
+    "screen-margin": {
       "$type": "dimension",
       "$value": "16px"
     },
-    "retrait-texte": {
+    "text-inset": {
       "$type": "dimension",
       "$value": "24px"
     },
-    "bouton-hauteur": {
+    "button-height": {
       "$type": "dimension",
       "$value": "56px"
     },
-    "icone": {
+    "icon": {
       "$type": "dimension",
       "$value": "24px"
     },
-    "barre-kcal": {
+    "kcal-bar": {
       "$type": "dimension",
       "$value": "6px"
     },
-    "barre-macro": {
+    "macro-bar": {
       "$type": "dimension",
       "$value": "4px"
     },
-    "anneau-jour": {
+    "day-ring": {
       "$type": "dimension",
       "$value": "38px"
     },
-    "anneau-macro": {
+    "macro-ring": {
       "$type": "dimension",
       "$value": "52px"
     },
-    "pastille-jour": {
+    "day-pill": {
       "$type": "dimension",
       "$value": "26px"
     },
-    "zone-tactile": {
+    "touch-target": {
+      "$type": "dimension",
+      "$value": "48px",
+      "$description": "Minimum touch target for every interactive element (48 dp)."
+    },
+    "button-medium": {
       "$type": "dimension",
       "$value": "48px"
     },
-    "bouton-moyen": {
-      "$type": "dimension",
-      "$value": "48px"
-    },
-    "pastille": {
+    "pill": {
       "$type": "dimension",
       "$value": "26px"
     },
-    "pastille-petite": {
+    "pill-small": {
       "$type": "dimension",
       "$value": "20px"
     }
   },
   "role": {
-    "fond": {
+    "background": {
       "page": {
         "$type": "color",
-        "$value": "{couleur.washi}"
+        "$value": "{color.washi}"
       },
-      "carte": {
+      "card": {
         "$type": "color",
-        "$value": "{couleur.kinu}"
+        "$value": "{color.kinu}"
       },
       "info": {
         "$type": "color",
-        "$value": "{couleur.sora-clair}"
+        "$value": "{color.sora-light}"
       },
-      "alerte": {
+      "alert": {
         "$type": "color",
-        "$value": "{couleur.shu-clair}"
+        "$value": "{color.shu-light}"
       },
-      "succes": {
+      "success": {
         "$type": "color",
-        "$value": "{couleur.matcha}"
+        "$value": "{color.matcha}"
       },
-      "voile": {
+      "scrim": {
         "$type": "color",
-        "$value": "{couleur.sumi}"
+        "$value": "{color.sumi}",
+        "$description": "Modal scrim under sheets, at 50% opacity."
       },
-      "sombre": {
+      "dark": {
         "$type": "color",
-        "$value": "{couleur.sumi}"
+        "$value": "{color.sumi}",
+        "$description": "Background of camera screens and dark pills."
       }
     },
-    "bordure": {
-      "carte": {
+    "border": {
+      "card": {
         "$type": "color",
-        "$value": "{couleur.kinari}"
+        "$value": "{color.kinari}"
       },
-      "filet": {
+      "hairline": {
         "$type": "color",
-        "$value": "{couleur.kinari}"
+        "$value": "{color.kinari}"
       },
-      "separateur": {
+      "divider": {
         "$type": "color",
-        "$value": "{couleur.kin}"
+        "$value": "{color.kin}"
       }
     },
-    "texte": {
-      "principal": {
+    "text": {
+      "primary": {
         "$type": "color",
-        "$value": "{couleur.sumi}"
+        "$value": "{color.sumi}"
       },
-      "secondaire": {
+      "secondary": {
         "$type": "color",
-        "$value": "{couleur.hai}"
+        "$value": "{color.hai}"
       },
-      "tertiaire": {
+      "tertiary": {
         "$type": "color",
-        "$value": "{couleur.hai-clair}"
+        "$value": "{color.hai-light}"
       },
-      "inactif": {
+      "disabled": {
         "$type": "color",
-        "$value": "{couleur.usuzumi}"
+        "$value": "{color.usuzumi}"
       },
-      "lien": {
+      "link": {
         "$type": "color",
-        "$value": "{couleur.fujin}"
+        "$value": "{color.fujin}"
       },
-      "or": {
+      "gold": {
         "$type": "color",
-        "$value": "{couleur.kin-fonce}"
+        "$value": "{color.kin-dark}"
       },
-      "alerte": {
+      "alert": {
         "$type": "color",
-        "$value": "{couleur.shu}"
+        "$value": "{color.shu}"
       },
-      "sur-sombre": {
+      "on-dark": {
         "$type": "color",
-        "$value": "{couleur.kinu}"
+        "$value": "{color.kinu}"
       }
     },
-    "bouton": {
-      "principal-fond": {
+    "button": {
+      "primary-background": {
         "$type": "color",
-        "$value": "{couleur.sumi}"
+        "$value": "{color.sumi}"
       },
-      "principal-texte": {
+      "primary-text": {
         "$type": "color",
-        "$value": "{couleur.kinu}"
+        "$value": "{color.kinu}"
       },
-      "inactif-fond": {
+      "disabled-background": {
         "$type": "color",
-        "$value": "{couleur.kinari}"
+        "$value": "{color.kinari}"
       },
-      "inactif-texte": {
+      "disabled-text": {
         "$type": "color",
-        "$value": "{couleur.hai-clair}"
+        "$value": "{color.hai-light}"
       },
-      "alerte-fond": {
+      "alert-background": {
         "$type": "color",
-        "$value": "{couleur.shu}"
+        "$value": "{color.shu}"
       },
-      "alerte-texte": {
+      "alert-text": {
         "$type": "color",
-        "$value": "{couleur.kinu}"
+        "$value": "{color.kinu}"
       }
     },
     "source": {
       "mfp": {
         "$type": "color",
-        "$value": "{couleur.mfp}"
+        "$value": "{color.mfp}"
       },
       "ekklo": {
         "$type": "color",
-        "$value": "{couleur.ekklo}"
+        "$value": "{color.ekklo}"
       },
-      "ekklo-fond": {
+      "ekklo-background": {
         "$type": "color",
-        "$value": "{couleur.ekklo-clair}"
+        "$value": "{color.ekklo-light}"
       },
-      "ekklo-texte": {
+      "ekklo-text": {
         "$type": "color",
-        "$value": "{couleur.ekklo-fonce}"
+        "$value": "{color.ekklo-dark}"
       }
     },
-    "objectif": {
-      "piste": {
+    "goal": {
+      "track": {
         "$type": "color",
-        "$value": "{couleur.kinari}"
+        "$value": "{color.kinari}"
       },
-      "en-cours": {
+      "in-progress": {
         "$type": "color",
-        "$value": "{couleur.mfp}"
+        "$value": "{color.mfp}"
       },
-      "atteint": {
+      "reached": {
         "$type": "color",
-        "$value": "{couleur.fujin}"
+        "$value": "{color.fujin}"
       },
-      "atteint-fond": {
+      "reached-background": {
         "$type": "color",
-        "$value": "{couleur.matcha}"
+        "$value": "{color.matcha}"
       },
-      "depasse": {
+      "exceeded": {
         "$type": "color",
-        "$value": "{couleur.shu}"
+        "$value": "{color.shu}"
       },
-      "depasse-fond": {
+      "exceeded-background": {
         "$type": "color",
-        "$value": "{couleur.shu-clair}"
+        "$value": "{color.shu-light}"
       },
-      "minimum-reste": {
+      "minimum-left": {
         "$type": "color",
-        "$value": "{couleur.mfp-moyen}"
+        "$value": "{color.mfp-medium}"
       },
-      "jour-choisi": {
+      "selected-day": {
         "$type": "color",
-        "$value": "{couleur.sumi}"
+        "$value": "{color.sumi}"
       },
-      "non-atteint": {
+      "missed": {
         "$type": "color",
-        "$value": "{couleur.mfp}"
+        "$value": "{color.mfp}",
+        "$description": "Arc of a past day that stayed under 98% of its goal. Its length shows the share reached."
       },
-      "non-atteint-fond": {
+      "missed-background": {
         "$type": "color",
-        "$value": "{couleur.mfp-clair}"
+        "$value": "{color.mfp-light}",
+        "$description": "Background of a past day that stayed under 98% of its goal."
       }
     }
   },
-  "police": {
-    "famille": {
+  "font": {
+    "family": {
       "hina": {
         "$type": "fontFamily",
-        "$value": "Hina Mincho"
+        "$value": "Hina Mincho",
+        "$description": "Naming: app, dates, states, titles. One weight, 20 px and up."
       },
       "inter": {
         "$type": "fontFamily",
-        "$value": "Inter"
+        "$value": "Inter",
+        "$description": "Counting: kcal, macros, times, buttons."
       }
     },
-    "graisse": {
+    "weight": {
       "regular": {
         "$type": "number",
         "$value": 400
@@ -405,7 +433,8 @@
       },
       "semibold": {
         "$type": "number",
-        "$value": 600
+        "$value": 600,
+        "$description": "kcal and the primary button only."
       }
     }
   }

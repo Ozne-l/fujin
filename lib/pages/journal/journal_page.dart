@@ -99,14 +99,14 @@ class JournalPage extends HookConsumerWidget {
     const SliverToBoxAdapter(child: GoldSeparator()),
     SliverPadding(
       padding: const EdgeInsetsDirectional.only(
-        start: FujinSize.retraitTexte,
+        start: FujinSize.textInset,
         bottom: FujinSpace.s3,
       ),
       sliver: SliverToBoxAdapter(
         child: Text(
           AppLocalizations.of(context).mealsOfTheDay,
           style: FujinText.inter12Medium.copyWith(
-            color: FujinRole.texteSecondaire,
+            color: FujinColorRole.textSecondary,
           ),
         ),
       ),
@@ -133,13 +133,13 @@ class JournalPage extends HookConsumerWidget {
             Text(
               l10n.nothingNewTitle,
               style: FujinText.inter14Semibold.copyWith(
-                color: FujinRole.texteSurSombre,
+                color: FujinColorRole.textOnDark,
               ),
             ),
             Text(
               l10n.nothingNewDetail,
               style: FujinText.inter13Regular.copyWith(
-                color: FujinRole.texteSurSombre,
+                color: FujinColorRole.textOnDark,
               ),
             ),
           ],

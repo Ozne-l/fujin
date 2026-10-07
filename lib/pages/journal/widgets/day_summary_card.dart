@@ -15,7 +15,7 @@ class DaySummaryCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final counts = day.counts;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: FujinSize.margeEcran),
+      margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
       padding: const EdgeInsets.fromLTRB(
         FujinSpace.s5,
         FujinSpace.s4,
@@ -23,10 +23,10 @@ class DaySummaryCard extends StatelessWidget {
         FujinSpace.s4,
       ),
       decoration: BoxDecoration(
-        color: FujinRole.fondCarte,
-        borderRadius: BorderRadius.circular(FujinRadius.carte),
+        color: FujinColorRole.backgroundCard,
+        borderRadius: BorderRadius.circular(FujinRadius.card),
         border: Border.all(
-          color: FujinRole.bordureCarte,
+          color: FujinColorRole.borderCard,
         ),
       ),
       child: Column(
@@ -34,7 +34,7 @@ class DaySummaryCard extends StatelessWidget {
         spacing: FujinSpace.s4,
         children: [
           _SourceLine(
-            dot: FujinRole.sourceMfp,
+            dot: FujinColorRole.sourceMfp,
             label: l10n.sourceMyFitnessPal,
             trailing: [
               TextSpan(
@@ -49,7 +49,7 @@ class DaySummaryCard extends StatelessWidget {
             spacing: FujinSpace.s3,
             children: [
               _SourceLine(
-                dot: FujinRole.sourceEkklo,
+                dot: FujinColorRole.sourceEkklo,
                 label: l10n.sourceEkklo,
                 trailing: [
                   TextSpan(
@@ -60,7 +60,7 @@ class DaySummaryCard extends StatelessWidget {
                     text:
                         ' ${l10n.ekkloProgress(counts.inEkklo, counts.total)}',
                     style: FujinText.inter13Regular.copyWith(
-                      color: FujinRole.texteSecondaire,
+                      color: FujinColorRole.textSecondary,
                     ),
                   ),
                 ],
@@ -78,9 +78,10 @@ class DaySummaryCard extends StatelessWidget {
             FilledButton(
               onPressed: null,
               style: FilledButton.styleFrom(
-                minimumSize: const Size.fromHeight(FujinSize.boutonMoyen),
-                disabledBackgroundColor: FujinRole.boutonInactifFond,
-                disabledForegroundColor: FujinRole.boutonInactifTexte,
+                minimumSize: const Size.fromHeight(FujinSize.buttonMedium),
+                disabledBackgroundColor:
+                    FujinColorRole.buttonDisabledBackground,
+                disabledForegroundColor: FujinColorRole.buttonDisabledText,
                 textStyle: FujinText.inter15Medium,
                 shape: const StadiumBorder(),
               ),
@@ -124,13 +125,13 @@ class _SourceLine extends StatelessWidget {
         child: Text(
           label,
           style: FujinText.inter13Medium.copyWith(
-            color: FujinRole.textePrincipal,
+            color: FujinColorRole.textPrimary,
           ),
         ),
       ),
       Text.rich(
         TextSpan(
-          style: const TextStyle(color: FujinRole.textePrincipal),
+          style: const TextStyle(color: FujinColorRole.textPrimary),
           children: trailing,
         ),
       ),

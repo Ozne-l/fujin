@@ -17,8 +17,8 @@ class JournalHeader extends StatelessWidget {
     };
     return Padding(
       padding: const EdgeInsetsDirectional.only(
-        start: FujinSize.retraitTexte,
-        end: FujinSize.retraitTexte,
+        start: FujinSize.textInset,
+        end: FujinSize.textInset,
         top: FujinSpace.s4,
       ),
       child: Column(
@@ -27,11 +27,11 @@ class JournalHeader extends StatelessWidget {
         children: [
           Text(
             l10n.appName,
-            style: FujinText.hina22.copyWith(color: FujinRole.texteLien),
+            style: FujinText.hina22.copyWith(color: FujinColorRole.textLink),
           ),
           Text(
             title,
-            style: FujinText.hina30.copyWith(color: FujinRole.textePrincipal),
+            style: FujinText.hina30.copyWith(color: FujinColorRole.textPrimary),
           ),
         ],
       ),

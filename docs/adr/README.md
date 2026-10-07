@@ -19,3 +19,4 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0013](0013-layers.md) | Layers | Accepted |
 | [0014](0014-lints-and-code-style.md) | Lints and code style | Accepted |
 | [0015](0015-french-and-english-copy.md) | French and English copy | Accepted |
+| [0016](0016-english-in-code-and-tokens.md) | English in code, design tokens and docs | Accepted |

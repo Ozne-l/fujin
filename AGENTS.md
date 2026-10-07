@@ -56,7 +56,7 @@ clients       package:ekklo_client, package:myfitnesspal_client
 | Table change | append a script to `schemaMigrations` | `lib/data/database/schema.dart` |
 | Repository (one per aggregate) | `lib/data/<aggregate>/` | `sent_link_repository.dart` |
 | User-facing text | `lib/l10n/app_fr.arb` (template, Figma wording) and `lib/l10n/app_en.arb` | `nothingNewTitle` |
-| Colour, size, text style | design tokens, then the generator | `FujinRole.textePrincipal` |
+| Colour, size, text style | design tokens, then the generator | `FujinColorRole.textPrimary` |
 | Animation | `motor` preset in `lib/app/theme/fujin_motion.dart` | `FujinMotion.progress` |
 | Test helpers | `test/support/` | `fixtures.dart`, `fake_backends.dart` |
 
@@ -92,6 +92,7 @@ Single-context: `GLOSSARY.md` and `docs/adr/` at the root. See `docs/agents/doma
 ## Working rules
 
 - Talk to the owner in French by default; follow him if he switches to English. Conclusion first, then evidence; mark anything unverified.
+- Code, file names, docs, issues and commits are in English; French appears only in `lib/l10n/app_fr.arb` and in verbatim quotes of the app copy ([ADR 0016](docs/adr/0016-english-in-code-and-tokens.md)). If you find French anywhere else, tell the owner and let him decide; do not rename on your own.
 - Never call the real MyFitnessPal or Ekklo accounts. When a question needs the real APIs, write a read-only probe and let the owner run it and paste the output.
 - Never print, log, commit or paste credentials, tokens or cookies.
 - Commit only when asked. Conventional Commits, no emoji, no AI attribution.

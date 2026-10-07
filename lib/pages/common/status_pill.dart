@@ -18,11 +18,11 @@ class StatusPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = FujinText.inter12Medium.copyWith(color: tone.foreground);
     return Container(
-      height: FujinSize.pastille,
+      height: FujinSize.pill,
       padding: const EdgeInsets.symmetric(horizontal: FujinSpace.s3),
       decoration: BoxDecoration(
         color: tone.background,
-        borderRadius: BorderRadius.circular(FujinRadius.pastille),
+        borderRadius: BorderRadius.circular(FujinRadius.pill),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

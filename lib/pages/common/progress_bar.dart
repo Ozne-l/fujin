@@ -7,7 +7,7 @@ class ProgressBar extends StatelessWidget {
   const ProgressBar({
     required this.fraction,
     required this.color,
-    this.track = FujinRole.objectifPiste,
+    this.track = FujinColorRole.goalTrack,
     super.key,
   });
 
@@ -17,9 +17,9 @@ class ProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(FujinSize.barreKcal / 2);
+    final radius = BorderRadius.circular(FujinSize.kcalBar / 2);
     return Container(
-      height: FujinSize.barreKcal,
+      height: FujinSize.kcalBar,
       decoration: BoxDecoration(color: track, borderRadius: radius),
       alignment: AlignmentDirectional.centerStart,
       child: SingleMotionBuilder(

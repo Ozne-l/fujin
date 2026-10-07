@@ -19,13 +19,13 @@ class MealCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final counts = meal.counts;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: FujinSize.margeEcran),
+      margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
       padding: const EdgeInsets.all(FujinSpace.s5),
       decoration: BoxDecoration(
-        color: FujinRole.fondCarte,
-        borderRadius: BorderRadius.circular(FujinRadius.carte),
+        color: FujinColorRole.backgroundCard,
+        borderRadius: BorderRadius.circular(FujinRadius.card),
         border: Border.all(
-          color: FujinRole.bordureCarte,
+          color: FujinColorRole.borderCard,
         ),
       ),
       child: Column(
@@ -36,13 +36,13 @@ class MealCard extends StatelessWidget {
             leading: Text(
               meal.name,
               style: FujinText.inter16Medium.copyWith(
-                color: FujinRole.textePrincipal,
+                color: FujinColorRole.textPrimary,
               ),
             ),
             trailing: Text(
               l10n.kilocalories(meal.kilocalories),
               style: FujinText.inter15Semibold.copyWith(
-                color: FujinRole.textePrincipal,
+                color: FujinColorRole.textPrimary,
               ),
             ),
           ),
@@ -51,7 +51,7 @@ class MealCard extends StatelessWidget {
               leading: Text(
                 l10n.mealProgress(counts.inEkklo, counts.total),
                 style: FujinText.inter13Regular.copyWith(
-                  color: FujinRole.texteSecondaire,
+                  color: FujinColorRole.textSecondary,
                 ),
               ),
               trailing: Wrap(
@@ -117,13 +117,13 @@ class _EntryRow extends StatelessWidget {
           leading: Text(
             entry.food.description,
             style: FujinText.inter15Medium.copyWith(
-              color: FujinRole.textePrincipal,
+              color: FujinColorRole.textPrimary,
             ),
           ),
           trailing: Text(
             l10n.kilocalories(entry.nutrients.energy?.kilocalories ?? 0),
             style: FujinText.inter15Semibold.copyWith(
-              color: FujinRole.textePrincipal,
+              color: FujinColorRole.textPrimary,
             ),
           ),
         ),
@@ -135,13 +135,13 @@ class _EntryRow extends StatelessWidget {
               Text(
                 _serving(l10n, entry),
                 style: FujinText.inter13Regular.copyWith(
-                  color: FujinRole.texteSecondaire,
+                  color: FujinColorRole.textSecondary,
                 ),
               ),
               Text(
                 detail,
                 style: FujinText.inter12Medium.copyWith(
-                  color: FujinRole.texteTertiaire,
+                  color: FujinColorRole.textTertiary,
                 ),
               ),
             ],

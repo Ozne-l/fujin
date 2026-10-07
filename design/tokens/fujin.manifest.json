@@ -3,7 +3,9 @@
   "collections": {
     "Fūjin": {
       "modes": {
-        "Clair": ["fujin.figma.tokens.json"]
+        "Light": [
+          "fujin.figma.tokens.json"
+        ]
       }
     }
   }

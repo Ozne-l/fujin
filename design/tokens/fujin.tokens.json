@@ -1,6 +1,6 @@
 {
-  "$description": "Fūjin, design tokens (DTCG 2025.10). Primitives japonaises, rôles en alias.",
-  "couleur": {
+  "$description": "Fūjin design tokens (DTCG 2025.10). Japanese primitives, roles as aliases.",
+  "color": {
     "sumi": {
       "$value": {
         "colorSpace": "srgb",
@@ -12,7 +12,7 @@
         "alpha": 1,
         "hex": "#1B1A17"
       },
-      "$description": "Encre. Texte principal, bouton principal.",
+      "$description": "Ink. Primary text, primary button.",
       "$type": "color"
     },
     "hai": {
@@ -26,10 +26,10 @@
         "alpha": 1,
         "hex": "#6F6857"
       },
-      "$description": "Texte secondaire.",
+      "$description": "Secondary text.",
       "$type": "color"
     },
-    "hai-clair": {
+    "hai-light": {
       "$value": {
         "colorSpace": "srgb",
         "components": [
@@ -40,7 +40,7 @@
         "alpha": 1,
         "hex": "#8A826C"
       },
-      "$description": "Texte tertiaire, objectifs « / 160 ».",
+      "$description": "Tertiary text, goal denominators (\"/ 160\").",
       "$type": "color"
     },
     "usuzumi": {
@@ -54,7 +54,7 @@
         "alpha": 1,
         "hex": "#BDB49C"
       },
-      "$description": "Encre diluée. Dates à venir, poignée de feuille, texte inactif.",
+      "$description": "Diluted ink. Upcoming dates, sheet handle, disabled text.",
       "$type": "color"
     },
     "kinari": {
@@ -68,7 +68,7 @@
         "alpha": 1,
         "hex": "#E3DAC0"
       },
-      "$description": "Écru. Bordures de carte, filets, pistes de progression.",
+      "$description": "Unbleached cloth. Card borders, hairlines, progress tracks.",
       "$type": "color"
     },
     "washi": {
@@ -82,7 +82,7 @@
         "alpha": 1,
         "hex": "#F7F1E0"
       },
-      "$description": "Papier. Fond de page.",
+      "$description": "Paper. Page background.",
       "$type": "color"
     },
     "kinu": {
@@ -96,7 +96,7 @@
         "alpha": 1,
         "hex": "#FFFCF4"
       },
-      "$description": "Soie. Fond de carte.",
+      "$description": "Silk. Card background.",
       "$type": "color"
     },
     "fujin": {
@@ -110,7 +110,7 @@
         "alpha": 1,
         "hex": "#2F5E34"
       },
-      "$description": "Vert Fūjin. Accent, liens, objectif atteint.",
+      "$description": "Fūjin green. Accent, links, goal reached.",
       "$type": "color"
     },
     "matcha": {
@@ -124,7 +124,7 @@
         "alpha": 1,
         "hex": "#DCE8D5"
       },
-      "$description": "Fond vert clair : atteint, « Dans Ekklo ».",
+      "$description": "Light green background: goal reached, the \"in Ekklo\" status.",
       "$type": "color"
     },
     "sora": {
@@ -138,10 +138,10 @@
         "alpha": 1,
         "hex": "#3F6A82"
       },
-      "$description": "Bleu ciel. Information.",
+      "$description": "Sky blue. Information.",
       "$type": "color"
     },
-    "sora-clair": {
+    "sora-light": {
       "$value": {
         "colorSpace": "srgb",
         "components": [
@@ -152,7 +152,7 @@
         "alpha": 1,
         "hex": "#DDE7EC"
       },
-      "$description": "Fond des notes d’information.",
+      "$description": "Background of information notes.",
       "$type": "color"
     },
     "kin": {
@@ -166,10 +166,10 @@
         "alpha": 1,
         "hex": "#D4A548"
       },
-      "$description": "Or. Filets, séparateurs, Rafale. Jamais en texte.",
+      "$description": "Gold. Hairlines, dividers. Never used for text.",
       "$type": "color"
     },
-    "kin-clair": {
+    "kin-light": {
       "$value": {
         "colorSpace": "srgb",
         "components": [
@@ -180,10 +180,10 @@
         "alpha": 1,
         "hex": "#F3E6C4"
       },
-      "$description": "Fond or clair.",
+      "$description": "Light gold background.",
       "$type": "color"
     },
-    "kin-fonce": {
+    "kin-dark": {
       "$value": {
         "colorSpace": "srgb",
         "components": [
@@ -194,7 +194,7 @@
         "alpha": 1,
         "hex": "#8C6418"
       },
-      "$description": "Or lisible : seul or autorisé en texte.",
+      "$description": "Readable gold: the only gold allowed for text.",
       "$type": "color"
     },
     "shu": {
@@ -208,10 +208,10 @@
         "alpha": 1,
         "hex": "#B23A26"
       },
-      "$description": "Vermillon. Alerte, objectif dépassé.",
+      "$description": "Vermilion. Alert, goal exceeded.",
       "$type": "color"
     },
-    "shu-clair": {
+    "shu-light": {
       "$value": {
         "colorSpace": "srgb",
         "components": [
@@ -222,7 +222,7 @@
         "alpha": 1,
         "hex": "#F4DDD6"
       },
-      "$description": "Fond vermillon clair.",
+      "$description": "Light vermilion background.",
       "$type": "color"
     },
     "mfp": {
@@ -236,10 +236,10 @@
         "alpha": 1,
         "hex": "#1E6BD6"
       },
-      "$description": "Couleur source MyFitnessPal : points et progression.",
+      "$description": "MyFitnessPal source colour: dots and progress.",
       "$type": "color"
     },
-    "mfp-moyen": {
+    "mfp-medium": {
       "$value": {
         "colorSpace": "srgb",
         "components": [
@@ -250,7 +250,7 @@
         "alpha": 1,
         "hex": "#BBD0EB"
       },
-      "$description": "Reste incertain d’un minimum (fibres ≥).",
+      "$description": "Uncertain remainder of a minimum goal (fibre ≥).",
       "$type": "color"
     },
     "ekklo": {
@@ -264,10 +264,10 @@
         "alpha": 1,
         "hex": "#7A4BC9"
       },
-      "$description": "Couleur source Ekklo : points seulement.",
+      "$description": "Ekklo source colour: dots only.",
       "$type": "color"
     },
-    "ekklo-clair": {
+    "ekklo-light": {
       "$value": {
         "colorSpace": "srgb",
         "components": [
@@ -280,7 +280,7 @@
       },
       "$type": "color"
     },
-    "ekklo-fonce": {
+    "ekklo-dark": {
       "$value": {
         "colorSpace": "srgb",
         "components": [
@@ -293,7 +293,7 @@
       },
       "$type": "color"
     },
-    "mfp-clair": {
+    "mfp-light": {
       "$value": {
         "colorSpace": "srgb",
         "components": [
@@ -307,7 +307,7 @@
       "$type": "color"
     }
   },
-  "espace": {
+  "space": {
     "1": {
       "$value": {
         "value": 4,
@@ -334,7 +334,7 @@
         "value": 16,
         "unit": "px"
       },
-      "$description": "Marge horizontale des écrans.",
+      "$description": "Horizontal screen margin.",
       "$type": "dimension"
     },
     "5": {
@@ -359,74 +359,74 @@
       "$type": "dimension"
     }
   },
-  "rayon": {
-    "barre": {
+  "radius": {
+    "bar": {
       "$value": {
         "value": 2,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "carte": {
+    "card": {
       "$value": {
         "value": 20,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "bouton": {
+    "button": {
       "$value": {
         "value": 28,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "feuille": {
+    "sheet": {
       "$value": {
         "value": 28,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "pastille": {
+    "pill": {
       "$value": {
         "value": 999,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "champ": {
+    "field": {
       "$value": {
         "value": 16,
         "unit": "px"
       },
-      "$description": "Champs de saisie. Les champs de recherche restent en pilule.",
+      "$description": "Input fields. Search fields stay pill-shaped.",
       "$type": "dimension"
     }
   },
-  "trait": {
-    "carte": {
+  "stroke": {
+    "card": {
       "$value": {
         "value": 1,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "icone": {
+    "icon": {
       "$value": {
         "value": 1.75,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "anneau-jour": {
+    "day-ring": {
       "$value": {
         "value": 1.5,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "anneau-macro": {
+    "macro-ring": {
       "$value": {
         "value": 2,
         "unit": "px"
@@ -434,93 +434,93 @@
       "$type": "dimension"
     }
   },
-  "taille": {
-    "marge-ecran": {
+  "size": {
+    "screen-margin": {
       "$value": {
         "value": 16,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "retrait-texte": {
+    "text-inset": {
       "$value": {
         "value": 24,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "bouton-hauteur": {
+    "button-height": {
       "$value": {
         "value": 56,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "icone": {
+    "icon": {
       "$value": {
         "value": 24,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "barre-kcal": {
+    "kcal-bar": {
       "$value": {
         "value": 6,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "barre-macro": {
+    "macro-bar": {
       "$value": {
         "value": 4,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "anneau-jour": {
+    "day-ring": {
       "$value": {
         "value": 38,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "anneau-macro": {
+    "macro-ring": {
       "$value": {
         "value": 52,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "pastille-jour": {
+    "day-pill": {
       "$value": {
         "value": 26,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "zone-tactile": {
+    "touch-target": {
       "$value": {
         "value": 48,
         "unit": "px"
       },
-      "$description": "Zone tactile minimale de tout élément interactif (48 dp).",
+      "$description": "Minimum touch target for every interactive element (48 dp).",
       "$type": "dimension"
     },
-    "bouton-moyen": {
+    "button-medium": {
       "$value": {
         "value": 48,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "pastille": {
+    "pill": {
       "$value": {
         "value": 26,
         "unit": "px"
       },
       "$type": "dimension"
     },
-    "pastille-petite": {
+    "pill-small": {
       "$value": {
         "value": 20,
         "unit": "px"
@@ -529,183 +529,183 @@
     }
   },
   "role": {
-    "fond": {
+    "background": {
       "page": {
-        "$value": "{couleur.washi}",
+        "$value": "{color.washi}",
         "$type": "color"
       },
-      "carte": {
-        "$value": "{couleur.kinu}",
+      "card": {
+        "$value": "{color.kinu}",
         "$type": "color"
       },
       "info": {
-        "$value": "{couleur.sora-clair}",
+        "$value": "{color.sora-light}",
         "$type": "color"
       },
-      "alerte": {
-        "$value": "{couleur.shu-clair}",
+      "alert": {
+        "$value": "{color.shu-light}",
         "$type": "color"
       },
-      "succes": {
-        "$value": "{couleur.matcha}",
+      "success": {
+        "$value": "{color.matcha}",
         "$type": "color"
       },
-      "voile": {
-        "$value": "{couleur.sumi}",
-        "$description": "Voile modal sous les feuilles, posé à 50 % d’opacité.",
+      "scrim": {
+        "$value": "{color.sumi}",
+        "$description": "Modal scrim under sheets, at 50% opacity.",
         "$type": "color"
       },
-      "sombre": {
-        "$value": "{couleur.sumi}",
-        "$description": "Fond des écrans caméra et des pastilles sombres.",
+      "dark": {
+        "$value": "{color.sumi}",
+        "$description": "Background of camera screens and dark pills.",
         "$type": "color"
       }
     },
-    "bordure": {
-      "carte": {
-        "$value": "{couleur.kinari}",
+    "border": {
+      "card": {
+        "$value": "{color.kinari}",
         "$type": "color"
       },
-      "filet": {
-        "$value": "{couleur.kinari}",
+      "hairline": {
+        "$value": "{color.kinari}",
         "$type": "color"
       },
-      "separateur": {
-        "$value": "{couleur.kin}",
+      "divider": {
+        "$value": "{color.kin}",
         "$type": "color"
       }
     },
-    "texte": {
-      "principal": {
-        "$value": "{couleur.sumi}",
+    "text": {
+      "primary": {
+        "$value": "{color.sumi}",
         "$type": "color"
       },
-      "secondaire": {
-        "$value": "{couleur.hai}",
+      "secondary": {
+        "$value": "{color.hai}",
         "$type": "color"
       },
-      "tertiaire": {
-        "$value": "{couleur.hai-clair}",
+      "tertiary": {
+        "$value": "{color.hai-light}",
         "$type": "color"
       },
-      "inactif": {
-        "$value": "{couleur.usuzumi}",
+      "disabled": {
+        "$value": "{color.usuzumi}",
         "$type": "color"
       },
-      "lien": {
-        "$value": "{couleur.fujin}",
+      "link": {
+        "$value": "{color.fujin}",
         "$type": "color"
       },
-      "or": {
-        "$value": "{couleur.kin-fonce}",
+      "gold": {
+        "$value": "{color.kin-dark}",
         "$type": "color"
       },
-      "alerte": {
-        "$value": "{couleur.shu}",
+      "alert": {
+        "$value": "{color.shu}",
         "$type": "color"
       },
-      "sur-sombre": {
-        "$value": "{couleur.kinu}",
+      "on-dark": {
+        "$value": "{color.kinu}",
         "$type": "color"
       }
     },
-    "bouton": {
-      "principal-fond": {
-        "$value": "{couleur.sumi}",
+    "button": {
+      "primary-background": {
+        "$value": "{color.sumi}",
         "$type": "color"
       },
-      "principal-texte": {
-        "$value": "{couleur.kinu}",
+      "primary-text": {
+        "$value": "{color.kinu}",
         "$type": "color"
       },
-      "inactif-fond": {
-        "$value": "{couleur.kinari}",
+      "disabled-background": {
+        "$value": "{color.kinari}",
         "$type": "color"
       },
-      "inactif-texte": {
-        "$value": "{couleur.hai-clair}",
+      "disabled-text": {
+        "$value": "{color.hai-light}",
         "$type": "color"
       },
-      "alerte-fond": {
-        "$value": "{couleur.shu}",
+      "alert-background": {
+        "$value": "{color.shu}",
         "$type": "color"
       },
-      "alerte-texte": {
-        "$value": "{couleur.kinu}",
+      "alert-text": {
+        "$value": "{color.kinu}",
         "$type": "color"
       }
     },
     "source": {
       "mfp": {
-        "$value": "{couleur.mfp}",
+        "$value": "{color.mfp}",
         "$type": "color"
       },
       "ekklo": {
-        "$value": "{couleur.ekklo}",
+        "$value": "{color.ekklo}",
         "$type": "color"
       },
-      "ekklo-fond": {
-        "$value": "{couleur.ekklo-clair}",
+      "ekklo-background": {
+        "$value": "{color.ekklo-light}",
         "$type": "color"
       },
-      "ekklo-texte": {
-        "$value": "{couleur.ekklo-fonce}",
+      "ekklo-text": {
+        "$value": "{color.ekklo-dark}",
         "$type": "color"
       }
     },
-    "objectif": {
-      "piste": {
-        "$value": "{couleur.kinari}",
+    "goal": {
+      "track": {
+        "$value": "{color.kinari}",
         "$type": "color"
       },
-      "en-cours": {
-        "$value": "{couleur.mfp}",
+      "in-progress": {
+        "$value": "{color.mfp}",
         "$type": "color"
       },
-      "atteint": {
-        "$value": "{couleur.fujin}",
+      "reached": {
+        "$value": "{color.fujin}",
         "$type": "color"
       },
-      "atteint-fond": {
-        "$value": "{couleur.matcha}",
+      "reached-background": {
+        "$value": "{color.matcha}",
         "$type": "color"
       },
-      "depasse": {
-        "$value": "{couleur.shu}",
+      "exceeded": {
+        "$value": "{color.shu}",
         "$type": "color"
       },
-      "depasse-fond": {
-        "$value": "{couleur.shu-clair}",
+      "exceeded-background": {
+        "$value": "{color.shu-light}",
         "$type": "color"
       },
-      "minimum-reste": {
-        "$value": "{couleur.mfp-moyen}",
+      "minimum-left": {
+        "$value": "{color.mfp-medium}",
         "$type": "color"
       },
-      "jour-choisi": {
-        "$value": "{couleur.sumi}",
+      "selected-day": {
+        "$value": "{color.sumi}",
         "$type": "color"
       },
-      "non-atteint": {
-        "$value": "{couleur.mfp}",
-        "$description": "Arc d’un jour passé resté sous 98 % de l’objectif. Sa longueur montre la part atteinte.",
+      "missed": {
+        "$value": "{color.mfp}",
+        "$description": "Arc of a past day that stayed under 98% of its goal. Its length shows the share reached.",
         "$type": "color"
       },
-      "non-atteint-fond": {
-        "$value": "{couleur.mfp-clair}",
-        "$description": "Fond d’un jour passé resté sous 98 % de l’objectif.",
+      "missed-background": {
+        "$value": "{color.mfp-light}",
+        "$description": "Background of a past day that stayed under 98% of its goal.",
         "$type": "color"
       }
     }
   },
-  "police": {
-    "famille": {
+  "font": {
+    "family": {
       "hina": {
         "$value": [
           "Hina Mincho",
           "serif"
         ],
-        "$description": "Nommer : app, dates, états, titres. Une seule graisse, 20 px et plus.",
+        "$description": "Naming: app, dates, states, titles. One weight, 20 px and up.",
         "$type": "fontFamily"
       },
       "inter": {
@@ -713,11 +713,11 @@
           "Inter",
           "sans-serif"
         ],
-        "$description": "Compter : kcal, macros, heures, boutons.",
+        "$description": "Counting: kcal, macros, times, buttons.",
         "$type": "fontFamily"
       }
     },
-    "graisse": {
+    "weight": {
       "regular": {
         "$value": 400,
         "$type": "fontWeight"
@@ -728,37 +728,37 @@
       },
       "semibold": {
         "$value": 600,
-        "$description": "kcal et bouton principal seulement.",
+        "$description": "kcal and the primary button only.",
         "$type": "fontWeight"
       }
     }
   },
-  "texte": {
+  "text": {
     "inter-15-semibold": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 15,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.semibold}",
+        "fontWeight": "{font.weight.semibold}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
         },
         "lineHeight": 1.21
       },
-      "$description": "kcal, bouton principal.",
+      "$description": "kcal, primary button.",
       "$type": "typography"
     },
     "inter-12-medium": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 12,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.medium}",
+        "fontWeight": "{font.weight.medium}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -769,29 +769,29 @@
     },
     "inter-15-medium": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 15,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.medium}",
+        "fontWeight": "{font.weight.medium}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
         },
         "lineHeight": 1.21
       },
-      "$description": "Texte fort.",
+      "$description": "Strong text.",
       "$type": "typography"
     },
     "inter-14-medium": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 14,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.medium}",
+        "fontWeight": "{font.weight.medium}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -802,12 +802,12 @@
     },
     "inter-11-medium": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 11,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.medium}",
+        "fontWeight": "{font.weight.medium}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -818,12 +818,12 @@
     },
     "inter-20-regular": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 20,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -834,12 +834,12 @@
     },
     "inter-15-regular": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 15,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -850,12 +850,12 @@
     },
     "inter-22-regular": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 22,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -866,12 +866,12 @@
     },
     "inter-16-regular": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 16,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -882,12 +882,12 @@
     },
     "inter-14-regular": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 14,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -898,63 +898,63 @@
     },
     "inter-13-medium": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 13,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.medium}",
+        "fontWeight": "{font.weight.medium}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
         },
         "lineHeight": 1.21
       },
-      "$description": "Libellé, lien.",
+      "$description": "Label, link.",
       "$type": "typography"
     },
     "inter-10-regular": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 10,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
         },
         "lineHeight": 1.21
       },
-      "$description": "Objectif dans un anneau.",
+      "$description": "Goal inside a ring.",
       "$type": "typography"
     },
     "inter-11-regular": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 11,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
         },
         "lineHeight": 1.21
       },
-      "$description": "Jours du bandeau, notes.",
+      "$description": "Week band days, notes.",
       "$type": "typography"
     },
     "inter-16-medium": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 16,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.medium}",
+        "fontWeight": "{font.weight.medium}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -965,29 +965,29 @@
     },
     "inter-13-regular": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 13,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
         },
         "lineHeight": 1.21
       },
-      "$description": "Texte courant.",
+      "$description": "Body text.",
       "$type": "typography"
     },
     "inter-14-semibold": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 14,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.semibold}",
+        "fontWeight": "{font.weight.semibold}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -998,80 +998,80 @@
     },
     "inter-12-regular": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 12,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
         },
         "lineHeight": 1.21
       },
-      "$description": "Texte secondaire.",
+      "$description": "Secondary text.",
       "$type": "typography"
     },
     "hina-44": {
       "$value": {
-        "fontFamily": "{police.famille.hina}",
+        "fontFamily": "{font.family.hina}",
         "fontSize": {
           "value": 44,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
         },
         "lineHeight": 1.2000000476837158
       },
-      "$description": "Grand titre, écran d’accueil.",
+      "$description": "Large title, welcome screen.",
       "$type": "typography"
     },
     "hina-22": {
       "$value": {
-        "fontFamily": "{police.famille.hina}",
+        "fontFamily": "{font.family.hina}",
         "fontSize": {
           "value": 22,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
         },
         "lineHeight": 1.2000000476837158
       },
-      "$description": "Nom de l’app.",
+      "$description": "App name.",
       "$type": "typography"
     },
     "hina-30": {
       "$value": {
-        "fontFamily": "{police.famille.hina}",
+        "fontFamily": "{font.family.hina}",
         "fontSize": {
           "value": 30,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
         },
         "lineHeight": 1.2000000476837158
       },
-      "$description": "Titre d’écran, date, état.",
+      "$description": "Screen title, date, state.",
       "$type": "typography"
     },
     "hina-28": {
       "$value": {
-        "fontFamily": "{police.famille.hina}",
+        "fontFamily": "{font.family.hina}",
         "fontSize": {
           "value": 28,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -1082,12 +1082,12 @@
     },
     "hina-26": {
       "$value": {
-        "fontFamily": "{police.famille.hina}",
+        "fontFamily": "{font.family.hina}",
         "fontSize": {
           "value": 26,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -1098,29 +1098,29 @@
     },
     "inter-17-medium": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 17,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.medium}",
+        "fontWeight": "{font.weight.medium}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
         },
         "lineHeight": 1.21
       },
-      "$description": "Titre de feuille ou de carte.",
+      "$description": "Sheet or card title.",
       "$type": "typography"
     },
     "inter-22-semibold": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 22,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.semibold}",
+        "fontWeight": "{font.weight.semibold}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -1131,12 +1131,12 @@
     },
     "inter-11-semibold": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 11,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.semibold}",
+        "fontWeight": "{font.weight.semibold}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -1147,12 +1147,12 @@
     },
     "inter-13-semibold": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 13,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.semibold}",
+        "fontWeight": "{font.weight.semibold}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -1163,12 +1163,12 @@
     },
     "inter-12-semibold": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 12,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.semibold}",
+        "fontWeight": "{font.weight.semibold}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -1179,46 +1179,46 @@
     },
     "inter-13-regular-l19": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 13,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
         },
         "lineHeight": 1.462
       },
-      "$description": "Texte courant.",
+      "$description": "Body text.",
       "$type": "typography"
     },
     "inter-12-regular-l16": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 12,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
         },
         "lineHeight": 1.333
       },
-      "$description": "Texte secondaire.",
+      "$description": "Secondary text.",
       "$type": "typography"
     },
     "hina-24": {
       "$value": {
-        "fontFamily": "{police.famille.hina}",
+        "fontFamily": "{font.family.hina}",
         "fontSize": {
           "value": 24,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -1229,12 +1229,12 @@
     },
     "inter-18-medium": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 18,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.medium}",
+        "fontWeight": "{font.weight.medium}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -1245,12 +1245,12 @@
     },
     "inter-15-regular-l22": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 15,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -1261,12 +1261,12 @@
     },
     "inter-28-semibold": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 28,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.semibold}",
+        "fontWeight": "{font.weight.semibold}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
@@ -1277,12 +1277,12 @@
     },
     "inter-14-regular-l20": {
       "$value": {
-        "fontFamily": "{police.famille.inter}",
+        "fontFamily": "{font.family.inter}",
         "fontSize": {
           "value": 14,
           "unit": "px"
         },
-        "fontWeight": "{police.graisse.regular}",
+        "fontWeight": "{font.weight.regular}",
         "letterSpacing": {
           "value": 0,
           "unit": "px"
