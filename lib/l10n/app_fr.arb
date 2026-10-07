@@ -1,0 +1,122 @@
+{
+  "@@locale": "fr",
+  "appName": "Fūjin",
+  "journalToday": "Aujourd'hui",
+  "journalDay": "{date}",
+  "@journalDay": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "MMMMEEEEd"}
+    }
+  },
+  "weekdayShort": "{date}",
+  "@weekdayShort": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "E"}
+    }
+  },
+  "dayOfMonth": "{date}",
+  "@dayOfMonth": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "d"}
+    }
+  },
+  "sourceMyFitnessPal": "MyFitnessPal",
+  "sourceEkklo": "Ekklo",
+  "kilocalories": "{value} kcal",
+  "@kilocalories": {
+    "placeholders": {
+      "value": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}}
+    }
+  },
+  "kilocaloriesValue": "{value}",
+  "@kilocaloriesValue": {
+    "placeholders": {
+      "value": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}}
+    }
+  },
+  "ekkloProgress": "· {sent} {total, plural, =1{aliment sur 1} other{aliments sur {total}}} ›",
+  "@ekkloProgress": {
+    "placeholders": {
+      "sent": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "sendFoods": "Envoyer {count} {count, plural, =1{aliment} other{aliments}} vers Ekklo",
+  "@sendFoods": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "updateFoods": "Mettre à jour {count} {count, plural, =1{aliment} other{aliments}} dans Ekklo",
+  "@updateFoods": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "sendAndUpdateFoods": "Envoyer {send} {send, plural, =1{aliment} other{aliments}} et {update} {update, plural, =1{mise à jour} other{mises à jour}}",
+  "@sendAndUpdateFoods": {
+    "placeholders": {
+      "send": {"type": "int"},
+      "update": {"type": "int"}
+    }
+  },
+  "mealsOfTheDay": "REPAS DU JOUR",
+  "mealProgress": "{inEkklo}/{total} dans Ekklo",
+  "@mealProgress": {
+    "placeholders": {
+      "inEkklo": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "statusInEkklo": "Dans Ekklo",
+  "statusToSend": "À envoyer",
+  "statusToUpdate": "À mettre à jour",
+  "mealToSend": "{count} à envoyer",
+  "@mealToSend": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "mealToUpdate": "{count} à mettre à jour",
+  "@mealToUpdate": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "servingLine": "{servings} × {value} {unit}",
+  "@servingLine": {
+    "placeholders": {
+      "servings": {"type": "double", "format": "decimalPattern"},
+      "value": {"type": "double", "format": "decimalPattern"},
+      "unit": {"type": "String"}
+    }
+  },
+  "brandedServingLine": "{brand} · {serving}",
+  "@brandedServingLine": {
+    "placeholders": {
+      "brand": {"type": "String"},
+      "serving": {"type": "String"}
+    }
+  },
+  "inEkkloAs": "Dans Ekklo : {serving}",
+  "@inEkkloAs": {
+    "placeholders": {"serving": {"type": "String"}}
+  },
+  "macros": "P {protein} · G {carbohydrates} · L {fat} · F {fiber}",
+  "@macros": {
+    "placeholders": {
+      "protein": {"type": "String"},
+      "carbohydrates": {"type": "String"},
+      "fat": {"type": "String"},
+      "fiber": {"type": "String"}
+    }
+  },
+  "macroValue": "{value}",
+  "@macroValue": {
+    "placeholders": {
+      "value": {"type": "double", "format": "decimalPattern"}
+    }
+  },
+  "macroUnknown": "n.c.",
+  "nothingNewTitle": "Rien de nouveau",
+  "nothingNewDetail": "Modifié dans MyFitnessPal ? Synchronise l'app",
+  "disconnected": "Déconnecté",
+  "mfpSessionExpired": "Ta session MyFitnessPal a expiré.",
+  "mfpSessionExpiredDetail": "Reconnecte-toi pour lire ton journal.\nRien n'est perdu.",
+  "ekkloSessionExpired": "Ta session Ekklo a expiré.",
+  "ekkloSessionExpiredDetail": "Reconnecte-toi pour ajouter et envoyer. Ton journal MyFitnessPal reste lisible.",
+  "readFailed": "Lecture impossible",
+  "readFailedDetail": "Tire vers le bas pour réessayer."
+}

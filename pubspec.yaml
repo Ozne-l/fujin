@@ -40,4 +40,5 @@ dev_dependencies:
   very_good_analysis: ^10.3.0
 
 flutter:
+  generate: true
   uses-material-design: true
