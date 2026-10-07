@@ -1,6 +1,6 @@
 ---
 name: fujin-dialect
-description: Fūjin's Dart and Flutter house style. Load before writing or reviewing any Dart in this repo, or when asked about "code style", "conventions", "dialect", "how we write Dart here", "lint", "formatting", comments, null handling, switch versus if, models and dart_mappable, theme tokens or French copy.
+description: Fūjin's Dart and Flutter house style. Load before writing or reviewing any Dart in this repo, or when asked about "code style", "conventions", "dialect", "how we write Dart here", "lint", "formatting", comments, null handling, switch versus if, models and dart_mappable, theme tokens or app copy and translations.
 ---
 
 # Fūjin dialect
@@ -101,8 +101,8 @@ Each rule: what to do, why, where the repo already does it.
     Why: the design file `design/tokens/fujin.tokens.json` is the single source; literals drift from the mockups.
     Examples: `StatusPill` uses `FujinSize.pastille`, `FujinSpace.s3`, `FujinRadius.pastille`, `FujinText.inter12Medium` (`lib/pages/common/status_pill.dart`); `PillTone` pairs `FujinRole` colours (`lib/pages/common/pill_tone.dart`). Theme-wide defaults live in `FujinTheme.light()` (`lib/app/theme/fujin_theme.dart`). Regenerate `lib/app/theme/fujin_tokens.g.dart` with `dart run tool/generate_tokens.dart`, never by hand. Motion follows the same idea: presets in `FujinMotion` (`lib/app/theme/fujin_motion.dart`), driven by `motor` (`SingleMotionBuilder` in `lib/pages/common/progress_bar.dart`), no hand-written `AnimationController`.
 
-11. **Show French copy only through `AppLocalizations`; add strings to `lib/l10n/app_fr.arb`, with ICU plurals for counts.**
-    Why: copy matches the Figma texts in one file, and plurals ("1 aliment", "2 aliments") are handled by gen-l10n, not string building.
+11. **Show copy only through `AppLocalizations`; add each string to `lib/l10n/app_fr.arb` (Figma wording, placeholder definitions) and its translation to `lib/l10n/app_en.arb`, with ICU plurals for counts.**
+    Why: copy lives in one place per language, and plurals ("1 aliment", "2 aliments") are handled by gen-l10n, not string building ([ADR 0015](../../../docs/adr/0015-french-and-english-copy.md)).
     Examples: `AppLocalizations.of(context).mealsOfTheDay` in `JournalPage` (`lib/pages/journal/journal_page.dart`); `sendFoods` in `lib/l10n/app_fr.arb` renders "Envoyer {count} … vers Ekklo". `l10n.yaml` sets `nullable-getter: false`, so `AppLocalizations.of` needs no null check. Output goes to `lib/l10n/generated/` (Flutter docs, docs.flutter.dev, "Internationalizing Flutter apps").
 
 12. **Leave `dart analyze --fatal-infos` and `dart format --set-exit-if-changed` clean.**

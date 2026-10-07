@@ -14,6 +14,8 @@ Future<FakeBackends> _pumpJournal(
   WidgetTester tester,
   FakeBackends backends,
 ) async {
+  tester.platformDispatcher.localesTestValue = const [Locale('fr')];
+  addTearDown(tester.platformDispatcher.clearLocalesTestValue);
   final database = FujinDatabase.inMemory();
   addTearDown(database.close);
   final memoryRepository = MemoryRepository(database);

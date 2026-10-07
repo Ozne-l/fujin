@@ -42,8 +42,8 @@ Riverpod 3 does both injection and state. Providers are written by hand; a notif
    Example: `JournalNotifier.build` watches `journalServiceProvider` and `mealNamesProvider.future`; `JournalNotifier._reread` reads them (`lib/pages/journal/journal_notifier.dart`). `JournalPage.build` takes the notifier with `ref.read(journalProvider(day).notifier)` (`lib/pages/journal/journal_page.dart`).
 
 5. **Treat a notifier as the presenter: it owns state and logic and never touches `BuildContext`, navigation or localized strings.**
-   Why: the presenter stays testable without widgets, and French copy is decided in one layer.
-   Example: `JournalNotifier` exposes a `JournalDay` and the methods `refresh()` and `reload()` (`lib/pages/journal/journal_notifier.dart`); the page turns `JournalDay.counts` into the French button label and pills (`lib/pages/journal/widgets/meal_card.dart`, `lib/pages/journal/widgets/day_summary_card.dart`).
+   Why: the presenter stays testable without widgets, and copy is chosen in one layer, in the device language.
+   Example: `JournalNotifier` exposes a `JournalDay` and the methods `refresh()` and `reload()` (`lib/pages/journal/journal_notifier.dart`); the page turns `JournalDay.counts` into the localized button label and pills (`lib/pages/journal/widgets/meal_card.dart`, `lib/pages/journal/widgets/day_summary_card.dart`).
 
 6. **Key per-day state with an auto-disposed family and pass the argument through the notifier constructor.**
    Why: each day gets its own cache, released when no widget shows it any more (riverpod.dev, "Family" and "Auto dispose").

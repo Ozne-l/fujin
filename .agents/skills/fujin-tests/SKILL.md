@@ -41,9 +41,9 @@ The vocabulary comes from Vladimir Khorikov, *Unit Testing Principles, Practices
    Why: the reader sees the one difference that matters; shared names (`oats`, `rice`, `breakfast`, `petitDejeuner`) keep the scenarios consistent with `memory`.
    Example: `entry('E-1', food: rice, unit: cup, servingValue: 1, servings: 2)` in `test/domain/comparison/compare_day_test.dart`; the helpers `entry`, `item`, `meal`, `link`, the `memory` constant, `day` and `now` in `test/support/fixtures.dart`.
 
-6. **Test a page by pumping `FujinApp` inside a `ProviderScope` that overrides the edge providers, then assert on the French text a user would read.**
-   Why: this runs routing, theme, gen-l10n, the notifier and the service together, with only the edges swapped (rule 3).
-   Example: `_pumpJournal` in `test/pages/journal_page_test.dart` overrides `databaseProvider`, `clockProvider`, `mfpClientProvider` and `ekkloClientProvider`, then checks `find.text('Envoyer 2 aliments vers Ekklo')`, `find.text('1/2 dans Ekklo')` and `find.text('Rien de nouveau')`. Pull to refresh is a `tester.fling` on the `CustomScrollView` (`_pullToRefresh`).
+6. **Test a page by pumping `FujinApp` inside a `ProviderScope` that overrides the edge providers, with the French locale pinned, then assert on the French text a user would read.**
+   Why: this runs routing, theme, gen-l10n, the notifier and the service together, with only the edges swapped (rule 3). The test binding reports an English device, so without the pin the English ARB would answer.
+   Example: `_pumpJournal` in `test/pages/journal_page_test.dart` sets `tester.platformDispatcher.localesTestValue` to French, overrides `databaseProvider`, `clockProvider`, `mfpClientProvider` and `ekkloClientProvider`, then checks `find.text('Envoyer 2 aliments vers Ekklo')`, `find.text('1/2 dans Ekklo')` and `find.text('Rien de nouveau')`. Pull to refresh is a `tester.fling` on the `CustomScrollView` (`_pullToRefresh`).
 
 7. **Name each test as a sentence that states the behaviour, reading on from its `group`.**
    Why: the test list doubles as the specification of the comparison rules.

@@ -55,7 +55,7 @@ clients       package:ekklo_client, package:myfitnesspal_client
 | Use case doing I/O | `lib/domain/<area>/*_service.dart` | `journal_service.dart` |
 | Table change | append a script to `schemaMigrations` | `lib/data/database/schema.dart` |
 | Repository (one per aggregate) | `lib/data/<aggregate>/` | `sent_link_repository.dart` |
-| User-facing text | `lib/l10n/app_fr.arb` (French only) | `nothingNewTitle` |
+| User-facing text | `lib/l10n/app_fr.arb` (template, Figma wording) and `lib/l10n/app_en.arb` | `nothingNewTitle` |
 | Colour, size, text style | design tokens, then the generator | `FujinRole.textePrincipal` |
 | Animation | `motor` preset in `lib/app/theme/fujin_motion.dart` | `FujinMotion.progress` |
 | Test helpers | `test/support/` | `fixtures.dart`, `fake_backends.dart` |
@@ -66,7 +66,7 @@ One public type per file, named after the file. Code style: no comments, no `!`,
 
 Project skills in `.agents/skills/` (also reachable as `.claude/skills/`):
 
-- `fujin-dialect`: Dart and Flutter house style, models, theme tokens, French copy. Load before writing any Dart.
+- `fujin-dialect`: Dart and Flutter house style, models, theme tokens, app copy. Load before writing any Dart.
 - `fujin-state`: Riverpod providers, notifiers as presenters, injection, one-shot UI effects, hooks.
 - `fujin-storage`: `fujin.db`, migrations, repositories, Auto Backup, where sessions live.
 - `fujin-tests`: what to test and what to fake, fixtures, `FakeBackends`, `package:checks`.

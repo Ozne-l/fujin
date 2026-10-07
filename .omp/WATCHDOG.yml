@@ -28,8 +28,9 @@ advisors:
          BuildContext, navigation or AppLocalizations inside them (ADR 0006). Dependencies
          point down: pages to domain to data to the client packages, never upward.
 
-      3. No duplication (ADR 0007, ADR 0008, ADR 0009, ADR 0014).
-         Each fact has one home: user-facing copy in lib/l10n/app_fr.arb; colours, sizes,
+      3. No duplication (ADR 0007, ADR 0008, ADR 0014, ADR 0015).
+         Each fact has one home: user-facing copy in lib/l10n/app_fr.arb and
+         lib/l10n/app_en.arb; colours, sizes,
          radii and text styles in lib/app/theme/fujin_tokens.g.dart, generated from
          design/tokens by tool/generate_tokens.dart (never hand-edited); table names in
          FujinTable; the expected Ekklo quantity in ExpectedItem.forEntry; JSON and row

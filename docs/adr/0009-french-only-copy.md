@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Accepted
+Superseded by [0015](0015-french-and-english-copy.md)
 
 ## Context
 

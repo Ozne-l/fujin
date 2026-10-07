@@ -12,9 +12,10 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0006](0006-riverpod-notifiers-as-presenters.md) | Riverpod notifiers as presenters | Accepted |
 | [0007](0007-dart-mappable-models.md) | dart_mappable models | Accepted |
 | [0008](0008-theme-from-design-tokens.md) | Theme from design tokens, motion with motor | Accepted |
-| [0009](0009-french-only-copy.md) | French-only copy | Accepted |
+| [0009](0009-french-only-copy.md) | French-only copy | Superseded by 0015 |
 | [0010](0010-go-router-navigation.md) | go_router navigation | Accepted |
 | [0011](0011-sessions-in-secure-storage.md) | Sessions in secure storage | Accepted |
 | [0012](0012-test-doubles-at-process-edges.md) | Test doubles at process edges only | Accepted |
 | [0013](0013-layers.md) | Layers | Accepted |
 | [0014](0014-lints-and-code-style.md) | Lints and code style | Accepted |
+| [0015](0015-french-and-english-copy.md) | French and English copy | Accepted |
