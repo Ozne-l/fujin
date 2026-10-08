@@ -1,6 +1,6 @@
 # Working in Fūjin
 
-Fūjin is a Flutter Android app that copies the owner's MyFitnessPal diary into Ekklo. Read `GLOSSARY.md` for the vocabulary and `docs/adr/` for the decisions before changing behaviour. This file is for coding agents.
+Fūjin is a Flutter app, tested on Android with an iOS project ready, that copies the owner's MyFitnessPal diary into Ekklo. Read `GLOSSARY.md` for the vocabulary and `docs/adr/` for the decisions before changing behaviour. This file is for coding agents.
 
 ## Commands
 
@@ -23,15 +23,15 @@ Generated files (`*.mapper.dart`, `lib/l10n/generated/`, `lib/app/theme/fujin_to
 Never point a run or a test at the owner's real MyFitnessPal or Ekklo accounts. The base URIs come from `--dart-define` (`lib/app/config.dart`) and default to the real services:
 
 ```sh
-flutter run \
+flutter run --flavor production \
   --dart-define=MFP_WEB_URI=http://10.0.2.2:<port> \
   --dart-define=MFP_API_URI=http://10.0.2.2:<port> \
   --dart-define=EKKLO_BASE_URI=http://10.0.2.2:<port>
 ```
 
-The owner can run on his real accounts in read-only mode with `--dart-define=FUJIN_ENV=dev` ([ADR 0017](docs/adr/0017-read-only-dev-environment.md)): reads and sign-in go through, every other write is stopped in `ReadOnlyHttpClient` (`lib/data/http/read_only_http_client.dart`). That mode is for the owner; agents still use fake servers, and may add `FUJIN_ENV=dev` to a fake-server run to check the guard.
+Every build and run names a flavor, `production` or `dev`; a build without one throws at startup. The dev flavor is a second app (`dev.oznel.fujin.dev`, "Fūjin DEV") that the owner runs on his real accounts in read-only mode ([ADR 0017](docs/adr/0017-read-only-dev-environment.md)): reads and sign-in go through, every other write is stopped in `ReadOnlyHttpClient` (`lib/data/http/read_only_http_client.dart`). That app is for the owner; agents still use fake servers, and may run `--flavor dev` against them to check the guard.
 
-`10.0.2.2` is the host machine as seen from the Android emulator. Debug builds allow cleartext HTTP (`android/app/src/debug/AndroidManifest.xml`); release builds do not. Tests never need a server: they use `FakeBackends` (`test/support/fake_backends.dart`).
+`10.0.2.2` is the host machine as seen from the Android emulator; on the iOS simulator use `127.0.0.1`. Debug builds allow cleartext HTTP (`android/app/src/debug/AndroidManifest.xml`); release builds do not. Tests never need a server: they use `FakeBackends` (`test/support/fake_backends.dart`).
 
 ## Layers
 

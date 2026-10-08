@@ -17,23 +17,23 @@ Planned: the splash screen, the send flow and updates (the send button is shown 
 
 ## Build and run
 
-Requires Flutter 3.44.9 (Dart 3.12.2) and an Android device or emulator.
+Requires Flutter 3.44.9 (Dart 3.12.2) and an Android device or emulator. The iOS project builds and runs on the iOS simulator (Xcode 26); it has not been installed on an iPhone yet.
 
 ```sh
 flutter pub get
 flutter test
-flutter run
+flutter run --flavor production
 ```
 
 Base URIs can be redirected to local fake servers with `--dart-define`; see [AGENTS.md](AGENTS.md#running-without-real-accounts).
 
-To try the app on your own accounts without changing them, run it read-only:
+To try the app on your own accounts without changing them, run the dev app:
 
 ```sh
-flutter run --dart-define=FUJIN_ENV=dev
+flutter run --flavor dev
 ```
 
-A red "DEV" ribbon in the top-right corner shows the mode is on. Reads and sign-in work; every other request to MyFitnessPal or Ekklo is stopped on the phone ([ADR 0017](docs/adr/0017-read-only-dev-environment.md)).
+It installs next to the real app as "Fūjin DEV", with its own data and sessions, and shows a red "DEV" ribbon in the top-right corner. Reads and sign-in work; every other request to MyFitnessPal or Ekklo is stopped on the phone ([ADR 0017](docs/adr/0017-read-only-dev-environment.md)).
 
 ## Documentation
 

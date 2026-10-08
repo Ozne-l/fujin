@@ -21,7 +21,7 @@ Riverpod 3 does both injection and state. Providers are written by hand; a notif
    ```
    ```dart
    final httpClientProvider = Provider<http.Client>((ref) {
-     final client = switch (Config.environment) {
+     final client = switch (ref.watch(appEnvironmentProvider)) {
        AppEnvironment.production => http.Client(),
        AppEnvironment.dev => ReadOnlyHttpClient(
          http.Client(),
@@ -34,9 +34,9 @@ Riverpod 3 does both injection and state. Providers are written by hand; a notif
    ```
    Every request to both services goes through this one client, so the read-only dev environment (ADR 0017) is enforced here and nowhere else. `mfpClientProvider` and `ekkloClientProvider` pass `clockProvider` and `httpClientProvider` into the client packages and close the client on dispose. `mfpUserAgentProvider` defaults to the client's own User-Agent; `lib/main.dart` overrides it with the web view's.
 
-3. **Override `databaseProvider` at bootstrap; its default throws.**
-   Why: opening `fujin.db` needs the app support directory, which is async; `main` resolves it once and hands the open database to the scope. A missing override fails loudly instead of opening a second database.
-   Example: `lib/main.dart` (`databaseProvider.overrideWithValue(database)` inside `ProviderScope`), default in `lib/app/providers.dart`:
+3. **Override `databaseProvider` and `appEnvironmentProvider` at bootstrap; their defaults throw.**
+   Why: opening `fujin.db` needs the app support directory, which is async; `main` resolves it once and hands the open database to the scope. A missing override fails loudly instead of opening a second database. `main` reads `Config.environment` from the build flavor before `runApp`, so a build without a flavor stops at startup instead of running unguarded (ADR 0017).
+   Example: `lib/main.dart` (`appEnvironmentProvider.overrideWithValue(environment)` and `databaseProvider.overrideWithValue(database)` inside `ProviderScope`), default in `lib/app/providers.dart`:
    ```dart
    final databaseProvider = Provider<FujinDatabase>(
      (ref) => throw StateError('databaseProvider is overridden in bootstrap'),
