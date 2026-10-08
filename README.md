@@ -27,6 +27,14 @@ flutter run
 
 Base URIs can be redirected to local fake servers with `--dart-define`; see [AGENTS.md](AGENTS.md#running-without-real-accounts).
 
+To try the app on your own accounts without changing them, run it read-only:
+
+```sh
+flutter run --dart-define=FUJIN_ENV=dev
+```
+
+Reads and sign-in work; every other request to MyFitnessPal or Ekklo is stopped on the phone ([ADR 0017](docs/adr/0017-read-only-dev-environment.md)).
+
 ## Documentation
 
 - [AGENTS.md](AGENTS.md): commands, layers, where code goes, working rules.

@@ -21,12 +21,18 @@ Riverpod 3 does both injection and state. Providers are written by hand; a notif
    ```
    ```dart
    final httpClientProvider = Provider<http.Client>((ref) {
-     final client = http.Client();
+     final client = switch (Config.environment) {
+       AppEnvironment.production => http.Client(),
+       AppEnvironment.dev => ReadOnlyHttpClient(
+         http.Client(),
+         ekkloBaseUri: Config.ekkloBaseUri,
+       ),
+     };
      ref.onDispose(client.close);
      return client;
    });
    ```
-   `mfpClientProvider` and `ekkloClientProvider` pass `clockProvider` and `httpClientProvider` into the client packages and close the client on dispose. `mfpUserAgentProvider` defaults to the client's own User-Agent; `lib/main.dart` overrides it with the web view's.
+   Every request to both services goes through this one client, so the read-only dev environment (ADR 0017) is enforced here and nowhere else. `mfpClientProvider` and `ekkloClientProvider` pass `clockProvider` and `httpClientProvider` into the client packages and close the client on dispose. `mfpUserAgentProvider` defaults to the client's own User-Agent; `lib/main.dart` overrides it with the web view's.
 
 3. **Override `databaseProvider` at bootstrap; its default throws.**
    Why: opening `fujin.db` needs the app support directory, which is async; `main` resolves it once and hands the open database to the scope. A missing override fails loudly instead of opening a second database.

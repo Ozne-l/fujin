@@ -1,7 +1,9 @@
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/config.dart';
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/http/read_only_http_client.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/sessions/secure_ekklo_token_store.dart';
@@ -19,7 +21,13 @@ final databaseProvider = Provider<FujinDatabase>(
 );
 
 final httpClientProvider = Provider<http.Client>((ref) {
-  final client = http.Client();
+  final client = switch (Config.environment) {
+    AppEnvironment.production => http.Client(),
+    AppEnvironment.dev => ReadOnlyHttpClient(
+      http.Client(),
+      ekkloBaseUri: Config.ekkloBaseUri,
+    ),
+  };
   ref.onDispose(client.close);
   return client;
 });

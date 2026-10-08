@@ -29,6 +29,8 @@ flutter run \
   --dart-define=EKKLO_BASE_URI=http://10.0.2.2:<port>
 ```
 
+The owner can run on his real accounts in read-only mode with `--dart-define=FUJIN_ENV=dev` ([ADR 0017](docs/adr/0017-read-only-dev-environment.md)): reads and sign-in go through, every other write is stopped in `ReadOnlyHttpClient` (`lib/data/http/read_only_http_client.dart`). That mode is for the owner; agents still use fake servers, and may add `FUJIN_ENV=dev` to a fake-server run to check the guard.
+
 `10.0.2.2` is the host machine as seen from the Android emulator. Debug builds allow cleartext HTTP (`android/app/src/debug/AndroidManifest.xml`); release builds do not. Tests never need a server: they use `FakeBackends` (`test/support/fake_backends.dart`).
 
 ## Layers
@@ -39,7 +41,7 @@ Dependencies point down only ([ADR 0013](docs/adr/0013-layers.md)):
 lib/app/      bootstrap, router, providers, theme
 lib/pages/    screens, notifiers (presenters), widgets
 lib/domain/   rules (pure) and services (I/O around them)
-lib/data/     SQLite, repositories, session stores
+lib/data/     SQLite, repositories, session stores, the dev write guard
 clients       package:ekklo_client, package:myfitnesspal_client
 ```
 
