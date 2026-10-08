@@ -1,5 +1,6 @@
 enum FujinRoute {
-  journal('/');
+  journal('/'),
+  ekkloSignIn('/ekklo-sign-in');
 
   const FujinRoute(this.path);
 

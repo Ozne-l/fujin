@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/journal/journal_day.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
@@ -14,6 +15,7 @@ import 'package:fujin/pages/journal/widgets/journal_header.dart';
 import 'package:fujin/pages/journal/widgets/journal_problem_card.dart';
 import 'package:fujin/pages/journal/widgets/meal_card.dart';
 import 'package:fujin/pages/journal/widgets/week_band.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class JournalPage extends HookConsumerWidget {
@@ -51,6 +53,11 @@ class JournalPage extends HookConsumerWidget {
       }
     }
 
+    Future<void> signIn(FujinRoute route) async {
+      final signedIn = await context.push<bool>(route.path);
+      if (signedIn case true) await notifier.reload();
+    }
+
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
@@ -78,7 +85,12 @@ class JournalPage extends HookConsumerWidget {
                   loaded,
                 ),
                 AsyncError(:final error) => [
-                  SliverToBoxAdapter(child: JournalProblemCard(error: error)),
+                  SliverToBoxAdapter(
+                    child: JournalProblemCard(
+                      error: error,
+                      onSignIn: (route) => unawaited(signIn(route)),
+                    ),
+                  ),
                 ],
                 _ => [
                   const SliverFillRemaining(

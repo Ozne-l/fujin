@@ -118,5 +118,23 @@
   "ekkloSessionExpired": "Ta session Ekklo a expiré.",
   "ekkloSessionExpiredDetail": "Reconnecte-toi pour ajouter et envoyer. Ton journal MyFitnessPal reste lisible.",
   "readFailed": "Lecture impossible",
-  "readFailedDetail": "Tire vers le bas pour réessayer."
+  "readFailedDetail": "Tire vers le bas pour réessayer.",
+  "ekkloReconnect": "Se reconnecter à Ekklo",
+  "ekkloSignInTitle": "Connexion Ekklo",
+  "ekkloSignInHeading": "Ton compte Ekklo",
+  "ekkloSignInSubtitle": "Celui que ton coach utilise pour te suivre.",
+  "emailLabel": "Email",
+  "passwordLabel": "Mot de passe",
+  "passwordShow": "Afficher",
+  "passwordHide": "Masquer",
+  "signIn": "Se connecter",
+  "ekkloSignInRefused": "Ekklo a refusé la connexion",
+  "ekkloSignInMessage": "« {message} »",
+  "@ekkloSignInMessage": {
+    "placeholders": {
+      "message": {"type": "String"}
+    }
+  },
+  "ekkloSignInUnreachable": "Ekklo ne répond pas",
+  "ekkloSignInUnreachableDetail": "Vérifie ta connexion, puis réessaie."
 }

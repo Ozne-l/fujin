@@ -1,42 +1,10 @@
 import 'package:checks/checks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fujin/app/fujin_app.dart';
-import 'package:fujin/app/providers.dart';
-import 'package:fujin/data/database/fujin_database.dart';
-import 'package:fujin/data/memory/memory_repository.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
-
-Future<FakeBackends> _pumpJournal(
-  WidgetTester tester,
-  FakeBackends backends,
-) async {
-  tester.platformDispatcher.localesTestValue = const [Locale('fr')];
-  addTearDown(tester.platformDispatcher.clearLocalesTestValue);
-  final database = FujinDatabase.inMemory();
-  addTearDown(database.close);
-  final memoryRepository = MemoryRepository(database);
-  memory.foods.forEach(memoryRepository.saveFood);
-  memory.meals.forEach(memoryRepository.saveMeal);
-  final mfp = await backends.mfp();
-  final ekklo = await backends.ekklo();
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: [
-        databaseProvider.overrideWithValue(database),
-        clockProvider.overrideWithValue(() => now),
-        mfpClientProvider.overrideWithValue(mfp),
-        ekkloClientProvider.overrideWithValue(ekklo),
-      ],
-      child: const FujinApp(),
-    ),
-  );
-  await tester.pumpAndSettle();
-  return backends;
-}
+import '../support/pump_fujin.dart';
 
 Future<void> _pullToRefresh(WidgetTester tester) async {
   await tester.fling(
@@ -51,7 +19,7 @@ void main() {
   testWidgets('counts what is left to send and to update on the button', (
     tester,
   ) async {
-    await _pumpJournal(
+    await pumpFujin(
       tester,
       FakeBackends(
         mealNames: [breakfast, lunch],
@@ -75,10 +43,11 @@ void main() {
   testWidgets('says nothing is new only after a pull that changed nothing', (
     tester,
   ) async {
-    final backends = await _pumpJournal(
-      tester,
-      FakeBackends(mealNames: [breakfast], entries: [entry('E-1')]),
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [entry('E-1')],
     );
+    await pumpFujin(tester, backends);
     check(find.text('Rien de nouveau').evaluate()).isEmpty();
 
     backends.entries = [entry('E-1'), entry('E-2')];

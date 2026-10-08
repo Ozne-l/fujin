@@ -34,5 +34,18 @@
   "ekkloSessionExpired": "Your Ekklo session has expired.",
   "ekkloSessionExpiredDetail": "Sign in again to add and send. Your MyFitnessPal diary stays readable.",
   "readFailed": "Couldn't load",
-  "readFailedDetail": "Pull down to try again."
+  "readFailedDetail": "Pull down to try again.",
+  "ekkloReconnect": "Sign in to Ekklo again",
+  "ekkloSignInTitle": "Ekklo sign-in",
+  "ekkloSignInHeading": "Your Ekklo account",
+  "ekkloSignInSubtitle": "The one your coach uses to follow you.",
+  "emailLabel": "Email",
+  "passwordLabel": "Password",
+  "passwordShow": "Show",
+  "passwordHide": "Hide",
+  "signIn": "Sign in",
+  "ekkloSignInRefused": "Ekklo refused the sign-in",
+  "ekkloSignInMessage": "“{message}”",
+  "ekkloSignInUnreachable": "Ekklo isn't responding",
+  "ekkloSignInUnreachableDetail": "Check your connection, then try again."
 }

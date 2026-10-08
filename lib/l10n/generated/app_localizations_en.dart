@@ -219,4 +219,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get readFailedDetail => 'Pull down to try again.';
+
+  @override
+  String get ekkloReconnect => 'Sign in to Ekklo again';
+
+  @override
+  String get ekkloSignInTitle => 'Ekklo sign-in';
+
+  @override
+  String get ekkloSignInHeading => 'Your Ekklo account';
+
+  @override
+  String get ekkloSignInSubtitle => 'The one your coach uses to follow you.';
+
+  @override
+  String get emailLabel => 'Email';
+
+  @override
+  String get passwordLabel => 'Password';
+
+  @override
+  String get passwordShow => 'Show';
+
+  @override
+  String get passwordHide => 'Hide';
+
+  @override
+  String get signIn => 'Sign in';
+
+  @override
+  String get ekkloSignInRefused => 'Ekklo refused the sign-in';
+
+  @override
+  String ekkloSignInMessage(String message) {
+    return '“$message”';
+  }
+
+  @override
+  String get ekkloSignInUnreachable => 'Ekklo isn\'t responding';
+
+  @override
+  String get ekkloSignInUnreachableDetail =>
+      'Check your connection, then try again.';
 }

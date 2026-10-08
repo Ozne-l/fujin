@@ -2,6 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 
 abstract final class FujinTheme {
+  static const fieldBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(FujinRadius.field)),
+    borderSide: BorderSide(color: FujinColorRole.borderCard),
+  );
+
+  static const fieldErrorBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(FujinRadius.field)),
+    borderSide: BorderSide(
+      color: FujinColor.shu,
+      width: FujinStroke.fieldError,
+    ),
+  );
+
   static ThemeData light() => ThemeData(
     useMaterial3: true,
     colorScheme: _colorScheme,
@@ -15,6 +28,22 @@ abstract final class FujinTheme {
       thickness: FujinStroke.card,
       space: FujinStroke.card,
     ),
+    inputDecorationTheme: InputDecorationThemeData(
+      filled: true,
+      fillColor: FujinColorRole.backgroundCard,
+      contentPadding: const EdgeInsets.all(FujinSpace.s4),
+      hintStyle: FujinText.inter16Regular.copyWith(
+        color: FujinColorRole.textTertiary,
+      ),
+      border: fieldBorder,
+      enabledBorder: fieldBorder,
+      focusedBorder: fieldBorder,
+      errorBorder: fieldErrorBorder,
+      focusedErrorBorder: fieldErrorBorder,
+    ),
+    textSelectionTheme: const TextSelectionThemeData(
+      cursorColor: FujinColorRole.textPrimary,
+    ),
     progressIndicatorTheme: const ProgressIndicatorThemeData(
       color: FujinColorRole.textLink,
       refreshBackgroundColor: FujinColorRole.backgroundCard,
@@ -26,6 +55,17 @@ abstract final class FujinTheme {
       ),
       actionTextColor: FujinColorRole.textOnDark,
       behavior: SnackBarBehavior.floating,
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        minimumSize: const Size.fromHeight(FujinSize.buttonHeight),
+        backgroundColor: FujinColorRole.buttonPrimaryBackground,
+        foregroundColor: FujinColorRole.buttonPrimaryText,
+        disabledBackgroundColor: FujinColorRole.buttonDisabledBackground,
+        disabledForegroundColor: FujinColorRole.buttonDisabledText,
+        textStyle: FujinText.inter15Semibold,
+        shape: const StadiumBorder(),
+      ),
     ),
   );
 

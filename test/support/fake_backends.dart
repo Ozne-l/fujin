@@ -28,11 +28,30 @@ final class FakeBackends {
   List<MfpFoodEntry> entries;
   List<EkkloDailyMeal> ekkloMeals;
   List<String> mealNames;
+  bool ekkloReachable = true;
   final requests = <http.Request>[];
+
+  static const ekkloEmail = 'owner@example.com';
+  static const ekkloPassword = 'right-password';
+  static const ekkloRefusal = 'Invalid email or password';
+  static const staleEkkloTokens = EkkloTokens(
+    accessToken: 'stale-access',
+    refreshToken: 'stale-refresh',
+  );
 
   late final httpClient = MockClient((request) async {
     requests.add(request);
     return switch ((request.method, request.url.host, request.url.path)) {
+      (_, final host, _) when host == ekkloUri.host && !ekkloReachable =>
+        throw http.ClientException('Connection refused', request.url),
+      ('POST', final host, '/api/v1/auth/login') when host == ekkloUri.host =>
+        _ekkloLogin(request),
+      ('POST', final host, '/api/v1/auth/login/refresh_token')
+          when host == ekkloUri.host =>
+        http.Response('', 401),
+      (_, final host, _)
+          when host == ekkloUri.host && !_carriesEkkloAccess(request) =>
+        http.Response('', 401),
       ('GET', final host, '/user/auth_token') when host == mfpWebUri.host =>
         _json({
           'access_token': 'mfp-access',
@@ -58,24 +77,47 @@ final class FakeBackends {
   });
 
   Future<MyFitnessPalClient> mfp() async {
-    final client = MyFitnessPalClient(
-      httpClient: httpClient,
-      webUri: mfpWebUri,
-      apiUri: mfpApiUri,
-    );
+    final client = mfpWith(InMemoryMfpSessionStore());
     await client.signIn(_sessionCookies);
     return client;
   }
 
+  MyFitnessPalClient mfpWith(MfpSessionStore store) => MyFitnessPalClient(
+    httpClient: httpClient,
+    webUri: mfpWebUri,
+    apiUri: mfpApiUri,
+    sessionStore: store,
+  );
+
   Future<EkkloClient> ekklo() async {
     final store = InMemoryEkkloTokenStore();
     await store.write(_ekkloTokens);
-    return EkkloClient(
-      httpClient: httpClient,
-      baseUri: ekkloUri,
-      tokenStore: store,
-    );
+    return ekkloWith(store);
   }
+
+  EkkloClient ekkloWith(EkkloTokenStore store) => EkkloClient(
+    httpClient: httpClient,
+    baseUri: ekkloUri,
+    tokenStore: store,
+  );
+
+  static http.Response _ekkloLogin(http.Request request) =>
+      switch (jsonDecode(request.body)) {
+        {'email': ekkloEmail, 'password': ekkloPassword} => _json({
+          'access_token': _ekkloTokens.accessToken,
+          'refresh_token': _ekkloTokens.refreshToken,
+          'role': 'customer',
+          'first_login': false,
+        }),
+        _ => http.Response(
+          jsonEncode({'error': ekkloRefusal}),
+          401,
+          headers: _jsonType,
+        ),
+      };
+
+  static bool _carriesEkkloAccess(http.Request request) =>
+      request.headers['authorization'] == 'Bearer ${_ekkloTokens.accessToken}';
 
   static http.Response _json(Object body) =>
       http.Response(jsonEncode(body), 200, headers: _jsonType);

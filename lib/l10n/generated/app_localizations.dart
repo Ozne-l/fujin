@@ -307,6 +307,84 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Tire vers le bas pour réessayer.'**
   String get readFailedDetail;
+
+  /// No description provided for @ekkloReconnect.
+  ///
+  /// In fr, this message translates to:
+  /// **'Se reconnecter à Ekklo'**
+  String get ekkloReconnect;
+
+  /// No description provided for @ekkloSignInTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connexion Ekklo'**
+  String get ekkloSignInTitle;
+
+  /// No description provided for @ekkloSignInHeading.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ton compte Ekklo'**
+  String get ekkloSignInHeading;
+
+  /// No description provided for @ekkloSignInSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Celui que ton coach utilise pour te suivre.'**
+  String get ekkloSignInSubtitle;
+
+  /// No description provided for @emailLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Email'**
+  String get emailLabel;
+
+  /// No description provided for @passwordLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mot de passe'**
+  String get passwordLabel;
+
+  /// No description provided for @passwordShow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Afficher'**
+  String get passwordShow;
+
+  /// No description provided for @passwordHide.
+  ///
+  /// In fr, this message translates to:
+  /// **'Masquer'**
+  String get passwordHide;
+
+  /// No description provided for @signIn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Se connecter'**
+  String get signIn;
+
+  /// No description provided for @ekkloSignInRefused.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ekklo a refusé la connexion'**
+  String get ekkloSignInRefused;
+
+  /// No description provided for @ekkloSignInMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'« {message} »'**
+  String ekkloSignInMessage(String message);
+
+  /// No description provided for @ekkloSignInUnreachable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ekklo ne répond pas'**
+  String get ekkloSignInUnreachable;
+
+  /// No description provided for @ekkloSignInUnreachableDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifie ta connexion, puis réessaie.'**
+  String get ekkloSignInUnreachableDetail;
 }
 
 class _AppLocalizationsDelegate

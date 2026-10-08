@@ -220,4 +220,47 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get readFailedDetail => 'Tire vers le bas pour réessayer.';
+
+  @override
+  String get ekkloReconnect => 'Se reconnecter à Ekklo';
+
+  @override
+  String get ekkloSignInTitle => 'Connexion Ekklo';
+
+  @override
+  String get ekkloSignInHeading => 'Ton compte Ekklo';
+
+  @override
+  String get ekkloSignInSubtitle =>
+      'Celui que ton coach utilise pour te suivre.';
+
+  @override
+  String get emailLabel => 'Email';
+
+  @override
+  String get passwordLabel => 'Mot de passe';
+
+  @override
+  String get passwordShow => 'Afficher';
+
+  @override
+  String get passwordHide => 'Masquer';
+
+  @override
+  String get signIn => 'Se connecter';
+
+  @override
+  String get ekkloSignInRefused => 'Ekklo a refusé la connexion';
+
+  @override
+  String ekkloSignInMessage(String message) {
+    return '« $message »';
+  }
+
+  @override
+  String get ekkloSignInUnreachable => 'Ekklo ne répond pas';
+
+  @override
+  String get ekkloSignInUnreachableDetail =>
+      'Vérifie ta connexion, puis réessaie.';
 }
