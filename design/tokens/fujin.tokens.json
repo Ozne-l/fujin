@@ -432,6 +432,14 @@
         "unit": "px"
       },
       "$type": "dimension"
+    },
+    "field-error": {
+      "$value": {
+        "value": 1.5,
+        "unit": "px"
+      },
+      "$description": "Input field in error.",
+      "$type": "dimension"
     }
   },
   "size": {

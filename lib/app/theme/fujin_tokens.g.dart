@@ -90,6 +90,7 @@ abstract final class FujinRadius {
 abstract final class FujinStroke {
   static const double card = 1;
   static const double dayRing = 1.5;
+  static const double fieldError = 1.5;
   static const double icon = 1.75;
   static const double macroRing = 2;
 }

@@ -182,6 +182,11 @@
     "macro-ring": {
       "$type": "dimension",
       "$value": "2px"
+    },
+    "field-error": {
+      "$type": "dimension",
+      "$value": "1.5px",
+      "$description": "Input field in error."
     }
   },
   "size": {
