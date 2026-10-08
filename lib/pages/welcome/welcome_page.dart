@@ -8,6 +8,7 @@ import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/gold_volute.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/seigaiha_band.dart';
+import 'package:fujin/pages/common/source_dot.dart';
 import 'package:fujin/pages/common/status_pill.dart';
 import 'package:fujin/pages/welcome/connected_accounts_provider.dart';
 import 'package:go_router/go_router.dart';
@@ -174,11 +175,7 @@ class _AccountCard extends StatelessWidget {
         child: Row(
           spacing: FujinSpace.s3,
           children: [
-            Container(
-              width: FujinSpace.s2,
-              height: FujinSpace.s2,
-              decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
-            ),
+            SourceDot(color: dot),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

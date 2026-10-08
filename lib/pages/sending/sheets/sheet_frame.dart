@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 
@@ -21,7 +22,6 @@ class SheetFrame extends HookWidget {
     super.key,
   });
 
-  static const _searchIconSize = 20.0;
   static const double _inset = FujinSize.textInset - FujinSize.screenMargin;
 
   final String title;
@@ -165,11 +165,6 @@ class SheetFrame extends HookWidget {
 class _SearchField extends StatelessWidget {
   const _SearchField({required this.controller, required this.onSearch});
 
-  static const _border = OutlineInputBorder(
-    borderRadius: BorderRadius.all(Radius.circular(FujinRadius.pill)),
-    borderSide: BorderSide(color: FujinColorRole.borderCard),
-  );
-
   final TextEditingController controller;
   final ValueChanged<String> onSearch;
 
@@ -187,13 +182,13 @@ class _SearchField extends StatelessWidget {
       ),
       prefixIcon: const Icon(
         Icons.search,
-        size: SheetFrame._searchIconSize,
+        size: FujinSize.searchIcon,
         color: FujinColorRole.textSecondary,
       ),
       contentPadding: const EdgeInsets.symmetric(vertical: FujinSpace.s4),
-      border: _border,
-      enabledBorder: _border,
-      focusedBorder: _border,
+      border: FujinTheme.searchFieldBorder,
+      enabledBorder: FujinTheme.searchFieldBorder,
+      focusedBorder: FujinTheme.searchFieldBorder,
     ),
     onSubmitted: (text) {
       if (text.trim().isEmpty) return;

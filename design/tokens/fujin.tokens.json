@@ -410,6 +410,14 @@
       },
       "$description": "Toasts and snackbars.",
       "$type": "dimension"
+    },
+    "tile": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$description": "Icon tiles of the sent summary.",
+      "$type": "dimension"
     }
   },
   "stroke": {
@@ -447,6 +455,29 @@
         "unit": "px"
       },
       "$description": "Input field in error.",
+      "$type": "dimension"
+    },
+    "streak": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      },
+      "$description": "Breeze streaks.",
+      "$type": "dimension"
+    },
+    "radio": {
+      "$value": {
+        "value": 1.5,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "field-focus": {
+      "$value": {
+        "value": 1.5,
+        "unit": "px"
+      },
+      "$description": "Focused input field.",
       "$type": "dimension"
     }
   },
@@ -550,6 +581,192 @@
       },
       "$description": "Seigaiha band at the bottom of welcome screens.",
       "$type": "dimension"
+    },
+    "glyph-card": {
+      "$value": {
+        "value": 56,
+        "unit": "px"
+      },
+      "$description": "Weather glyph of a status card.",
+      "$type": "dimension"
+    },
+    "glyph-hero": {
+      "$value": {
+        "value": 72,
+        "unit": "px"
+      },
+      "$description": "Weather glyph heading a result screen.",
+      "$type": "dimension"
+    },
+    "tile": {
+      "$value": {
+        "value": 32,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "tile-icon": {
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "step-marker": {
+      "$value": {
+        "value": 28,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "step-icon": {
+      "$value": {
+        "value": 14,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "volute": {
+      "$value": {
+        "value": 22,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "source-dot": {
+      "$value": {
+        "value": 8,
+        "unit": "px"
+      },
+      "$description": "MyFitnessPal and Ekklo source dots.",
+      "$type": "dimension"
+    },
+    "radio": {
+      "$value": {
+        "value": 20,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "radio-dot": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "search-icon": {
+      "$value": {
+        "value": 20,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "drag-handle-width": {
+      "$value": {
+        "value": 36,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "drag-handle-height": {
+      "$value": {
+        "value": 4,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "transit-lane": {
+      "$value": {
+        "value": 38,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "text-gap": {
+      "$value": {
+        "value": 3,
+        "unit": "px"
+      },
+      "$description": "Gap between a row title and its detail.",
+      "$type": "dimension"
+    },
+    "breeze-indicator": {
+      "$value": {
+        "value": 24,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "breeze-gap": {
+      "$value": {
+        "value": 3,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "breeze-inset-top": {
+      "$value": {
+        "value": 3,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "breeze-inset-bottom": {
+      "$value": {
+        "value": 1,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "streak-short": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "streak-medium": {
+      "$value": {
+        "value": 14,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "streak-long": {
+      "$value": {
+        "value": 18,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "streak-offset-small": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "streak-offset": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "streak-transit-short": {
+      "$value": {
+        "value": 24,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "streak-transit-long": {
+      "$value": {
+        "value": 40,
+        "unit": "px"
+      },
+      "$type": "dimension"
     }
   },
   "role": {
@@ -575,7 +792,16 @@
         "$type": "color"
       },
       "scrim": {
-        "$value": "{color.sumi}",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1059,
+            0.102,
+            0.0902
+          ],
+          "alpha": 0.5,
+          "hex": "#1B1A17"
+        },
         "$description": "Modal scrim under sheets, at 50% opacity.",
         "$type": "color"
       },

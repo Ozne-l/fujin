@@ -2,23 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/sending/send_report.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
-import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/fujin_weather.dart';
 import 'package:fujin/pages/common/fujin_weather_glyph.dart';
-import 'package:fujin/pages/common/gold_volute.dart';
+import 'package:fujin/pages/common/gold_separator.dart';
 import 'package:fujin/pages/common/seigaiha_band.dart';
+import 'package:fujin/pages/common/title_text.dart';
 import 'package:fujin/pages/sending/send_text.dart';
+import 'package:fujin/pages/sending/widgets/send_footer.dart';
 import 'package:go_router/go_router.dart';
 
 class SentView extends StatelessWidget {
   const SentView({required this.report, super.key});
-
-  static const double _glyphSide = 72;
-  static const double _tile = 32;
-  static const double _tileRadius = 10;
-  static const double _tileIcon = 16;
-  static const double _volute = 22;
-  static const double _goldRule = 2;
 
   final SendReport report;
 
@@ -49,7 +43,7 @@ class SentView extends StatelessWidget {
                   const Center(
                     child: FujinWeatherGlyph(
                       weather: FujinWeather.calm,
-                      side: _glyphSide,
+                      side: FujinSize.glyphHero,
                     ),
                   ),
                   const SizedBox(height: FujinSpace.s4),
@@ -70,7 +64,7 @@ class SentView extends StatelessWidget {
                   ),
                   const SizedBox(height: FujinSpace.s1),
                   Text(
-                    EntryText.capitalized(
+                    TitleText.capitalized(
                       l10n.sentAt(report.date, report.sentAt),
                     ),
                     textAlign: TextAlign.center,
@@ -79,7 +73,12 @@ class SentView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: FujinSpace.s5),
-                  const _GoldSeparator(),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: FujinSize.textInset - FujinSize.screenMargin,
+                    ),
+                    child: GoldSeparator(volute: true),
+                  ),
                   if (rows.isNotEmpty) ...[
                     const SizedBox(height: FujinSpace.s3),
                     Container(
@@ -99,7 +98,7 @@ class SentView extends StatelessWidget {
                             if (index > 0)
                               const Padding(
                                 padding: EdgeInsetsDirectional.only(
-                                  start: _tile + FujinSpace.s3,
+                                  start: FujinSize.tile + FujinSpace.s3,
                                 ),
                                 child: Divider(),
                               ),
@@ -112,13 +111,7 @@ class SentView extends StatelessWidget {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                FujinSize.screenMargin,
-                FujinSpace.s3,
-                FujinSize.screenMargin,
-                FujinSpace.s4,
-              ),
+            SendFooter(
               child: FilledButton(
                 onPressed: context.pop,
                 child: Text(l10n.backToJournal),
@@ -202,13 +195,13 @@ class _Row extends StatelessWidget {
       spacing: FujinSpace.s3,
       children: [
         Container(
-          width: SentView._tile,
-          height: SentView._tile,
+          width: FujinSize.tile,
+          height: FujinSize.tile,
           decoration: BoxDecoration(
             color: tile,
-            borderRadius: BorderRadius.circular(SentView._tileRadius),
+            borderRadius: BorderRadius.circular(FujinRadius.tile),
           ),
-          child: Icon(icon, size: SentView._tileIcon, color: iconColor),
+          child: Icon(icon, size: FujinSize.tileIcon, color: iconColor),
         ),
         Expanded(
           child: Text(
@@ -220,34 +213,5 @@ class _Row extends StatelessWidget {
         ),
       ],
     ),
-  );
-}
-
-class _GoldSeparator extends StatelessWidget {
-  const _GoldSeparator();
-
-  @override
-  Widget build(BuildContext context) => const Padding(
-    padding: EdgeInsets.symmetric(
-      horizontal: FujinSize.textInset - FujinSize.screenMargin,
-    ),
-    child: Row(
-      spacing: FujinSpace.s2,
-      children: [
-        Expanded(child: _GoldRule()),
-        SizedBox.square(dimension: SentView._volute, child: GoldVolute()),
-        Expanded(child: _GoldRule()),
-      ],
-    ),
-  );
-}
-
-class _GoldRule extends StatelessWidget {
-  const _GoldRule();
-
-  @override
-  Widget build(BuildContext context) => const SizedBox(
-    height: SentView._goldRule,
-    child: ColoredBox(color: FujinColor.kin),
   );
 }

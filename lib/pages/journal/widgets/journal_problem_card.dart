@@ -1,6 +1,7 @@
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter/material.dart';
 import 'package:fujin/app/fujin_route.dart';
+import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
@@ -68,13 +69,7 @@ class JournalProblemCard extends StatelessWidget {
               padding: const EdgeInsets.only(top: FujinSpace.s2),
               child: FilledButton(
                 onPressed: () => onSignIn(route),
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(FujinSize.buttonMedium),
-                  backgroundColor: FujinColorRole.buttonAlertBackground,
-                  foregroundColor: FujinColorRole.buttonAlertText,
-                  textStyle: FujinText.inter15Medium,
-                  shape: const StadiumBorder(),
-                ),
+                style: FujinTheme.alertButtonStyle,
                 child: Text(label),
               ),
             ),

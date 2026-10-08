@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/journal/journal_day.dart';
-import 'package:fujin/domain/journal/status_counts.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/progress_bar.dart';
+import 'package:fujin/pages/common/send_label.dart';
+import 'package:fujin/pages/common/source_dot.dart';
 
 class DaySummaryCard extends StatelessWidget {
   const DaySummaryCard({required this.day, required this.onSend, super.key});
@@ -75,7 +76,8 @@ class DaySummaryCard extends StatelessWidget {
               ),
             ],
           ),
-          if (_sendLabel(l10n, counts) case final label?)
+          if (SendLabel.of(l10n, counts.toSend, counts.toUpdate)
+              case final label?)
             FilledButton(
               onPressed: onSend,
               style: FilledButton.styleFrom(
@@ -92,14 +94,6 @@ class DaySummaryCard extends StatelessWidget {
       ),
     );
   }
-
-  static String? _sendLabel(AppLocalizations l10n, StatusCounts counts) =>
-      switch ((counts.toSend, counts.toUpdate)) {
-        (0, 0) => null,
-        (final send, 0) => l10n.sendFoods(send),
-        (0, final update) => l10n.updateFoods(update),
-        (final send, final update) => l10n.sendAndUpdateFoods(send, update),
-      };
 }
 
 class _SourceLine extends StatelessWidget {
@@ -117,11 +111,7 @@ class _SourceLine extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     spacing: FujinSpace.s2,
     children: [
-      Container(
-        width: FujinSpace.s2,
-        height: FujinSpace.s2,
-        decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
-      ),
+      SourceDot(color: dot),
       Expanded(
         child: Text(
           label,

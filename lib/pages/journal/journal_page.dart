@@ -6,11 +6,11 @@ import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/journal/journal_day.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/common/gold_separator.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
 import 'package:fujin/pages/journal/refresh_outcome.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:fujin/pages/journal/widgets/day_summary_card.dart';
-import 'package:fujin/pages/journal/widgets/gold_separator.dart';
 import 'package:fujin/pages/journal/widgets/journal_header.dart';
 import 'package:fujin/pages/journal/widgets/journal_problem_card.dart';
 import 'package:fujin/pages/journal/widgets/meal_card.dart';
@@ -120,7 +120,15 @@ class JournalPage extends HookConsumerWidget {
     SliverToBoxAdapter(
       child: DaySummaryCard(day: day, onSend: onSend),
     ),
-    const SliverToBoxAdapter(child: GoldSeparator()),
+    const SliverToBoxAdapter(
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: FujinSize.screenMargin,
+          vertical: FujinSpace.s4,
+        ),
+        child: GoldSeparator(),
+      ),
+    ),
     SliverPadding(
       padding: const EdgeInsetsDirectional.only(
         start: FujinSize.textInset,

@@ -169,6 +169,11 @@
       "$type": "dimension",
       "$value": "16px",
       "$description": "Toasts and snackbars."
+    },
+    "tile": {
+      "$type": "dimension",
+      "$value": "10px",
+      "$description": "Icon tiles of the sent summary."
     }
   },
   "stroke": {
@@ -192,6 +197,20 @@
       "$type": "dimension",
       "$value": "1.5px",
       "$description": "Input field in error."
+    },
+    "streak": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "Breeze streaks."
+    },
+    "radio": {
+      "$type": "dimension",
+      "$value": "1.5px"
+    },
+    "field-focus": {
+      "$type": "dimension",
+      "$value": "1.5px",
+      "$description": "Focused input field."
     }
   },
   "size": {
@@ -252,6 +271,114 @@
       "$type": "dimension",
       "$value": "252px",
       "$description": "Seigaiha band at the bottom of welcome screens."
+    },
+    "glyph-card": {
+      "$type": "dimension",
+      "$value": "56px",
+      "$description": "Weather glyph of a status card."
+    },
+    "glyph-hero": {
+      "$type": "dimension",
+      "$value": "72px",
+      "$description": "Weather glyph heading a result screen."
+    },
+    "tile": {
+      "$type": "dimension",
+      "$value": "32px"
+    },
+    "tile-icon": {
+      "$type": "dimension",
+      "$value": "16px"
+    },
+    "step-marker": {
+      "$type": "dimension",
+      "$value": "28px"
+    },
+    "step-icon": {
+      "$type": "dimension",
+      "$value": "14px"
+    },
+    "volute": {
+      "$type": "dimension",
+      "$value": "22px"
+    },
+    "source-dot": {
+      "$type": "dimension",
+      "$value": "8px",
+      "$description": "MyFitnessPal and Ekklo source dots."
+    },
+    "radio": {
+      "$type": "dimension",
+      "$value": "20px"
+    },
+    "radio-dot": {
+      "$type": "dimension",
+      "$value": "10px"
+    },
+    "search-icon": {
+      "$type": "dimension",
+      "$value": "20px"
+    },
+    "drag-handle-width": {
+      "$type": "dimension",
+      "$value": "36px"
+    },
+    "drag-handle-height": {
+      "$type": "dimension",
+      "$value": "4px"
+    },
+    "transit-lane": {
+      "$type": "dimension",
+      "$value": "38px"
+    },
+    "text-gap": {
+      "$type": "dimension",
+      "$value": "3px",
+      "$description": "Gap between a row title and its detail."
+    },
+    "breeze-indicator": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "breeze-gap": {
+      "$type": "dimension",
+      "$value": "3px"
+    },
+    "breeze-inset-top": {
+      "$type": "dimension",
+      "$value": "3px"
+    },
+    "breeze-inset-bottom": {
+      "$type": "dimension",
+      "$value": "1px"
+    },
+    "streak-short": {
+      "$type": "dimension",
+      "$value": "10px"
+    },
+    "streak-medium": {
+      "$type": "dimension",
+      "$value": "14px"
+    },
+    "streak-long": {
+      "$type": "dimension",
+      "$value": "18px"
+    },
+    "streak-offset-small": {
+      "$type": "dimension",
+      "$value": "2px"
+    },
+    "streak-offset": {
+      "$type": "dimension",
+      "$value": "6px"
+    },
+    "streak-transit-short": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "streak-transit-long": {
+      "$type": "dimension",
+      "$value": "40px"
     }
   },
   "role": {
@@ -278,7 +405,7 @@
       },
       "scrim": {
         "$type": "color",
-        "$value": "{color.sumi}",
+        "$value": "#1B1A1780",
         "$description": "Modal scrim under sheets, at 50% opacity."
       },
       "dark": {

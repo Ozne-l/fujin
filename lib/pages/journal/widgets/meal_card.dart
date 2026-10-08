@@ -95,13 +95,7 @@ class _EntryRow extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final entry = compared.entry;
     final detail = switch (compared.status) {
-      ToUpdate(:final link) => l10n.inEkkloAs(
-        l10n.servingLine(
-          link.mfpServings,
-          link.mfpServingValue,
-          link.mfpServingUnit,
-        ),
-      ),
+      ToUpdate(:final link) => EntryText.linkedServing(l10n, link),
       InEkklo() || ToSend() => EntryText.macros(l10n, entry.nutrients),
     };
     final (label, tone, icon) = switch (compared.status) {
@@ -121,7 +115,7 @@ class _EntryRow extends StatelessWidget {
             ),
           ),
           trailing: Text(
-            l10n.kilocalories(entry.nutrients.energy?.kilocalories ?? 0),
+            EntryText.energy(l10n, entry),
             style: FujinText.inter15Semibold.copyWith(
               color: FujinColorRole.textPrimary,
             ),

@@ -4,6 +4,7 @@ import 'package:fujin/domain/sending/send_plan.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/sending/widgets/plan_row.dart';
 import 'package:fujin/pages/sending/widgets/progress_card.dart';
+import 'package:fujin/pages/sending/widgets/send_footer.dart';
 import 'package:fujin/pages/sending/widgets/send_header.dart';
 
 class SearchingView extends StatelessWidget {
@@ -24,31 +25,24 @@ class SearchingView extends StatelessWidget {
       children: [
         SendHeader(plan: plan),
         Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: FujinSpace.s4),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: FujinSpace.s4,
-              children: [
-                ProgressCard(
-                  title: l10n.searchingTitle,
-                  detail: l10n.searchingDetail,
-                  note: l10n.searchingNote,
-                  done: plan.entries.length,
-                  total: plan.total,
-                ),
-                if (rows.isNotEmpty) PlanRow.card(rows),
+          child: ListView(
+            padding: const EdgeInsets.only(bottom: FujinSpace.s6),
+            children: [
+              ProgressCard(
+                title: l10n.searchingTitle,
+                detail: l10n.searchingDetail,
+                note: l10n.searchingNote,
+                done: plan.entries.length,
+                total: plan.total,
+              ),
+              if (rows.isNotEmpty) ...[
+                const SizedBox(height: FujinSpace.s4),
+                PlanRow.card(rows),
               ],
-            ),
+            ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            FujinSize.screenMargin,
-            0,
-            FujinSize.screenMargin,
-            FujinSpace.s2,
-          ),
+        SendFooter(
           child: FilledButton(onPressed: null, child: Text(l10n.sendToEkklo)),
         ),
       ],

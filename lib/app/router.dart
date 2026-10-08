@@ -37,13 +37,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: FujinRoute.send.path,
-        builder: (context, state) => SendPage(
-          date: SelectedDay.calendarDay(
-            DateTime.parse(
-              state.pathParameters[FujinRoute.dateParameter] ?? '',
-            ),
-          ),
-        ),
+        builder: (context, state) =>
+            switch (state.pathParameters[FujinRoute.dateParameter]) {
+              final date? => SendPage(
+                date: SelectedDay.calendarDay(DateTime.parse(date)),
+              ),
+              null => throw StateError(
+                '${FujinRoute.send.path} needs ${FujinRoute.dateParameter}',
+              ),
+            },
       ),
     ],
   );

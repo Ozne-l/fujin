@@ -470,12 +470,6 @@ abstract class AppLocalizations {
   /// **'MyFitnessPal ne répond pas.\nVérifie ta connexion, puis recharge la page.'**
   String get mfpSignInUnreachable;
 
-  /// No description provided for @close.
-  ///
-  /// In fr, this message translates to:
-  /// **'Fermer'**
-  String get close;
-
   /// No description provided for @sendTitle.
   ///
   /// In fr, this message translates to:
@@ -739,12 +733,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Copie exacte des valeurs MyFitnessPal'**
   String get ownCopyExact;
-
-  /// No description provided for @ownCopyReused.
-  ///
-  /// In fr, this message translates to:
-  /// **'Aliment perso'**
-  String get ownCopyReused;
 
   /// No description provided for @skippedDetail.
   ///
@@ -1139,13 +1127,13 @@ abstract class AppLocalizations {
   /// No description provided for @sendFailedNetwork.
   ///
   /// In fr, this message translates to:
-  /// **'Plus de réseau avant l\'envoi. Rien n\'est parti.'**
+  /// **'Plus de réseau avant l\'envoi. Rien n\'a été envoyé.'**
   String get sendFailedNetwork;
 
   /// No description provided for @sendFailedOther.
   ///
   /// In fr, this message translates to:
-  /// **'L\'envoi n\'a pas pu commencer. Rien n\'est parti.'**
+  /// **'L\'envoi n\'a pas pu commencer. Rien n\'a été envoyé.'**
   String get sendFailedOther;
 }
 

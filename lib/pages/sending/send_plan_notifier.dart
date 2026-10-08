@@ -21,9 +21,7 @@ final class SendPlanNotifier extends Notifier<SendPlanState> {
 
   @override
   SendPlanState build() {
-    final service = ref.watch(sendServiceProvider);
-    unawaited(Future(() => _plan(service)));
-    return SendPlanSearching(SendPlan(date: date));
+    return _started(ref.watch(sendServiceProvider));
   }
 
   Future<void> retry() async {
@@ -45,13 +43,16 @@ final class SendPlanNotifier extends Notifier<SendPlanState> {
   void weigh(String entryId, double gramsPerUnit) =>
       _change(entryId, (planned) => planned.weighing(gramsPerUnit));
 
+  SendPlanState _started(SendService service) {
+    unawaited(Future(() => _plan(service)));
+    return SendPlanSearching(SendPlan(date: date));
+  }
+
   Future<void> _plan(SendService service) async {
-    var latest = SendPlan(date: date);
     try {
       final plan = await service.plan(
         date,
         onProgress: (plan) {
-          latest = plan;
           if (ref.mounted) state = SendPlanSearching(plan);
         },
       );
@@ -59,7 +60,11 @@ final class SendPlanNotifier extends Notifier<SendPlanState> {
     } on Object catch (error) {
       if (ref.mounted) {
         state = SendPlanFailed(
-          latest,
+          switch (state) {
+            SendPlanSearching(:final plan) ||
+            SendPlanReady(:final plan) ||
+            SendPlanFailed(:final plan) => plan,
+          },
           SendFailure.of(error, ref.read(appEnvironmentProvider)),
         );
       }

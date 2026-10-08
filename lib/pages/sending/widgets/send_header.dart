@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/sending/send_plan.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
-import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/fujin_icon_button.dart';
+import 'package:fujin/pages/common/title_text.dart';
 import 'package:go_router/go_router.dart';
 
 class SendHeader extends StatelessWidget {
@@ -28,7 +28,7 @@ class SendHeader extends StatelessWidget {
           if (closable)
             FujinIconButton(
               icon: Icons.close,
-              tooltip: l10n.close,
+              tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
               onPressed: context.pop,
             ),
           Expanded(
@@ -50,7 +50,7 @@ class SendHeader extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    EntryText.capitalized(
+                    TitleText.capitalized(
                       l10n.sendSubtitle(plan.date, plan.total),
                     ),
                     style: FujinText.inter13Regular.copyWith(

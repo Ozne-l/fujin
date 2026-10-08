@@ -312,9 +312,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'MyFitnessPal ne répond pas.\nVérifie ta connexion, puis recharge la page.';
 
   @override
-  String get close => 'Fermer';
-
-  @override
   String get sendTitle => 'Envoi vers Ekklo';
 
   @override
@@ -500,9 +497,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get ownCopyExact => 'Copie exacte des valeurs MyFitnessPal';
-
-  @override
-  String get ownCopyReused => 'Aliment perso';
 
   @override
   String get skippedDetail => 'Reste hors de cet envoi.';
@@ -835,9 +829,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get sendFailedNetwork =>
-      'Plus de réseau avant l\'envoi. Rien n\'est parti.';
+      'Plus de réseau avant l\'envoi. Rien n\'a été envoyé.';
 
   @override
   String get sendFailedOther =>
-      'L\'envoi n\'a pas pu commencer. Rien n\'est parti.';
+      'L\'envoi n\'a pas pu commencer. Rien n\'a été envoyé.';
 }

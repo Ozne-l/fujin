@@ -26,15 +26,6 @@ class _WeightSheet extends HookConsumerWidget {
   const _WeightSheet({required this.planned, required this.choice});
 
   static const _decimals = 1;
-  static const _frenchDecimal = ',';
-  static const _decimal = '.';
-  static const _focusedBorder = OutlineInputBorder(
-    borderRadius: BorderRadius.all(Radius.circular(FujinRadius.field)),
-    borderSide: BorderSide(
-      color: FujinColor.fujin,
-      width: FujinStroke.fieldError,
-    ),
-  );
 
   final PlannedEntry planned;
   final SendToEkkloFood choice;
@@ -51,7 +42,7 @@ class _WeightSheet extends HookConsumerWidget {
       },
     );
     useListenable(weight);
-    final grams = _parse(weight.text);
+    final grams = _parse(context, weight.text);
     final plan = ref.read(sendPlanProvider(entry.date).notifier);
     final navigator = Navigator.of(context);
 
@@ -94,7 +85,6 @@ class _WeightSheet extends HookConsumerWidget {
                     suffixStyle: FujinText.inter15Regular.copyWith(
                       color: FujinColorRole.textSecondary,
                     ),
-                    focusedBorder: _focusedBorder,
                   ),
                 ),
                 if (_estimate(l10n) case final estimate?)
@@ -183,16 +173,19 @@ class _WeightSheet extends HookConsumerWidget {
     _ => null,
   };
 
-  static String _format(BuildContext context, double grams) =>
-      (NumberFormat.decimalPattern(Localizations.localeOf(context).toString())
-            ..maximumFractionDigits = _decimals
-            ..turnOffGrouping())
-          .format(grams);
+  static NumberFormat _numbers(BuildContext context) =>
+      NumberFormat.decimalPattern(Localizations.localeOf(context).toString())
+        ..maximumFractionDigits = _decimals
+        ..turnOffGrouping();
 
-  static double? _parse(String text) => switch (double.tryParse(
-    text.trim().replaceAll(_frenchDecimal, _decimal),
-  )) {
-    final grams? when grams.isFinite && grams > 0 => grams,
-    _ => null,
-  };
+  static String _format(BuildContext context, double grams) =>
+      _numbers(context).format(grams);
+
+  static double? _parse(BuildContext context, String text) {
+    final grams = _numbers(context).tryParse(text.trim());
+    return switch (grams) {
+      final grams? when grams.isFinite && grams > 0 => grams.toDouble(),
+      _ => null,
+    };
+  }
 }

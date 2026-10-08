@@ -4,18 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/common/breeze_indicator.dart';
+import 'package:fujin/pages/common/breeze_streaks.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
+import 'package:fujin/pages/common/source_dot.dart';
 import 'package:fujin/pages/common/status_pill.dart';
 import 'package:motor/motor.dart';
 
 class TransitCard extends StatelessWidget {
   const TransitCard({required this.names, super.key});
 
-  static const double _dot = 8;
-  static const double _lane = 38;
-  static const double _longStreak = 40;
-  static const double _shortStreak = 24;
-  static const double _streakThickness = 2;
   static const _drift = StepSequence<double>(
     [0, 1],
     motion: FujinMotion.drift,
@@ -53,7 +51,7 @@ class TransitCard extends StatelessWidget {
               Row(
                 spacing: FujinSpace.s2,
                 children: [
-                  const _Dot(color: FujinColorRole.sourceMfp),
+                  const SourceDot(color: FujinColorRole.sourceMfp),
                   Text(l10n.sourceMyFitnessPal, style: labelStyle),
                 ],
               ),
@@ -61,13 +59,13 @@ class TransitCard extends StatelessWidget {
                 spacing: FujinSpace.s2,
                 children: [
                   Text(l10n.sourceEkklo, style: labelStyle),
-                  const _Dot(color: FujinColorRole.sourceEkklo),
+                  const SourceDot(color: FujinColorRole.sourceEkklo),
                 ],
               ),
             ],
           ),
           SizedBox(
-            height: _lane,
+            height: FujinSize.transitLane,
             child: SequenceMotionBuilder<int, double>(
               sequence: _drift,
               converter: MotionConverter.single,
@@ -115,46 +113,10 @@ class _Drifting extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         spacing: FujinSpace.s1,
         children: [
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            spacing: FujinSpace.s1,
-            children: [
-              _Streak(width: TransitCard._longStreak),
-              _Streak(width: TransitCard._shortStreak),
-            ],
-          ),
+          const BreezeIndicator(streaks: BreezeStreaks.transit),
           StatusPill(label: name, tone: PillTone.neutral),
         ],
       ),
     ),
-  );
-}
-
-class _Streak extends StatelessWidget {
-  const _Streak({required this.width});
-
-  final double width;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    width: width,
-    height: TransitCard._streakThickness,
-    decoration: BoxDecoration(
-      color: FujinColor.sora,
-      borderRadius: BorderRadius.circular(TransitCard._streakThickness / 2),
-    ),
-  );
-}
-
-class _Dot extends StatelessWidget {
-  const _Dot({required this.color});
-
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    width: TransitCard._dot,
-    height: TransitCard._dot,
-    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
   );
 }

@@ -12,10 +12,6 @@ class CandidateCard extends StatelessWidget {
     super.key,
   });
 
-  static const _radioSize = 20.0;
-  static const _dotSize = 10.0;
-  static const _radioStroke = 1.5;
-
   final bool selected;
   final VoidCallback? onTap;
   final Widget child;
@@ -59,13 +55,13 @@ class CandidateCard extends StatelessWidget {
               spacing: FujinSpace.s3,
               children: [
                 Container(
-                  width: _radioSize,
-                  height: _radioSize,
+                  width: FujinSize.radio,
+                  height: FujinSize.radio,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: FujinColorRole.backgroundCard,
                     shape: BoxShape.circle,
-                    border: Border.all(color: accent, width: _radioStroke),
+                    border: Border.all(color: accent, width: FujinStroke.radio),
                   ),
                   child: switch (selected) {
                     true => const DecoratedBox(
@@ -73,7 +69,7 @@ class CandidateCard extends StatelessWidget {
                         color: FujinColor.fujin,
                         shape: BoxShape.circle,
                       ),
-                      child: SizedBox.square(dimension: _dotSize),
+                      child: SizedBox.square(dimension: FujinSize.radioDot),
                     ),
                     false => null,
                   },

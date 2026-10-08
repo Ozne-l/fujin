@@ -151,7 +151,6 @@
   "mfpSignInHint": "Connecte-toi comme d'habitude.\nCette page se fermera toute seule.",
   "mfpSignInRefused": "MyFitnessPal a refusé la session.\nConnecte-toi à nouveau sur cette page.",
   "mfpSignInUnreachable": "MyFitnessPal ne répond pas.\nVérifie ta connexion, puis recharge la page.",
-  "close": "Fermer",
   "sendTitle": "Envoi vers Ekklo",
   "sendSubtitle": "{date} · {count} {count, plural, =1{aliment} other{aliments}}",
   "@sendSubtitle": {
@@ -284,7 +283,6 @@
   "confirm": "Confirmer",
   "ownCopyToCreate": "Aliment perso à créer",
   "ownCopyExact": "Copie exacte des valeurs MyFitnessPal",
-  "ownCopyReused": "Aliment perso",
   "skippedDetail": "Reste hors de cet envoi.",
   "proposalsUsed": "Sans changement de ta part, les propositions sont utilisées.",
   "searchEkklo": "Chercher dans Ekklo",
@@ -495,6 +493,6 @@
   "searchFailedTitle": "Recherche interrompue",
   "searchFailedNetwork": "Plus de réseau pendant la recherche. Rien n'a été envoyé.",
   "searchFailedOther": "Ekklo ne répond pas. Rien n'a été envoyé.",
-  "sendFailedNetwork": "Plus de réseau avant l'envoi. Rien n'est parti.",
-  "sendFailedOther": "L'envoi n'a pas pu commencer. Rien n'est parti."
+  "sendFailedNetwork": "Plus de réseau avant l'envoi. Rien n'a été envoyé.",
+  "sendFailedOther": "L'envoi n'a pas pu commencer. Rien n'a été envoyé."
 }

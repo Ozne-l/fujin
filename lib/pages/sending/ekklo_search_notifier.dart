@@ -30,34 +30,34 @@ final class EkkloSearchNotifier extends Notifier<EkkloSearchState> {
     final service = ref.watch(sendServiceProvider);
     return switch (planned.candidates) {
       [] when query.isNotEmpty => _started(service, query),
-      [] => EkkloSearchState(query: query, results: const []),
-      final candidates => EkkloSearchState(query: query, results: candidates),
+      [] => EkkloSearchDone(query, const []),
+      final candidates => EkkloSearchDone(query, candidates),
     };
   }
 
   Future<void> search(String query) async {
     final trimmed = query.trim();
     if (trimmed.isEmpty) return;
-    state = EkkloSearchState(query: trimmed);
+    state = EkkloSearchRunning(trimmed);
     await _run(ref.read(sendServiceProvider), trimmed);
   }
 
   EkkloSearchState _started(SendService service, String query) {
     unawaited(Future(() => _run(service, query)));
-    return EkkloSearchState(query: query);
+    return EkkloSearchRunning(query);
   }
 
   Future<void> _run(SendService service, String query) async {
     try {
       final results = await service.search(planned, query);
       if (ref.mounted && state.query == query) {
-        state = EkkloSearchState(query: query, results: results);
+        state = EkkloSearchDone(query, results);
       }
     } on Object catch (error) {
       if (ref.mounted && state.query == query) {
-        state = EkkloSearchState(
-          query: query,
-          failure: SendFailure.of(error, ref.read(appEnvironmentProvider)),
+        state = EkkloSearchFailed(
+          query,
+          SendFailure.of(error, ref.read(appEnvironmentProvider)),
         );
       }
     }

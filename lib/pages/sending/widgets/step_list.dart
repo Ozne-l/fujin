@@ -3,16 +3,11 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/sending/send_step.dart';
 import 'package:fujin/domain/sending/step_state.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/common/breeze_indicator.dart';
+import 'package:fujin/pages/common/breeze_streaks.dart';
 
 class StepList extends StatelessWidget {
   const StepList({required this.steps, super.key});
-
-  static const double _circle = 28;
-  static const double _icon = 14;
-  static const double _shortBar = 10;
-  static const double _longBar = 14;
-  static const double _barThickness = 2;
-  static const double _textGap = 3;
 
   final List<SendStep> steps;
 
@@ -39,7 +34,7 @@ class StepList extends StatelessWidget {
             if (index > 0)
               const Padding(
                 padding: EdgeInsetsDirectional.only(
-                  start: _circle + FujinSpace.s4,
+                  start: FujinSize.stepMarker + FujinSpace.s4,
                   top: FujinSpace.s3,
                   bottom: FujinSpace.s3,
                 ),
@@ -61,7 +56,7 @@ class StepList extends StatelessWidget {
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: _textGap,
+            spacing: FujinSize.textGap,
             children: [
               Text(
                 title,
@@ -149,19 +144,15 @@ class StepList extends StatelessWidget {
   Widget _marker(StepState state) => switch (state) {
     StepState.done => const _Circle(
       color: FujinColor.fujin,
-      child: Icon(Icons.check, size: _icon, color: FujinColorRole.textOnDark),
+      child: Icon(
+        Icons.check,
+        size: FujinSize.stepIcon,
+        color: FujinColorRole.textOnDark,
+      ),
     ),
     StepState.running => const _Circle(
       color: FujinColorRole.backgroundInfo,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: FujinSpace.s1,
-        children: [
-          _Bar(width: _shortBar),
-          _Bar(width: _longBar),
-        ],
-      ),
+      child: BreezeIndicator(streaks: BreezeStreaks.marker),
     ),
     StepState.pending => const _Circle(
       color: FujinColorRole.backgroundCard,
@@ -169,7 +160,11 @@ class StepList extends StatelessWidget {
     ),
     StepState.failed => const _Circle(
       color: FujinColorRole.backgroundAlert,
-      child: Icon(Icons.close, size: _icon, color: FujinColorRole.textAlert),
+      child: Icon(
+        Icons.close,
+        size: FujinSize.stepIcon,
+        color: FujinColorRole.textAlert,
+      ),
     ),
   };
 }
@@ -183,8 +178,8 @@ class _Circle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    width: StepList._circle,
-    height: StepList._circle,
+    width: FujinSize.stepMarker,
+    height: FujinSize.stepMarker,
     alignment: Alignment.center,
     decoration: BoxDecoration(
       color: color,
@@ -195,21 +190,5 @@ class _Circle extends StatelessWidget {
       },
     ),
     child: child,
-  );
-}
-
-class _Bar extends StatelessWidget {
-  const _Bar({required this.width});
-
-  final double width;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    width: width,
-    height: StepList._barThickness,
-    decoration: BoxDecoration(
-      color: FujinColor.sora,
-      borderRadius: BorderRadius.circular(StepList._barThickness / 2),
-    ),
   );
 }

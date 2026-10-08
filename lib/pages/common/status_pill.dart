@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/pages/common/pill_size.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 
 class StatusPill extends StatelessWidget {
@@ -7,32 +8,21 @@ class StatusPill extends StatelessWidget {
     required this.label,
     required this.tone,
     this.icon,
-    this.small = false,
+    this.size = PillSize.regular,
     super.key,
   });
 
   final String label;
   final PillTone tone;
   final IconData? icon;
-  final bool small;
+  final PillSize size;
 
   @override
   Widget build(BuildContext context) {
-    final style = switch (small) {
-      true => FujinText.inter11Medium,
-      false => FujinText.inter12Medium,
-    }.copyWith(color: tone.foreground);
+    final style = size.style.copyWith(color: tone.foreground);
     return Container(
-      height: switch (small) {
-        true => FujinSize.pillSmall,
-        false => FujinSize.pill,
-      },
-      padding: EdgeInsets.symmetric(
-        horizontal: switch (small) {
-          true => FujinSpace.s2,
-          false => FujinSpace.s3,
-        },
-      ),
+      height: size.height,
+      padding: EdgeInsets.symmetric(horizontal: size.inset),
       decoration: BoxDecoration(
         color: tone.background,
         borderRadius: BorderRadius.circular(FujinRadius.pill),

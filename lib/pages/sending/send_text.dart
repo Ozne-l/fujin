@@ -72,7 +72,7 @@ abstract final class SendText {
         SendToEkkloFood(:final ekkloFoodName, :final grams) =>
           l10n.towardsAmount(ekkloFoodName, SendText.grams(l10n, grams)),
         SendAsOwnCopy(reuse: null) => l10n.towards(l10n.ownCopyToCreate),
-        SendAsOwnCopy() => l10n.towards(l10n.ownCopyReused),
+        SendAsOwnCopy() => l10n.towards(l10n.ownCopy),
         SkipEntry() => l10n.skippedDetail,
       };
 }

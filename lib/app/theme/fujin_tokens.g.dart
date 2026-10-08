@@ -33,7 +33,6 @@ abstract final class FujinColorRole {
   static const Color backgroundDark = FujinColor.sumi;
   static const Color backgroundInfo = FujinColor.soraLight;
   static const Color backgroundPage = FujinColor.washi;
-  static const Color backgroundScrim = FujinColor.sumi;
   static const Color backgroundSuccess = FujinColor.matcha;
   static const Color borderCard = FujinColor.kinari;
   static const Color borderDivider = FujinColor.kin;
@@ -66,6 +65,7 @@ abstract final class FujinColorRole {
   static const Color textPrimary = FujinColor.sumi;
   static const Color textSecondary = FujinColor.hai;
   static const Color textTertiary = FujinColor.haiLight;
+  static const backgroundScrim = Color(0x801B1A17);
 }
 
 abstract final class FujinSpace {
@@ -85,6 +85,7 @@ abstract final class FujinRadius {
   static const double field = 16;
   static const double pill = 999;
   static const double sheet = 28;
+  static const double tile = 10;
   static const double toast = 16;
 }
 
@@ -92,15 +93,26 @@ abstract final class FujinStroke {
   static const double card = 1;
   static const double dayRing = 1.5;
   static const double fieldError = 1.5;
+  static const double fieldFocus = 1.5;
   static const double icon = 1.75;
   static const double macroRing = 2;
+  static const double radio = 1.5;
+  static const double streak = 2;
 }
 
 abstract final class FujinSize {
+  static const double breezeGap = 3;
+  static const double breezeIndicator = 24;
+  static const double breezeInsetBottom = 1;
+  static const double breezeInsetTop = 3;
   static const double buttonHeight = 56;
   static const double buttonMedium = 48;
   static const double dayPill = 26;
   static const double dayRing = 38;
+  static const double dragHandleHeight = 4;
+  static const double dragHandleWidth = 36;
+  static const double glyphCard = 56;
+  static const double glyphHero = 72;
   static const double icon = 24;
   static const double kcalBar = 6;
   static const double macroBar = 4;
@@ -108,9 +120,27 @@ abstract final class FujinSize {
   static const double motifBand = 252;
   static const double pill = 26;
   static const double pillSmall = 20;
+  static const double radio = 20;
+  static const double radioDot = 10;
   static const double screenMargin = 16;
+  static const double searchIcon = 20;
+  static const double sourceDot = 8;
+  static const double stepIcon = 14;
+  static const double stepMarker = 28;
+  static const double streakLong = 18;
+  static const double streakMedium = 14;
+  static const double streakOffset = 6;
+  static const double streakOffsetSmall = 2;
+  static const double streakShort = 10;
+  static const double streakTransitLong = 40;
+  static const double streakTransitShort = 24;
+  static const double textGap = 3;
   static const double textInset = 24;
+  static const double tile = 32;
+  static const double tileIcon = 16;
   static const double touchTarget = 48;
+  static const double transitLane = 38;
+  static const double volute = 22;
 }
 
 abstract final class FujinFont {

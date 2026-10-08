@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:fujin/data/links/sent_link.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -16,6 +16,15 @@ abstract final class EntryText {
         final brand => l10n.brandedServingLine(brand, serving(l10n, entry)),
       };
 
+  static String linkedServing(AppLocalizations l10n, SentLink link) =>
+      l10n.inEkkloAs(
+        l10n.servingLine(
+          link.mfpServings,
+          link.mfpServingValue,
+          link.mfpServingUnit,
+        ),
+      );
+
   static String energy(AppLocalizations l10n, MfpFoodEntry entry) =>
       l10n.kilocalories(entry.nutrients.energy?.kilocalories ?? 0);
 
@@ -31,9 +40,4 @@ abstract final class EntryText {
       amount(nutrients.fiber),
     );
   }
-
-  static String capitalized(String text) => switch (text) {
-    '' => text,
-    _ => '${text.characters.first.toUpperCase()}${text.characters.skip(1)}',
-  };
 }

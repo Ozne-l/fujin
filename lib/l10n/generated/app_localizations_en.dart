@@ -309,9 +309,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'MyFitnessPal isn\'t responding.\nCheck your connection, then reload the page.';
 
   @override
-  String get close => 'Close';
-
-  @override
   String get sendTitle => 'Sending to Ekklo';
 
   @override
@@ -493,9 +490,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ownCopyExact => 'Exact copy of the MyFitnessPal values';
 
   @override
-  String get ownCopyReused => 'Own food';
-
-  @override
   String get skippedDetail => 'Left out of this send.';
 
   @override
@@ -593,7 +587,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sendingTitle => 'Sending';
 
   @override
-  String get sendingDetail => 'Your foods are on their way to Ekklo…';
+  String get sendingDetail => 'Foods are on their way to Ekklo…';
 
   @override
   String get sendingNote => 'Own foods first, then one send per meal.';

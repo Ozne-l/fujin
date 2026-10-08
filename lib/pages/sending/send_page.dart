@@ -24,9 +24,7 @@ class SendPage extends HookConsumerWidget {
     final sendState = ref.watch(sendProvider(date));
 
     ref.listen(sendPlanProvider(date), (previous, next) {
-      if (next case SendPlanReady(
-        :final plan,
-      ) when plan.entries.isNotEmpty && plan.updatesOnly) {
+      if (next case SendPlanReady(:final plan) when plan.updatesOnly) {
         unawaited(ref.read(sendProvider(date).notifier).send(plan));
       }
     });

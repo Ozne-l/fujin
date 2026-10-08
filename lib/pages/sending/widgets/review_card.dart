@@ -253,7 +253,7 @@ class _Proposal extends StatelessWidget {
           null,
         ),
         SendAsOwnCopy() => (
-          l10n.towards(l10n.ownCopyReused),
+          l10n.towards(l10n.ownCopy),
           l10n.ownCopyExact,
           null,
         ),

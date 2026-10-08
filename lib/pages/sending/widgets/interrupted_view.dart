@@ -8,10 +8,9 @@ import 'package:fujin/domain/sending/send_step.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/sending/send_failure.dart';
 import 'package:fujin/pages/sending/send_notifier.dart';
-import 'package:fujin/pages/sending/widgets/send_header.dart';
 import 'package:fujin/pages/sending/widgets/step_list.dart';
 import 'package:fujin/pages/sending/widgets/storm_card.dart';
-import 'package:go_router/go_router.dart';
+import 'package:fujin/pages/sending/widgets/storm_view.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class InterruptedView extends ConsumerWidget {
@@ -30,63 +29,37 @@ class InterruptedView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final remaining = progress.remainingEntries;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SendHeader(plan: plan),
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.only(bottom: FujinSpace.s6),
-            children: [
-              StormCard(
-                title: l10n.interruptedTitle,
-                reason: _reason(l10n),
-                waiting: switch (remaining) {
-                  > 0 => l10n.interruptedWaiting(remaining),
-                  _ => null,
-                },
-                action: switch (progress.steps) {
-                  [] => l10n.tryAgain,
-                  _ => l10n.sendRemaining(remaining),
-                },
-                onPressed: () => unawaited(
-                  ref.read(sendProvider(plan.date).notifier).send(plan),
-                ),
-              ),
-              if (progress.steps.isNotEmpty) ...[
-                const SizedBox(height: FujinSpace.s2),
-                StepList(steps: progress.steps),
-              ],
-              const SizedBox(height: FujinSpace.s6),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: FujinSize.textInset,
-                ),
-                child: Text(
-                  l10n.interruptedNote,
-                  textAlign: TextAlign.center,
-                  style: FujinText.inter13Regular.copyWith(
-                    color: FujinColorRole.textSecondary,
-                  ),
-                ),
-              ),
-            ],
-          ),
+    return StormView(
+      plan: plan,
+      card: StormCard(
+        title: l10n.interruptedTitle,
+        reason: _reason(l10n),
+        waiting: switch (remaining) {
+          > 0 => l10n.interruptedWaiting(remaining),
+          _ => null,
+        },
+        action: switch (progress.steps) {
+          [] => l10n.tryAgain,
+          _ => l10n.sendRemaining(remaining),
+        },
+        onPressed: () => unawaited(
+          ref.read(sendProvider(plan.date).notifier).send(plan),
         ),
+      ),
+      children: [
+        if (progress.steps.isNotEmpty) ...[
+          const SizedBox(height: FujinSpace.s2),
+          StepList(steps: progress.steps),
+        ],
+        const SizedBox(height: FujinSpace.s6),
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-            FujinSize.screenMargin,
-            FujinSpace.s3,
-            FujinSize.screenMargin,
-            FujinSpace.s4,
-          ),
-          child: OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              minimumSize: const Size.fromHeight(FujinSize.buttonHeight),
-              textStyle: FujinText.inter15Semibold,
+          padding: const EdgeInsets.symmetric(horizontal: FujinSize.textInset),
+          child: Text(
+            l10n.interruptedNote,
+            textAlign: TextAlign.center,
+            style: FujinText.inter13Regular.copyWith(
+              color: FujinColorRole.textSecondary,
             ),
-            onPressed: context.pop,
-            child: Text(l10n.later),
           ),
         ),
       ],

@@ -3,13 +3,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/sending/send_plan.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
+import 'package:fujin/pages/common/send_label.dart';
 import 'package:fujin/pages/sending/send_notifier.dart';
 import 'package:fujin/pages/sending/widgets/plan_row.dart';
 import 'package:fujin/pages/sending/widgets/review_card.dart';
 import 'package:fujin/pages/sending/widgets/review_filters.dart';
+import 'package:fujin/pages/sending/widgets/send_footer.dart';
 import 'package:fujin/pages/sending/widgets/send_header.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -48,7 +51,10 @@ class ReviewView extends HookConsumerWidget {
           ),
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.symmetric(vertical: FujinSpace.s4),
+            padding: const EdgeInsets.only(
+              top: FujinSpace.s4,
+              bottom: FujinSpace.s6,
+            ),
             children: [
               if (section case final section?) ...[
                 Padding(
@@ -84,7 +90,8 @@ class ReviewView extends HookConsumerWidget {
                   _Section.inEkklo => [
                     PlanRow.card([
                       for (final compared in plan.inEkklo)
-                        PlanRow.inEkklo(compared),
+                        if (compared.status case InEkklo(:final link))
+                          PlanRow.inEkklo(compared.entry, link),
                     ]),
                   ],
                 },
@@ -134,45 +141,32 @@ class _Footer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final sent = plan.entries.where((planned) => planned.sends);
-    final updates = sent.where((planned) => planned.replacing != null).length;
-    final label = switch ((sent.length - updates, updates)) {
-      (0, 0) => null,
-      (final send, 0) => l10n.sendFoods(send),
-      (0, final update) => l10n.updateFoods(update),
-      (final send, final update) => l10n.sendAndUpdateFoods(send, update),
-    };
-    return ColoredBox(
-      color: FujinColorRole.backgroundPage,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          FujinSize.screenMargin,
-          FujinSpace.s4,
-          FujinSize.screenMargin,
-          FujinSpace.s2,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          spacing: FujinSpace.s3,
-          children: [
-            Text(
-              l10n.proposalsUsed,
-              textAlign: TextAlign.center,
-              style: FujinText.inter12Regular.copyWith(
-                color: FujinColorRole.textSecondary,
+    final updates = plan.entries
+        .where((planned) => planned.sends && planned.replacing != null)
+        .length;
+    final label = SendLabel.of(l10n, plan.sendCount - updates, updates);
+    return SendFooter(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: FujinSpace.s3,
+        children: [
+          Text(
+            l10n.proposalsUsed,
+            textAlign: TextAlign.center,
+            style: FujinText.inter12Regular.copyWith(
+              color: FujinColorRole.textSecondary,
+            ),
+          ),
+          FilledButton(
+            onPressed: switch (label) {
+              null => null,
+              _ => () => unawaited(
+                ref.read(sendProvider(plan.date).notifier).send(plan),
               ),
-            ),
-            FilledButton(
-              onPressed: switch (label) {
-                null => null,
-                _ => () => unawaited(
-                  ref.read(sendProvider(plan.date).notifier).send(plan),
-                ),
-              },
-              child: Text(label ?? l10n.sendToEkklo),
-            ),
-          ],
-        ),
+            },
+            child: Text(label ?? l10n.sendToEkklo),
+          ),
+        ],
       ),
     );
   }

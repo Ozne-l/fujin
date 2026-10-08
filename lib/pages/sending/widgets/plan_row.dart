@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/domain/comparison/compared_entry.dart';
-import 'package:fujin/domain/comparison/entry_status.dart';
+import 'package:fujin/data/links/sent_link.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/common/breeze_indicator.dart';
+import 'package:fujin/pages/common/breeze_streaks.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
@@ -19,8 +20,8 @@ class PlanRow extends StatelessWidget {
     super.key,
   }) : _row = _Pending(entry, searching: searching);
 
-  PlanRow.inEkklo(ComparedEntry compared, {super.key})
-    : _row = _InEkkloRow(compared);
+  PlanRow.inEkklo(MfpFoodEntry entry, SentLink link, {super.key})
+    : _row = _InEkkloRow(entry, link);
 
   final _RowKind _row;
 
@@ -40,7 +41,7 @@ class PlanRow extends StatelessWidget {
         entry.food.description,
         l10n.rowSearching,
         FujinColor.sora,
-        const _BreezeIndicator(),
+        const BreezeIndicator(streaks: BreezeStreaks.searching),
       ),
       _Pending(:final entry, searching: false) => (
         entry.food.description,
@@ -48,9 +49,9 @@ class PlanRow extends StatelessWidget {
         FujinColorRole.textTertiary,
         null,
       ),
-      _InEkkloRow(:final compared) => (
-        compared.entry.food.description,
-        _inEkkloDetail(l10n, compared),
+      _InEkkloRow(:final entry, :final link) => (
+        entry.food.description,
+        EntryText.linkedServing(l10n, link),
         FujinColorRole.textSecondary,
         StatusPill(label: l10n.statusInEkklo, tone: PillTone.validated),
       ),
@@ -100,20 +101,6 @@ class PlanRow extends StatelessWidget {
           (final label, final tone) => StatusPill(label: label, tone: tone),
         },
       };
-
-  static String _inEkkloDetail(
-    AppLocalizations l10n,
-    ComparedEntry compared,
-  ) => switch (compared.status) {
-    InEkklo(:final link) || ToUpdate(:final link) => l10n.inEkkloAs(
-      l10n.servingLine(
-        link.mfpServings,
-        link.mfpServingValue,
-        link.mfpServingUnit,
-      ),
-    ),
-    ToSend() => EntryText.brandedServing(l10n, compared.entry),
-  };
 }
 
 sealed class _RowKind {
@@ -134,9 +121,10 @@ final class _Pending extends _RowKind {
 }
 
 final class _InEkkloRow extends _RowKind {
-  const _InEkkloRow(this.compared);
+  const _InEkkloRow(this.entry, this.link);
 
-  final ComparedEntry compared;
+  final MfpFoodEntry entry;
+  final SentLink link;
 }
 
 class _PlanCard extends StatelessWidget {
@@ -166,42 +154,6 @@ class _PlanCard extends StatelessWidget {
           if (index > 0) const Divider(),
           row,
         ],
-      ],
-    ),
-  );
-}
-
-class _BreezeIndicator extends StatelessWidget {
-  const _BreezeIndicator();
-
-  static const double _width = 24;
-  static const double _stroke = 2;
-  static const double _gap = 3;
-  static const EdgeInsets _padding = EdgeInsets.only(top: 3, bottom: 1);
-  static const List<({double start, double length})> _bars = [
-    (start: 0.0, length: 14.0),
-    (start: 6.0, length: 18.0),
-    (start: 2.0, length: 10.0),
-  ];
-
-  @override
-  Widget build(BuildContext context) => Container(
-    width: _width,
-    padding: _padding,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: _gap,
-      children: [
-        for (final bar in _bars)
-          Container(
-            margin: EdgeInsetsDirectional.only(start: bar.start),
-            width: bar.length,
-            height: _stroke,
-            decoration: BoxDecoration(
-              color: FujinColor.sora,
-              borderRadius: BorderRadius.circular(_stroke / 2),
-            ),
-          ),
       ],
     ),
   );

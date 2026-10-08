@@ -15,8 +15,36 @@ abstract final class FujinTheme {
     ),
   );
 
-  static const _scrimOpacity = 0.5;
-  static const _dragHandleSize = Size(36, 4);
+  static const searchFieldBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(FujinRadius.pill)),
+    borderSide: BorderSide(color: FujinColorRole.borderCard),
+  );
+
+  static const fieldFocusedBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(FujinRadius.field)),
+    borderSide: BorderSide(
+      color: FujinColor.fujin,
+      width: FujinStroke.fieldFocus,
+    ),
+  );
+
+  static final ButtonStyle alertButtonStyle = FilledButton.styleFrom(
+    minimumSize: const Size.fromHeight(FujinSize.buttonMedium),
+    backgroundColor: FujinColorRole.buttonAlertBackground,
+    foregroundColor: FujinColorRole.buttonAlertText,
+    textStyle: FujinText.inter15Medium,
+    shape: const StadiumBorder(),
+  );
+
+  static final ButtonStyle largeOutlinedButtonStyle = OutlinedButton.styleFrom(
+    minimumSize: const Size.fromHeight(FujinSize.buttonHeight),
+    textStyle: FujinText.inter15Semibold,
+  );
+
+  static const _dragHandleSize = Size(
+    FujinSize.dragHandleWidth,
+    FujinSize.dragHandleHeight,
+  );
 
   static ThemeData light() => ThemeData(
     useMaterial3: true,
@@ -40,7 +68,7 @@ abstract final class FujinTheme {
       ),
       border: fieldBorder,
       enabledBorder: fieldBorder,
-      focusedBorder: fieldBorder,
+      focusedBorder: fieldFocusedBorder,
       errorBorder: fieldErrorBorder,
       focusedErrorBorder: fieldErrorBorder,
     ),
@@ -62,18 +90,16 @@ abstract final class FujinTheme {
         borderRadius: BorderRadius.all(Radius.circular(FujinRadius.toast)),
       ),
     ),
-    bottomSheetTheme: BottomSheetThemeData(
+    bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: FujinColorRole.backgroundCard,
       modalBackgroundColor: FujinColorRole.backgroundCard,
-      modalBarrierColor: FujinColorRole.backgroundScrim.withValues(
-        alpha: _scrimOpacity,
-      ),
+      modalBarrierColor: FujinColorRole.backgroundScrim,
       elevation: 0,
       modalElevation: 0,
       clipBehavior: Clip.antiAlias,
       dragHandleColor: FujinColor.kinari,
       dragHandleSize: _dragHandleSize,
-      shape: const RoundedRectangleBorder(
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(FujinRadius.sheet),
         ),
@@ -130,7 +156,7 @@ abstract final class FujinTheme {
     surfaceTint: FujinColorRole.backgroundCard,
     outline: FujinColorRole.borderCard,
     outlineVariant: FujinColorRole.borderHairline,
-    shadow: FujinColorRole.backgroundScrim,
+    shadow: FujinColorRole.backgroundDark,
     scrim: FujinColorRole.backgroundScrim,
     inverseSurface: FujinColorRole.backgroundDark,
     onInverseSurface: FujinColorRole.textOnDark,

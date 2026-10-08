@@ -8,6 +8,7 @@ import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/entry_text.dart';
+import 'package:fujin/pages/common/source_dot.dart';
 import 'package:fujin/pages/sending/ekklo_search_notifier.dart';
 import 'package:fujin/pages/sending/ekklo_search_state.dart';
 import 'package:fujin/pages/sending/send_failure.dart';
@@ -22,15 +23,21 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 Future<void> showMatchSheet(
   BuildContext context, {
   required PlannedEntry planned,
+  String? query,
 }) => SheetFrame.show(
   context,
-  builder: (_) => _MatchSheet(planned: planned, opener: context),
+  builder: (_) => _MatchSheet(planned: planned, query: query, opener: context),
 );
 
 class _MatchSheet extends HookConsumerWidget {
-  const _MatchSheet({required this.planned, required this.opener});
+  const _MatchSheet({
+    required this.planned,
+    required this.query,
+    required this.opener,
+  });
 
   final PlannedEntry planned;
+  final String? query;
   final BuildContext opener;
 
   @override
@@ -39,7 +46,20 @@ class _MatchSheet extends HookConsumerWidget {
     final entry = planned.entry;
     final search = ref.watch(ekkloSearchProvider(planned));
     final picked = useState<String?>(null);
-    final selected = _selected(search.results ?? const [], picked.value);
+    final selected = _selected(switch (search) {
+      EkkloSearchDone(:final results) => results,
+      EkkloSearchRunning() || EkkloSearchFailed() => const [],
+    }, picked.value);
+    useEffect(() {
+      if (query case final typed?) {
+        unawaited(
+          Future(
+            () => ref.read(ekkloSearchProvider(planned).notifier).search(typed),
+          ),
+        );
+      }
+      return null;
+    }, const []);
     final plan = ref.read(sendPlanProvider(entry.date).notifier);
     final navigator = Navigator.of(context);
 
@@ -100,7 +120,7 @@ class _MatchSheet extends HookConsumerWidget {
     EkkloCandidate? selected,
     ValueNotifier<String?> picked,
   ) => switch (search) {
-    EkkloSearchState(failure: final failure?) => [
+    EkkloSearchFailed(:final failure) => [
       _Message(
         text: switch (failure) {
           SendFailure.network => l10n.searchFailedNetwork,
@@ -113,14 +133,14 @@ class _MatchSheet extends HookConsumerWidget {
         color: FujinColorRole.textAlert,
       ),
     ],
-    EkkloSearchState(results: null) => [const _Searching()],
-    EkkloSearchState(results: []) => [
+    EkkloSearchRunning() => [const _Searching()],
+    EkkloSearchDone(results: []) => [
       _Message(
         text: l10n.noEkkloResult,
         color: FujinColorRole.textSecondary,
       ),
     ],
-    EkkloSearchState(results: final results?) => [
+    EkkloSearchDone(:final results) => [
       for (final candidate in results)
         CandidateCard(
           selected: candidate == selected,
@@ -133,8 +153,6 @@ class _MatchSheet extends HookConsumerWidget {
 
 class _MfpReference extends StatelessWidget {
   const _MfpReference({required this.planned});
-
-  static const _dotSize = 8.0;
 
   final PlannedEntry planned;
 
@@ -154,13 +172,7 @@ class _MfpReference extends StatelessWidget {
           Row(
             spacing: FujinSpace.s2,
             children: [
-              const DecoratedBox(
-                decoration: BoxDecoration(
-                  color: FujinColorRole.sourceMfp,
-                  shape: BoxShape.circle,
-                ),
-                child: SizedBox.square(dimension: _dotSize),
-              ),
+              const SourceDot(color: FujinColorRole.sourceMfp),
               Expanded(
                 child: Text(
                   l10n.sourceMyFitnessPal,
