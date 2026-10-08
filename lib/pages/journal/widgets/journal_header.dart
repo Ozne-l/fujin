@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/common/entry_text.dart';
 
 class JournalHeader extends StatelessWidget {
   const JournalHeader({required this.day, required this.today, super.key});
@@ -13,7 +14,7 @@ class JournalHeader extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final title = switch (day == today) {
       true => l10n.journalToday,
-      false => _capitalized(l10n.journalDay(day)),
+      false => EntryText.capitalized(l10n.journalDay(day)),
     };
     return Padding(
       padding: const EdgeInsetsDirectional.only(
@@ -37,9 +38,4 @@ class JournalHeader extends StatelessWidget {
       ),
     );
   }
-
-  static String _capitalized(String text) => switch (text) {
-    '' => text,
-    _ => '${text.characters.first.toUpperCase()}${text.characters.skip(1)}',
-  };
 }

@@ -7,19 +7,32 @@ class StatusPill extends StatelessWidget {
     required this.label,
     required this.tone,
     this.icon,
+    this.small = false,
     super.key,
   });
 
   final String label;
   final PillTone tone;
   final IconData? icon;
+  final bool small;
 
   @override
   Widget build(BuildContext context) {
-    final style = FujinText.inter12Medium.copyWith(color: tone.foreground);
+    final style = switch (small) {
+      true => FujinText.inter11Medium,
+      false => FujinText.inter12Medium,
+    }.copyWith(color: tone.foreground);
     return Container(
-      height: FujinSize.pill,
-      padding: const EdgeInsets.symmetric(horizontal: FujinSpace.s3),
+      height: switch (small) {
+        true => FujinSize.pillSmall,
+        false => FujinSize.pill,
+      },
+      padding: EdgeInsets.symmetric(
+        horizontal: switch (small) {
+          true => FujinSpace.s2,
+          false => FujinSpace.s3,
+        },
+      ),
       decoration: BoxDecoration(
         color: tone.background,
         borderRadius: BorderRadius.circular(FujinRadius.pill),

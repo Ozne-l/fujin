@@ -5,9 +5,9 @@ import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/journal/journal_meal.dart';
 import 'package:fujin/domain/journal/status_counts.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 class MealCard extends StatelessWidget {
   const MealCard({required this.meal, super.key});
@@ -102,7 +102,7 @@ class _EntryRow extends StatelessWidget {
           link.mfpServingUnit,
         ),
       ),
-      InEkklo() || ToSend() => _macros(l10n, entry.nutrients),
+      InEkklo() || ToSend() => EntryText.macros(l10n, entry.nutrients),
     };
     final (label, tone, icon) = switch (compared.status) {
       InEkklo() => (l10n.statusInEkklo, PillTone.validated, null),
@@ -133,7 +133,7 @@ class _EntryRow extends StatelessWidget {
             spacing: FujinSpace.s1,
             children: [
               Text(
-                _serving(l10n, entry),
+                EntryText.brandedServing(l10n, entry),
                 style: FujinText.inter13Regular.copyWith(
                   color: FujinColorRole.textSecondary,
                 ),
@@ -149,31 +149,6 @@ class _EntryRow extends StatelessWidget {
           trailing: StatusPill(label: label, tone: tone, icon: icon),
         ),
       ],
-    );
-  }
-
-  static String _serving(AppLocalizations l10n, MfpFoodEntry entry) {
-    final serving = l10n.servingLine(
-      entry.servings,
-      entry.servingSize.value,
-      entry.servingSize.unit,
-    );
-    return switch (entry.food.brandName) {
-      null || '' => serving,
-      final brand => l10n.brandedServingLine(brand, serving),
-    };
-  }
-
-  static String _macros(AppLocalizations l10n, MfpNutrients nutrients) {
-    String amount(double? grams) => switch (grams) {
-      null => l10n.macroUnknown,
-      final grams => l10n.macroValue(grams),
-    };
-    return l10n.macros(
-      amount(nutrients.protein),
-      amount(nutrients.carbohydrates),
-      amount(nutrients.fat),
-      amount(nutrients.fiber),
     );
   }
 }
