@@ -1,5 +1,5 @@
 import 'package:ekklo_client/ekklo_client.dart';
-import 'package:fujin/domain/comparison/gram_unit.dart';
+import 'package:fujin/domain/comparison/entry_quantity.dart';
 import 'package:fujin/domain/sending/ekklo_candidate.dart';
 import 'package:fujin/domain/sending/food_words.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
@@ -33,29 +33,18 @@ EkkloCandidate? evaluateCandidate(
       nutrients.protein != null ||
       nutrients.carbohydrates != null ||
       nutrients.fat != null;
-  return switch ((kilocalories, food.quantityType, knownGrams, macrosKnown)) {
-    (final kcal?, EkkloQuantityType.grams, _, _)
+  return switch ((kilocalories, food.quantityType, knownGrams)) {
+    (_?, EkkloQuantityType.grams, null) when !macrosKnown => null,
+    (final kcal?, EkkloQuantityType.grams, final grams)
         when kcal > 0 && food.portion > 0 && food.calories > 0 =>
-      switch (knownGrams) {
-        null when !macrosKnown => null,
-        final grams => _candidate(
-          food,
-          entry,
-          kcal,
-          grams ?? kcal * food.portion / food.calories,
-          gramsInferred: grams == null,
-        ),
-      },
+      _candidate(
+        food,
+        entry,
+        kcal,
+        grams ?? kcal * food.portion / food.calories,
+        gramsInferred: grams == null,
+      ),
     _ => null,
-  };
-}
-
-double? entryGrams(MfpFoodEntry entry, {double? gramsPerUnit}) {
-  final units = entry.servingSize.value * entry.servings;
-  return switch ((isGramUnit(entry.servingSize.unit), gramsPerUnit)) {
-    (true, _) => units,
-    (false, final perUnit?) => units * perUnit,
-    (false, null) => null,
   };
 }
 

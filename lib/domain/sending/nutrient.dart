@@ -1,8 +1,3 @@
-import 'package:dart_mappable/dart_mappable.dart';
-
-part 'nutrient.mapper.dart';
-
-@MappableEnum()
 enum Nutrient {
   kilocalories(null),
   protein(4),

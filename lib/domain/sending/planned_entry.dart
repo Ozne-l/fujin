@@ -1,6 +1,7 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/links/sent_link.dart';
+import 'package:fujin/domain/comparison/entry_quantity.dart';
 import 'package:fujin/domain/comparison/expected_item.dart';
 import 'package:fujin/domain/comparison/gram_unit.dart';
 import 'package:fujin/domain/sending/ekklo_candidate.dart';
@@ -26,8 +27,6 @@ final class PlannedEntry with PlannedEntryMappable {
     this.replacing,
   });
 
-  static const _decimals = 1;
-
   final MfpFoodEntry entry;
   final String entryId;
   final String ekkloMealName;
@@ -39,7 +38,7 @@ final class PlannedEntry with PlannedEntryMappable {
   final double? rememberedGramsPerUnit;
   final SentLink? replacing;
 
-  double get units => entry.servingSize.value * entry.servings;
+  double get units => entryUnits(entry);
 
   bool get sends => switch (choice) {
     SkipEntry() => false,
@@ -56,28 +55,29 @@ final class PlannedEntry with PlannedEntryMappable {
     (SendToEkkloFood() || SendAsOwnCopy(), false) => ReviewReason.confirmed,
   };
 
-  PlannedEntry choose(EkkloCandidate candidate) => copyWith(
-    confirmed: true,
-    choice: SendToEkkloFood(
-      ekkloFoodId: candidate.food.id,
-      ekkloFoodName: candidate.food.name,
-      grams: candidate.grams,
-      remembered: candidate.food.id == rememberedEkkloFoodId,
-      food: candidate.food,
-      weight: switch ((
-        isGramUnit(entry.servingSize.unit),
-        candidate.gramsInferred,
-      )) {
-        (true, _) => UnitWeight.notNeeded,
-        (false, true) => UnitWeight.estimated,
-        (false, false) => UnitWeight.remembered,
-      },
-      gramsPerUnit: switch (isGramUnit(entry.servingSize.unit)) {
-        true => null,
-        false => candidate.grams / units,
-      },
-    ),
-  );
+  PlannedEntry choose(EkkloCandidate candidate, {bool confirmed = true}) =>
+      copyWith(
+        confirmed: confirmed,
+        choice: SendToEkkloFood(
+          ekkloFoodId: candidate.food.id,
+          ekkloFoodName: candidate.food.name,
+          grams: candidate.grams,
+          remembered: candidate.food.id == rememberedEkkloFoodId,
+          food: candidate.food,
+          weight: switch ((
+            isGramUnit(entry.servingSize.unit),
+            candidate.gramsInferred,
+          )) {
+            (true, _) => UnitWeight.notNeeded,
+            (false, true) => UnitWeight.estimated,
+            (false, false) => UnitWeight.remembered,
+          },
+          gramsPerUnit: switch (isGramUnit(entry.servingSize.unit)) {
+            true => null,
+            false => candidate.grams / units,
+          },
+        ),
+      );
 
   PlannedEntry asOwnCopy() =>
       copyWith(confirmed: true, choice: const SendAsOwnCopy());
@@ -100,15 +100,13 @@ final class PlannedEntry with PlannedEntryMappable {
   ExpectedItem expectedIn(
     String ekkloFoodId,
     EkkloQuantityType quantityType,
-  ) => ExpectedItem(
+  ) => ExpectedItem.rounded(
     ekkloMealName: ekkloMealName,
     ekkloFoodId: ekkloFoodId,
-    quantity: double.parse(
-      switch (choice) {
-        SendToEkkloFood(:final grams) => grams,
-        SendAsOwnCopy() || SkipEntry() => units,
-      }.toStringAsFixed(_decimals),
-    ),
+    quantity: switch (choice) {
+      SendToEkkloFood(:final grams) => grams,
+      SendAsOwnCopy() || SkipEntry() => units,
+    },
     quantityType: quantityType,
   );
 }

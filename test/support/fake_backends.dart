@@ -87,17 +87,15 @@ final class FakeBackends {
             'diary_preferences': {'meal_names': mealNames},
           },
         }),
-      ('GET', final host, '/api/v1/nutritions/daily-meals')
-          when host == ekkloUri.host =>
-        _json([for (final meal in ekkloMeals) meal.toMap()]),
-      ('GET', final host, '/api/v1/nutritions/food-items/search')
-          when host == ekkloUri.host =>
-        _json([
-          for (final food
-              in ekkloSearches[request.url.queryParameters['q']] ??
-                  const <EkkloFood>[])
-            food.toMap(),
-        ]),
+      ('GET', final host, dailyMealsPath) when host == ekkloUri.host => _json([
+        for (final meal in ekkloMeals) meal.toMap(),
+      ]),
+      ('GET', final host, _foodSearch) when host == ekkloUri.host => _json([
+        for (final food
+            in ekkloSearches[request.url.queryParameters['q']] ??
+                const <EkkloFood>[])
+          food.toMap(),
+      ]),
       ('GET', final host, final path)
           when host == ekkloUri.host && path.startsWith(_foodItems) =>
         switch (ekkloFoods
@@ -109,13 +107,13 @@ final class FakeBackends {
       ('POST', final host, '/api/v1/nutritions/client/food-items')
           when host == ekkloUri.host =>
         _createOwn(request),
-      ('POST', final host, _dailyMeals) when host == ekkloUri.host =>
+      ('POST', final host, dailyMealsPath) when host == ekkloUri.host =>
         _appendItems(request),
       ('PUT', final host, final path)
-          when host == ekkloUri.host && path.startsWith(_dailyMeals) =>
+          when host == ekkloUri.host && path.startsWith(dailyMealsPath) =>
         _updateQuantity(request),
       ('DELETE', final host, final path)
-          when host == ekkloUri.host && path.startsWith(_dailyMeals) =>
+          when host == ekkloUri.host && path.startsWith(dailyMealsPath) =>
         _removeItem(request),
       _ => http.Response('', 404),
     };
@@ -146,8 +144,9 @@ final class FakeBackends {
     tokenStore: store,
   );
 
-  static const _dailyMeals = '/api/v1/nutritions/daily-meals';
+  static const dailyMealsPath = '/api/v1/nutritions/daily-meals';
   static const _foodItems = '/api/v1/nutritions/food-items/';
+  static const _foodSearch = '${_foodItems}search';
 
   List<EkkloDailyMealItem> get ekkloItems => [
     for (final meal in ekkloMeals) ...meal.items,
@@ -179,7 +178,7 @@ final class FakeBackends {
   http.Response _appendItems(http.Request request) {
     final body = jsonDecode(request.body) as Map<String, Object?>;
     final name = body['name'] as String? ?? '';
-    if (failingMeals.contains(name)) return http.Response('', 503);
+    if (failingMeals.contains(name)) return http.Response('', 422);
     final drafts = [
       for (final item in body['daily_meal_items'] as List<Object?>? ?? [])
         EkkloMealItemDraftMapper.fromMap(item as Map<String, Object?>),

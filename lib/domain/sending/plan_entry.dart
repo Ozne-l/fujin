@@ -2,6 +2,7 @@ import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/links/sent_link.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
+import 'package:fujin/domain/comparison/entry_quantity.dart';
 import 'package:fujin/domain/comparison/gram_unit.dart';
 import 'package:fujin/domain/sending/ekklo_candidate.dart';
 import 'package:fujin/domain/sending/entry_planning.dart';
@@ -12,7 +13,7 @@ import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/domain/sending/unit_weight.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
-const searchResultsKept = 8;
+const _searchResultsKept = 8;
 
 EntryPlanning planEntry({
   required MfpFoodEntry entry,
@@ -47,7 +48,7 @@ EntryPlanning planEntry({
       _fromCandidates(
         base,
         rankCandidates(
-          results.take(searchResultsKept),
+          results.take(_searchResultsKept),
           entry,
           gramsPerUnit: gramsPerUnit,
         ),
@@ -82,7 +83,7 @@ EntryPlanning planEntry({
       (null, null) => NeedsEkkloFood(ekkloFoodId),
       (null, final food?) => switch (evaluateCandidate(food, entry)) {
         final candidate? => Planned(
-          base.choose(candidate).copyWith(reviewed: true, confirmed: false),
+          base.copyWith(reviewed: true).choose(candidate, confirmed: false),
         ),
         null => search(),
       },
@@ -106,7 +107,7 @@ PlannedEntry _fromCandidates(
   return switch (candidates
       .where((candidate) => candidate.acceptable)
       .firstOrNull) {
-    final best? => planned.choose(best).copyWith(confirmed: false),
+    final best? => planned.choose(best, confirmed: false),
     null => planned,
   };
 }

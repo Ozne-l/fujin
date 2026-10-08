@@ -5,10 +5,10 @@ import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/day_comparison.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/comparison/expected_item.dart';
+import 'package:fujin/domain/comparison/placement.dart';
 import 'package:fujin/domain/comparison/update_kind.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
-typedef _Placement = ({EkkloDailyMeal meal, EkkloDailyMealItem item});
 typedef _Orphan = ({
   SentLink link,
   EkkloDailyMeal meal,
@@ -22,10 +22,7 @@ DayComparison compareDay({
   required Memory memory,
   required DateTime now,
 }) {
-  final placements = <String, _Placement>{
-    for (final meal in meals)
-      for (final item in meal.items) item.id: (meal: meal, item: item),
-  };
+  final placements = placementsOf(meals);
   final entryIds = {for (final entry in entries) ?entry.id};
   final claimed = <String>{};
   final linked = <String, SentLink>{};
@@ -60,18 +57,13 @@ DayComparison compareDay({
   SentLink adopt(
     MfpFoodEntry entry,
     String entryId,
-    _Placement placement, {
+    Placement placement, {
     SentLink? replacing,
   }) {
     if (replacing case final SentLink old) dropped.add(old);
-    final link = SentLink(
-      mfpEntryId: entryId,
-      date: entry.date,
-      mfpFoodId: entry.food.id,
-      mfpMealName: entry.mealName,
-      mfpServings: entry.servings,
-      mfpServingValue: entry.servingSize.value,
-      mfpServingUnit: entry.servingSize.unit,
+    final link = SentLink.forEntry(
+      entry,
+      entryId: entryId,
       ekkloMealId: placement.meal.id,
       ekkloItemId: placement.item.id,
       sentAt: placement.item.createdAt ?? now,
@@ -98,7 +90,7 @@ DayComparison compareDay({
               (expected?.matches(placement.meal, placement.item) ?? false),
         )
         .firstOrNull;
-    if (match case final _Placement placement) {
+    if (match case final Placement placement) {
       statuses[index] = InEkklo(adopt(entry, id, placement));
     }
   }

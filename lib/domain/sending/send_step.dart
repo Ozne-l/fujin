@@ -16,11 +16,13 @@ sealed class SendStep with SendStepMappable {
 final class OwnCopyStep extends SendStep with OwnCopyStepMappable {
   const OwnCopyStep({
     required this.mfpFoodId,
+    required this.mfpUnit,
     required this.name,
     super.state,
   });
 
   final String mfpFoodId;
+  final String mfpUnit;
   final String name;
 
   @override

@@ -6,6 +6,8 @@ import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
+import 'package:fujin/domain/comparison/expected_item.dart';
+import 'package:fujin/domain/comparison/placement.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/sending/ekklo_candidate.dart';
 import 'package:fujin/domain/sending/entry_planning.dart';
@@ -25,7 +27,16 @@ import 'package:fujin/domain/sending/step_state.dart';
 import 'package:fujin/domain/sending/unit_weight.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
-typedef _Placement = ({EkkloDailyMeal meal, EkkloDailyMealItem item});
+typedef _OwnCopyKey = (String mfpFoodId, String mfpUnit);
+typedef _Update = ({
+  PlannedEntry planned,
+  SentLink link,
+  ExpectedItem expected,
+});
+typedef _Work = (SendStep step, Future<void> Function() run);
+
+_OwnCopyKey _ownCopyKey(MfpFoodEntry entry) =>
+    (entry.food.id, entry.servingSize.unit);
 
 final class SendService {
   const SendService({
@@ -120,48 +131,26 @@ final class SendService {
           },
     ];
     _remember(active);
-    final placements = <String, _Placement>{
-      for (final meal in day.ekkloMeals)
-        for (final item in meal.items) item.id: (meal: meal, item: item),
-    };
-    final ownCopyIds = <String, String>{
+    final ownCopyIds = <_OwnCopyKey, String>{
       for (final planned in active)
         if (planned.choice case SendAsOwnCopy(reuse: final OwnCopy copy))
-          planned.entry.food.id: copy.ekkloFoodId,
+          _ownCopyKey(planned.entry): copy.ekkloFoodId,
     };
-    final steps = _steps(active, placements);
     final createdCopies = <String>[];
-    var progress = SendProgress(steps: steps);
+    final work = _work(
+      plan.date,
+      active,
+      day.ekkloMeals,
+      ownCopyIds,
+      createdCopies,
+    );
+    var progress = SendProgress(steps: [for (final (step, _) in work) step]);
     onProgress(progress);
-    for (final (index, step) in steps.indexed) {
+    for (final (index, (_, run)) in work.indexed) {
       progress = progress.marking(index, StepState.running);
       onProgress(progress);
       try {
-        switch (step) {
-          case OwnCopyStep(:final mfpFoodId):
-            final entry = active
-                .firstWhere((planned) => planned.entry.food.id == mfpFoodId)
-                .entry;
-            final (ekkloFoodId, created) = await _ownCopy(entry);
-            ownCopyIds[mfpFoodId] = ekkloFoodId;
-            if (created) createdCopies.add(step.name);
-          case QuantityUpdateStep(:final entryId):
-            await _updateQuantity(
-              active.firstWhere((planned) => planned.entryId == entryId),
-              ownCopyIds,
-            );
-          case MealStep(:final ekkloMealName, :final entryIds):
-            await _sendMeal(
-              plan.date,
-              ekkloMealName,
-              [
-                for (final planned in active)
-                  if (entryIds.contains(planned.entryId)) planned,
-              ],
-              day.ekkloMeals,
-              ownCopyIds,
-            );
-        }
+        await run();
       } on Object catch (error) {
         progress = progress.marking(index, StepState.failed);
         onProgress(progress);
@@ -192,118 +181,141 @@ final class SendService {
 
   void _remember(List<PlannedEntry> active) {
     final memory = _memory.load();
-    for (final planned in active) {
-      if (memory.ekkloMealName(planned.entry.mealName) == null) {
-        _memory.saveMeal(
-          MealMapping(
-            mfpMealName: planned.entry.mealName,
-            ekkloMealName: planned.ekkloMealName,
-          ),
-        );
-      }
-      switch (planned.choice) {
-        case SendToEkkloFood(
-          :final ekkloFoodId,
-          :final ekkloFoodName,
-          :final remembered,
-          :final weight,
-          :final gramsPerUnit,
-        ):
-          if (!remembered) {
-            _memory.saveFood(
-              MatchedFood(
-                mfpFoodId: planned.entry.food.id,
-                mfpDescription: planned.entry.food.description,
-                ekkloFoodId: ekkloFoodId,
-                ekkloFoodName: ekkloFoodName,
-              ),
-            );
-          }
-          if ((weight, gramsPerUnit) case (
-            UnitWeight.estimated || UnitWeight.confirmed,
-            final double grams,
-          )) {
-            _memory.saveUnit(
-              RememberedUnit(
-                mfpFoodId: planned.entry.food.id,
-                mfpUnit: planned.entry.servingSize.unit,
-                grams: grams,
-              ),
-            );
-          }
-        case SendAsOwnCopy() || SkipEntry():
-          break;
-      }
-    }
+    _memory.remember(
+      meals: [
+        for (final planned in active)
+          if (memory.ekkloMealName(planned.entry.mealName) == null)
+            MealMapping(
+              mfpMealName: planned.entry.mealName,
+              ekkloMealName: planned.ekkloMealName,
+            ),
+      ],
+      foods: [
+        for (final planned in active)
+          if (planned.choice case SendToEkkloFood(
+            :final ekkloFoodId,
+            :final ekkloFoodName,
+            remembered: false,
+          ))
+            MatchedFood(
+              mfpFoodId: planned.entry.food.id,
+              mfpDescription: planned.entry.food.description,
+              ekkloFoodId: ekkloFoodId,
+              ekkloFoodName: ekkloFoodName,
+            ),
+      ],
+      units: [
+        for (final planned in active)
+          if (planned.choice case SendToEkkloFood(
+            weight: UnitWeight.estimated || UnitWeight.confirmed,
+            gramsPerUnit: final double grams,
+          ))
+            RememberedUnit(
+              mfpFoodId: planned.entry.food.id,
+              mfpUnit: planned.entry.servingSize.unit,
+              grams: grams,
+            ),
+      ],
+    );
   }
 
-  List<SendStep> _steps(
+  List<_Work> _work(
+    DateTime date,
     List<PlannedEntry> active,
-    Map<String, _Placement> placements,
+    List<EkkloDailyMeal> before,
+    Map<_OwnCopyKey, String> ownCopyIds,
+    List<String> createdCopies,
   ) {
-    final ownCopies = <String, OwnCopyStep>{
+    final placements = placementsOf(before);
+    final ownCopies = <_OwnCopyKey, MfpFoodEntry>{
       for (final planned in active)
         if (planned.choice case SendAsOwnCopy(reuse: null))
-          planned.entry.food.id: OwnCopyStep(
-            mfpFoodId: planned.entry.food.id,
-            name: productName(planned.entry.food),
-          ),
+          _ownCopyKey(planned.entry): planned.entry,
     };
-    final updates = [
+    final updates = <String, _Update>{
       for (final planned in active)
-        if (_updatesInPlace(planned, placements)) planned,
-    ];
-    final meals = <String, List<String>>{};
+        if (_inPlace(planned, placements) case final _Update update)
+          planned.entryId: update,
+    };
+    final meals = <String, List<PlannedEntry>>{};
     for (final planned in active) {
-      if (!updates.contains(planned)) {
-        meals.putIfAbsent(planned.ekkloMealName, () => []).add(planned.entryId);
+      if (!updates.containsKey(planned.entryId)) {
+        meals.putIfAbsent(planned.ekkloMealName, () => []).add(planned);
       }
     }
     return [
-      ...ownCopies.values,
-      for (final planned in updates)
-        QuantityUpdateStep(
-          entryId: planned.entryId,
-          name: productName(planned.entry.food),
+      for (final MapEntry(:key, value: entry) in ownCopies.entries)
+        (
+          OwnCopyStep(
+            mfpFoodId: entry.food.id,
+            mfpUnit: entry.servingSize.unit,
+            name: productName(entry.food),
+          ),
+          () async {
+            final (ekkloFoodId, created) = await _ownCopy(entry);
+            ownCopyIds[key] = ekkloFoodId;
+            if (created) createdCopies.add(productName(entry.food));
+          },
         ),
-      for (final MapEntry(key: name, value: entryIds) in meals.entries)
-        MealStep(ekkloMealName: name, entryIds: entryIds),
+      for (final update in updates.values)
+        (
+          QuantityUpdateStep(
+            entryId: update.planned.entryId,
+            name: productName(update.planned.entry.food),
+          ),
+          () => _updateQuantity(update),
+        ),
+      for (final MapEntry(key: name, value: entries) in meals.entries)
+        (
+          MealStep(
+            ekkloMealName: name,
+            entryIds: [for (final planned in entries) planned.entryId],
+          ),
+          () => _sendMeal(date, name, entries, before, ownCopyIds),
+        ),
     ];
   }
 
-  bool _updatesInPlace(
-    PlannedEntry planned,
-    Map<String, _Placement> placements,
-  ) => switch ((planned.replacing, _target(planned, const {}))) {
-    (final SentLink link, (final String foodId, final quantityType)) =>
-      switch (placements[link.ekkloItemId]) {
-        (:final meal, :final item) =>
-          meal.name == planned.ekkloMealName &&
-              item.foodId == foodId &&
-              item.quantityType == quantityType,
-        null => false,
-      },
-    _ => false,
-  };
+  _Update? _inPlace(PlannedEntry planned, Map<String, Placement> placements) =>
+      switch ((planned.replacing, _knownTarget(planned))) {
+        (final SentLink link, final ExpectedItem expected) =>
+          switch (placements[link.ekkloItemId]) {
+            (:final meal, :final item)
+                when meal.name == expected.ekkloMealName &&
+                    item.foodId == expected.ekkloFoodId &&
+                    item.quantityType == expected.quantityType =>
+              (planned: planned, link: link, expected: expected),
+            _ => null,
+          },
+        _ => null,
+      };
 
-  (String, EkkloQuantityType)? _target(
-    PlannedEntry planned,
-    Map<String, String> ownCopyIds,
-  ) => switch (planned.choice) {
-    SendToEkkloFood(:final ekkloFoodId) => (
+  ExpectedItem? _knownTarget(PlannedEntry planned) => switch (planned.choice) {
+    SendToEkkloFood(:final ekkloFoodId) => planned.expectedIn(
       ekkloFoodId,
       EkkloQuantityType.grams,
     ),
-    SendAsOwnCopy(:final reuse) => switch (reuse?.ekkloFoodId ??
-        ownCopyIds[planned.entry.food.id]) {
-      final String id => (
-        id,
-        ownCopyQuantityType(planned.entry.servingSize.unit),
-      ),
-      null => null,
-    },
-    SkipEntry() => null,
+    SendAsOwnCopy(reuse: final OwnCopy copy) => planned.expectedIn(
+      copy.ekkloFoodId,
+      ownCopyQuantityType(planned.entry.servingSize.unit),
+    ),
+    SendAsOwnCopy() || SkipEntry() => null,
   };
+
+  ExpectedItem _target(
+    PlannedEntry planned,
+    Map<_OwnCopyKey, String> ownCopyIds,
+  ) =>
+      switch ((_knownTarget(planned), ownCopyIds[_ownCopyKey(planned.entry)])) {
+        (final ExpectedItem expected, _) => expected,
+        (null, final String ekkloFoodId) => planned.expectedIn(
+          ekkloFoodId,
+          ownCopyQuantityType(planned.entry.servingSize.unit),
+        ),
+        (null, null) => throw StateError(
+          'No Ekklo food for entry ${planned.entryId}',
+        ),
+      };
 
   Future<(String, bool)> _ownCopy(MfpFoodEntry entry) async {
     switch (_memory.load().food(entry.food.id)) {
@@ -325,26 +337,18 @@ final class SendService {
     }
   }
 
-  Future<void> _updateQuantity(
-    PlannedEntry planned,
-    Map<String, String> ownCopyIds,
-  ) async {
-    if ((planned.replacing, _target(planned, ownCopyIds)) case (
-      final SentLink link,
-      (final String foodId, final quantityType),
-    )) {
-      final expected = planned.expectedIn(foodId, quantityType);
-      final item = await _ekklo.meals.updateItemQuantity(
-        mealId: link.ekkloMealId,
-        itemId: link.ekkloItemId,
-        quantity: expected.quantity,
-        quantityType: expected.quantityType,
-      );
-      _links.replace(
-        dropped: [link],
-        adopted: [_link(planned, link.ekkloMealId, item.id)],
-      );
-    }
+  Future<void> _updateQuantity(_Update update) async {
+    final (:planned, :link, :expected) = update;
+    final item = await _ekklo.meals.updateItemQuantity(
+      mealId: link.ekkloMealId,
+      itemId: link.ekkloItemId,
+      quantity: expected.quantity,
+      quantityType: expected.quantityType,
+    );
+    _links.replace(
+      dropped: [link],
+      adopted: [_link(planned, link.ekkloMealId, item.id)],
+    );
   }
 
   Future<void> _sendMeal(
@@ -352,7 +356,7 @@ final class SendService {
     String ekkloMealName,
     List<PlannedEntry> entries,
     List<EkkloDailyMeal> before,
-    Map<String, String> ownCopyIds,
+    Map<_OwnCopyKey, String> ownCopyIds,
   ) async {
     for (final planned in entries) {
       if (planned.replacing case final SentLink link) {
@@ -364,12 +368,7 @@ final class SendService {
       }
     }
     final expected = [
-      for (final planned in entries)
-        if (_target(planned, ownCopyIds) case (
-          final String foodId,
-          final quantityType,
-        ))
-          (planned, planned.expectedIn(foodId, quantityType)),
+      for (final planned in entries) (planned, _target(planned, ownCopyIds)),
     ];
     final known = {
       for (final meal in before)
@@ -393,41 +392,27 @@ final class SendService {
         if (!known.contains(item.id)) item,
     ];
     final claimed = <String>{};
-    _links.replace(
-      dropped: const [],
-      adopted: [
-        for (final (planned, item) in expected)
-          if (added
-                  .where(
-                    (candidate) =>
-                        !claimed.contains(candidate.id) &&
-                        item.matches(meal, candidate),
-                  )
-                  .firstOrNull
-              case final EkkloDailyMealItem match)
-            _claim(claimed, match, _link(planned, meal.id, match.id)),
-      ],
-    );
-  }
-
-  SentLink _claim(
-    Set<String> claimed,
-    EkkloDailyMealItem item,
-    SentLink link,
-  ) {
-    claimed.add(item.id);
-    return link;
+    final adopted = <SentLink>[];
+    for (final (planned, item) in expected) {
+      if (added
+              .where(
+                (candidate) =>
+                    !claimed.contains(candidate.id) &&
+                    item.matches(meal, candidate),
+              )
+              .firstOrNull
+          case final EkkloDailyMealItem match) {
+        claimed.add(match.id);
+        adopted.add(_link(planned, meal.id, match.id));
+      }
+    }
+    _links.replace(dropped: const [], adopted: adopted);
   }
 
   SentLink _link(PlannedEntry planned, String mealId, String itemId) =>
-      SentLink(
-        mfpEntryId: planned.entryId,
-        date: planned.entry.date,
-        mfpFoodId: planned.entry.food.id,
-        mfpMealName: planned.entry.mealName,
-        mfpServings: planned.entry.servings,
-        mfpServingValue: planned.entry.servingSize.value,
-        mfpServingUnit: planned.entry.servingSize.unit,
+      SentLink.forEntry(
+        planned.entry,
+        entryId: planned.entryId,
         ekkloMealId: mealId,
         ekkloItemId: itemId,
         sentAt: _clock(),

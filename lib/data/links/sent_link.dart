@@ -1,5 +1,6 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:fujin/data/database/calendar_date_hook.dart';
+import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 part 'sent_link.mapper.dart';
 
@@ -17,6 +18,25 @@ final class SentLink with SentLinkMappable {
     required this.ekkloItemId,
     required this.sentAt,
   });
+
+  factory SentLink.forEntry(
+    MfpFoodEntry entry, {
+    required String entryId,
+    required String ekkloMealId,
+    required String ekkloItemId,
+    required DateTime sentAt,
+  }) => SentLink(
+    mfpEntryId: entryId,
+    date: entry.date,
+    mfpFoodId: entry.food.id,
+    mfpMealName: entry.mealName,
+    mfpServings: entry.servings,
+    mfpServingValue: entry.servingSize.value,
+    mfpServingUnit: entry.servingSize.unit,
+    ekkloMealId: ekkloMealId,
+    ekkloItemId: ekkloItemId,
+    sentAt: sentAt,
+  );
 
   final String mfpEntryId;
   @MappableField(hook: CalendarDateHook())

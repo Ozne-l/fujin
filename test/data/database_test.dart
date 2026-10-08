@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart'
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/schema.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
+import 'package:fujin/data/memory/meal_mapping.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
@@ -115,6 +116,29 @@ void main() {
       final loaded = repository.load();
       check(loaded.food(rice)).isA<OwnCopy>();
       check(loaded.units).isEmpty();
+    });
+
+    test('keeps nothing of a send whose unit weight is refused', () {
+      check(
+        () => repository.remember(
+          meals: const [
+            MealMapping(mfpMealName: snacks, ekkloMealName: snacks),
+          ],
+          foods: const [
+            MatchedFood(
+              mfpFoodId: skyr,
+              mfpDescription: skyr,
+              ekkloFoodId: 'isey',
+              ekkloFoodName: 'isey',
+            ),
+          ],
+          units: const [RememberedUnit(mfpFoodId: oil, mfpUnit: pot, grams: 1)],
+        ),
+      ).throws<Object>();
+
+      final loaded = repository.load();
+      check(loaded.food(skyr)).isNull();
+      check(loaded.ekkloMealName(snacks)).isNull();
     });
 
     test('forgets the version of an own copy saved again without one', () {

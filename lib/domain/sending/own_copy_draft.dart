@@ -1,9 +1,11 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/domain/comparison/entry_quantity.dart';
 import 'package:fujin/domain/comparison/gram_unit.dart';
 import 'package:fujin/domain/sending/food_words.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
-const gramsPerOwnCopyPortion = 100.0;
+const _gramsPerOwnCopyPortion = 100.0;
+const _portionPerUnit = 1.0;
 
 EkkloQuantityType ownCopyQuantityType(String mfpUnit) =>
     switch (isGramUnit(mfpUnit)) {
@@ -12,13 +14,11 @@ EkkloQuantityType ownCopyQuantityType(String mfpUnit) =>
     };
 
 EkkloFoodDraft ownCopyDraft(MfpFoodEntry entry) {
-  final units = entry.servingSize.value * entry.servings;
-  final quantityType = ownCopyQuantityType(entry.servingSize.unit);
-  final portion = switch (quantityType) {
-    EkkloQuantityType.grams => gramsPerOwnCopyPortion,
-    _ => 1.0,
+  final (portion, quantityType) = switch (isGramUnit(entry.servingSize.unit)) {
+    true => (_gramsPerOwnCopyPortion, EkkloQuantityType.grams),
+    false => (_portionPerUnit, EkkloQuantityType.portion),
   };
-  final scale = portion / units;
+  final scale = portion / entryUnits(entry);
   final nutrients = entry.nutrients;
   return EkkloFoodDraft(
     name: productName(entry.food),

@@ -174,14 +174,14 @@ void main() {
 
     test('keeps the MyFitnessPal meal name when Memory maps no meal', () {
       final planning = plan(
-        entry('E-1', meal: 'Collations'),
+        entry('E-1', meal: snacks),
         searchResults: const [],
       );
 
       planned(planning)
           .has((it) => it.ekkloMealName, 'meal')
           .equals(
-            'Collations',
+            snacks,
           );
     });
   });

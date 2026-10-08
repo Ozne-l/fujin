@@ -59,6 +59,16 @@ final class MemoryRepository {
     key: const [_mfpMealName],
   );
 
+  void remember({
+    required Iterable<MealMapping> meals,
+    required Iterable<RememberedFood> foods,
+    required Iterable<RememberedUnit> units,
+  }) => _database.transaction(() {
+    meals.forEach(saveMeal);
+    foods.forEach(saveFood);
+    units.forEach(saveUnit);
+  });
+
   static const _mfpFoodId = 'mfp_food_id';
   static const _mfpUnit = 'mfp_unit';
   static const _mfpMealName = 'mfp_meal_name';

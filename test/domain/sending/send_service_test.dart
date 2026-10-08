@@ -9,6 +9,8 @@ import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
+import 'package:fujin/domain/sending/review_reason.dart';
+import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/domain/sending/send_interruption.dart';
 import 'package:fujin/domain/sending/send_plan.dart';
 import 'package:fujin/domain/sending/send_report.dart';
@@ -19,8 +21,9 @@ import 'package:http/http.dart' as http;
 import '../../support/fake_backends.dart';
 import '../../support/fixtures.dart';
 
-const collations = 'Collations';
-const _dailyMeals = '/api/v1/nutritions/daily-meals';
+const _gratin = 'mfp-gratin';
+const _gratinName = 'Gratin dauphinois maison';
+const _portion = 'portion';
 
 void main() {
   late FujinDatabase database;
@@ -55,9 +58,10 @@ void main() {
   Future<SendReport> send(SendService sending, SendPlan plan) =>
       sending.send(plan, onProgress: (_) {});
 
-  List<http.Request> writes(String method, [String path = _dailyMeals]) => [
+  List<http.Request> writes(String method) => [
     for (final request in backends.requests)
-      if (request.method == method && request.url.path.startsWith(path))
+      if (request.method == method &&
+          request.url.path.startsWith(FakeBackends.dailyMealsPath))
         request,
   ];
 
@@ -106,8 +110,8 @@ void main() {
       food: skyr,
       description: 'Skyr nature',
       brand: 'Isey',
-      meal: collations,
-      unit: 'pot',
+      meal: snacks,
+      unit: pot,
       servingValue: 1,
       servings: 2,
       nutrients: nutrients(kcal: 160, protein: 25, carbs: 10, fat: 0.5),
@@ -127,10 +131,10 @@ void main() {
       remembered.food(skyr),
     ).isA<MatchedFood>().has((it) => it.ekkloFoodId, 'food').equals('isey');
     check(
-      remembered.gramsPerUnit(skyr, 'pot'),
+      remembered.gramsPerUnit(skyr, pot),
     ).isNotNull().isCloseTo(80 * 100 / 62, 1e-9);
-    check(remembered.ekkloMealName(collations)).equals(collations);
-    check(appendedMeals()).deepEquals([collations]);
+    check(remembered.ekkloMealName(snacks)).equals(snacks);
+    check(appendedMeals()).deepEquals([snacks]);
     check((await journal.readDay(day)).counts.inEkklo).equals(1);
     check(report)
       ..has((it) => it.newAssociations, 'associations').deepEquals([
@@ -143,23 +147,23 @@ void main() {
   test(
     'creates an own copy before sending it in portions of its unit',
     () async {
-      final gratin = entry(
+      final gratinEntry = entry(
         'E-1',
-        food: 'mfp-gratin',
-        description: 'Gratin dauphinois maison',
-        unit: 'portion',
+        food: _gratin,
+        description: _gratinName,
+        unit: _portion,
         servingValue: 1,
         servings: 1.5,
         nutrients: nutrients(kcal: 465, protein: 10.5),
       );
-      backends = FakeBackends(entries: [gratin]);
+      backends = FakeBackends(entries: [gratinEntry]);
       final (journal, sending) = await services();
 
       final report = await send(sending, await planDay(sending));
 
       final copy = backends.ekkloFoods.single;
       check(copy)
-        ..has((it) => it.name, 'name').equals('Gratin dauphinois maison')
+        ..has((it) => it.name, 'name').equals(_gratinName)
         ..has((it) => it.quantityType, 'type').equals(EkkloQuantityType.portion)
         ..has((it) => it.calories, 'kcal').equals(310)
         ..has((it) => it.proteins, 'protein').equals(7);
@@ -170,13 +174,112 @@ void main() {
           (it) => it.quantityType,
           'type',
         ).equals(EkkloQuantityType.portion);
-      check(memoryRepository.load().food('mfp-gratin')).isA<OwnCopy>()
+      check(memoryRepository.load().food(_gratin)).isA<OwnCopy>()
         ..has((it) => it.ekkloFoodId, 'food').equals(copy.id)
-        ..has((it) => it.mfpUnit, 'unit').equals('portion');
+        ..has((it) => it.mfpUnit, 'unit').equals(_portion);
       check((await journal.readDay(day)).counts.inEkklo).equals(1);
-      check(report.ownCopies).deepEquals(['Gratin dauphinois maison']);
+      check(report.ownCopies).deepEquals([_gratinName]);
     },
   );
+
+  test('creates one own copy per unit of a food logged in two units', () async {
+    backends = FakeBackends(
+      entries: [
+        entry(
+          'E-1',
+          food: _gratin,
+          description: _gratinName,
+          unit: _portion,
+          servingValue: 1,
+          servings: 1.5,
+          nutrients: nutrients(kcal: 465, protein: 10.5),
+        ),
+        entry(
+          'E-2',
+          food: _gratin,
+          description: _gratinName,
+          servingValue: 200,
+          nutrients: nutrients(kcal: 300, protein: 7),
+        ),
+      ],
+    );
+    final (_, sending) = await services();
+
+    final report = await send(sending, await planDay(sending));
+
+    final copies = {
+      for (final food in backends.ekkloFoods) food.id: food.quantityType,
+    };
+    check(copies).length.equals(2);
+    check([
+      for (final item in backends.ekkloItems)
+        (copies[item.foodId], item.quantityType, item.quantity),
+    ]).deepEquals([
+      (EkkloQuantityType.portion, EkkloQuantityType.portion, 1.5),
+      (EkkloQuantityType.grams, EkkloQuantityType.grams, 200),
+    ]);
+    check(report.ownCopies).length.equals(2);
+  });
+
+  test('reuses the own copy created before an interruption', () async {
+    backends = FakeBackends(
+      entries: [
+        entry(
+          'E-1',
+          food: _gratin,
+          description: _gratinName,
+          unit: _portion,
+          servingValue: 1,
+          nutrients: nutrients(kcal: 310, protein: 7),
+        ),
+      ],
+    );
+    backends.failingMeals.add(petitDejeuner);
+    final (journal, sending) = await services();
+    final plan = await planDay(sending);
+    await check(send(sending, plan)).throws<SendInterruption>();
+
+    backends.failingMeals.clear();
+    final report = await send(sending, plan);
+
+    final copy = backends.ekkloFoods.single;
+    check(backends.ekkloItems.single.foodId).equals(copy.id);
+    check(report.ownCopies).isEmpty();
+    check((await journal.readDay(day)).counts.inEkklo).equals(1);
+  });
+
+  test('reads the remembered Ekklo food to weigh a new unit', () async {
+    backends = FakeBackends(
+      entries: [
+        entry(
+          'E-1',
+          food: rice,
+          unit: bowl,
+          servingValue: 1,
+          nutrients: nutrients(kcal: 260, carbs: 56),
+        ),
+      ],
+      ekkloFoods: [ekkloFood(riceInEkklo, calories: 130, carbs: 28)],
+    );
+    final (_, sending) = await services();
+
+    final plan = await planDay(sending);
+    await send(sending, plan);
+
+    check(plan.entries.single)
+      ..has((it) => it.reason, 'reason').equals(ReviewReason.weightToConfirm)
+      ..has((it) => it.choice, 'choice')
+          .isA<SendToEkkloFood>()
+          .has(
+            (it) => it.grams,
+            'grams',
+          )
+          .equals(200);
+    check(memoryRepository.load().gramsPerUnit(rice, bowl)).equals(200);
+    check(backends.ekkloItems.single)
+      ..has((it) => it.foodId, 'food').equals(riceInEkklo)
+      ..has((it) => it.quantity, 'quantity').equals(200);
+  });
 
   test('changes only the quantity of an item whose servings changed', () async {
     links.add(link('E-1', 'I-1'));

@@ -2,6 +2,7 @@ import 'package:dart_mappable/dart_mappable.dart';
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
+import 'package:fujin/domain/comparison/entry_quantity.dart';
 import 'package:fujin/domain/comparison/gram_unit.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -16,6 +17,18 @@ final class ExpectedItem with ExpectedItemMappable {
     required this.quantityType,
   });
 
+  factory ExpectedItem.rounded({
+    required String ekkloMealName,
+    required String ekkloFoodId,
+    required double quantity,
+    required EkkloQuantityType quantityType,
+  }) => ExpectedItem(
+    ekkloMealName: ekkloMealName,
+    ekkloFoodId: ekkloFoodId,
+    quantity: double.parse(quantity.toStringAsFixed(_decimals)),
+    quantityType: quantityType,
+  );
+
   static const quantityTolerance = 0.1;
   static const _decimals = 1;
   static const _epsilon = 1e-9;
@@ -28,28 +41,22 @@ final class ExpectedItem with ExpectedItemMappable {
   static ExpectedItem? forEntry(MfpFoodEntry entry, Memory memory) {
     final mealName = memory.ekkloMealName(entry.mealName);
     final food = memory.food(entry.food.id);
-    final units = entry.servingSize.value * entry.servings;
     final quantity = switch (food) {
       null => null,
-      MatchedFood(:final mfpFoodId) => switch (isGramUnit(
-        entry.servingSize.unit,
+      MatchedFood(:final mfpFoodId) => switch (entryGrams(
+        entry,
+        gramsPerUnit: memory.gramsPerUnit(mfpFoodId, entry.servingSize.unit),
       )) {
-        true => (units, EkkloQuantityType.grams),
-        false => switch (memory.gramsPerUnit(
-          mfpFoodId,
-          entry.servingSize.unit,
-        )) {
-          null => null,
-          final grams => (units * grams, EkkloQuantityType.grams),
-        },
+        null => null,
+        final grams => (grams, EkkloQuantityType.grams),
       },
       OwnCopy(:final mfpUnit) => switch ((
         mfpUnit == entry.servingSize.unit,
         isGramUnit(mfpUnit),
       )) {
         (false, _) => null,
-        (true, true) => (units, EkkloQuantityType.grams),
-        (true, false) => (units, EkkloQuantityType.portion),
+        (true, true) => (entryUnits(entry), EkkloQuantityType.grams),
+        (true, false) => (entryUnits(entry), EkkloQuantityType.portion),
       },
     };
     return switch ((mealName, food, quantity)) {
@@ -61,10 +68,10 @@ final class ExpectedItem with ExpectedItemMappable {
           final EkkloQuantityType type,
         ),
       ) =>
-        ExpectedItem(
+        ExpectedItem.rounded(
           ekkloMealName: mealName,
           ekkloFoodId: food.ekkloFoodId,
-          quantity: double.parse(amount.toStringAsFixed(_decimals)),
+          quantity: amount,
           quantityType: type,
         ),
       _ => null,

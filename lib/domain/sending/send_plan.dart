@@ -36,7 +36,9 @@ final class SendPlan with SendPlanMappable {
   int get sendCount => entries.where((planned) => planned.sends).length;
 
   bool get updatesOnly =>
-      toReview.isEmpty && entries.every((planned) => planned.replacing != null);
+      entries.isNotEmpty &&
+      toReview.isEmpty &&
+      entries.every((planned) => planned.replacing != null);
 
   PlannedEntry? entry(String entryId) =>
       entries.where((planned) => planned.entryId == entryId).firstOrNull;

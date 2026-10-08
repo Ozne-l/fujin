@@ -162,6 +162,9 @@ const memory = Memory(
 const skyr = 'mfp-skyr';
 const oil = 'mfp-oil';
 const tablespoon = 'c. à soupe';
+const pot = 'pot';
+const bowl = 'bowl';
+const snacks = 'Collations';
 
 final MfpFoodEntry skyrEntry = entry(
   'E-1',

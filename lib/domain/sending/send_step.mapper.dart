@@ -93,6 +93,12 @@ class OwnCopyStepMapper extends SubClassMapperBase<OwnCopyStep> {
     _$mfpFoodId,
     key: r'mfp_food_id',
   );
+  static String _$mfpUnit(OwnCopyStep v) => v.mfpUnit;
+  static const Field<OwnCopyStep, String> _f$mfpUnit = Field(
+    'mfpUnit',
+    _$mfpUnit,
+    key: r'mfp_unit',
+  );
   static String _$name(OwnCopyStep v) => v.name;
   static const Field<OwnCopyStep, String> _f$name = Field('name', _$name);
   static StepState _$state(OwnCopyStep v) => v.state;
@@ -106,6 +112,7 @@ class OwnCopyStepMapper extends SubClassMapperBase<OwnCopyStep> {
   @override
   final MappableFields<OwnCopyStep> fields = const {
     #mfpFoodId: _f$mfpFoodId,
+    #mfpUnit: _f$mfpUnit,
     #name: _f$name,
     #state: _f$state,
   };
@@ -122,6 +129,7 @@ class OwnCopyStepMapper extends SubClassMapperBase<OwnCopyStep> {
   static OwnCopyStep _instantiate(DecodingData data) {
     return OwnCopyStep(
       mfpFoodId: data.dec(_f$mfpFoodId),
+      mfpUnit: data.dec(_f$mfpUnit),
       name: data.dec(_f$name),
       state: data.dec(_f$state),
     );
@@ -188,7 +196,7 @@ extension OwnCopyStepValueCopy<$R, $Out>
 abstract class OwnCopyStepCopyWith<$R, $In extends OwnCopyStep, $Out>
     implements SendStepCopyWith<$R, $In, $Out> {
   @override
-  $R call({String? mfpFoodId, String? name, StepState? state});
+  $R call({String? mfpFoodId, String? mfpUnit, String? name, StepState? state});
   OwnCopyStepCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -201,9 +209,15 @@ class _OwnCopyStepCopyWithImpl<$R, $Out>
   late final ClassMapperBase<OwnCopyStep> $mapper =
       OwnCopyStepMapper.ensureInitialized();
   @override
-  $R call({String? mfpFoodId, String? name, StepState? state}) => $apply(
+  $R call({
+    String? mfpFoodId,
+    String? mfpUnit,
+    String? name,
+    StepState? state,
+  }) => $apply(
     FieldCopyWithData({
       if (mfpFoodId != null) #mfpFoodId: mfpFoodId,
+      if (mfpUnit != null) #mfpUnit: mfpUnit,
       if (name != null) #name: name,
       if (state != null) #state: state,
     }),
@@ -211,6 +225,7 @@ class _OwnCopyStepCopyWithImpl<$R, $Out>
   @override
   OwnCopyStep $make(CopyWithData data) => OwnCopyStep(
     mfpFoodId: data.get(#mfpFoodId, or: $value.mfpFoodId),
+    mfpUnit: data.get(#mfpUnit, or: $value.mfpUnit),
     name: data.get(#name, or: $value.name),
     state: data.get(#state, or: $value.state),
   );
