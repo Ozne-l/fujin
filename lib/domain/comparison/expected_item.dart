@@ -43,7 +43,14 @@ final class ExpectedItem with ExpectedItemMappable {
           final grams => (units * grams, EkkloQuantityType.grams),
         },
       },
-      OwnCopy() => (entry.servings, EkkloQuantityType.portion),
+      OwnCopy(:final mfpUnit) => switch ((
+        mfpUnit == entry.servingSize.unit,
+        isGramUnit(mfpUnit),
+      )) {
+        (false, _) => null,
+        (true, true) => (units, EkkloQuantityType.grams),
+        (true, false) => (units, EkkloQuantityType.portion),
+      },
     };
     return switch ((mealName, food, quantity)) {
       (

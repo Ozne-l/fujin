@@ -311,6 +311,12 @@ class OwnCopyMapper extends SubClassMapperBase<OwnCopy> {
     _$ekkloFoodName,
     key: r'ekklo_food_name',
   );
+  static String _$mfpUnit(OwnCopy v) => v.mfpUnit;
+  static const Field<OwnCopy, String> _f$mfpUnit = Field(
+    'mfpUnit',
+    _$mfpUnit,
+    key: r'mfp_unit',
+  );
   static String? _$mfpFoodVersion(OwnCopy v) => v.mfpFoodVersion;
   static const Field<OwnCopy, String> _f$mfpFoodVersion = Field(
     'mfpFoodVersion',
@@ -325,6 +331,7 @@ class OwnCopyMapper extends SubClassMapperBase<OwnCopy> {
     #mfpDescription: _f$mfpDescription,
     #ekkloFoodId: _f$ekkloFoodId,
     #ekkloFoodName: _f$ekkloFoodName,
+    #mfpUnit: _f$mfpUnit,
     #mfpFoodVersion: _f$mfpFoodVersion,
   };
   @override
@@ -344,6 +351,7 @@ class OwnCopyMapper extends SubClassMapperBase<OwnCopy> {
       mfpDescription: data.dec(_f$mfpDescription),
       ekkloFoodId: data.dec(_f$ekkloFoodId),
       ekkloFoodName: data.dec(_f$ekkloFoodName),
+      mfpUnit: data.dec(_f$mfpUnit),
       mfpFoodVersion: data.dec(_f$mfpFoodVersion),
     );
   }
@@ -411,6 +419,7 @@ abstract class OwnCopyCopyWith<$R, $In extends OwnCopy, $Out>
     String? mfpDescription,
     String? ekkloFoodId,
     String? ekkloFoodName,
+    String? mfpUnit,
     String? mfpFoodVersion,
   });
   OwnCopyCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
@@ -430,6 +439,7 @@ class _OwnCopyCopyWithImpl<$R, $Out>
     String? mfpDescription,
     String? ekkloFoodId,
     String? ekkloFoodName,
+    String? mfpUnit,
     Object? mfpFoodVersion = $none,
   }) => $apply(
     FieldCopyWithData({
@@ -437,6 +447,7 @@ class _OwnCopyCopyWithImpl<$R, $Out>
       if (mfpDescription != null) #mfpDescription: mfpDescription,
       if (ekkloFoodId != null) #ekkloFoodId: ekkloFoodId,
       if (ekkloFoodName != null) #ekkloFoodName: ekkloFoodName,
+      if (mfpUnit != null) #mfpUnit: mfpUnit,
       if (mfpFoodVersion != $none) #mfpFoodVersion: mfpFoodVersion,
     }),
   );
@@ -446,6 +457,7 @@ class _OwnCopyCopyWithImpl<$R, $Out>
     mfpDescription: data.get(#mfpDescription, or: $value.mfpDescription),
     ekkloFoodId: data.get(#ekkloFoodId, or: $value.ekkloFoodId),
     ekkloFoodName: data.get(#ekkloFoodName, or: $value.ekkloFoodName),
+    mfpUnit: data.get(#mfpUnit, or: $value.mfpUnit),
     mfpFoodVersion: data.get(#mfpFoodVersion, or: $value.mfpFoodVersion),
   );
 

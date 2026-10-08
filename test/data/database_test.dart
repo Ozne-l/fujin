@@ -107,6 +107,7 @@ void main() {
           mfpDescription: rice,
           ekkloFoodId: 'own-rice',
           ekkloFoodName: rice,
+          mfpUnit: cup,
           mfpFoodVersion: 'v2',
         ),
       );
@@ -122,6 +123,7 @@ void main() {
         mfpDescription: rice,
         ekkloFoodId: 'own-rice',
         ekkloFoodName: rice,
+        mfpUnit: cup,
         mfpFoodVersion: 'v2',
       );
       repository
@@ -134,6 +136,7 @@ void main() {
           mfpDescription: rice,
           ekkloFoodId: 'own-rice',
           ekkloFoodName: rice,
+          mfpUnit: cup,
         ),
       );
     });

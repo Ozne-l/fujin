@@ -32,4 +32,7 @@ const schemaMigrations = [
   );
   CREATE INDEX sent_link_date ON sent_link (date);
   ''',
+  '''
+  ALTER TABLE memory_food ADD COLUMN mfp_unit TEXT;
+  ''',
 ];

@@ -34,8 +34,10 @@ final class OwnCopy extends RememberedFood with OwnCopyMappable {
     required super.mfpDescription,
     required super.ekkloFoodId,
     required super.ekkloFoodName,
+    required this.mfpUnit,
     this.mfpFoodVersion,
   });
 
+  final String mfpUnit;
   final String? mfpFoodVersion;
 }

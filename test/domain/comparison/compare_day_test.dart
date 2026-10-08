@@ -2,7 +2,9 @@ import 'package:checks/checks.dart';
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_test/flutter_test.dart' show group, test;
 import 'package:fujin/data/links/sent_link.dart';
+import 'package:fujin/data/memory/meal_mapping.dart';
 import 'package:fujin/data/memory/memory.dart';
+import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/comparison/compare_day.dart';
 import 'package:fujin/domain/comparison/day_comparison.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
@@ -129,6 +131,64 @@ void main() {
         ),
       ]);
     });
+
+    test(
+      'expects an own copy in portions of its unit, and nothing in another',
+      () {
+        const copied = Memory(
+          foods: [
+            OwnCopy(
+              mfpFoodId: oats,
+              mfpDescription: oats,
+              ekkloFoodId: 'own-oats',
+              ekkloFoodName: oats,
+              mfpUnit: cup,
+            ),
+          ],
+          meals: [
+            MealMapping(mfpMealName: breakfast, ekkloMealName: petitDejeuner),
+          ],
+        );
+
+        final result = compare(
+          [
+            entry('E-1', unit: cup, servingValue: 0.5, servings: 3),
+            entry('E-2', unit: 'bowl', servingValue: 1, servings: 1.5),
+          ],
+          [
+            meal('meal-1', [
+              item(
+                'I-1',
+                food: 'own-oats',
+                quantity: 1.5,
+                type: EkkloQuantityType.portion,
+              ),
+              item(
+                'I-2',
+                food: 'own-oats',
+                quantity: 1.5,
+                type: EkkloQuantityType.portion,
+              ),
+            ]),
+          ],
+          const [],
+          copied,
+        );
+
+        check(statusesOf(result)).deepEquals([
+          InEkklo(
+            adoptedLink(
+              'E-1',
+              'I-1',
+              servings: 3,
+              servingValue: 0.5,
+              unit: cup,
+            ),
+          ),
+          const ToSend(),
+        ]);
+      },
+    );
 
     test('is to send when its unit has no grams in Memory', () {
       final result = compare(
