@@ -20,8 +20,13 @@ final databaseProvider = Provider<FujinDatabase>(
   (ref) => throw StateError('databaseProvider is overridden in bootstrap'),
 );
 
+final appEnvironmentProvider = Provider<AppEnvironment>(
+  (ref) =>
+      throw StateError('appEnvironmentProvider is overridden in bootstrap'),
+);
+
 final httpClientProvider = Provider<http.Client>((ref) {
-  final client = switch (Config.environment) {
+  final client = switch (ref.watch(appEnvironmentProvider)) {
     AppEnvironment.production => http.Client(),
     AppEnvironment.dev => ReadOnlyHttpClient(
       http.Client(),

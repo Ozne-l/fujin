@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/app_environment.dart';
-import 'package:fujin/app/config.dart';
+import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/router.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
@@ -18,7 +18,7 @@ class FujinApp extends ConsumerWidget {
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     debugShowCheckedModeBanner: false,
-    builder: switch (Config.environment) {
+    builder: switch (ref.watch(appEnvironmentProvider)) {
       AppEnvironment.production => null,
       AppEnvironment.dev => _devBanner,
     },

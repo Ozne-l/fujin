@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:fujin/app/config.dart';
 import 'package:fujin/app/fujin_app.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/data/database/fujin_database.dart';
@@ -8,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final environment = Config.environment;
   final directory = await getApplicationSupportDirectory();
   final database = FujinDatabase.open(
     '${directory.path}/${FujinDatabase.fileName}',
@@ -16,6 +18,7 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
+        appEnvironmentProvider.overrideWithValue(environment),
         databaseProvider.overrideWithValue(database),
         mfpUserAgentProvider.overrideWithValue(userAgent),
       ],

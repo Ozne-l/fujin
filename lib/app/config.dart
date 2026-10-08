@@ -1,13 +1,12 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:flutter/services.dart';
 import 'package:fujin/app/app_environment.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 abstract final class Config {
-  static final AppEnvironment environment =
-      switch (const String.fromEnvironment('FUJIN_ENV')) {
-        '' => AppEnvironment.production,
-        final name => AppEnvironment.values.byName(name),
-      };
+  static final AppEnvironment environment = AppEnvironment.fromFlavor(
+    appFlavor,
+  );
   static final Uri mfpWebUri = _uri(
     const String.fromEnvironment('MFP_WEB_URI'),
     MyFitnessPalClient.defaultWebUri,

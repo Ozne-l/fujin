@@ -1,6 +1,7 @@
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart' show WidgetTester, addTearDown;
+import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/fujin_app.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/data/database/fujin_database.dart';
@@ -29,6 +30,7 @@ Future<void> pumpFujin(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
+        appEnvironmentProvider.overrideWithValue(AppEnvironment.production),
         databaseProvider.overrideWithValue(database),
         clockProvider.overrideWithValue(() => now),
         mfpClientProvider.overrideWithValue(signedInMfp),
