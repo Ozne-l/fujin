@@ -261,4 +261,47 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get ekkloSignInUnreachableDetail =>
       'Check your connection, then try again.';
+
+  @override
+  String get mfpReconnect => 'Sign in to MyFitnessPal again';
+
+  @override
+  String get welcomeHeading => 'Log once,\nyour coach sees it all.';
+
+  @override
+  String get welcomeIntro =>
+      'You log in MyFitnessPal.\nFūjin sends your day to Ekklo.';
+
+  @override
+  String get mfpAccountRole => 'Your diary, the source';
+
+  @override
+  String get ekkloAccountRole => 'Your coach\'s follow-up';
+
+  @override
+  String get accountSessionActive => 'Session active';
+
+  @override
+  String get accountConnected => 'Connected';
+
+  @override
+  String get credentialsStayOnPhone => 'Your credentials stay on this phone.';
+
+  @override
+  String get continueAction => 'Continue';
+
+  @override
+  String get reload => 'Reload';
+
+  @override
+  String get mfpSignInHint =>
+      'Sign in as usual.\nThis page will close by itself.';
+
+  @override
+  String get mfpSignInRefused =>
+      'MyFitnessPal refused the session.\nSign in again on this page.';
+
+  @override
+  String get mfpSignInUnreachable =>
+      'MyFitnessPal isn\'t responding.\nCheck your connection, then reload the page.';
 }

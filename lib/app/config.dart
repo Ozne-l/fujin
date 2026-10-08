@@ -10,10 +10,13 @@ abstract final class Config {
     const String.fromEnvironment('MFP_API_URI'),
     MyFitnessPalClient.defaultApiUri,
   );
+  static final Uri mfpSignInUri = mfpWebUri.resolve(_mfpSignInPath);
   static final Uri ekkloBaseUri = _uri(
     const String.fromEnvironment('EKKLO_BASE_URI'),
     EkkloClient.defaultBaseUri,
   );
+
+  static const _mfpSignInPath = '/account/login';
 
   static Uri _uri(String defined, Uri fallback) => switch (defined) {
     '' => fallback,

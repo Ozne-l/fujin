@@ -85,6 +85,7 @@ abstract final class FujinRadius {
   static const double field = 16;
   static const double pill = 999;
   static const double sheet = 28;
+  static const double toast = 16;
 }
 
 abstract final class FujinStroke {
@@ -104,6 +105,7 @@ abstract final class FujinSize {
   static const double kcalBar = 6;
   static const double macroBar = 4;
   static const double macroRing = 52;
+  static const double motifBand = 252;
   static const double pill = 26;
   static const double pillSmall = 20;
   static const double screenMargin = 16;

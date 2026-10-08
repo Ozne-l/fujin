@@ -29,6 +29,7 @@ final class FakeBackends {
   List<EkkloDailyMeal> ekkloMeals;
   List<String> mealNames;
   bool ekkloReachable = true;
+  bool mfpReachable = true;
   final requests = <http.Request>[];
 
   static const ekkloEmail = 'owner@example.com';
@@ -38,11 +39,17 @@ final class FakeBackends {
     accessToken: 'stale-access',
     refreshToken: 'stale-refresh',
   );
+  static const MfpSessionCookies mfpSession = _sessionCookies;
+  static const refusedMfpSession = MfpSessionCookies({
+    '__Secure-next-auth.session-token': 'refused-session',
+  });
 
   late final httpClient = MockClient((request) async {
     requests.add(request);
     return switch ((request.method, request.url.host, request.url.path)) {
       (_, final host, _) when host == ekkloUri.host && !ekkloReachable =>
+        throw http.ClientException('Connection refused', request.url),
+      (_, final host, _) when host == mfpWebUri.host && !mfpReachable =>
         throw http.ClientException('Connection refused', request.url),
       ('POST', final host, '/api/v1/auth/login') when host == ekkloUri.host =>
         _ekkloLogin(request),
@@ -51,6 +58,10 @@ final class FakeBackends {
         http.Response('', 401),
       (_, final host, _)
           when host == ekkloUri.host && !_carriesEkkloAccess(request) =>
+        http.Response('', 401),
+      ('GET', final host, '/user/auth_token')
+          when host == mfpWebUri.host &&
+              request.headers['cookie'] == refusedMfpSession.header =>
         http.Response('', 401),
       ('GET', final host, '/user/auth_token') when host == mfpWebUri.host =>
         _json({

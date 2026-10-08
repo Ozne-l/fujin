@@ -136,5 +136,18 @@
     }
   },
   "ekkloSignInUnreachable": "Ekklo ne répond pas",
-  "ekkloSignInUnreachableDetail": "Vérifie ta connexion, puis réessaie."
+  "ekkloSignInUnreachableDetail": "Vérifie ta connexion, puis réessaie.",
+  "mfpReconnect": "Se reconnecter à MyFitnessPal",
+  "welcomeHeading": "Note une fois,\nton coach voit tout.",
+  "welcomeIntro": "Tu notes dans MyFitnessPal.\nFūjin envoie ta journée vers Ekklo.",
+  "mfpAccountRole": "Ton journal, la source",
+  "ekkloAccountRole": "Le suivi de ton coach",
+  "accountSessionActive": "Session active",
+  "accountConnected": "Connecté",
+  "credentialsStayOnPhone": "Tes identifiants restent sur ce téléphone.",
+  "continueAction": "Continuer",
+  "reload": "Recharger",
+  "mfpSignInHint": "Connecte-toi comme d'habitude.\nCette page se fermera toute seule.",
+  "mfpSignInRefused": "MyFitnessPal a refusé la session.\nConnecte-toi à nouveau sur cette page.",
+  "mfpSignInUnreachable": "MyFitnessPal ne répond pas.\nVérifie ta connexion, puis recharge la page."
 }

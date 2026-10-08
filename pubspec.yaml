@@ -16,6 +16,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_hooks: ^0.21.3+1
+  flutter_inappwebview: ^6.2.0-beta.3
   flutter_localizations:
     sdk: flutter
   flutter_secure_storage: ^11.2.0
@@ -44,7 +45,9 @@ flutter:
   generate: true
   uses-material-design: true
   assets:
+    - assets/icons/
     - assets/icons/weather/
+    - assets/images/
   fonts:
     - family: Inter
       fonts:

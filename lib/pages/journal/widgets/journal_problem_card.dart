@@ -25,7 +25,7 @@ class JournalProblemCard extends StatelessWidget {
         l10n.disconnected,
         l10n.mfpSessionExpired,
         l10n.mfpSessionExpiredDetail,
-        null,
+        (l10n.mfpReconnect, FujinRoute.mfpSignIn),
       ),
       EkkloAuthException() => (
         l10n.disconnected,

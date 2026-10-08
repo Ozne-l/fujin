@@ -402,6 +402,14 @@
       },
       "$description": "Input fields. Search fields stay pill-shaped.",
       "$type": "dimension"
+    },
+    "toast": {
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      },
+      "$description": "Toasts and snackbars.",
+      "$type": "dimension"
     }
   },
   "stroke": {
@@ -533,6 +541,14 @@
         "value": 20,
         "unit": "px"
       },
+      "$type": "dimension"
+    },
+    "motif-band": {
+      "$value": {
+        "value": 252,
+        "unit": "px"
+      },
+      "$description": "Seigaiha band at the bottom of welcome screens.",
       "$type": "dimension"
     }
   },

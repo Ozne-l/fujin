@@ -47,5 +47,18 @@
   "ekkloSignInRefused": "Ekklo refused the sign-in",
   "ekkloSignInMessage": "“{message}”",
   "ekkloSignInUnreachable": "Ekklo isn't responding",
-  "ekkloSignInUnreachableDetail": "Check your connection, then try again."
+  "ekkloSignInUnreachableDetail": "Check your connection, then try again.",
+  "mfpReconnect": "Sign in to MyFitnessPal again",
+  "welcomeHeading": "Log once,\nyour coach sees it all.",
+  "welcomeIntro": "You log in MyFitnessPal.\nFūjin sends your day to Ekklo.",
+  "mfpAccountRole": "Your diary, the source",
+  "ekkloAccountRole": "Your coach's follow-up",
+  "accountSessionActive": "Session active",
+  "accountConnected": "Connected",
+  "credentialsStayOnPhone": "Your credentials stay on this phone.",
+  "continueAction": "Continue",
+  "reload": "Reload",
+  "mfpSignInHint": "Sign in as usual.\nThis page will close by itself.",
+  "mfpSignInRefused": "MyFitnessPal refused the session.\nSign in again on this page.",
+  "mfpSignInUnreachable": "MyFitnessPal isn't responding.\nCheck your connection, then reload the page."
 }

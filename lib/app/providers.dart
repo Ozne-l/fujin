@@ -6,6 +6,7 @@ import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/sessions/secure_ekklo_token_store.dart';
 import 'package:fujin/data/sessions/secure_mfp_session_store.dart';
+import 'package:fujin/domain/accounts/accounts_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -27,12 +28,17 @@ final secureStorageProvider = Provider<FlutterSecureStorage>(
   (ref) => const FlutterSecureStorage(),
 );
 
+final mfpUserAgentProvider = Provider<String>(
+  (ref) => MyFitnessPalClient.defaultUserAgent,
+);
+
 final mfpClientProvider = Provider<MyFitnessPalClient>((ref) {
   final client = MyFitnessPalClient(
     sessionStore: SecureMfpSessionStore(ref.watch(secureStorageProvider)),
     httpClient: ref.watch(httpClientProvider),
     webUri: Config.mfpWebUri,
     apiUri: Config.mfpApiUri,
+    userAgent: ref.watch(mfpUserAgentProvider),
     clock: ref.watch(clockProvider),
   );
   ref.onDispose(client.close);
@@ -56,6 +62,13 @@ final sentLinkRepositoryProvider = Provider<SentLinkRepository>(
 
 final memoryRepositoryProvider = Provider<MemoryRepository>(
   (ref) => MemoryRepository(ref.watch(databaseProvider)),
+);
+
+final accountsServiceProvider = Provider<AccountsService>(
+  (ref) => AccountsService(
+    mfp: ref.watch(mfpClientProvider),
+    ekklo: ref.watch(ekkloClientProvider),
+  ),
 );
 
 final journalServiceProvider = Provider<JournalService>(

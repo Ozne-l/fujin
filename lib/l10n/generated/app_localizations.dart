@@ -385,6 +385,84 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Vérifie ta connexion, puis réessaie.'**
   String get ekkloSignInUnreachableDetail;
+
+  /// No description provided for @mfpReconnect.
+  ///
+  /// In fr, this message translates to:
+  /// **'Se reconnecter à MyFitnessPal'**
+  String get mfpReconnect;
+
+  /// No description provided for @welcomeHeading.
+  ///
+  /// In fr, this message translates to:
+  /// **'Note une fois,\nton coach voit tout.'**
+  String get welcomeHeading;
+
+  /// No description provided for @welcomeIntro.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tu notes dans MyFitnessPal.\nFūjin envoie ta journée vers Ekklo.'**
+  String get welcomeIntro;
+
+  /// No description provided for @mfpAccountRole.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ton journal, la source'**
+  String get mfpAccountRole;
+
+  /// No description provided for @ekkloAccountRole.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le suivi de ton coach'**
+  String get ekkloAccountRole;
+
+  /// No description provided for @accountSessionActive.
+  ///
+  /// In fr, this message translates to:
+  /// **'Session active'**
+  String get accountSessionActive;
+
+  /// No description provided for @accountConnected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connecté'**
+  String get accountConnected;
+
+  /// No description provided for @credentialsStayOnPhone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tes identifiants restent sur ce téléphone.'**
+  String get credentialsStayOnPhone;
+
+  /// No description provided for @continueAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Continuer'**
+  String get continueAction;
+
+  /// No description provided for @reload.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recharger'**
+  String get reload;
+
+  /// No description provided for @mfpSignInHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connecte-toi comme d\'habitude.\nCette page se fermera toute seule.'**
+  String get mfpSignInHint;
+
+  /// No description provided for @mfpSignInRefused.
+  ///
+  /// In fr, this message translates to:
+  /// **'MyFitnessPal a refusé la session.\nConnecte-toi à nouveau sur cette page.'**
+  String get mfpSignInRefused;
+
+  /// No description provided for @mfpSignInUnreachable.
+  ///
+  /// In fr, this message translates to:
+  /// **'MyFitnessPal ne répond pas.\nVérifie ta connexion, puis recharge la page.'**
+  String get mfpSignInUnreachable;
 }
 
 class _AppLocalizationsDelegate

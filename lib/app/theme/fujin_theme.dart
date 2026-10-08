@@ -55,6 +55,9 @@ abstract final class FujinTheme {
       ),
       actionTextColor: FujinColorRole.textOnDark,
       behavior: SnackBarBehavior.floating,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(FujinRadius.toast)),
+      ),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
@@ -64,6 +67,17 @@ abstract final class FujinTheme {
         disabledBackgroundColor: FujinColorRole.buttonDisabledBackground,
         disabledForegroundColor: FujinColorRole.buttonDisabledText,
         textStyle: FujinText.inter15Semibold,
+        shape: const StadiumBorder(),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size(0, FujinSize.buttonMedium),
+        padding: const EdgeInsets.symmetric(horizontal: FujinSpace.s5),
+        backgroundColor: FujinColorRole.backgroundCard,
+        foregroundColor: FujinColorRole.textPrimary,
+        side: const BorderSide(color: FujinColorRole.borderCard),
+        textStyle: FujinText.inter15Medium,
         shape: const StadiumBorder(),
       ),
     ),
