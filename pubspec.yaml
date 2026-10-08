@@ -19,6 +19,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_secure_storage: ^11.2.0
+  flutter_svg: ^2.3.0
   go_router: ^18.0.2
   hooks_riverpod: ^3.4.3
   http: ^1.6.0
@@ -42,6 +43,8 @@ dev_dependencies:
 flutter:
   generate: true
   uses-material-design: true
+  assets:
+    - assets/icons/weather/
   fonts:
     - family: Inter
       fonts:
