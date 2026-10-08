@@ -33,7 +33,7 @@ To try the app on your own accounts without changing them, run it read-only:
 flutter run --dart-define=FUJIN_ENV=dev
 ```
 
-Reads and sign-in work; every other request to MyFitnessPal or Ekklo is stopped on the phone ([ADR 0017](docs/adr/0017-read-only-dev-environment.md)).
+A red "DEV" ribbon in the top-right corner shows the mode is on. Reads and sign-in work; every other request to MyFitnessPal or Ekklo is stopped on the phone ([ADR 0017](docs/adr/0017-read-only-dev-environment.md)).
 
 ## Documentation
 

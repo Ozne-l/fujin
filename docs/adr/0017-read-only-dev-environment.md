@@ -17,6 +17,7 @@ The owner wants to try new screens on his own MyFitnessPal diary and Ekklo accou
 - The guard lets `GET` and `HEAD` through, plus the two Ekklo session writes: login (`/api/v1/auth/login`) and refresh (`/api/v1/auth/login/refresh_token`), matched on origin and path against `Config.ekkloBaseUri`. MyFitnessPal needs no exception: its token exchange `/user/auth_token` is a `GET`.
 - Every other request throws `http.ClientException` before it leaves the phone. The clients turn it into `EkkloNetworkException` or `MfpNetworkException`, so a page shows its "unreachable" state.
 - The rule is an allowlist: a new write endpoint is blocked until this record and the guard say otherwise.
+- In dev, `FujinApp` (`lib/app/fujin_app.dart`) wraps every screen in a Flutter `Banner` at the top-end corner reading "DEV" (`devEnvironmentBanner`), on the alert button colours, so the mode is visible on every screen. The banner does not catch taps.
 
 ## Consequences
 

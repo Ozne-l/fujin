@@ -1,6 +1,7 @@
 {
   "@@locale": "en",
   "appName": "Fūjin",
+  "devEnvironmentBanner": "DEV",
   "journalToday": "Today",
   "journalDay": "{date}",
   "weekdayShort": "{date}",

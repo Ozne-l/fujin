@@ -12,6 +12,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get appName => 'Fūjin';
 
   @override
+  String get devEnvironmentBanner => 'DEV';
+
+  @override
   String get journalToday => 'Aujourd\'hui';
 
   @override

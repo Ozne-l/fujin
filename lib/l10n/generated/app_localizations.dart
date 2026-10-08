@@ -104,6 +104,12 @@ abstract class AppLocalizations {
   /// **'Fūjin'**
   String get appName;
 
+  /// No description provided for @devEnvironmentBanner.
+  ///
+  /// In fr, this message translates to:
+  /// **'DEV'**
+  String get devEnvironmentBanner;
+
   /// No description provided for @journalToday.
   ///
   /// In fr, this message translates to:
