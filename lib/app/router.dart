@@ -3,7 +3,9 @@ import 'package:fujin/app/providers.dart';
 import 'package:fujin/domain/accounts/connected_accounts.dart';
 import 'package:fujin/pages/ekklo_sign_in/ekklo_sign_in_page.dart';
 import 'package:fujin/pages/journal/journal_page.dart';
+import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:fujin/pages/mfp_sign_in/mfp_sign_in_page.dart';
+import 'package:fujin/pages/sending/send_page.dart';
 import 'package:fujin/pages/welcome/welcome_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -32,6 +34,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: FujinRoute.ekkloSignIn.path,
         builder: (context, state) => const EkkloSignInPage(),
+      ),
+      GoRoute(
+        path: FujinRoute.send.path,
+        builder: (context, state) => SendPage(
+          date: SelectedDay.calendarDay(
+            DateTime.parse(
+              state.pathParameters[FujinRoute.dateParameter] ?? '',
+            ),
+          ),
+        ),
       ),
     ],
   );

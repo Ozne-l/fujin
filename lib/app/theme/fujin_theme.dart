@@ -15,6 +15,9 @@ abstract final class FujinTheme {
     ),
   );
 
+  static const _scrimOpacity = 0.5;
+  static const _dragHandleSize = Size(36, 4);
+
   static ThemeData light() => ThemeData(
     useMaterial3: true,
     colorScheme: _colorScheme,
@@ -57,6 +60,23 @@ abstract final class FujinTheme {
       behavior: SnackBarBehavior.floating,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(FujinRadius.toast)),
+      ),
+    ),
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: FujinColorRole.backgroundCard,
+      modalBackgroundColor: FujinColorRole.backgroundCard,
+      modalBarrierColor: FujinColorRole.backgroundScrim.withValues(
+        alpha: _scrimOpacity,
+      ),
+      elevation: 0,
+      modalElevation: 0,
+      clipBehavior: Clip.antiAlias,
+      dragHandleColor: FujinColor.kinari,
+      dragHandleSize: _dragHandleSize,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(FujinRadius.sheet),
+        ),
       ),
     ),
     filledButtonTheme: FilledButtonThemeData(

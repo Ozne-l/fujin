@@ -53,6 +53,11 @@ class JournalPage extends HookConsumerWidget {
       }
     }
 
+    Future<void> send() async {
+      await context.push<void>(FujinRoute.send.forDate(day));
+      await notifier.reload();
+    }
+
     Future<void> signIn(FujinRoute route) async {
       final signedIn = await context.push<bool>(route.path);
       if (signedIn case true) await notifier.reload();
@@ -83,6 +88,7 @@ class JournalPage extends HookConsumerWidget {
                 AsyncValue(value: final JournalDay loaded) => _loaded(
                   context,
                   loaded,
+                  () => unawaited(send()),
                 ),
                 AsyncError(:final error) => [
                   SliverToBoxAdapter(
@@ -106,8 +112,14 @@ class JournalPage extends HookConsumerWidget {
     );
   }
 
-  List<Widget> _loaded(BuildContext context, JournalDay day) => [
-    SliverToBoxAdapter(child: DaySummaryCard(day: day)),
+  List<Widget> _loaded(
+    BuildContext context,
+    JournalDay day,
+    VoidCallback onSend,
+  ) => [
+    SliverToBoxAdapter(
+      child: DaySummaryCard(day: day, onSend: onSend),
+    ),
     const SliverToBoxAdapter(child: GoldSeparator()),
     SliverPadding(
       padding: const EdgeInsetsDirectional.only(

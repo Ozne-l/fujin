@@ -150,5 +150,351 @@
   "reload": "Recharger",
   "mfpSignInHint": "Connecte-toi comme d'habitude.\nCette page se fermera toute seule.",
   "mfpSignInRefused": "MyFitnessPal a refusé la session.\nConnecte-toi à nouveau sur cette page.",
-  "mfpSignInUnreachable": "MyFitnessPal ne répond pas.\nVérifie ta connexion, puis recharge la page."
+  "mfpSignInUnreachable": "MyFitnessPal ne répond pas.\nVérifie ta connexion, puis recharge la page.",
+  "close": "Fermer",
+  "sendTitle": "Envoi vers Ekklo",
+  "sendSubtitle": "{date} · {count} {count, plural, =1{aliment} other{aliments}}",
+  "@sendSubtitle": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "EEEE d MMM", "isCustomDateFormat": "true"},
+      "count": {"type": "int"}
+    }
+  },
+  "searchingTitle": "Recherche en cours",
+  "searchingDetail": "Fūjin cherche tes aliments dans Ekklo.",
+  "searchingNote": "Une requête Ekklo par aliment. Les aliments mémorisés vont plus vite.",
+  "progressCount": "{done} / {total}",
+  "@progressCount": {
+    "placeholders": {
+      "done": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "gramsValue": "{value} g",
+  "@gramsValue": {
+    "placeholders": {
+      "value": {"type": "double", "format": "decimalPattern"}
+    }
+  },
+  "towards": "→ {name}",
+  "@towards": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "towardsAmount": "→ {name} · {amount}",
+  "@towardsAmount": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "amount": {"type": "String"}
+    }
+  },
+  "rowSearching": "Recherche dans Ekklo…",
+  "rowWaiting": "En attente",
+  "pillRemembered": "Mémorisé",
+  "pillWeightToConfirm": "Poids à confirmer",
+  "pillNewAssociation": "Nouvelle association",
+  "pillNoCloseFood": "Aucun aliment proche",
+  "pillConfirmed": "Confirmé",
+  "pillSkipped": "Sauté",
+  "sendToEkklo": "Envoyer vers Ekklo",
+  "filterToReview": "{count} à vérifier",
+  "@filterToReview": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "filterAutomatic": "{count} {count, plural, =1{automatique} other{automatiques}}",
+  "@filterAutomatic": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "filterInEkklo": "{count} déjà dans Ekklo",
+  "@filterInEkklo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "sectionToReview": "À VÉRIFIER",
+  "sectionAutomatic": "AUTOMATIQUES",
+  "sectionInEkklo": "DÉJÀ DANS EKKLO",
+  "mealTowards": "{mfp} → {ekklo}",
+  "@mealTowards": {
+    "placeholders": {
+      "mfp": {"type": "String"},
+      "ekklo": {"type": "String"}
+    }
+  },
+  "entryDetail": "{serving} · {energy}",
+  "@entryDetail": {
+    "placeholders": {
+      "serving": {"type": "String"},
+      "energy": {"type": "String"}
+    }
+  },
+  "change": "Changer ›",
+  "ekkloAmount": "Ekklo · {amount}",
+  "@ekkloAmount": {
+    "placeholders": {
+      "amount": {"type": "String"}
+    }
+  },
+  "ekkloAmountMatch": "Ekklo · {amount} · {match}",
+  "@ekkloAmountMatch": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "match": {"type": "String"}
+    }
+  },
+  "nameMatchProduct": "nom identique",
+  "nameMatchBrand": "même marque",
+  "nameMatchNone": "nom différent",
+  "nutrientKilocalories": "kcal",
+  "nutrientProtein": "P",
+  "nutrientCarbohydrates": "G",
+  "nutrientFat": "L",
+  "nutrientFiber": "F",
+  "deltaUp": "{nutrient} +{value} %",
+  "@deltaUp": {
+    "placeholders": {
+      "nutrient": {"type": "String"},
+      "value": {"type": "int"}
+    }
+  },
+  "deltaDown": "{nutrient} −{value} %",
+  "@deltaDown": {
+    "placeholders": {
+      "nutrient": {"type": "String"},
+      "value": {"type": "int"}
+    }
+  },
+  "deltaNone": "{nutrient} 0 %",
+  "@deltaNone": {
+    "placeholders": {
+      "nutrient": {"type": "String"}
+    }
+  },
+  "deltaUnknown": "{nutrient} n.c.",
+  "@deltaUnknown": {
+    "placeholders": {
+      "nutrient": {"type": "String"}
+    }
+  },
+  "confirm": "Confirmer",
+  "ownCopyToCreate": "Aliment perso à créer",
+  "ownCopyExact": "Copie exacte des valeurs MyFitnessPal",
+  "ownCopyReused": "Aliment perso",
+  "skippedDetail": "Reste hors de cet envoi.",
+  "proposalsUsed": "Sans changement de ta part, les propositions sont utilisées.",
+  "searchEkklo": "Chercher dans Ekklo",
+  "ekkloCandidates": "CANDIDATS EKKLO",
+  "rejectedCandidates": "CANDIDATS ÉCARTÉS",
+  "noEkkloResult": "Aucun aliment Ekklo trouvé.",
+  "toleranceNote": "Écarts calculés sur la portion MFP. Vert : dans la tolérance (kcal 12 %, macros 10 %). F n.c. : fibres non communiquées.",
+  "associateAndRemember": "Associer et mémoriser",
+  "ownCopy": "Aliment perso",
+  "skip": "Sauter",
+  "weightQuestion": "Combien pèse\n1 « {unit} » ?",
+  "@weightQuestion": {
+    "placeholders": {
+      "unit": {"type": "String"}
+    }
+  },
+  "weightLabel": "Poids d'1 {unit}",
+  "@weightLabel": {
+    "placeholders": {
+      "unit": {"type": "String"}
+    }
+  },
+  "gramsSuffix": "g",
+  "weightEstimate": "Estimé à partir des kcal : {energy} pour 1 {unit}.",
+  "@weightEstimate": {
+    "placeholders": {
+      "energy": {"type": "String"},
+      "unit": {"type": "String"}
+    }
+  },
+  "inEkkloTitle": "Dans Ekklo",
+  "weightRemembered": "Retenu pour les prochains envois de cet aliment.",
+  "validate": "Valider",
+  "noCloseFoodTitle": "Aucun aliment Ekklo assez proche",
+  "noCloseFoodDetail": "Fūjin propose de créer un aliment perso, copie exacte des valeurs MFP.",
+  "ownCopyLabel": "Ekklo · aliment perso",
+  "ownCopyServing": "{serving} (MFP) · {energy}",
+  "@ownCopyServing": {
+    "placeholders": {
+      "serving": {"type": "String"},
+      "energy": {"type": "String"}
+    }
+  },
+  "createOwnCopy": "Créer l'aliment perso",
+  "chooseCandidate": "Choisir un candidat",
+  "candidateBrandMatch": "{brand} · {match}",
+  "@candidateBrandMatch": {
+    "placeholders": {
+      "brand": {"type": "String"},
+      "match": {"type": "String"}
+    }
+  },
+  "weightFoodBrand": "{food} · {brand}",
+  "@weightFoodBrand": {
+    "placeholders": {
+      "food": {"type": "String"},
+      "brand": {"type": "String"}
+    }
+  },
+  "weightInEkklo": "{name} · {amount}",
+  "@weightInEkklo": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "amount": {"type": "String"}
+    }
+  },
+  "sendingTitle": "Envoi en cours",
+  "sendingDetail": "Les aliments partent vers Ekklo…",
+  "sendingNote": "D'abord les aliments perso, puis un envoi par repas.",
+  "stepOwnCopyDone": "Aliment perso créé",
+  "stepOwnCopy": "Aliment perso",
+  "stepOnTheWay": "{subject} · en route",
+  "@stepOnTheWay": {
+    "placeholders": {
+      "subject": {"type": "String"}
+    }
+  },
+  "stepWaiting": "{subject} · en attente",
+  "@stepWaiting": {
+    "placeholders": {
+      "subject": {"type": "String"}
+    }
+  },
+  "stepFoods": "{count} {count, plural, =1{aliment} other{aliments}}",
+  "@stepFoods": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "stepFoodsAdded": "{count} {count, plural, =1{aliment ajouté} other{aliments ajoutés}}",
+  "@stepFoodsAdded": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "stepFoodsNotSent": "{count} {count, plural, =1{aliment non envoyé} other{aliments non envoyés}}",
+  "@stepFoodsNotSent": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "stepQuantity": "Quantité",
+  "stepQuantityDone": "Quantité mise à jour",
+  "stepQuantityFailed": "Quantité non mise à jour",
+  "stepFailed": "Non créé",
+  "sentTitle": "Envoi terminé",
+  "sentDetail": "Fūjin a envoyé {count} {count, plural, =1{aliment} other{aliments}} vers Ekklo.",
+  "@sentDetail": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "sentAt": "{date} · {time}",
+  "@sentAt": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "MMMMEEEEd"},
+      "time": {"type": "DateTime", "format": "Hm"}
+    }
+  },
+  "sentReused": "{count} {count, plural, =1{aliment mémorisé réutilisé} other{aliments mémorisés réutilisés}}",
+  "@sentReused": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "sentAssociations": "{count} {count, plural, =1{nouvelle association} other{nouvelles associations}} : {names}",
+  "@sentAssociations": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "names": {"type": "String"}
+    }
+  },
+  "sentWeights": "{count} {count, plural, =1{poids retenu} other{poids retenus}} : {weights}",
+  "@sentWeights": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "weights": {"type": "String"}
+    }
+  },
+  "unitWeight": "1 {unit} = {grams}",
+  "@unitWeight": {
+    "placeholders": {
+      "unit": {"type": "String"},
+      "grams": {"type": "String"}
+    }
+  },
+  "sentOwnCopies": "{count} {count, plural, =1{aliment perso créé} other{aliments perso créés}} : {names}",
+  "@sentOwnCopies": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "names": {"type": "String"}
+    }
+  },
+  "sentUpdated": "{count} {count, plural, =1{aliment mis à jour} other{aliments mis à jour}}",
+  "@sentUpdated": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "listSeparator": ", ",
+  "backToJournal": "Retour au journal",
+  "interruptedTitle": "Envoi interrompu",
+  "interruptedNetwork": "Plus de réseau pendant l'envoi : {step}.",
+  "@interruptedNetwork": {
+    "placeholders": {
+      "step": {"type": "String"}
+    }
+  },
+  "interruptedSession": "Ta session Ekklo a expiré pendant l'envoi : {step}.",
+  "@interruptedSession": {
+    "placeholders": {
+      "step": {"type": "String"}
+    }
+  },
+  "interruptedRefused": "Ekklo a refusé l'envoi : {step}.",
+  "@interruptedRefused": {
+    "placeholders": {
+      "step": {"type": "String"}
+    }
+  },
+  "interruptedOther": "L'envoi s'est arrêté : {step}.",
+  "@interruptedOther": {
+    "placeholders": {
+      "step": {"type": "String"}
+    }
+  },
+  "interruptedDev": "Fūjin DEV n'écrit pas dans Ekklo : {step} n'est pas parti.",
+  "@interruptedDev": {
+    "placeholders": {
+      "step": {"type": "String"}
+    }
+  },
+  "interruptedWaiting": "{count} {count, plural, =1{aliment attend} other{aliments attendent}}. Rien n'est perdu.",
+  "@interruptedWaiting": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "sendRemaining": "Envoyer {count, plural, =1{l'aliment restant} other{les {count} aliments restants}}",
+  "@sendRemaining": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "tryAgain": "Réessayer",
+  "interruptedNote": "Ce qui est coché est déjà dans Ekklo et y reste.\nFūjin n'enverra que ce qui manque.",
+  "later": "Plus tard",
+  "searchFailedTitle": "Recherche interrompue",
+  "searchFailedNetwork": "Plus de réseau pendant la recherche. Rien n'a été envoyé.",
+  "searchFailedOther": "Ekklo ne répond pas. Rien n'a été envoyé.",
+  "sendFailedNetwork": "Plus de réseau avant l'envoi. Rien n'est parti.",
+  "sendFailedOther": "L'envoi n'a pas pu commencer. Rien n'est parti."
 }

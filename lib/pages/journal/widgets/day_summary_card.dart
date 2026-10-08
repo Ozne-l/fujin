@@ -6,9 +6,10 @@ import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/progress_bar.dart';
 
 class DaySummaryCard extends StatelessWidget {
-  const DaySummaryCard({required this.day, super.key});
+  const DaySummaryCard({required this.day, required this.onSend, super.key});
 
   final JournalDay day;
+  final VoidCallback onSend;
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +77,7 @@ class DaySummaryCard extends StatelessWidget {
           ),
           if (_sendLabel(l10n, counts) case final label?)
             FilledButton(
-              onPressed: null,
+              onPressed: onSend,
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(FujinSize.buttonMedium),
                 disabledBackgroundColor:

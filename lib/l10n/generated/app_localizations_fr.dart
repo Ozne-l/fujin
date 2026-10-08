@@ -310,4 +310,534 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get mfpSignInUnreachable =>
       'MyFitnessPal ne répond pas.\nVérifie ta connexion, puis recharge la page.';
+
+  @override
+  String get close => 'Fermer';
+
+  @override
+  String get sendTitle => 'Envoi vers Ekklo';
+
+  @override
+  String sendSubtitle(DateTime date, int count) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat(
+      'EEEE d MMM',
+      localeName,
+    );
+    final String dateString = dateDateFormat.format(date);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'aliments',
+      one: 'aliment',
+    );
+    return '$dateString · $count $_temp0';
+  }
+
+  @override
+  String get searchingTitle => 'Recherche en cours';
+
+  @override
+  String get searchingDetail => 'Fūjin cherche tes aliments dans Ekklo.';
+
+  @override
+  String get searchingNote =>
+      'Une requête Ekklo par aliment. Les aliments mémorisés vont plus vite.';
+
+  @override
+  String progressCount(int done, int total) {
+    return '$done / $total';
+  }
+
+  @override
+  String gramsValue(double value) {
+    final intl.NumberFormat valueNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String valueString = valueNumberFormat.format(value);
+
+    return '$valueString g';
+  }
+
+  @override
+  String towards(String name) {
+    return '→ $name';
+  }
+
+  @override
+  String towardsAmount(String name, String amount) {
+    return '→ $name · $amount';
+  }
+
+  @override
+  String get rowSearching => 'Recherche dans Ekklo…';
+
+  @override
+  String get rowWaiting => 'En attente';
+
+  @override
+  String get pillRemembered => 'Mémorisé';
+
+  @override
+  String get pillWeightToConfirm => 'Poids à confirmer';
+
+  @override
+  String get pillNewAssociation => 'Nouvelle association';
+
+  @override
+  String get pillNoCloseFood => 'Aucun aliment proche';
+
+  @override
+  String get pillConfirmed => 'Confirmé';
+
+  @override
+  String get pillSkipped => 'Sauté';
+
+  @override
+  String get sendToEkklo => 'Envoyer vers Ekklo';
+
+  @override
+  String filterToReview(int count) {
+    return '$count à vérifier';
+  }
+
+  @override
+  String filterAutomatic(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'automatiques',
+      one: 'automatique',
+    );
+    return '$count $_temp0';
+  }
+
+  @override
+  String filterInEkklo(int count) {
+    return '$count déjà dans Ekklo';
+  }
+
+  @override
+  String get sectionToReview => 'À VÉRIFIER';
+
+  @override
+  String get sectionAutomatic => 'AUTOMATIQUES';
+
+  @override
+  String get sectionInEkklo => 'DÉJÀ DANS EKKLO';
+
+  @override
+  String mealTowards(String mfp, String ekklo) {
+    return '$mfp → $ekklo';
+  }
+
+  @override
+  String entryDetail(String serving, String energy) {
+    return '$serving · $energy';
+  }
+
+  @override
+  String get change => 'Changer ›';
+
+  @override
+  String ekkloAmount(String amount) {
+    return 'Ekklo · $amount';
+  }
+
+  @override
+  String ekkloAmountMatch(String amount, String match) {
+    return 'Ekklo · $amount · $match';
+  }
+
+  @override
+  String get nameMatchProduct => 'nom identique';
+
+  @override
+  String get nameMatchBrand => 'même marque';
+
+  @override
+  String get nameMatchNone => 'nom différent';
+
+  @override
+  String get nutrientKilocalories => 'kcal';
+
+  @override
+  String get nutrientProtein => 'P';
+
+  @override
+  String get nutrientCarbohydrates => 'G';
+
+  @override
+  String get nutrientFat => 'L';
+
+  @override
+  String get nutrientFiber => 'F';
+
+  @override
+  String deltaUp(String nutrient, int value) {
+    return '$nutrient +$value %';
+  }
+
+  @override
+  String deltaDown(String nutrient, int value) {
+    return '$nutrient −$value %';
+  }
+
+  @override
+  String deltaNone(String nutrient) {
+    return '$nutrient 0 %';
+  }
+
+  @override
+  String deltaUnknown(String nutrient) {
+    return '$nutrient n.c.';
+  }
+
+  @override
+  String get confirm => 'Confirmer';
+
+  @override
+  String get ownCopyToCreate => 'Aliment perso à créer';
+
+  @override
+  String get ownCopyExact => 'Copie exacte des valeurs MyFitnessPal';
+
+  @override
+  String get ownCopyReused => 'Aliment perso';
+
+  @override
+  String get skippedDetail => 'Reste hors de cet envoi.';
+
+  @override
+  String get proposalsUsed =>
+      'Sans changement de ta part, les propositions sont utilisées.';
+
+  @override
+  String get searchEkklo => 'Chercher dans Ekklo';
+
+  @override
+  String get ekkloCandidates => 'CANDIDATS EKKLO';
+
+  @override
+  String get rejectedCandidates => 'CANDIDATS ÉCARTÉS';
+
+  @override
+  String get noEkkloResult => 'Aucun aliment Ekklo trouvé.';
+
+  @override
+  String get toleranceNote =>
+      'Écarts calculés sur la portion MFP. Vert : dans la tolérance (kcal 12 %, macros 10 %). F n.c. : fibres non communiquées.';
+
+  @override
+  String get associateAndRemember => 'Associer et mémoriser';
+
+  @override
+  String get ownCopy => 'Aliment perso';
+
+  @override
+  String get skip => 'Sauter';
+
+  @override
+  String weightQuestion(String unit) {
+    return 'Combien pèse\n1 « $unit » ?';
+  }
+
+  @override
+  String weightLabel(String unit) {
+    return 'Poids d\'1 $unit';
+  }
+
+  @override
+  String get gramsSuffix => 'g';
+
+  @override
+  String weightEstimate(String energy, String unit) {
+    return 'Estimé à partir des kcal : $energy pour 1 $unit.';
+  }
+
+  @override
+  String get inEkkloTitle => 'Dans Ekklo';
+
+  @override
+  String get weightRemembered =>
+      'Retenu pour les prochains envois de cet aliment.';
+
+  @override
+  String get validate => 'Valider';
+
+  @override
+  String get noCloseFoodTitle => 'Aucun aliment Ekklo assez proche';
+
+  @override
+  String get noCloseFoodDetail =>
+      'Fūjin propose de créer un aliment perso, copie exacte des valeurs MFP.';
+
+  @override
+  String get ownCopyLabel => 'Ekklo · aliment perso';
+
+  @override
+  String ownCopyServing(String serving, String energy) {
+    return '$serving (MFP) · $energy';
+  }
+
+  @override
+  String get createOwnCopy => 'Créer l\'aliment perso';
+
+  @override
+  String get chooseCandidate => 'Choisir un candidat';
+
+  @override
+  String candidateBrandMatch(String brand, String match) {
+    return '$brand · $match';
+  }
+
+  @override
+  String weightFoodBrand(String food, String brand) {
+    return '$food · $brand';
+  }
+
+  @override
+  String weightInEkklo(String name, String amount) {
+    return '$name · $amount';
+  }
+
+  @override
+  String get sendingTitle => 'Envoi en cours';
+
+  @override
+  String get sendingDetail => 'Les aliments partent vers Ekklo…';
+
+  @override
+  String get sendingNote =>
+      'D\'abord les aliments perso, puis un envoi par repas.';
+
+  @override
+  String get stepOwnCopyDone => 'Aliment perso créé';
+
+  @override
+  String get stepOwnCopy => 'Aliment perso';
+
+  @override
+  String stepOnTheWay(String subject) {
+    return '$subject · en route';
+  }
+
+  @override
+  String stepWaiting(String subject) {
+    return '$subject · en attente';
+  }
+
+  @override
+  String stepFoods(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'aliments',
+      one: 'aliment',
+    );
+    return '$count $_temp0';
+  }
+
+  @override
+  String stepFoodsAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'aliments ajoutés',
+      one: 'aliment ajouté',
+    );
+    return '$count $_temp0';
+  }
+
+  @override
+  String stepFoodsNotSent(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'aliments non envoyés',
+      one: 'aliment non envoyé',
+    );
+    return '$count $_temp0';
+  }
+
+  @override
+  String get stepQuantity => 'Quantité';
+
+  @override
+  String get stepQuantityDone => 'Quantité mise à jour';
+
+  @override
+  String get stepQuantityFailed => 'Quantité non mise à jour';
+
+  @override
+  String get stepFailed => 'Non créé';
+
+  @override
+  String get sentTitle => 'Envoi terminé';
+
+  @override
+  String sentDetail(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'aliments',
+      one: 'aliment',
+    );
+    return 'Fūjin a envoyé $count $_temp0 vers Ekklo.';
+  }
+
+  @override
+  String sentAt(DateTime date, DateTime time) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMEEEEd(
+      localeName,
+    );
+    final String dateString = dateDateFormat.format(date);
+    final intl.DateFormat timeDateFormat = intl.DateFormat.Hm(localeName);
+    final String timeString = timeDateFormat.format(time);
+
+    return '$dateString · $timeString';
+  }
+
+  @override
+  String sentReused(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'aliments mémorisés réutilisés',
+      one: 'aliment mémorisé réutilisé',
+    );
+    return '$count $_temp0';
+  }
+
+  @override
+  String sentAssociations(int count, String names) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'nouvelles associations',
+      one: 'nouvelle association',
+    );
+    return '$count $_temp0 : $names';
+  }
+
+  @override
+  String sentWeights(int count, String weights) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'poids retenus',
+      one: 'poids retenu',
+    );
+    return '$count $_temp0 : $weights';
+  }
+
+  @override
+  String unitWeight(String unit, String grams) {
+    return '1 $unit = $grams';
+  }
+
+  @override
+  String sentOwnCopies(int count, String names) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'aliments perso créés',
+      one: 'aliment perso créé',
+    );
+    return '$count $_temp0 : $names';
+  }
+
+  @override
+  String sentUpdated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'aliments mis à jour',
+      one: 'aliment mis à jour',
+    );
+    return '$count $_temp0';
+  }
+
+  @override
+  String get listSeparator => ', ';
+
+  @override
+  String get backToJournal => 'Retour au journal';
+
+  @override
+  String get interruptedTitle => 'Envoi interrompu';
+
+  @override
+  String interruptedNetwork(String step) {
+    return 'Plus de réseau pendant l\'envoi : $step.';
+  }
+
+  @override
+  String interruptedSession(String step) {
+    return 'Ta session Ekklo a expiré pendant l\'envoi : $step.';
+  }
+
+  @override
+  String interruptedRefused(String step) {
+    return 'Ekklo a refusé l\'envoi : $step.';
+  }
+
+  @override
+  String interruptedOther(String step) {
+    return 'L\'envoi s\'est arrêté : $step.';
+  }
+
+  @override
+  String interruptedDev(String step) {
+    return 'Fūjin DEV n\'écrit pas dans Ekklo : $step n\'est pas parti.';
+  }
+
+  @override
+  String interruptedWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'aliments attendent',
+      one: 'aliment attend',
+    );
+    return '$count $_temp0. Rien n\'est perdu.';
+  }
+
+  @override
+  String sendRemaining(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'les $count aliments restants',
+      one: 'l\'aliment restant',
+    );
+    return 'Envoyer $_temp0';
+  }
+
+  @override
+  String get tryAgain => 'Réessayer';
+
+  @override
+  String get interruptedNote =>
+      'Ce qui est coché est déjà dans Ekklo et y reste.\nFūjin n\'enverra que ce qui manque.';
+
+  @override
+  String get later => 'Plus tard';
+
+  @override
+  String get searchFailedTitle => 'Recherche interrompue';
+
+  @override
+  String get searchFailedNetwork =>
+      'Plus de réseau pendant la recherche. Rien n\'a été envoyé.';
+
+  @override
+  String get searchFailedOther => 'Ekklo ne répond pas. Rien n\'a été envoyé.';
+
+  @override
+  String get sendFailedNetwork =>
+      'Plus de réseau avant l\'envoi. Rien n\'est parti.';
+
+  @override
+  String get sendFailedOther =>
+      'L\'envoi n\'a pas pu commencer. Rien n\'est parti.';
 }
