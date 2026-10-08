@@ -16,10 +16,10 @@ The owner wants to try new screens on his own MyFitnessPal diary and Ekklo accou
 
   | Flavor | App id (Android and iOS) | Name | Icon |
   | --- | --- | --- | --- |
-  | `production` | `dev.oznel.fujin` | Fūjin | standard |
-  | `dev` | `dev.oznel.fujin.dev` | Fūjin DEV | with a red "DEV" band |
+  | `production` | `dev.oznel.fujin` | Fūjin | the Figma component "Logo · Fūjin" |
+  | `dev` | `dev.oznel.fujin.dev` | Fūjin DEV | the same logo with a red "DEV" band |
 
-  Android: `productFlavors` in `android/app/build.gradle.kts`, with the dev name and icon in `android/app/src/dev/res/`. iOS: the `production` and `dev` schemes with their `Debug-`, `Profile-` and `Release-` configurations in `ios/Runner.xcodeproj`; each sets `PRODUCT_BUNDLE_IDENTIFIER`, `APP_DISPLAY_NAME` and the icon set (`AppIcon` or `AppIcon-dev`).
+  Android: `productFlavors` in `android/app/build.gradle.kts`, with the dev name, legacy icon and adaptive-icon foreground in `android/app/src/dev/res/`; the adaptive background and monochrome layers are shared from `android/app/src/main/res/`. iOS: the `production` and `dev` schemes with their `Debug-`, `Profile-` and `Release-` configurations in `ios/Runner.xcodeproj`; each sets `PRODUCT_BUNDLE_IDENTIFIER`, `APP_DISPLAY_NAME` and the icon set (`AppIcon` or `AppIcon-dev`).
 - The environment comes from the flavor itself: `Config.environment` is `AppEnvironment.fromFlavor(appFlavor)` (`lib/app/app_environment.dart`, `lib/app/config.dart`), and `main` hands it to `appEnvironmentProvider`. The build tool sets `appFlavor` from the same flavor that picks the app id, so the dev app cannot run without the guard. A build without a flavor, or with an unknown one, throws at startup instead of running as production; the Flutter tool already refuses such a build on iOS.
 - In dev, `httpClientProvider` (`lib/app/providers.dart`) wraps the shared `http.Client` in `ReadOnlyHttpClient` (`lib/data/http/read_only_http_client.dart`). Both client packages send through that one client, so the guard covers every call, present and future, and the domain does not know it exists.
 - The guard lets `GET` and `HEAD` through, plus the two Ekklo session writes: login (`/api/v1/auth/login`) and refresh (`/api/v1/auth/login/refresh_token`), matched on origin and path against `Config.ekkloBaseUri`. MyFitnessPal needs no exception: its token exchange `/user/auth_token` is a `GET`.

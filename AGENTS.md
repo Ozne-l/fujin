@@ -61,6 +61,7 @@ clients       package:ekklo_client, package:myfitnesspal_client
 | Colour, size, text style | design tokens, then the generator | `FujinColorRole.textPrimary` |
 | Animation | `motor` preset in `lib/app/theme/fujin_motion.dart` | `FujinMotion.progress` |
 | Icon or image exported from Figma | `assets/icons/` (SVG, `currentColor`) or `assets/images/` with `2.0x/` to `4.0x/` variants | `volute.svg`, `seigaiha.png` |
+| App icon | the Figma component "Logo · Fūjin", rendered to `android/app/src/{main,dev}/res/mipmap-*/` (legacy icon and adaptive layers, `mipmap-anydpi-v26/ic_launcher.xml`) and `ios/Runner/Assets.xcassets/AppIcon{,-dev}.appiconset/` | `ic_launcher_foreground.png` |
 | Test helpers | `test/support/` | `fixtures.dart`, `fake_backends.dart` |
 
 One public type per file, named after the file. Code style: no comments, no `!`, no magic strings, `switch` over if-chains (exhaustive on sealed types), `null` for absence ([ADR 0014](docs/adr/0014-lints-and-code-style.md)).
