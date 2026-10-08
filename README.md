@@ -35,6 +35,8 @@ flutter run --flavor dev
 
 It installs next to the real app as "Fūjin DEV", with its own data and sessions, and shows a red "DEV" ribbon in the top-right corner. Reads and sign-in work; every other request to MyFitnessPal or Ekklo is stopped on the phone ([ADR 0017](docs/adr/0017-read-only-dev-environment.md)).
 
+In VS Code or Cursor, the Run and Debug panel offers both apps from `.vscode/launch.json`: "Fūjin" (`--flavor production`) and "Fūjin DEV" (`--flavor dev`), on the device picked in the status bar.
+
 ## Documentation
 
 - [AGENTS.md](AGENTS.md): commands, layers, where code goes, working rules.
