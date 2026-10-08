@@ -29,8 +29,11 @@ final class ReadOnlyHttpClient extends http.BaseClient {
   @override
   void close() => _inner.close();
 
+  static bool reads(String method) =>
+      _readMethods.contains(method.toUpperCase());
+
   bool _allows(http.BaseRequest request) =>
-      _readMethods.contains(request.method.toUpperCase()) ||
+      reads(request.method) ||
       _sessionWrites.any(
         (uri) =>
             uri.origin == request.url.origin && uri.path == request.url.path,
