@@ -49,7 +49,7 @@ The database runs synchronously on the UI isolate: the tables are tiny (a few hu
 
 7. **Group writes that belong together in `FujinDatabase.transaction`; nested calls join the outer transaction.**
    Why: a failure halfway rolls everything back. `transaction` opens `BEGIN IMMEDIATE` only when the connection is in autocommit, so a repository method can be transactional on its own and still be part of a larger one.
-   Example: `MemoryRepository.saveFood` deletes an own copy's units and upserts the food in one transaction (`lib/data/memory/memory_repository.dart`); `SentLinkRepository.replace` drops and adopts links in one (`lib/data/links/sent_link_repository.dart`). Pinned by "are all kept when one adoption is refused" in `test/data/database_test.dart`.
+   Example: `MemoryRepository.saveFood` deletes an own copy's units and upserts the food in one transaction (`lib/data/memory/memory_repository.dart`); `MemoryRepository.remember` writes the meal mappings, associations and unit weights of one send in one; `SentLinkRepository.replace` drops and adopts links in one (`lib/data/links/sent_link_repository.dart`). Pinned by "are all kept when one adoption is refused" and "keeps nothing of a send whose unit weight is refused" in `test/data/database_test.dart`.
 
 8. **Persist the adoptions and drops found while reading a day, in one transaction, during that read.**
    Why: statuses are always recomputed from both apps, so the link registry is the only local truth; an interrupted send (Ekklo written, link not yet) is adopted on the next read instead of being sent twice.

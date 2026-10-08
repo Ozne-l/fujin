@@ -16,13 +16,13 @@ Planning, per entry "À envoyer" or "À mettre à jour" that has a MyFitnessPal 
 
 - The Ekklo meal is the one Memory maps, else the MyFitnessPal meal name unchanged ("Un repas MyFitnessPal sans correspondance garde son nom dans Ekklo", screen 20).
 - A remembered matched food whose grams are known (gram serving, or a remembered unit) is sent without review ("Mémorisé").
-- A remembered matched food logged in a new unit is reviewed: Fūjin reads the Ekklo food (`foods.byId`) and estimates the unit's weight from the kilocalories ("Poids à confirmer").
+- A remembered matched food logged in a new unit is reviewed: Fūjin reads the Ekklo food (`foods.byId`) and estimates the unit's weight from the kilocalories ("Poids à confirmer"). If that Ekklo food cannot be evaluated (counted in portions, without energy, or the entry has no kcal), the entry is searched like an unknown food.
 - A remembered own copy is reused when it was made for the same serving unit and, when both are known, the same MyFitnessPal food version as the entry (`isFresh`); otherwise a new own copy is made without review.
 - Any other food is searched in Ekklo with the first three meaningful words of its product name (`searchTerms`, `lib/domain/sending/food_words.dart`); the first 8 results are ranked (`rankCandidates`, `lib/domain/sending/rank_candidates.dart`). The best acceptable candidate is proposed ("Nouvelle association"); with none, an own copy is proposed ("Aucun aliment proche") and the rejected candidates stay listed.
 
 Ranking and acceptance (`EkkloCandidate`, `NutrientDeltas`):
 
-- Only Ekklo foods counted in grams with positive energy qualify. The grams are the entry's grams, or the remembered weight of its unit, or the energy divided by the food's kcal per gram (estimated).
+- Only Ekklo foods counted in grams with positive energy qualify. The grams are the entry's grams, or the remembered weight of its unit, or the energy divided by the food's kcal per gram (estimated). An estimated weight needs at least one of protein, carbs or fat on the entry; without them the food is not a candidate, since a kcal gap of zero by construction would accept anything.
 - Gaps are signed and measured on the MyFitnessPal portion: kcal as a share of the entry's kcal, each macro as its energy difference (4, 4, 9, 2 kcal per gram for protein, carbs, fat, fiber) over the entry's kcal. A missing MyFitnessPal value, or an Ekklo fiber of 0, gives no gap ("n.c.").
 - A candidate is acceptable when it shares a word of the product name or of the brand, kcal is within 12 % and each macro within 10 %, or within 5 kcal for small entries. Ranking puts product-name matches first, then brand matches, then the smallest total gap.
 
@@ -33,8 +33,8 @@ Own copies: one Ekklo food per MyFitnessPal food and serving unit, an exact copy
 Execution (`SendService.send`), in this order:
 
 1. Read the day again through `JournalService.readDay`, which adopts items an earlier interrupted send already wrote, and keep only the planned entries still "À envoyer" or "À mettre à jour".
-2. Write Memory before Ekklo: missing meal mappings, new associations, retained unit weights. Adoption on a later read needs them.
-3. Create own copies (one step each), saving each in Memory as soon as Ekklo returns it.
+2. Write Memory before Ekklo, in one transaction (`MemoryRepository.remember`): missing meal mappings, new associations, retained unit weights. Adoption on a later read needs them.
+3. Create own copies (one step per MyFitnessPal food and serving unit), saving each in Memory as soon as Ekklo returns it.
 4. Update in place (`updateItemQuantity`) an entry whose item is in the right Ekklo meal with the right food and quantity type, moving its link to the new entry id.
 5. Send one `appendItems` per Ekklo meal, after removing the old item of every other update; new items are found by diffing the meal's item ids against the read of step 1, matched to entries with `ExpectedItem.matches`, and linked.
 
@@ -44,7 +44,8 @@ The entry's own food version (`MfpFoodEntry.food.version`) decides whether an ow
 
 ## Consequences
 
-- An interrupted send never duplicates an item: tests cover a reply lost after Ekklo wrote the meal and a meal refused outright (`test/domain/sending/send_service_test.dart`).
+- An interrupted send never duplicates an item or an own copy: tests cover a reply lost after Ekklo wrote the meal, a meal refused outright and an own copy made before a refused meal (`test/domain/sending/send_service_test.dart`).
+- Memory keeps one food per MyFitnessPal food, so of a food logged in two units the same day only the last own copy is remembered; the other one is made again on its next send.
 - Every choice made while sending is remembered, so a day of known foods is sent from screen 10 with nothing to review.
 - An estimated weight is retained even when the owner does not open sheet 12; screen 15 lists it ("poids retenu") so it can be corrected later in Mémoire.
 - Entries without a MyFitnessPal id cannot be linked and are left out of the send.
