@@ -86,6 +86,6 @@ The database runs synchronously on the UI isolate: the tables are tiny (a few hu
     Example: `SecureEkkloTokenStore` and `SecureMfpSessionStore` implement the client packages' `EkkloTokenStore` and `MfpSessionStore` (`lib/data/sessions/secure_ekklo_token_store.dart`, `lib/data/sessions/secure_mfp_session_store.dart`), keyed by `SessionKey` (`lib/data/sessions/session_key.dart`), wired in `mfpClientProvider` and `ekkloClientProvider` (`lib/app/providers.dart`).
     Status: sign-in screens are not built; the MyFitnessPal web view's User-Agent is not persisted yet (open point).
 
-15. **Planned: export the four tables to `fujin-sauvegarde-AAAA-MM-JJ.json` (`format: "fujin-sauvegarde"`, `version: 1`, no credentials) and import such a file by replacing all four tables in one transaction.**
+15. **Planned: export the four tables to `fujin-backup-YYYY-MM-DD.json` (`format: "fujin-backup"`, `version: 1`, no credentials) and import such a file by replacing all four tables in one transaction.**
     Why: Auto Backup restore is unverified for a sideloaded app; a file the owner keeps is the fallback. Import is strict and never merges.
     Status: not built; nothing under `lib/data/` handles it yet. It will reuse `FujinDatabase.transaction` (rule 7) and the mappers (rule 11).
