@@ -29,6 +29,10 @@ MfpFoodEntry entry(
   double servings = 1,
   double servingValue = 100,
   String unit = grams,
+  String? description,
+  String? brand,
+  String? version,
+  MfpNutrients nutrients = const MfpNutrients(),
 }) => MfpFoodEntry(
   id: id,
   date: day,
@@ -36,8 +40,54 @@ MfpFoodEntry entry(
   mealPosition: 0,
   servings: servings,
   servingSize: MfpServingSize(value: servingValue, unit: unit),
-  food: MfpEntryFood(id: food, description: food),
-  nutrients: const MfpNutrients(),
+  food: MfpEntryFood(
+    id: food,
+    description: description ?? food,
+    brandName: brand,
+    version: version,
+  ),
+  nutrients: nutrients,
+);
+
+MfpNutrients nutrients({
+  required double kcal,
+  double? protein,
+  double? carbs,
+  double? fat,
+  double? fiber,
+}) => MfpNutrients(
+  energy: MfpEnergy(unit: MfpEnergyUnit.calories, value: kcal),
+  protein: protein,
+  carbohydrates: carbs,
+  fat: fat,
+  fiber: fiber,
+);
+
+EkkloFood ekkloFood(
+  String id, {
+  String? name,
+  String? brands,
+  double calories = 100,
+  double proteins = 0,
+  double carbs = 0,
+  double fats = 0,
+  double fiber = 0,
+  double portion = 100,
+  EkkloQuantityType quantityType = EkkloQuantityType.grams,
+}) => EkkloFood(
+  id: id,
+  name: name ?? id,
+  brands: brands,
+  portion: portion,
+  quantityType: quantityType,
+  calories: calories,
+  proteins: proteins,
+  carbs: carbs,
+  fats: fats,
+  fiber: fiber,
+  sugar: 0,
+  sodiumMilligrams: 0,
+  category: EkkloFoodCategory.other,
 );
 
 EkkloDailyMealItem item(
@@ -107,4 +157,60 @@ const memory = Memory(
     MealMapping(mfpMealName: breakfast, ekkloMealName: petitDejeuner),
     MealMapping(mfpMealName: lunch, ekkloMealName: dejeuner),
   ],
+);
+
+const skyr = 'mfp-skyr';
+const oil = 'mfp-oil';
+const tablespoon = 'c. à soupe';
+
+final MfpFoodEntry skyrEntry = entry(
+  'E-1',
+  food: skyr,
+  description: 'Skyr nature',
+  brand: 'Isey',
+  servingValue: 250,
+  nutrients: nutrients(kcal: 160, protein: 25, carbs: 10, fat: 0.5),
+);
+
+final EkkloFood isey = ekkloFood(
+  'isey',
+  name: 'Skyr nature 0 %',
+  brands: 'Isey',
+  calories: 62,
+  proteins: 10.4,
+  carbs: 3.8,
+  fats: 0.2,
+);
+final EkkloFood siggis = ekkloFood(
+  'siggis',
+  name: 'Skyr',
+  brands: "Siggi's",
+  calories: 80,
+  proteins: 10,
+  carbs: 4,
+  fats: 0.2,
+);
+final EkkloFood fromageBlanc = ekkloFood(
+  'fromage-blanc',
+  name: 'Fromage blanc 0 %',
+  brands: 'Danone',
+  calories: 64,
+  proteins: 10,
+  carbs: 4,
+  fats: 0.2,
+);
+
+final MfpFoodEntry oilEntry = entry(
+  'E-2',
+  food: oil,
+  description: "Huile d'olive vierge extra",
+  unit: tablespoon,
+  servingValue: 1,
+  nutrients: nutrients(kcal: 119, fat: 13.5),
+);
+final EkkloFood oliveOil = ekkloFood(
+  'olive-oil',
+  name: "Huile d'olive vierge extra",
+  calories: 884,
+  fats: 100,
 );
