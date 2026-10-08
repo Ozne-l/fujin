@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Accepted. Stores implemented; sign-in screens planned.
+Accepted. Stores and both sign-ins implemented.
 
 ## Context
 
@@ -15,8 +15,9 @@ Both client packages take a pluggable credential store (`EkkloTokenStore` in `~/
 - Ekklo tokens and MyFitnessPal session cookies persist in `flutter_secure_storage` 11.2.0: `SecureEkkloTokenStore` (`lib/data/sessions/secure_ekklo_token_store.dart`) and `SecureMfpSessionStore` (`lib/data/sessions/secure_mfp_session_store.dart`), each storing the client's own JSON form under one key from `SessionKey` (`lib/data/sessions/session_key.dart`).
 - `lib/app/providers.dart` wires both stores into the clients through `secureStorageProvider`.
 - They are outside Auto Backup by construction: the backup rules include only `fujin.db`.
-- Planned: the Ekklo login screen and the MyFitnessPal web view sign-in that captures cookies (as the POC did with `flutter_inappwebview`).
-- Open point: the MyFitnessPal web view's User-Agent is not persisted yet.
+- The Ekklo sign-in screen (`lib/pages/ekklo_sign_in/ekklo_sign_in_page.dart`) calls `EkkloClient.login` on the app's client, which writes the tokens through `SecureEkkloTokenStore`. Fūjin keeps no email or password.
+- The MyFitnessPal sign-in screen (`lib/pages/mfp_sign_in/mfp_sign_in_page.dart`) opens `Config.mfpSignInUri` in a web view (`flutter_inappwebview` 6.2.0-beta.3, MIT; the 6.1 Android plugin does not build with Android Gradle Plugin 9). After each page load it reads the cookies of `Config.mfpWebUri`, including the HttpOnly session cookie, through `CookieManager`, and hands them to `MfpSignInNotifier`, which calls `MyFitnessPalClient.signIn` once they hold a session. The client writes them through `SecureMfpSessionStore`.
+- The MyFitnessPal client sends the web view's own User-Agent, read once at bootstrap with `InAppWebViewController.getDefaultUserAgent()` (`lib/main.dart`, `mfpUserAgentProvider`), because the website's bot protection may refuse `/user/auth_token` from another agent (`~/Dev/myfitnesspal_client/README.md`). It is not stored: it changes with each Android System WebView update, and the next launch reads the new one.
 
 ## Consequences
 

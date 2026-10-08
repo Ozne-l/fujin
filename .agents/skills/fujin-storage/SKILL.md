@@ -84,7 +84,7 @@ The database runs synchronously on the UI isolate: the tables are tiny (a few hu
 14. **Keep Ekklo tokens and MyFitnessPal cookies in `flutter_secure_storage`, never in SQLite.**
     Why: they are credentials; secure storage is encrypted by the platform and sits outside the backup whitelist by construction.
     Example: `SecureEkkloTokenStore` and `SecureMfpSessionStore` implement the client packages' `EkkloTokenStore` and `MfpSessionStore` (`lib/data/sessions/secure_ekklo_token_store.dart`, `lib/data/sessions/secure_mfp_session_store.dart`), keyed by `SessionKey` (`lib/data/sessions/session_key.dart`), wired in `mfpClientProvider` and `ekkloClientProvider` (`lib/app/providers.dart`).
-    Status: sign-in screens are not built; the MyFitnessPal web view's User-Agent is not persisted yet (open point).
+    Status: both sign-ins are built (`lib/pages/ekklo_sign_in/`, `lib/pages/mfp_sign_in/`). The MyFitnessPal User-Agent is not stored: `lib/main.dart` reads the web view's at each launch ([ADR 0011](../../../docs/adr/0011-sessions-in-secure-storage.md)).
 
 15. **Planned: export the four tables to `fujin-backup-YYYY-MM-DD.json` (`format: "fujin-backup"`, `version: 1`, no credentials) and import such a file by replacing all four tables in one transaction.**
     Why: Auto Backup restore is unverified for a sideloaded app; a file the owner keeps is the fallback. Import is strict and never merges.

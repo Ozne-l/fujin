@@ -42,6 +42,8 @@ The words below have one meaning in Fūjin's code, docs and conversations. Frenc
 
 **Session.** The credentials a client needs: Ekklo tokens or MyFitnessPal session cookies, kept in secure storage, never backed up. Code: `SecureEkkloTokenStore`, `SecureMfpSessionStore`, `SessionKey` (`lib/data/sessions/`).
 
+**Connected accounts.** Whether a session is stored for MyFitnessPal and for Ekklo; it does not ask either service whether the session still works. It decides between the welcome screen and the Journal. Code: `ConnectedAccounts`, `AccountsService` (`lib/domain/accounts/`).
+
 **Fake backends.** The test stand-in for both services: an `http` `MockClient` that serves MyFitnessPal and Ekklo routes from in-memory data and records requests. For runs on a device, separate local fake servers play the same role through `--dart-define`. Code: `FakeBackends` (`test/support/fake_backends.dart`).
 
 ## Screens
@@ -50,9 +52,16 @@ Codes from the Figma file "Fūjin · Maquettes", as used in the docs.
 
 | Code | Meaning |
 | --- | --- |
+| 00 | Splash (planned) |
+| 01 | Welcome: one card per account, MyFitnessPal and Ekklo, each with "Se connecter"; "Continuer" stays disabled until both are signed in. Shown instead of the Journal while either session is missing. Code: `WelcomePage` (`lib/pages/welcome/welcome_page.dart`) |
+| 02 | MyFitnessPal sign-in in a web view: Fūjin reads the session cookies after each page load and closes the page once MyFitnessPal accepts them. Code: `MfpSignInPage` (`lib/pages/mfp_sign_in/mfp_sign_in_page.dart`), reached from 01 and from "Se reconnecter à MyFitnessPal" on the Journal problem card |
+| 03 | Ekklo sign-in: email, password, "Se connecter". Code: `EkkloSignInPage` (`lib/pages/ekklo_sign_in/ekklo_sign_in_page.dart`), reached from 01 and from "Se reconnecter à Ekklo" on the Journal problem card |
+| 03b | Ekklo sign-in refused: banner "Ekklo a refusé la connexion" with Ekklo's own message in quotes, password field outlined in red until edited |
+| 03c | Ekklo sign-in with no answer from Ekklo (network, server error, unreadable reply): banner "Ekklo ne répond pas" |
+| 04 | Both accounts connected: 01 with a "Connecté" pill and "Session active" on each card, "Continuer" opens the Journal. The mockup shows the Ekklo email; Fūjin keeps no email, so the Ekklo card says "Session active" too |
 | K1 | Reference Journal: week band with rings, day card, meals |
 | K7 | A Journal screen in the Figma file; its role is not described in the decision record |
-| K12 | Journal with the Ekklo session expired: MyFitnessPal stays readable (planned; today any failure shows the problem card) |
+| K12 | Journal with the Ekklo session expired: MyFitnessPal stays readable (planned; today any failure shows the problem card, which already offers "Se reconnecter à Ekklo") |
 | K14 | Scanner: barcode not found (out of v1) |
 | K15 | Generic MyFitnessPal error banner |
 | K19 | Journal with entries "À mettre à jour" |

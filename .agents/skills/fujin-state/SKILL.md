@@ -26,7 +26,7 @@ Riverpod 3 does both injection and state. Providers are written by hand; a notif
      return client;
    });
    ```
-   `mfpClientProvider` and `ekkloClientProvider` pass `clockProvider` and `httpClientProvider` into the client packages and close the client on dispose.
+   `mfpClientProvider` and `ekkloClientProvider` pass `clockProvider` and `httpClientProvider` into the client packages and close the client on dispose. `mfpUserAgentProvider` defaults to the client's own User-Agent; `lib/main.dart` overrides it with the web view's.
 
 3. **Override `databaseProvider` at bootstrap; its default throws.**
    Why: opening `fujin.db` needs the app support directory, which is async; `main` resolves it once and hands the open database to the scope. A missing override fails loudly instead of opening a second database.
@@ -87,10 +87,10 @@ Riverpod 3 does both injection and state. Providers are written by hand; a notif
       _ => [
     ```
 
-11. **Write screens as `HookConsumerWidget` and use hooks for what one widget owns: lifecycle listeners and, later, its controllers.**
+11. **Write screens as `HookConsumerWidget` and use hooks for what one widget owns: lifecycle listeners, text controllers, view toggles.**
     Why: hooks tie setup and disposal to the widget without a `StatefulWidget`.
-    Example: `useOnAppLifecycleStateChange` calls `notifier.reload()` on `AppLifecycleState.resumed` in `JournalPage.build` (`lib/pages/journal/journal_page.dart`). Planned: `useTextEditingController` and `useFocusNode` for form fields once a screen has one; a controller whose text is business state (a search query, for example) will belong to the notifier, not the widget.
+    Examples: `useOnAppLifecycleStateChange` calls `notifier.reload()` on `AppLifecycleState.resumed` in `JournalPage.build` (`lib/pages/journal/journal_page.dart`); `EkkloSignInPage` keeps the email and password in `useTextEditingController`, rebuilds on typing with `useListenable`, and holds the password's red outline and its show/hide toggle in `useState` (`lib/pages/ekklo_sign_in/ekklo_sign_in_page.dart`). A controller whose text is business state (a search query, for example) will belong to the notifier, not the widget.
 
-12. **Planned: give each write use case (send, update, undo, import, export) its own notifier with a sealed state `idle`, `running`, `done`, `failed`.**
-    Why: a write has a lifecycle the page must render (screen 14 "Envoi en cours", failure sheets) and must not be mixed into the read state of `JournalNotifier`.
-    Status: not built; the send button is shown disabled with its computed label (`lib/pages/journal/widgets/day_summary_card.dart`). The sealed state will follow the `EntryStatus` shape (`lib/domain/comparison/entry_status.dart`). Riverpod's `Mutation` is not used: in `riverpod` 3.4.3 it still ships under `package:riverpod/experimental/mutation.dart`.
+12. **Give each write use case (sign-in, send, update, undo, import, export) its own auto-disposed notifier with a sealed state `idle`, `running`, `done`, `failed`; the page reacts to transitions with `ref.listen`.**
+    Why: a write has a lifecycle the page must render (screen 14 "Envoi en cours", failure banners and sheets) and must not be mixed into the read state of `JournalNotifier`. `done` and `failed` are states the page shows or leaves on, not stored events, so rule 8 still holds.
+    Example: `EkkloSignInNotifier` with `EkkloSignInState` (`EkkloSignInIdle`, `EkkloSignInRunning`, `EkkloSignInDone`, `EkkloSignInFailed` carrying a `SignInFailure` and Ekklo's message) in `lib/pages/ekklo_sign_in/`; the sealed state follows the `EntryStatus` shape (`lib/domain/comparison/entry_status.dart`). `EkkloSignInPage` pops with `true` on `EkkloSignInDone` and outlines the password on a refusal, both from `ref.listen`. `MfpSignInNotifier` (`lib/pages/mfp_sign_in/`) has the same four states; its `offer` ignores cookies without a session or already refused, and queues cookies that arrive while a check runs. Planned users: send and update (the send button is shown disabled with its computed label in `lib/pages/journal/widgets/day_summary_card.dart`). Riverpod's `Mutation` is not used: in `riverpod` 3.4.3 it still ships under `package:riverpod/experimental/mutation.dart`.

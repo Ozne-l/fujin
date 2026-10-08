@@ -8,10 +8,12 @@ Works today:
 
 - The Journal (`lib/pages/journal/journal_page.dart`): week band, day card with MyFitnessPal and Ekklo energy and the Ekklo progress bar, meals with a status per entry and "N/M dans Ekklo", pull to refresh with the "Rien de nouveau" snackbar, re-read on return to the foreground.
 - The day comparison (`lib/domain/comparison/compare_day.dart`): statuses recomputed from both services, adoption of items already in Ekklo, edited entries detected through orphan links.
+- The welcome screen (`lib/pages/welcome/welcome_page.dart`), shown instead of the Journal until both accounts are signed in.
+- MyFitnessPal sign-in in a web view (`lib/pages/mfp_sign_in/mfp_sign_in_page.dart`) and Ekklo sign-in (`lib/pages/ekklo_sign_in/ekklo_sign_in_page.dart`), opened from the welcome screen or from the Journal when a session has expired; the Journal reads the day again after a successful sign-in.
 - Local storage in one SQLite file, `fujin.db` (Memory and send links), Android Auto Backup limited to that file, sessions in secure storage.
-- Theme generated from design tokens, French and English copy through gen-l10n, tests for the comparison, storage and Journal screen.
+- Theme generated from design tokens, French and English copy through gen-l10n, tests for the comparison, storage, the Journal, the welcome screen and both sign-ins.
 
-Planned: sign-in screens (Ekklo login, MyFitnessPal web view), the send flow and updates (the send button is shown disabled with its label), undo, Mémoire, Réglages, Scanner, the manual backup file, and the partial Journal that keeps MyFitnessPal readable when only the Ekklo read fails (today a failure on either side shows the problem card).
+Planned: the splash screen, the send flow and updates (the send button is shown disabled with its label), undo, Mémoire, Réglages, Scanner, the manual backup file, and the partial Journal that keeps MyFitnessPal readable when only the Ekklo read fails (today a failure on either side shows the problem card).
 
 ## Build and run
 
