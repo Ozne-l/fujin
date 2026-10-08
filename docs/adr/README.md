@@ -4,8 +4,8 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 
 | # | Decision | Status |
 | --- | --- | --- |
-| [0001](0001-recompute-statuses-from-both-sides.md) | Recompute statuses from both sides, with a send-link registry and no queue | Accepted |
-| [0002](0002-write-ordering.md) | Write ordering for add, undo, send and own copies | Accepted, not implemented yet |
+| [0001](0001-recompute-statuses-from-both-sides.md) | Recompute statuses from both sides, with a send-link registry and no queue | Accepted (own-copy expectation settled by 0018) |
+| [0002](0002-write-ordering.md) | Write ordering for add, undo, send and own copies | Accepted (sending implemented by 0018; add and undo planned) |
 | [0003](0003-refresh-on-foreground-and-pull.md) | Refresh on foreground return and pull to refresh | Accepted |
 | [0004](0004-one-sqlite-file.md) | One SQLite file, schema and migrations | Accepted |
 | [0005](0005-backup.md) | Backup: Auto Backup whitelist, manual JSON file | Accepted (B implemented, C planned) |
@@ -21,3 +21,4 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0015](0015-french-and-english-copy.md) | French and English copy | Accepted |
 | [0016](0016-english-in-code-and-tokens.md) | English in code, design tokens and docs | Accepted |
 | [0017](0017-read-only-dev-environment.md) | Read-only dev environment | Accepted |
+| [0018](0018-send-flow.md) | Send flow: matching, review and execution | Accepted |

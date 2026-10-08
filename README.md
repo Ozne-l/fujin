@@ -1,6 +1,6 @@
 # Fūjin
 
-Fūjin is a personal Android app, built with Flutter, that copies its owner's MyFitnessPal food diary into Ekklo, the nutrition app his coach follows. For each day it reads both services, shows which MyFitnessPal entries are already in Ekklo ("Dans Ekklo"), which still have to go ("À envoyer") and which changed after being sent ("À mettre à jour"), and, once the send flow exists, writes them to Ekklo. The interface is in French, with an English translation for English devices.
+Fūjin is a personal Android app, built with Flutter, that copies its owner's MyFitnessPal food diary into Ekklo, the nutrition app his coach follows. For each day it reads both services, shows which MyFitnessPal entries are already in Ekklo ("Dans Ekklo"), which still have to go ("À envoyer") and which changed after being sent ("À mettre à jour"), and writes them to Ekklo. The interface is in French, with an English translation for English devices.
 
 ## Status
 
@@ -10,10 +10,11 @@ Works today:
 - The day comparison (`lib/domain/comparison/compare_day.dart`): statuses recomputed from both services, adoption of items already in Ekklo, edited entries detected through orphan links.
 - The welcome screen (`lib/pages/welcome/welcome_page.dart`), shown instead of the Journal until both accounts are signed in.
 - MyFitnessPal sign-in in a web view (`lib/pages/mfp_sign_in/mfp_sign_in_page.dart`) and Ekklo sign-in (`lib/pages/ekklo_sign_in/ekklo_sign_in_page.dart`), opened from the welcome screen or from the Journal when a session has expired; the Journal reads the day again after a successful sign-in.
+- The send flow (`lib/pages/sending/send_page.dart`, `lib/domain/sending/`): Ekklo search and ranking of candidates, review with the sheets to choose a food, set a unit's weight or create an own copy, then sending per Ekklo meal with progress, a summary and the interrupted state; updates of entries changed in MyFitnessPal; every choice remembered in Memory ([ADR 0018](docs/adr/0018-send-flow.md)).
 - Local storage in one SQLite file, `fujin.db` (Memory and send links), Android Auto Backup limited to that file, sessions in secure storage.
-- Theme generated from design tokens, French and English copy through gen-l10n, tests for the comparison, storage, the Journal, the welcome screen and both sign-ins.
+- Theme generated from design tokens, French and English copy through gen-l10n, tests for the comparison, storage, the Journal, the welcome screen, both sign-ins, the send planning and execution, and the send flow.
 
-Planned: the splash screen, the send flow and updates (the send button is shown disabled with its label), undo, Mémoire, Réglages, Scanner, the manual backup file, and the partial Journal that keeps MyFitnessPal readable when only the Ekklo read fails (today a failure on either side shows the problem card).
+Planned: the splash screen, undo, the "Mode automatique" setting, Mémoire, Réglages, Scanner, the manual backup file, and the partial Journal that keeps MyFitnessPal readable when only the Ekklo read fails (today a failure on either side shows the problem card).
 
 ## Build and run
 

@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Accepted
+Accepted. The own-copy expectation below was an assumption; [0018](0018-send-flow.md) settles it.
 
 ## Context
 

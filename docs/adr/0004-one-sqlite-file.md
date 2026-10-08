@@ -28,7 +28,7 @@ Schema version 1 (`lib/data/database/schema.dart`):
 
 | Table | Key | Holds |
 | --- | --- | --- |
-| `memory_food` | `mfp_food_id` | `kind` (`ekklo` or `own_copy`), Ekklo food id and name, `mfp_food_version` for own copies |
+| `memory_food` | `mfp_food_id` | `kind` (`ekklo` or `own_copy`), Ekklo food id and name, `mfp_food_version` and `mfp_unit` for own copies (`mfp_unit` added by migration 2, [0018](0018-send-flow.md)) |
 | `memory_unit` | `mfp_food_id`, `mfp_unit` | grams per MyFitnessPal unit; `ON DELETE CASCADE` from `memory_food` |
 | `memory_meal` | `mfp_meal_name` | `ekklo_meal_name` |
 | `sent_link` | `mfp_entry_id` | date, food, meal, servings, `mfp_serving_value`, unit, Ekklo meal id, `ekklo_item_id` (`UNIQUE`), `sent_at`; index on `date` |

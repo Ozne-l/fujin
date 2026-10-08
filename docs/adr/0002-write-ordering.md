@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Accepted, not implemented yet. No write to MyFitnessPal or Ekklo exists in the code today; the send button in `lib/pages/journal/widgets/day_summary_card.dart` is disabled (`onPressed: null`).
+Accepted. Sending is implemented as described in [0018](0018-send-flow.md); adding a food and undo are planned.
 
 ## Context
 

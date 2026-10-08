@@ -14,11 +14,11 @@ The words below have one meaning in Fūjin's code, docs and conversations. Frenc
 
 **Memory (Mémoire).** What Fūjin has learned about how MyFitnessPal maps to Ekklo: remembered foods, remembered units and meal mappings. Built by the owner, kept in SQLite, backed up. Code: `Memory` (`lib/data/memory/memory.dart`), `MemoryRepository` (`lib/data/memory/memory_repository.dart`).
 
-**Remembered food.** The Ekklo food that stands for a MyFitnessPal food. Either a matched food, an existing Ekklo food counted in grams, or an own copy ("aliment perso"), a food Fūjin created in Ekklo from the MyFitnessPal one, counted in portions and tied to the MyFitnessPal food version it was copied from. Code: sealed `RememberedFood` with `MatchedFood` and `OwnCopy` (`lib/data/memory/remembered_food.dart`), table `memory_food`.
+**Remembered food.** The Ekklo food that stands for a MyFitnessPal food. Either a matched food, an existing Ekklo food counted in grams, or an own copy ("aliment perso"), a food Fūjin created in Ekklo as an exact copy of a MyFitnessPal entry's values, tied to the serving unit and the MyFitnessPal food version it was copied from: per 100 g for a gram serving, one portion per unit otherwise. Code: sealed `RememberedFood` with `MatchedFood` and `OwnCopy` (`OwnCopy.mfpUnit`, `OwnCopy.mfpFoodVersion`) (`lib/data/memory/remembered_food.dart`), table `memory_food`.
 
 **Remembered unit.** How many grams one MyFitnessPal serving unit of a given food weighs, for matched foods logged in a unit other than grams. Code: `RememberedUnit` (`lib/data/memory/remembered_unit.dart`), table `memory_unit`.
 
-**Meal mapping.** Which Ekklo meal receives a given MyFitnessPal meal. Without one, an entry of that meal has no expected item. Code: `MealMapping` (`lib/data/memory/meal_mapping.dart`), table `memory_meal`.
+**Meal mapping.** Which Ekklo meal receives a given MyFitnessPal meal. Without one, an entry of that meal has no expected item; the first send of that meal keeps its name in Ekklo and records the mapping. Code: `MealMapping` (`lib/data/memory/meal_mapping.dart`), table `memory_meal`.
 
 **Send link.** Fūjin's record that one MyFitnessPal entry is represented by one Ekklo item: entry id, date, food, meal, servings, serving value and unit, Ekklo meal and item ids, send time. The only state Fūjin keeps about sending. Code: `SentLink` (`lib/data/links/sent_link.dart`), `SentLinkRepository` (`lib/data/links/sent_link_repository.dart`), table `sent_link`.
 
@@ -40,6 +40,20 @@ The words below have one meaning in Fūjin's code, docs and conversations. Frenc
 
 **Refresh outcome.** What a pull to refresh found: `changed`, or `nothingNew` when the MyFitnessPal diary is identical before and after, which triggers the "Rien de nouveau" snackbar. Code: `RefreshOutcome` (`lib/pages/journal/refresh_outcome.dart`).
 
+**Send plan.** What a send will do for one day, built before anything is written: one planned entry per entry "À envoyer" or "À mettre à jour" with a MyFitnessPal id, the entries still being searched, and the entries already in Ekklo. Code: `SendPlan` (`lib/domain/sending/send_plan.dart`), built by `SendService.plan` (`lib/domain/sending/send_service.dart`) from the pure rules in `planEntry` (`lib/domain/sending/plan_entry.dart`).
+
+**Planned entry.** One entry of a send plan: its Ekklo meal, its choice (an Ekklo food with grams, an own copy to reuse or create, or skipped), its ranked candidates, whether it is reviewed and confirmed, and the link of the item it updates. Code: `PlannedEntry` (`lib/domain/sending/planned_entry.dart`), sealed `SendChoice` (`SendToEkkloFood`, `SendAsOwnCopy`, `SkipEntry`, `lib/domain/sending/send_choice.dart`).
+
+**Automatic / to review.** A planned entry is automatic ("Mémorisé") when Memory fully decides it; every other one is to review ("à vérifier") on screen 10 and shows why: "Poids à confirmer", "Nouvelle association", "Aucun aliment proche", then "Confirmé" or "Sauté". Code: `PlannedEntry.reviewed`, `ReviewReason` (`lib/domain/sending/review_reason.dart`).
+
+**Candidate.** An Ekklo food proposed for a MyFitnessPal entry, with the grams to send, whether they were estimated from the kilocalories, the nutrient gaps and how the names match. Acceptable when a name or brand word is shared and the gaps are within tolerance (kcal 12 %, each macro 10 % or 5 kcal). Code: `EkkloCandidate` (`lib/domain/sending/ekklo_candidate.dart`), `NutrientDeltas` (`lib/domain/sending/nutrient_deltas.dart`), `NameMatch`, `rankCandidates` (`lib/domain/sending/rank_candidates.dart`).
+
+**Unit weight.** How a planned Ekklo food got the grams of a non-gram serving: remembered, estimated from the kilocalories, or confirmed by the owner (screen 12). Estimated and confirmed weights become remembered units when the send runs. Code: `UnitWeight` (`lib/domain/sending/unit_weight.dart`).
+
+**Send step.** One write of a send, shown on screens 14 and 16: create an own copy, update a quantity in place, or send one Ekklo meal. Code: sealed `SendStep` (`OwnCopyStep`, `QuantityUpdateStep`, `MealStep`, `lib/domain/sending/send_step.dart`), `SendProgress`, `StepState`.
+
+**Send report.** What screen 15 sums up: foods sent, remembered foods reused, new associations, retained unit weights, own copies created, updates. Code: `SendReport` (`lib/domain/sending/send_report.dart`).
+
 **Session.** The credentials a client needs: Ekklo tokens or MyFitnessPal session cookies, kept in secure storage, never backed up. Code: `SecureEkkloTokenStore`, `SecureMfpSessionStore`, `SessionKey` (`lib/data/sessions/`).
 
 **Connected accounts.** Whether a session is stored for MyFitnessPal and for Ekklo; it does not ask either service whether the session still works. It decides between the welcome screen and the Journal. Code: `ConnectedAccounts`, `AccountsService` (`lib/domain/accounts/`).
@@ -60,14 +74,21 @@ Codes from the Figma file "Fūjin · Maquettes", as used in the docs.
 | 03c | Ekklo sign-in with no answer from Ekklo (network, server error, unreadable reply): banner "Ekklo ne répond pas" |
 | 04 | Both accounts connected: 01 with a "Connecté" pill and "Session active" on each card, "Continuer" opens the Journal. The mockup shows the Ekklo email; Fūjin keeps no email, so the Ekklo card says "Session active" too |
 | K1 | Reference Journal: week band with rings, day card, meals |
-| K7 | A Journal screen in the Figma file; its role is not described in the decision record |
+| K7 | Journal with the MyFitnessPal session expired ("Session MyFitnessPal expirée" in the Figma file) |
 | K12 | Journal with the Ekklo session expired: MyFitnessPal stays readable (planned; today any failure shows the problem card, which already offers "Se reconnecter à Ekklo") |
 | K14 | Scanner: barcode not found (out of v1) |
 | K15 | Generic MyFitnessPal error banner |
 | K19 | Journal with entries "À mettre à jour" |
 | K20 | "Rien de nouveau" snackbar after a pull that changed nothing |
-| 10 to 13 | Send flow: matching MyFitnessPal foods to Ekklo foods (planned) |
-| 14 | "Envoi en cours", send progress (planned) |
+| 09 | "Recherche en cours": Fūjin plans the send, one Ekklo search per unknown food. Code: `SearchingView` (`lib/pages/sending/widgets/searching_view.dart`) |
+| 10 | "À vérifier": the plan, filtered by "à vérifier", "automatiques" and "déjà dans Ekklo", and the send button. Code: `ReviewView` (`lib/pages/sending/widgets/review_view.dart`) |
+| 11 | Sheet "Choisir l'aliment Ekklo": candidates, Ekklo search, own copy or skip. Code: `showMatchSheet` (`lib/pages/sending/sheets/match_sheet.dart`) |
+| 12 | Sheet "Poids d'une unité". Code: `showWeightSheet` (`lib/pages/sending/sheets/weight_sheet.dart`) |
+| 13 | Sheet "Aucune correspondance": own copy preselected, rejected candidates listed. Code: `showOwnCopySheet` (`lib/pages/sending/sheets/own_copy_sheet.dart`) |
+| 14 | "Envoi en cours", send progress per step. Code: `SendingView` (`lib/pages/sending/widgets/sending_view.dart`) |
+| 15 | "Envoi terminé", the send report. Code: `SentView` (`lib/pages/sending/widgets/sent_view.dart`) |
+| 16 | "Envoi interrompu": why, what is already in Ekklo, "Envoyer les N aliments restants". Code: `InterruptedView` (`lib/pages/sending/widgets/interrupted_view.dart`) |
+| 17 | Result of a send in "Mode automatique", a Réglages setting (planned) |
 | 06e | Own copy whose MyFitnessPal food changed version since it was copied (planned) |
 | O1, O6 | Backup screens (Auto Backup and manual file); the decision record names them without detailing each (planned) |
 | O7 | Confirmation before importing a backup file, which replaces everything (planned) |

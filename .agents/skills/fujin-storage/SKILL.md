@@ -57,8 +57,8 @@ The database runs synchronously on the UI isolate: the tables are tiny (a few hu
 
 9. **Change the schema by appending a script to `schemaMigrations`; never edit a script that has shipped.**
    Why: `PRAGMA user_version` records how many scripts a device has run; `_migrate` runs only the ones after it, each in its own transaction, then sets `user_version` to its position (sqlite.org, "PRAGMA user_version"). Editing an applied script never reaches existing installs.
-   Example: `lib/data/database/schema.dart` and `FujinDatabase._migrate` (`lib/data/database/fujin_database.dart`). A new table also gets a `FujinTable` value. The test "reopening a database file keeps its rows and runs no migration twice" (`test/data/database_test.dart`) checks `schemaVersion` against `schemaMigrations.length`.
-   Status: v1 (the only script) has not shipped to a device yet, so it may still be edited in place until the first install; from then on, append only.
+   Example: `lib/data/database/schema.dart` and `FujinDatabase._migrate` (`lib/data/database/fujin_database.dart`); the second script adds `memory_food.mfp_unit`, the serving unit an own copy was made for (ADR 0018). A new table also gets a `FujinTable` value. The test "reopening a database file keeps its rows and runs no migration twice" (`test/data/database_test.dart`) checks `schemaVersion` against `schemaMigrations.length`.
+   Status: the first script is installed on the owner's phone (dev app) and on the emulator, so scripts are append only.
 
 10. **Give each aggregate one repository that owns its SQL and returns models.**
     Why: callers think in Memory and send links, not tables; a table belongs to exactly one repository.
