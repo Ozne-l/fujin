@@ -14,7 +14,7 @@ Future<void> _tap(WidgetTester tester, String text) async {
   await tester.pumpAndSettle();
 }
 
-void _sees(String text) => check(find.text(text).evaluate()).isNotEmpty();
+void _sees(String text) => check(find.text(text).evaluate()).length.equals(1);
 
 void main() {
   setUp(() {
@@ -29,7 +29,7 @@ void main() {
   testWidgets('sends a day reviewed on screen 10 and comes back to a '
       'Journal all in Ekklo', (tester) async {
     final backends = FakeBackends(
-      mealNames: [breakfast, 'Collations'],
+      mealNames: [breakfast, snacks],
       entries: [
         entry('E-1'),
         entry(
@@ -37,7 +37,7 @@ void main() {
           food: skyr,
           description: 'Skyr nature',
           brand: 'Isey',
-          meal: 'Collations',
+          meal: snacks,
           servingValue: 250,
           nutrients: nutrients(kcal: 160, protein: 25, carbs: 10, fat: 0.5),
         ),
@@ -103,5 +103,127 @@ void main() {
     _sees('Envoi terminé');
     _sees('1 aliment mis à jour');
     check(backends.ekkloItems.single.quantity).equals(200);
+  });
+  testWidgets('sends the candidate chosen on sheet 11 and remembers it for '
+      'the next send', (tester) async {
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [skyrEntry],
+      ekkloSearches: {
+        'skyr': [isey, siggis],
+      },
+    );
+    await pumpFujin(tester, backends);
+
+    await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
+    await _tap(tester, 'Changer ›');
+    await _tap(tester, 'Skyr');
+    await _tap(tester, 'Associer et mémoriser');
+    _sees('→ Skyr');
+
+    await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
+    _sees('1 nouvelle association : Skyr nature');
+    check(backends.ekkloItems.single.foodId).equals(siggis.id);
+
+    backends.entries = [skyrEntry, entry('E-2', food: skyr, servingValue: 250)];
+    await _tap(tester, 'Retour au journal');
+    await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
+    _sees('1 automatique');
+    check(find.text('1 à vérifier').evaluate()).isEmpty();
+
+    await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
+    check(
+      backends.ekkloItems.map((item) => item.foodId),
+    ).deepEquals([siggis.id, siggis.id]);
+  });
+
+  testWidgets('leaves a skipped entry out of the send and still to send in '
+      'the Journal', (tester) async {
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [skyrEntry, entry('E-2')],
+      ekkloSearches: {
+        'skyr': [isey, siggis],
+      },
+    );
+    await pumpFujin(tester, backends);
+
+    await _tap(tester, 'Envoyer 2 aliments vers Ekklo');
+    await _tap(tester, 'Changer ›');
+    await _tap(tester, 'Sauter');
+    _sees('Sauté');
+
+    await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
+    _sees('Fūjin a envoyé 1 aliment vers Ekklo.');
+    check(backends.ekkloItems.single.foodId).equals(oatsInEkklo);
+
+    await _tap(tester, 'Retour au journal');
+    _sees('À envoyer');
+    _sees('Envoyer 1 aliment vers Ekklo');
+  });
+
+  testWidgets('sends the quantity of a unit weight confirmed on sheet 12', (
+    tester,
+  ) async {
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [
+        entry(
+          'E-1',
+          food: rice,
+          unit: cup,
+          servingValue: 1,
+          servings: 2,
+          nutrients: nutrients(kcal: 468, carbs: 100),
+        ),
+      ],
+      ekkloFoods: [ekkloFood(riceInEkklo, calories: 130, carbs: 28)],
+    );
+    await pumpFujin(tester, backends);
+
+    await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
+    _sees('Poids à confirmer');
+    await _tap(tester, 'Confirmer');
+    await tester.enterText(find.byType(TextField), '200');
+    await _tap(tester, 'Valider');
+    _sees('Confirmé');
+
+    await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
+    _sees('1 poids retenu : 1 cup = 200 g');
+    check(backends.ekkloItems.single)
+      ..has((item) => item.foodId, 'food').equals(riceInEkklo)
+      ..has((item) => item.quantity, 'quantity').equals(400);
+  });
+
+  testWidgets('sends an own copy made from the MyFitnessPal values', (
+    tester,
+  ) async {
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [skyrEntry],
+      ekkloSearches: {
+        'skyr': [isey, siggis],
+      },
+    );
+    await pumpFujin(tester, backends);
+
+    await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
+    await _tap(tester, 'Changer ›');
+    await _tap(tester, 'Aliment perso');
+    await _tap(tester, "Créer l'aliment perso");
+    _sees('→ Aliment perso à créer');
+
+    await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
+    _sees('1 aliment perso créé : Skyr nature');
+    final ownCopy = backends.ekkloFoods.single;
+    check(ownCopy)
+      ..has((food) => food.name, 'name').equals('Skyr nature')
+      ..has((food) => food.brands, 'brands').equals('Isey')
+      ..has((food) => food.portion, 'portion').equals(100)
+      ..has((food) => food.calories, 'calories').isCloseTo(64, 0.01)
+      ..has((food) => food.proteins, 'proteins').isCloseTo(10, 0.01);
+    check(backends.ekkloItems.single)
+      ..has((item) => item.foodId, 'food').equals(ownCopy.id)
+      ..has((item) => item.quantity, 'quantity').equals(250);
   });
 }
