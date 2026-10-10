@@ -427,6 +427,14 @@
       "$description": "Toasts and snackbars.",
       "$type": "dimension"
     },
+    "hint": {
+      "$value": {
+        "value": 12,
+        "unit": "px"
+      },
+      "$description": "Swipe hint bubble under the Journal week band.",
+      "$type": "dimension"
+    },
     "tile": {
       "$value": {
         "value": 10,
@@ -591,6 +599,62 @@
         "unit": "px"
       },
       "$description": "Fade over the half days at both ends of the Journal week band.",
+      "$type": "dimension"
+    },
+    "band-nudge": {
+      "$value": {
+        "value": 44,
+        "unit": "px"
+      },
+      "$description": "How far the Journal week band slides towards past weeks when it shows its swipe hint.",
+      "$type": "dimension"
+    },
+    "hint-icon": {
+      "$value": {
+        "value": 18,
+        "unit": "px"
+      },
+      "$description": "Arrow in the swipe hint bubble under the Journal week band.",
+      "$type": "dimension"
+    },
+    "hint-padding-vertical": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$description": "Top and bottom padding of the swipe hint bubble.",
+      "$type": "dimension"
+    },
+    "hint-padding-end": {
+      "$value": {
+        "value": 14,
+        "unit": "px"
+      },
+      "$description": "Padding after the text of the swipe hint bubble.",
+      "$type": "dimension"
+    },
+    "hint-pointer-width": {
+      "$value": {
+        "value": 14,
+        "unit": "px"
+      },
+      "$description": "Width of the triangle on top of the swipe hint bubble.",
+      "$type": "dimension"
+    },
+    "hint-pointer-height": {
+      "$value": {
+        "value": 8,
+        "unit": "px"
+      },
+      "$description": "Height of the triangle on top of the swipe hint bubble.",
+      "$type": "dimension"
+    },
+    "hint-pointer-inset": {
+      "$value": {
+        "value": 26,
+        "unit": "px"
+      },
+      "$description": "Distance from the start of the swipe hint bubble to its triangle.",
       "$type": "dimension"
     },
     "macro-ring-dash": {

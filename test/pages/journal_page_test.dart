@@ -5,6 +5,7 @@ import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/data/goals/goals.dart';
+import 'package:fujin/data/hints/hint_repository.dart';
 import 'package:fujin/domain/goals/day_goal_state.dart';
 import 'package:fujin/pages/journal/widgets/day_ring.dart';
 import 'package:fujin/pages/journal/widgets/nutrient_ring.dart';
@@ -12,9 +13,11 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
+import '../support/in_memory_preferences.dart';
 import '../support/pump_fujin.dart';
 
 const _space = '\u202f';
+const _bandHint = 'Glisse pour voir les semaines passées';
 const _goals = Goals(
   kilocalories: 3000,
   protein: 160,
@@ -189,6 +192,41 @@ void main() {
 
       check(find.text('Septembre').evaluate()).length.equals(1);
       check(_ring(tester, '30').selected).isTrue();
+    });
+
+    testWidgets('hints that the band slides on the first visit only', (
+      tester,
+    ) async {
+      await pumpFujin(
+        tester,
+        FakeBackends(mealNames: [breakfast]),
+        preferences: await inMemoryPreferences(shown: const []),
+      );
+      check(find.text(_bandHint).evaluate()).length.equals(1);
+
+      await tester.pump(const Duration(seconds: 4));
+      check(find.text(_bandHint).evaluate()).isEmpty();
+
+      await tester.pumpWidget(const SizedBox());
+      await pumpFujin(
+        tester,
+        FakeBackends(mealNames: [breakfast]),
+        preferences: await HintRepository.openPreferences(),
+      );
+      check(find.text(_bandHint).evaluate()).isEmpty();
+    });
+
+    testWidgets('drops the band hint at the first swipe', (tester) async {
+      await pumpFujin(
+        tester,
+        FakeBackends(mealNames: [breakfast]),
+        preferences: await inMemoryPreferences(shown: const []),
+      );
+
+      await tester.fling(find.byType(PageView), const Offset(300, 0), 1000);
+      await tester.pumpAndSettle();
+
+      check(find.text(_bandHint).evaluate()).isEmpty();
     });
 
     testWidgets('leaves a nutrient without goal in a dashed circle', (

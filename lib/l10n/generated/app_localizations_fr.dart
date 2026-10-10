@@ -1220,6 +1220,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get nextWeek => 'Semaine suivante';
 
   @override
+  String get weekBandHint => 'Glisse pour voir les semaines passées';
+
+  @override
   String kilocaloriesGoal(double goal) {
     final intl.NumberFormat goalNumberFormat =
         intl.NumberFormat.decimalPatternDigits(

@@ -3,15 +3,19 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/goals/goals.dart';
+import 'package:fujin/data/hints/hint.dart';
 import 'package:fujin/domain/goals/day_goal_state.dart';
 import 'package:fujin/domain/journal/calendar_week.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
 import 'package:fujin/pages/journal/widgets/day_ring.dart';
+import 'package:fujin/pages/journal/widgets/week_band_hint.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:motor/motor.dart';
 
 class WeekBand extends HookConsumerWidget {
   const WeekBand({
@@ -23,6 +27,11 @@ class WeekBand extends HookConsumerWidget {
   });
 
   static const _visibleDays = 8;
+  static const _hintDuration = Duration(seconds: 4);
+  static const _nudge = StepSequence<double>(
+    [0, FujinSize.bandNudge, 0],
+    motion: FujinMotion.bandNudge,
+  );
 
   final DateTime selected;
   final DateTime today;
@@ -40,6 +49,18 @@ class WeekBand extends HookConsumerWidget {
     );
     final shown = useState(selectedPage);
     final turning = useRef(false);
+    final hints = ref.watch(hintRepositoryProvider);
+    final hinting = useMemoized(() => !hints.wasShown(Hint.weekBandSwipe));
+    final bubble = useOverlayPortalController();
+    final anchor = useMemoized(LayerLink.new);
+
+    useEffect(() {
+      if (!hinting) return null;
+      unawaited(hints.markShown(Hint.weekBandSwipe));
+      bubble.show();
+      final timer = Timer(_hintDuration, bubble.hide);
+      return timer.cancel;
+    }, const []);
 
     Future<void> turnTo(int page) async {
       turning.value = true;
@@ -81,32 +102,66 @@ class WeekBand extends HookConsumerWidget {
           CustomSemanticsAction(label: l10n.nextWeek): () =>
               selectWeek(shown.value - 1),
       },
-      child: SizedBox(
-        height: FujinSize.weekBand,
-        child: Stack(
-          children: [
-            PageView.builder(
-              controller: controller,
-              reverse: true,
-              onPageChanged: showPage,
-              itemBuilder: (context, page) => _Week(
-                days: CalendarWeek.daysOf(
-                  CalendarWeek.weeksBefore(thisWeek, page),
-                ),
-                selected: selected,
-                today: today,
-                goals: goals,
-                kilocalories: switch (page == shown.value) {
-                  true => kilocalories,
-                  false => const AsyncLoading(),
-                },
-                onSelect: onSelect,
+      child: OverlayPortal(
+        controller: bubble,
+        overlayChildBuilder: (context) => IgnorePointer(
+          child: CompositedTransformFollower(
+            link: anchor,
+            targetAnchor: Alignment.bottomLeft,
+            offset: const Offset(FujinSize.screenMargin, FujinSpace.s2),
+            child: const Padding(
+              padding: EdgeInsets.only(right: FujinSize.screenMargin * 2),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: WeekBandHint(),
               ),
             ),
-            const _Fade(alignment: AlignmentDirectional.centerStart),
-            if (shown.value > 0)
-              const _Fade(alignment: AlignmentDirectional.centerEnd),
-          ],
+          ),
+        ),
+        child: CompositedTransformTarget(
+          link: anchor,
+          child: SizedBox(
+            height: FujinSize.weekBand,
+            child: Stack(
+              children: [
+                NotificationListener<ScrollStartNotification>(
+                  onNotification: (notification) {
+                    if (notification.dragDetails != null) bubble.hide();
+                    return false;
+                  },
+                  child: SequenceMotionBuilder<int, double>(
+                    sequence: _nudge,
+                    converter: const SingleMotionConverter(),
+                    playing: hinting,
+                    builder: (context, nudge, phase, child) => PageView.builder(
+                      controller: controller,
+                      reverse: true,
+                      onPageChanged: showPage,
+                      itemBuilder: (context, page) => Transform.translate(
+                        offset: Offset(nudge, 0),
+                        child: _Week(
+                          days: CalendarWeek.daysOf(
+                            CalendarWeek.weeksBefore(thisWeek, page),
+                          ),
+                          selected: selected,
+                          today: today,
+                          goals: goals,
+                          kilocalories: switch (page == shown.value) {
+                            true => kilocalories,
+                            false => const AsyncLoading(),
+                          },
+                          onSelect: onSelect,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const _Fade(alignment: AlignmentDirectional.centerStart),
+                if (shown.value > 0)
+                  const _Fade(alignment: AlignmentDirectional.centerEnd),
+              ],
+            ),
+          ),
         ),
       ),
     );

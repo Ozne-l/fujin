@@ -26,3 +26,5 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0020](0020-goals.md) | Goals: one row in Fūjin's SQLite | Accepted |
 | [0021](0021-backup-file.md) | Backup file: fujin-backup v1 behind the BackupFiles seam | Accepted |
 | [0022](0022-journal-states-and-goal-rings.md) | Journal states and goal rings | Accepted |
+| [0023](0023-ui-flags-in-shared-preferences.md) | UI flags in shared preferences | Accepted |
+| [0024](0024-splash-from-the-first-frame.md) | Splash from the first frame | Accepted |

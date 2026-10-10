@@ -1688,6 +1688,12 @@ abstract class AppLocalizations {
   /// **'Semaine suivante'**
   String get nextWeek;
 
+  /// No description provided for @weekBandHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Glisse pour voir les semaines passées'**
+  String get weekBandHint;
+
   /// No description provided for @kilocaloriesGoal.
   ///
   /// In fr, this message translates to:

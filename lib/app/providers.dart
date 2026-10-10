@@ -8,6 +8,7 @@ import 'package:fujin/data/backup/backup_repository.dart';
 import 'package:fujin/data/backup/picker_backup_files.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/goals/goals_repository.dart';
+import 'package:fujin/data/hints/hint_repository.dart';
 import 'package:fujin/data/http/read_only_http_client.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
@@ -21,6 +22,7 @@ import 'package:fujin/domain/sending/send_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final clockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
 
@@ -31,6 +33,10 @@ final databaseProvider = Provider<FujinDatabase>(
 final appEnvironmentProvider = Provider<AppEnvironment>(
   (ref) =>
       throw StateError('appEnvironmentProvider is overridden in bootstrap'),
+);
+
+final preferencesProvider = Provider<SharedPreferencesWithCache>(
+  (ref) => throw StateError('preferencesProvider is overridden in bootstrap'),
 );
 
 final appVersionProvider = Provider<String>(
@@ -101,6 +107,10 @@ final memoryRepositoryProvider = Provider<MemoryRepository>(
 
 final goalsRepositoryProvider = Provider<GoalsRepository>(
   (ref) => GoalsRepository(ref.watch(databaseProvider)),
+);
+
+final hintRepositoryProvider = Provider<HintRepository>(
+  (ref) => HintRepository(ref.watch(preferencesProvider)),
 );
 
 final backupRepositoryProvider = Provider<BackupRepository>(

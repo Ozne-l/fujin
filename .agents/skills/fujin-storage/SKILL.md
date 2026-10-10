@@ -1,11 +1,17 @@
 ---
 name: fujin-storage
-description: Local persistence in Fūjin: the SQLite file fujin.db, FujinDatabase, migrations, repositories, row mapping, dates, what Android Auto Backup keeps, and where sessions live. Load when touching lib/data/, adding a table or column, writing SQL, adding a migration, changing schema.dart, saving Memory or send links, or when asked about "database", "sqlite", "migration", "upsert", "transaction", "backup", "tokens", "cookies", "secure storage".
+description: Local persistence in Fūjin: the SQLite file fujin.db, FujinDatabase, migrations, repositories, row mapping, dates, what Android Auto Backup keeps, and where sessions live. Load when touching lib/data/, adding a table or column, writing SQL, adding a migration, changing schema.dart, saving Memory or send links, or when asked about "database", "sqlite", "migration", "upsert", "transaction", "backup", "tokens", "cookies", "secure storage", "shared preferences", "hint shown", "flag".
 ---
 
 # Fūjin storage
 
-Everything Fūjin remembers lives in one SQLite file, `fujin.db`, opened through `FujinDatabase` (`lib/data/database/fujin_database.dart`) with the `sqlite3` package. SQL is hand-written; rows are written from and decoded by the `dart_mappable` mappers. Only that file is backed up. Credentials live elsewhere, in `flutter_secure_storage`.
+Everything of the owner's that Fūjin remembers lives in one SQLite file, `fujin.db`, opened through `FujinDatabase` (`lib/data/database/fujin_database.dart`) with the `sqlite3` package. SQL is hand-written; rows are written from and decoded by the `dart_mappable` mappers. Only that file is backed up. Credentials live elsewhere, in `flutter_secure_storage`; UI flags such as "this hint was shown" in `shared_preferences` (rule 16).
+
+| What | Where | Backed up |
+| --- | --- | --- |
+| Memory, send links, goals | `fujin.db` (SQLite) | Auto Backup and the backup file |
+| Ekklo tokens, MyFitnessPal cookies | `flutter_secure_storage` | never |
+| UI flags (hints shown) | `shared_preferences` | never |
 
 The database runs synchronously on the UI isolate: the tables are tiny (a few hundred rows of Memory and links, one row of goals), and `sqlite3` 3.5.2 is pinned because 3.6+ needs a newer `meta` than Flutter 3.44 allows (`pubspec.yaml`).
 
@@ -89,3 +95,7 @@ The database runs synchronously on the UI isolate: the tables are tiny (a few hu
 15. **Export the six tables to `fujin-backup-YYYY-MM-DD.json` (`format: "fujin-backup"`, `version: 1`, no credentials) and import such a file by replacing all six tables in one transaction.**
     Why: Auto Backup restore is unverified for a sideloaded app; a file the owner keeps is the fallback. Import is strict and never merges.
     Example: `BackupRepository.snapshot` and `BackupRepository.restore` (`lib/data/backup/backup_repository.dart`) call `MemoryRepository.replace`, `SentLinkRepository.replaceAll` and `GoalsRepository.replace` inside `FujinDatabase.transaction` (rule 7); `BackupCodec.decode` (`lib/data/backup/backup_codec.dart`) returns null for anything but a complete version 1 file. A new table must be added to `Backup` (`lib/data/backup/backup.dart`) or deliberately left out ([ADR 0021](../../../docs/adr/0021-backup-file.md)).
+
+16. **Keep UI flags (a hint already shown) in `shared_preferences` behind `HintRepository`, never in `fujin.db` or the backup file.**
+    Why: a lost flag only replays a hint once, so it is not the owner's data; keeping it out of `fujin.db` keeps it out of the six tables an import replaces and out of the backup file ([ADR 0023](../../../docs/adr/0023-ui-flags-in-shared-preferences.md)). On Android, `SharedPreferencesWithCache` writes through DataStore to `files/datastore/FlutterSharedPreferences.preferences_pb`, which the Auto Backup whitelist (rule 13) leaves out.
+    Example: `Hint` names each flag with its preference key (`lib/data/hints/hint.dart`); `HintRepository.wasShown` and `markShown` (`lib/data/hints/hint_repository.dart`); `HintRepository.openPreferences` limits the cache to `Hint.values` and is awaited in `lib/main.dart`, which overrides `preferencesProvider` (`lib/app/providers.dart`), whose default throws like `databaseProvider`. `WeekBand` marks `Hint.weekBandSwipe` shown before playing it (`lib/pages/journal/widgets/week_band.dart`). Tests open an in-memory store with `inMemoryPreferences` (`test/support/in_memory_preferences.dart`); `pumpFujin` defaults to every hint shown.

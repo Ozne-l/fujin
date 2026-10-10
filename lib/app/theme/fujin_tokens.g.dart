@@ -89,6 +89,7 @@ abstract final class FujinRadius {
   static const double button = 28;
   static const double card = 20;
   static const double field = 16;
+  static const double hint = 12;
   static const double logo = 36;
   static const double menu = 12;
   static const double pill = 999;
@@ -112,6 +113,7 @@ abstract final class FujinStroke {
 
 abstract final class FujinSize {
   static const double bandFade = 28;
+  static const double bandNudge = 44;
   static const double breezeGap = 3;
   static const double breezeIndicator = 24;
   static const double breezeInsetBottom = 1;
@@ -130,6 +132,12 @@ abstract final class FujinSize {
   static const double glyphHero = 72;
   static const double goalFieldGap = 10;
   static const double goldRuleWidth = 48;
+  static const double hintIcon = 18;
+  static const double hintPaddingEnd = 14;
+  static const double hintPaddingVertical = 10;
+  static const double hintPointerHeight = 8;
+  static const double hintPointerInset = 26;
+  static const double hintPointerWidth = 14;
   static const double icon = 24;
   static const double kcalBar = 6;
   static const double logo = 160;

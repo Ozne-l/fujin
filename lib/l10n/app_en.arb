@@ -265,6 +265,7 @@
   "setGoals": "Set my goals ›",
   "previousWeek": "Previous week",
   "nextWeek": "Next week",
+  "weekBandHint": "Swipe to see past weeks",
   "kilocaloriesGoal": "/ {goal} kcal",
   "kilocaloriesAt": "{value} kcal at {time}",
   "ringValue": "{value}",

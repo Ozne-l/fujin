@@ -662,6 +662,7 @@
   "setGoals": "Définir mes objectifs ›",
   "previousWeek": "Semaine précédente",
   "nextWeek": "Semaine suivante",
+  "weekBandHint": "Glisse pour voir les semaines passées",
   "kilocaloriesGoal": "/ {goal} kcal",
   "@kilocaloriesGoal": {
     "placeholders": {

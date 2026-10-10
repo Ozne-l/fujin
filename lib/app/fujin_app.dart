@@ -18,11 +18,14 @@ class FujinApp extends ConsumerWidget {
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     debugShowCheckedModeBanner: false,
-    builder: switch (ref.watch(appEnvironmentProvider)) {
-      AppEnvironment.production => null,
-      AppEnvironment.dev => _devBanner,
-    },
+    builder: bannerFor(ref.watch(appEnvironmentProvider)),
   );
+
+  static TransitionBuilder? bannerFor(AppEnvironment environment) =>
+      switch (environment) {
+        AppEnvironment.production => null,
+        AppEnvironment.dev => _devBanner,
+      };
 
   static Widget _devBanner(BuildContext context, Widget? child) => Banner(
     message: AppLocalizations.of(context).devEnvironmentBanner,

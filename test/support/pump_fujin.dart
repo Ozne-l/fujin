@@ -15,10 +15,12 @@ import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'fake_backends.dart';
 import 'fake_backup_files.dart';
 import 'fixtures.dart';
+import 'in_memory_preferences.dart';
 
 const appVersion = '0.1.0';
 
@@ -33,6 +35,7 @@ Future<void> pumpFujin(
   Goals? goals,
   BackupFiles? backupFiles,
   Future<void> Function()? clearWebCookies,
+  SharedPreferencesWithCache? preferences,
 }) async {
   tester.platformDispatcher.localesTestValue = const [Locale('fr')];
   addTearDown(tester.platformDispatcher.clearLocalesTestValue);
@@ -47,6 +50,7 @@ Future<void> pumpFujin(
   GoalsRepository(database).replace(goals);
   final signedInMfp = mfp ?? await backends.mfp();
   final signedInEkklo = ekklo ?? await backends.ekklo();
+  final storedPreferences = preferences ?? await inMemoryPreferences();
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
@@ -62,6 +66,7 @@ Future<void> pumpFujin(
         clearWebCookiesProvider.overrideWithValue(
           clearWebCookies ?? () async {},
         ),
+        preferencesProvider.overrideWithValue(storedPreferences),
       ],
       child: const FujinApp(),
     ),
