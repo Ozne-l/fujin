@@ -26,7 +26,7 @@ Future<void> pumpFujin(
   final database = FujinDatabase.inMemory();
   addTearDown(database.close);
   final memoryRepository = MemoryRepository(database);
-  memory.foods.forEach(memoryRepository.saveFood);
+  memory.matches.forEach(memoryRepository.saveFood);
   memory.meals.forEach(memoryRepository.saveMeal);
   links.forEach(SentLinkRepository(database).add);
   final signedInMfp = mfp ?? await backends.mfp();

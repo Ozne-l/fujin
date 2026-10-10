@@ -26,7 +26,7 @@ void main() {
     database = FujinDatabase.inMemory();
     links = SentLinkRepository(database);
     final repository = MemoryRepository(database);
-    memory.foods.forEach(repository.saveFood);
+    memory.matches.forEach(repository.saveFood);
     memory.units.forEach(repository.saveUnit);
     memory.meals.forEach(repository.saveMeal);
   });

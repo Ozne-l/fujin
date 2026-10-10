@@ -74,7 +74,7 @@ void main() {
     database = FujinDatabase.inMemory();
     links = SentLinkRepository(database);
     memoryRepository = MemoryRepository(database);
-    memory.foods.forEach(memoryRepository.saveFood);
+    memory.matches.forEach(memoryRepository.saveFood);
     memory.units.forEach(memoryRepository.saveUnit);
     memory.meals.forEach(memoryRepository.saveMeal);
   });
@@ -128,7 +128,7 @@ void main() {
 
     final remembered = memoryRepository.load();
     check(
-      remembered.food(skyr),
+      remembered.food(skyr, pot),
     ).isA<MatchedFood>().has((it) => it.ekkloFoodId, 'food').equals('isey');
     check(
       remembered.gramsPerUnit(skyr, pot),
@@ -174,7 +174,7 @@ void main() {
           (it) => it.quantityType,
           'type',
         ).equals(EkkloQuantityType.portion);
-      check(memoryRepository.load().food(_gratin)).isA<OwnCopy>()
+      check(memoryRepository.load().food(_gratin, _portion)).isA<OwnCopy>()
         ..has((it) => it.ekkloFoodId, 'food').equals(copy.id)
         ..has((it) => it.mfpUnit, 'unit').equals(_portion);
       check((await journal.readDay(day)).counts.inEkklo).equals(1);
@@ -203,7 +203,7 @@ void main() {
         ),
       ],
     );
-    final (_, sending) = await services();
+    final (journal, sending) = await services();
 
     final report = await send(sending, await planDay(sending));
 
@@ -219,6 +219,17 @@ void main() {
       (EkkloQuantityType.grams, EkkloQuantityType.grams, 200),
     ]);
     check(report.ownCopies).length.equals(2);
+    check({
+      for (final copy in memoryRepository.load().ownCopies)
+        copy.mfpUnit: copies[copy.ekkloFoodId],
+    }).deepEquals({
+      _portion: EkkloQuantityType.portion,
+      grams: EkkloQuantityType.grams,
+    });
+    for (final link in links.forDate(day)) {
+      links.remove(link.mfpEntryId);
+    }
+    check((await journal.readDay(day)).counts.inEkklo).equals(2);
   });
 
   test('reuses the own copy created before an interruption', () async {

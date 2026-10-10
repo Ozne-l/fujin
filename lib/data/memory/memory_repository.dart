@@ -11,11 +11,17 @@ final class MemoryRepository {
   final FujinDatabase _database;
 
   Memory load() => Memory(
-    foods: [
+    matches: [
       for (final row in _database.select(
         'SELECT * FROM memory_food ORDER BY mfp_description',
       ))
-        RememberedFoodMapper.fromMap(row),
+        MatchedFoodMapper.fromMap(row),
+    ],
+    ownCopies: [
+      for (final row in _database.select(
+        'SELECT * FROM memory_own_copy ORDER BY mfp_description, mfp_unit',
+      ))
+        OwnCopyMapper.fromMap(row),
     ],
     units: [
       for (final row in _database.select(
@@ -33,18 +39,27 @@ final class MemoryRepository {
 
   void saveFood(RememberedFood food) => _database.transaction(() {
     switch (food) {
-      case OwnCopy(:final mfpFoodId):
-        _database.execute('DELETE FROM memory_unit WHERE mfp_food_id = ?', [
-          mfpFoodId,
-        ]);
+      case OwnCopy():
+        _database
+          ..execute('DELETE FROM memory_food WHERE mfp_food_id = ?', [
+            food.mfpFoodId,
+          ])
+          ..upsert(
+            FujinTable.memoryOwnCopy,
+            food.toMap(),
+            key: const [_mfpFoodId, _mfpUnit],
+          );
       case MatchedFood():
-        break;
+        _database
+          ..execute('DELETE FROM memory_own_copy WHERE mfp_food_id = ?', [
+            food.mfpFoodId,
+          ])
+          ..upsert(
+            FujinTable.memoryFood,
+            food.toMap(),
+            key: const [_mfpFoodId],
+          );
     }
-    _database.upsert(
-      FujinTable.memoryFood,
-      food.toMap(),
-      key: const [_mfpFoodId],
-    );
   });
 
   void saveUnit(RememberedUnit unit) => _database.upsert(

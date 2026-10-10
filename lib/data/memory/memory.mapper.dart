@@ -15,7 +15,8 @@ class MemoryMapper extends ClassMapperBase<Memory> {
   static MemoryMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = MemoryMapper._());
-      RememberedFoodMapper.ensureInitialized();
+      MatchedFoodMapper.ensureInitialized();
+      OwnCopyMapper.ensureInitialized();
       RememberedUnitMapper.ensureInitialized();
       MealMappingMapper.ensureInitialized();
     }
@@ -25,10 +26,18 @@ class MemoryMapper extends ClassMapperBase<Memory> {
   @override
   final String id = 'Memory';
 
-  static List<RememberedFood> _$foods(Memory v) => v.foods;
-  static const Field<Memory, List<RememberedFood>> _f$foods = Field(
-    'foods',
-    _$foods,
+  static List<MatchedFood> _$matches(Memory v) => v.matches;
+  static const Field<Memory, List<MatchedFood>> _f$matches = Field(
+    'matches',
+    _$matches,
+    opt: true,
+    def: const [],
+  );
+  static List<OwnCopy> _$ownCopies(Memory v) => v.ownCopies;
+  static const Field<Memory, List<OwnCopy>> _f$ownCopies = Field(
+    'ownCopies',
+    _$ownCopies,
+    key: r'own_copies',
     opt: true,
     def: const [],
   );
@@ -49,7 +58,8 @@ class MemoryMapper extends ClassMapperBase<Memory> {
 
   @override
   final MappableFields<Memory> fields = const {
-    #foods: _f$foods,
+    #matches: _f$matches,
+    #ownCopies: _f$ownCopies,
     #units: _f$units,
     #meals: _f$meals,
   };
@@ -58,7 +68,8 @@ class MemoryMapper extends ClassMapperBase<Memory> {
 
   static Memory _instantiate(DecodingData data) {
     return Memory(
-      foods: data.dec(_f$foods),
+      matches: data.dec(_f$matches),
+      ownCopies: data.dec(_f$ownCopies),
       units: data.dec(_f$units),
       meals: data.dec(_f$meals),
     );
@@ -112,10 +123,12 @@ abstract class MemoryCopyWith<$R, $In extends Memory, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   ListCopyWith<
     $R,
-    RememberedFood,
-    RememberedFoodCopyWith<$R, RememberedFood, RememberedFood>
+    MatchedFood,
+    MatchedFoodCopyWith<$R, MatchedFood, MatchedFood>
   >
-  get foods;
+  get matches;
+  ListCopyWith<$R, OwnCopy, OwnCopyCopyWith<$R, OwnCopy, OwnCopy>>
+  get ownCopies;
   ListCopyWith<
     $R,
     RememberedUnit,
@@ -129,7 +142,8 @@ abstract class MemoryCopyWith<$R, $In extends Memory, $Out>
   >
   get meals;
   $R call({
-    List<RememberedFood>? foods,
+    List<MatchedFood>? matches,
+    List<OwnCopy>? ownCopies,
     List<RememberedUnit>? units,
     List<MealMapping>? meals,
   });
@@ -145,13 +159,20 @@ class _MemoryCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Memory, $Out>
   @override
   ListCopyWith<
     $R,
-    RememberedFood,
-    RememberedFoodCopyWith<$R, RememberedFood, RememberedFood>
+    MatchedFood,
+    MatchedFoodCopyWith<$R, MatchedFood, MatchedFood>
   >
-  get foods => ListCopyWith(
-    $value.foods,
+  get matches => ListCopyWith(
+    $value.matches,
     (v, t) => v.copyWith.$chain(t),
-    (v) => call(foods: v),
+    (v) => call(matches: v),
+  );
+  @override
+  ListCopyWith<$R, OwnCopy, OwnCopyCopyWith<$R, OwnCopy, OwnCopy>>
+  get ownCopies => ListCopyWith(
+    $value.ownCopies,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(ownCopies: v),
   );
   @override
   ListCopyWith<
@@ -177,19 +198,22 @@ class _MemoryCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Memory, $Out>
   );
   @override
   $R call({
-    List<RememberedFood>? foods,
+    List<MatchedFood>? matches,
+    List<OwnCopy>? ownCopies,
     List<RememberedUnit>? units,
     List<MealMapping>? meals,
   }) => $apply(
     FieldCopyWithData({
-      if (foods != null) #foods: foods,
+      if (matches != null) #matches: matches,
+      if (ownCopies != null) #ownCopies: ownCopies,
       if (units != null) #units: units,
       if (meals != null) #meals: meals,
     }),
   );
   @override
   Memory $make(CopyWithData data) => Memory(
-    foods: data.get(#foods, or: $value.foods),
+    matches: data.get(#matches, or: $value.matches),
+    ownCopies: data.get(#ownCopies, or: $value.ownCopies),
     units: data.get(#units, or: $value.units),
     meals: data.get(#meals, or: $value.meals),
   );

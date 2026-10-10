@@ -23,7 +23,7 @@ EntryPlanning planEntry({
   EkkloFood? rememberedFood,
   List<EkkloFood>? searchResults,
 }) {
-  final remembered = memory.food(entry.food.id);
+  final remembered = memory.food(entry.food.id, entry.servingSize.unit);
   final gramsPerUnit = memory.gramsPerUnit(
     entry.food.id,
     entry.servingSize.unit,
@@ -88,12 +88,12 @@ EntryPlanning planEntry({
         null => search(),
       },
     },
+    null when memory.hasOwnCopy(entry.food.id) => Planned(base),
     null => search(),
   };
 }
 
 bool isFresh(OwnCopy copy, MfpFoodEntry entry) =>
-    copy.mfpUnit == entry.servingSize.unit &&
     switch ((copy.mfpFoodVersion, entry.food.version)) {
       (final copied?, final logged?) => copied == logged,
       _ => true,

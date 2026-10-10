@@ -30,7 +30,7 @@ Subject<PlannedEntry> planned(EntryPlanning planning) =>
     check(planning).isA<Planned>().has((it) => it.planned, 'planned');
 
 final copiedOil = Memory(
-  foods: [
+  ownCopies: [
     OwnCopy(
       mfpFoodId: oil,
       mfpDescription: oilEntry.food.description,
@@ -121,15 +121,40 @@ void main() {
       planned(planning)
         ..has((it) => it.reviewed, 'reviewed').isFalse()
         ..has((it) => it.choice, 'choice').equals(
-          SendAsOwnCopy(reuse: copiedOil.foods.single as OwnCopy),
+          SendAsOwnCopy(reuse: copiedOil.ownCopies.single),
         );
+    });
+
+    test('reuses the own copy of each unit of a food copied in two', () {
+      final teaspoonCopy = copiedOil.ownCopies.single.copyWith(
+        ekkloFoodId: 'own-oil-teaspoon',
+        mfpUnit: teaspoon,
+      );
+      final copiedTwice = copiedOil.copyWith(
+        ownCopies: [...copiedOil.ownCopies, teaspoonCopy],
+      );
+
+      for (final (logged, copy) in [
+        (
+          entry('E-2', food: oil, unit: tablespoon, version: 'v1'),
+          copiedOil.ownCopies.single,
+        ),
+        (
+          entry('E-3', food: oil, unit: teaspoon, version: 'v1'),
+          teaspoonCopy,
+        ),
+      ]) {
+        planned(
+          plan(logged, remembered: copiedTwice),
+        ).has((it) => it.choice, 'choice').equals(SendAsOwnCopy(reuse: copy));
+      }
     });
 
     test('copies again a food changed in MyFitnessPal or logged in '
         'another unit', () {
       for (final logged in [
         entry('E-2', food: oil, unit: tablespoon, version: 'v2'),
-        entry('E-3', food: oil, unit: 'teaspoon', version: 'v1'),
+        entry('E-3', food: oil, unit: teaspoon, version: 'v1'),
       ]) {
         planned(plan(logged, remembered: copiedOil))
           ..has((it) => it.reviewed, 'reviewed').isFalse()

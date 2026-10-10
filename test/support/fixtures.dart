@@ -138,7 +138,7 @@ SentLink link(
 );
 
 const memory = Memory(
-  foods: [
+  matches: [
     MatchedFood(
       mfpFoodId: oats,
       mfpDescription: oats,
@@ -162,6 +162,7 @@ const memory = Memory(
 const skyr = 'mfp-skyr';
 const oil = 'mfp-oil';
 const tablespoon = 'c. à soupe';
+const teaspoon = 'teaspoon';
 const pot = 'pot';
 const bowl = 'bowl';
 const snacks = 'Collations';

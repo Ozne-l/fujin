@@ -35,4 +35,38 @@ const schemaMigrations = [
   '''
   ALTER TABLE memory_food ADD COLUMN mfp_unit TEXT;
   ''',
+  '''
+  CREATE TABLE memory_own_copy (
+    mfp_food_id TEXT NOT NULL,
+    mfp_unit TEXT NOT NULL,
+    mfp_description TEXT NOT NULL,
+    kind TEXT NOT NULL CHECK (kind = 'own_copy'),
+    ekklo_food_id TEXT NOT NULL,
+    ekklo_food_name TEXT NOT NULL,
+    mfp_food_version TEXT,
+    PRIMARY KEY (mfp_food_id, mfp_unit)
+  );
+  INSERT INTO memory_own_copy (
+    mfp_food_id,
+    mfp_unit,
+    mfp_description,
+    kind,
+    ekklo_food_id,
+    ekklo_food_name,
+    mfp_food_version
+  )
+  SELECT
+    mfp_food_id,
+    mfp_unit,
+    mfp_description,
+    kind,
+    ekklo_food_id,
+    ekklo_food_name,
+    mfp_food_version
+  FROM memory_food
+  WHERE kind = 'own_copy' AND mfp_unit IS NOT NULL;
+  DELETE FROM memory_food WHERE kind = 'own_copy';
+  ALTER TABLE memory_food DROP COLUMN mfp_unit;
+  ALTER TABLE memory_food DROP COLUMN mfp_food_version;
+  ''',
 ];

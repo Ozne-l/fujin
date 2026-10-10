@@ -3,7 +3,6 @@ import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/comparison/entry_quantity.dart';
-import 'package:fujin/domain/comparison/gram_unit.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 part 'expected_item.mapper.dart';
@@ -40,24 +39,18 @@ final class ExpectedItem with ExpectedItemMappable {
 
   static ExpectedItem? forEntry(MfpFoodEntry entry, Memory memory) {
     final mealName = memory.ekkloMealName(entry.mealName);
-    final food = memory.food(entry.food.id);
+    final unit = entry.servingSize.unit;
+    final food = memory.food(entry.food.id, unit);
     final quantity = switch (food) {
       null => null,
       MatchedFood(:final mfpFoodId) => switch (entryGrams(
         entry,
-        gramsPerUnit: memory.gramsPerUnit(mfpFoodId, entry.servingSize.unit),
+        gramsPerUnit: memory.gramsPerUnit(mfpFoodId, unit),
       )) {
         null => null,
         final grams => (grams, EkkloQuantityType.grams),
       },
-      OwnCopy(:final mfpUnit) => switch ((
-        mfpUnit == entry.servingSize.unit,
-        isGramUnit(mfpUnit),
-      )) {
-        (false, _) => null,
-        (true, true) => (entryUnits(entry), EkkloQuantityType.grams),
-        (true, false) => (entryUnits(entry), EkkloQuantityType.portion),
-      },
+      OwnCopy() => (entryUnits(entry), ownCopyQuantityType(unit)),
     };
     return switch ((mealName, food, quantity)) {
       (

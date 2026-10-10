@@ -136,7 +136,7 @@ void main() {
       'expects an own copy in portions of its unit, and nothing in another',
       () {
         const copied = Memory(
-          foods: [
+          ownCopies: [
             OwnCopy(
               mfpFoodId: oats,
               mfpDescription: oats,

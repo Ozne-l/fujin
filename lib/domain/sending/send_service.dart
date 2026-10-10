@@ -5,6 +5,7 @@ import 'package:fujin/data/memory/meal_mapping.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
+import 'package:fujin/domain/comparison/entry_quantity.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/comparison/expected_item.dart';
 import 'package:fujin/domain/comparison/placement.dart';
@@ -318,7 +319,7 @@ final class SendService {
       };
 
   Future<(String, bool)> _ownCopy(MfpFoodEntry entry) async {
-    switch (_memory.load().food(entry.food.id)) {
+    switch (_memory.load().food(entry.food.id, entry.servingSize.unit)) {
       case final OwnCopy copy when isFresh(copy, entry):
         return (copy.ekkloFoodId, false);
       case OwnCopy() || MatchedFood() || null:
