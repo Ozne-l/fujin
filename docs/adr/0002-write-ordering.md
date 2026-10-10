@@ -18,7 +18,7 @@ Client capabilities (from `~/Dev/myfitnesspal_client` and `~/Dev/ekklo_client`):
 - Undo: Ekklo first, then MyFitnessPal. A stop after the first half leaves an entry "À envoyer", never an Ekklo item without its MyFitnessPal source.
 - Sending: call `appendItems`, compare the meal's item ids before and after to find the items Fūjin created, then write the send links. A stop before the links are written is repaired by adoption on the next read.
 - Own copies: before reusing an own copy, re-read the MyFitnessPal food with `foods.byId` and compare its `version` with the one stored in Memory (`OwnCopy.mfpFoodVersion`, `lib/data/memory/remembered_food.dart`). A different version means the copy is stale (screen 06e).
-- The Scanner's barcode-not-found state (K14) is out of v1. K15 is the generic MyFitnessPal error banner.
+- The anti-bot block from MyFitnessPal (K14) is out of v1. K15 is the generic MyFitnessPal error banner.
 
 The executors will live under `lib/domain/sending/` with one notifier per write use case ([0006](0006-riverpod-notifiers-as-presenters.md)). Both are planned.
 

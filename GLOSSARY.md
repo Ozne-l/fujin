@@ -76,7 +76,7 @@ Codes from the Figma file "Fūjin · Maquettes", as used in the docs.
 | K1 | Reference Journal: week band with rings, day card, meals |
 | K7 | Journal with the MyFitnessPal session expired ("Session MyFitnessPal expirée" in the Figma file) |
 | K12 | Journal with the Ekklo session expired: MyFitnessPal stays readable (planned; today any failure shows the problem card, which already offers "Se reconnecter à Ekklo") |
-| K14 | Scanner: barcode not found (out of v1) |
+| K14 | Access blocked by MyFitnessPal's anti-bot check (out of v1) |
 | K15 | Generic MyFitnessPal error banner |
 | K19 | Journal with entries "À mettre à jour" |
 | K20 | "Rien de nouveau" snackbar after a pull that changed nothing |
@@ -90,5 +90,6 @@ Codes from the Figma file "Fūjin · Maquettes", as used in the docs.
 | 16 | "Envoi interrompu": why, what is already in Ekklo, "Envoyer les N aliments restants". Code: `InterruptedView` (`lib/pages/sending/widgets/interrupted_view.dart`) |
 | 17 | Result of a send in "Mode automatique", a Réglages setting (planned) |
 | 06e | Own copy whose MyFitnessPal food changed version since it was copied (planned) |
-| O1, O6 | Backup screens (Auto Backup and manual file); the decision record names them without detailing each (planned) |
-| O7 | Confirmation before importing a backup file, which replaces everything (planned) |
+| O1, O2 | Réglages tab, the third tab: "objectifs définis" (O1) and "aucun objectif" (O2) (planned) |
+| O3, O4, O5 | Goal editing: complete goals, empty fields, just saved (planned) |
+| O6, O7 | Backup file exported (O6) and imported (O7), reached from Réglages; the import replaces everything after a confirmation (planned) |

@@ -8,7 +8,7 @@ Accepted. B (Android Auto Backup) is implemented; C (manual file) is planned.
 
 ## Context
 
-The Memory takes weeks of matching to build and the send links prevent double sends. Losing them on a phone change would be costly. Sessions (Ekklo tokens, MyFitnessPal cookies) must never leave the phone ([0011](0011-sessions-in-secure-storage.md)). Fūjin is sideloaded, not installed from the Play Store. The screens are O1, O6 and O7 in the Figma file.
+The Memory takes weeks of matching to build and the send links prevent double sends. Losing them on a phone change would be costly. Sessions (Ekklo tokens, MyFitnessPal cookies) must never leave the phone ([0011](0011-sessions-in-secure-storage.md)). Fūjin is sideloaded, not installed from the Play Store. The screens are O6 (export) and O7 (import) in the Figma file, reached from the Réglages tab (O1).
 
 ## Decision
 
