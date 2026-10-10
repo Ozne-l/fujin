@@ -289,6 +289,7 @@ class SendAsOwnCopyMapper extends SubClassMapperBase<SendAsOwnCopy> {
       MapperContainer.globals.use(_instance = SendAsOwnCopyMapper._());
       SendChoiceMapper.ensureInitialized().addSubMapper(_instance!);
       OwnCopyMapper.ensureInitialized();
+      OwnCopyRenewalMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -302,9 +303,18 @@ class SendAsOwnCopyMapper extends SubClassMapperBase<SendAsOwnCopy> {
     _$reuse,
     opt: true,
   );
+  static OwnCopyRenewal? _$renewal(SendAsOwnCopy v) => v.renewal;
+  static const Field<SendAsOwnCopy, OwnCopyRenewal> _f$renewal = Field(
+    'renewal',
+    _$renewal,
+    opt: true,
+  );
 
   @override
-  final MappableFields<SendAsOwnCopy> fields = const {#reuse: _f$reuse};
+  final MappableFields<SendAsOwnCopy> fields = const {
+    #reuse: _f$reuse,
+    #renewal: _f$renewal,
+  };
   @override
   final bool ignoreNull = true;
 
@@ -316,7 +326,10 @@ class SendAsOwnCopyMapper extends SubClassMapperBase<SendAsOwnCopy> {
   late final ClassMapperBase superMapper = SendChoiceMapper.ensureInitialized();
 
   static SendAsOwnCopy _instantiate(DecodingData data) {
-    return SendAsOwnCopy(reuse: data.dec(_f$reuse));
+    return SendAsOwnCopy(
+      reuse: data.dec(_f$reuse),
+      renewal: data.dec(_f$renewal),
+    );
   }
 
   @override
@@ -383,7 +396,7 @@ abstract class SendAsOwnCopyCopyWith<$R, $In extends SendAsOwnCopy, $Out>
     implements SendChoiceCopyWith<$R, $In, $Out> {
   OwnCopyCopyWith<$R, OwnCopy, OwnCopy>? get reuse;
   @override
-  $R call({OwnCopy? reuse});
+  $R call({OwnCopy? reuse, OwnCopyRenewal? renewal});
   SendAsOwnCopyCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -399,11 +412,17 @@ class _SendAsOwnCopyCopyWithImpl<$R, $Out>
   OwnCopyCopyWith<$R, OwnCopy, OwnCopy>? get reuse =>
       $value.reuse?.copyWith.$chain((v) => call(reuse: v));
   @override
-  $R call({Object? reuse = $none}) =>
-      $apply(FieldCopyWithData({if (reuse != $none) #reuse: reuse}));
+  $R call({Object? reuse = $none, Object? renewal = $none}) => $apply(
+    FieldCopyWithData({
+      if (reuse != $none) #reuse: reuse,
+      if (renewal != $none) #renewal: renewal,
+    }),
+  );
   @override
-  SendAsOwnCopy $make(CopyWithData data) =>
-      SendAsOwnCopy(reuse: data.get(#reuse, or: $value.reuse));
+  SendAsOwnCopy $make(CopyWithData data) => SendAsOwnCopy(
+    reuse: data.get(#reuse, or: $value.reuse),
+    renewal: data.get(#renewal, or: $value.renewal),
+  );
 
   @override
   SendAsOwnCopyCopyWith<$R2, SendAsOwnCopy, $Out2> $chain<$R2, $Out2>(

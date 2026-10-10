@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/links/sent_link.dart';
+import 'package:fujin/domain/sending/own_copy_renewal.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
+import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/breeze_indicator.dart';
 import 'package:fujin/pages/common/breeze_streaks.dart';
@@ -89,7 +91,14 @@ class PlanRow extends StatelessWidget {
   static Widget _plannedPill(AppLocalizations l10n, PlannedEntry planned) =>
       switch ((planned.reviewed, planned.replacing)) {
         (false, null) => StatusPill(
-          label: l10n.pillRemembered,
+          label: switch (planned.choice) {
+            SendAsOwnCopy(renewal: OwnCopyRenewal.newUnit) => l10n.pillNewUnit,
+            SendAsOwnCopy(renewal: OwnCopyRenewal.foodChanged) =>
+              l10n.pillFoodChanged,
+            SendAsOwnCopy(renewal: null) ||
+            SendToEkkloFood() ||
+            SkipEntry() => l10n.pillRemembered,
+          },
           tone: PillTone.attention,
         ),
         (false, _) => StatusPill(

@@ -7,6 +7,7 @@ import 'package:fujin/domain/comparison/gram_unit.dart';
 import 'package:fujin/domain/sending/ekklo_candidate.dart';
 import 'package:fujin/domain/sending/entry_planning.dart';
 import 'package:fujin/domain/sending/food_words.dart';
+import 'package:fujin/domain/sending/own_copy_renewal.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/rank_candidates.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
@@ -60,7 +61,11 @@ EntryPlanning planEntry({
     final OwnCopy copy when isFresh(copy, entry) => Planned(
       base.copyWith(choice: SendAsOwnCopy(reuse: copy)),
     ),
-    OwnCopy() => Planned(base),
+    OwnCopy() => Planned(
+      base.copyWith(
+        choice: const SendAsOwnCopy(renewal: OwnCopyRenewal.foodChanged),
+      ),
+    ),
     MatchedFood(:final ekkloFoodId, :final ekkloFoodName) => switch ((
       entryGrams(entry, gramsPerUnit: gramsPerUnit),
       rememberedFood,
@@ -88,7 +93,11 @@ EntryPlanning planEntry({
         null => search(),
       },
     },
-    null when memory.hasOwnCopy(entry.food.id) => Planned(base),
+    null when memory.hasOwnCopy(entry.food.id) => Planned(
+      base.copyWith(
+        choice: const SendAsOwnCopy(renewal: OwnCopyRenewal.newUnit),
+      ),
+    ),
     null => search(),
   };
 }

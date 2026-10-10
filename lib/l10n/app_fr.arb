@@ -191,6 +191,8 @@
   "rowSearching": "Recherche dans Ekklo…",
   "rowWaiting": "En attente",
   "pillRemembered": "Mémorisé",
+  "pillNewUnit": "Nouvelle unité",
+  "pillFoodChanged": "Aliment modifié",
   "pillWeightToConfirm": "Poids à confirmer",
   "pillNewAssociation": "Nouvelle association",
   "pillNoCloseFood": "Aucun aliment proche",

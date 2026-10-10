@@ -1,6 +1,7 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
+import 'package:fujin/domain/sending/own_copy_renewal.dart';
 import 'package:fujin/domain/sending/unit_weight.dart';
 
 part 'send_choice.mapper.dart';
@@ -33,9 +34,10 @@ final class SendToEkkloFood extends SendChoice with SendToEkkloFoodMappable {
 
 @MappableClass(discriminatorValue: 'own_copy')
 final class SendAsOwnCopy extends SendChoice with SendAsOwnCopyMappable {
-  const SendAsOwnCopy({this.reuse});
+  const SendAsOwnCopy({this.reuse, this.renewal});
 
   final OwnCopy? reuse;
+  final OwnCopyRenewal? renewal;
 }
 
 @MappableClass(discriminatorValue: 'skip')

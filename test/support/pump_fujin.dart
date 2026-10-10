@@ -8,6 +8,7 @@ import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/links/sent_link.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
+import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -20,6 +21,7 @@ Future<void> pumpFujin(
   MyFitnessPalClient? mfp,
   EkkloClient? ekklo,
   List<SentLink> links = const [],
+  List<OwnCopy> ownCopies = const [],
 }) async {
   tester.platformDispatcher.localesTestValue = const [Locale('fr')];
   addTearDown(tester.platformDispatcher.clearLocalesTestValue);
@@ -28,6 +30,7 @@ Future<void> pumpFujin(
   final memoryRepository = MemoryRepository(database);
   memory.matches.forEach(memoryRepository.saveFood);
   memory.meals.forEach(memoryRepository.saveMeal);
+  ownCopies.forEach(memoryRepository.saveFood);
   links.forEach(SentLinkRepository(database).add);
   final signedInMfp = mfp ?? await backends.mfp();
   final signedInEkklo = ekklo ?? await backends.ekklo();

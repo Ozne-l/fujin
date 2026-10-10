@@ -542,6 +542,18 @@ abstract class AppLocalizations {
   /// **'Mémorisé'**
   String get pillRemembered;
 
+  /// No description provided for @pillNewUnit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle unité'**
+  String get pillNewUnit;
+
+  /// No description provided for @pillFoodChanged.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aliment modifié'**
+  String get pillFoodChanged;
+
   /// No description provided for @pillWeightToConfirm.
   ///
   /// In fr, this message translates to:

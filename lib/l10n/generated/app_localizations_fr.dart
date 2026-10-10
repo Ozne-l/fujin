@@ -375,6 +375,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get pillRemembered => 'Mémorisé';
 
   @override
+  String get pillNewUnit => 'Nouvelle unité';
+
+  @override
+  String get pillFoodChanged => 'Aliment modifié';
+
+  @override
   String get pillWeightToConfirm => 'Poids à confirmer';
 
   @override

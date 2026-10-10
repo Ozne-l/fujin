@@ -1,6 +1,7 @@
 import 'package:checks/checks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:fujin/data/memory/remembered_food.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
@@ -225,5 +226,31 @@ void main() {
     check(backends.ekkloItems.single)
       ..has((item) => item.foodId, 'food').equals(ownCopy.id)
       ..has((item) => item.quantity, 'quantity').equals(250);
+  });
+
+  testWidgets('shows a new unit for a food copied in another unit', (
+    tester,
+  ) async {
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [entry('E-1', food: oil, unit: teaspoon, description: oil)],
+    );
+    await pumpFujin(
+      tester,
+      backends,
+      ownCopies: const [
+        OwnCopy(
+          mfpFoodId: oil,
+          mfpDescription: oil,
+          ekkloFoodId: 'own-oil',
+          ekkloFoodName: oil,
+          mfpUnit: tablespoon,
+        ),
+      ],
+    );
+
+    await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
+    _sees('Nouvelle unité');
+    check(find.text('Mémorisé').evaluate()).isEmpty();
   });
 }

@@ -372,6 +372,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pillRemembered => 'Remembered';
 
   @override
+  String get pillNewUnit => 'New unit';
+
+  @override
+  String get pillFoodChanged => 'Food changed';
+
+  @override
   String get pillWeightToConfirm => 'Weight to confirm';
 
   @override

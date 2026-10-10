@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart' show group, test;
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/sending/entry_planning.dart';
+import 'package:fujin/domain/sending/own_copy_renewal.dart';
 import 'package:fujin/domain/sending/plan_entry.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/review_reason.dart';
@@ -152,13 +153,22 @@ void main() {
 
     test('copies again a food changed in MyFitnessPal or logged in '
         'another unit', () {
-      for (final logged in [
-        entry('E-2', food: oil, unit: tablespoon, version: 'v2'),
-        entry('E-3', food: oil, unit: teaspoon, version: 'v1'),
+      for (final (logged, renewal) in [
+        (
+          entry('E-2', food: oil, unit: tablespoon, version: 'v2'),
+          OwnCopyRenewal.foodChanged,
+        ),
+        (
+          entry('E-3', food: oil, unit: teaspoon, version: 'v1'),
+          OwnCopyRenewal.newUnit,
+        ),
       ]) {
         planned(plan(logged, remembered: copiedOil))
           ..has((it) => it.reviewed, 'reviewed').isFalse()
-          ..has((it) => it.choice, 'choice').equals(const SendAsOwnCopy());
+          ..has(
+            (it) => it.choice,
+            'choice',
+          ).equals(SendAsOwnCopy(renewal: renewal));
       }
     });
   });

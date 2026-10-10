@@ -74,6 +74,8 @@
   "rowSearching": "Searching Ekklo…",
   "rowWaiting": "Waiting",
   "pillRemembered": "Remembered",
+  "pillNewUnit": "New unit",
+  "pillFoodChanged": "Food changed",
   "pillWeightToConfirm": "Weight to confirm",
   "pillNewAssociation": "New match",
   "pillNoCloseFood": "No close food",
