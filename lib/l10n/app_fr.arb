@@ -496,5 +496,62 @@
   "searchFailedNetwork": "Plus de réseau pendant la recherche. Rien n'a été envoyé.",
   "searchFailedOther": "Ekklo ne répond pas. Rien n'a été envoyé.",
   "sendFailedNetwork": "Plus de réseau avant l'envoi. Rien n'a été envoyé.",
-  "sendFailedOther": "L'envoi n'a pas pu commencer. Rien n'a été envoyé."
+  "sendFailedOther": "L'envoi n'a pas pu commencer. Rien n'a été envoyé.",
+  "tabJournal": "Journal",
+  "tabMemory": "Mémoire",
+  "tabSettings": "Réglages",
+  "tabScanner": "Scanner",
+  "memorySubtitle": "Ce que Fūjin a appris de tes choix.",
+  "memoryFoods": "Aliments ({count})",
+  "@memoryFoods": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "memoryMeals": "Repas ({count})",
+  "@memoryMeals": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "memorySearchHint": "Rechercher un aliment",
+  "memorySearchEmpty": "Aucun aliment mémorisé ne correspond.",
+  "memoryTarget": "→ {name}",
+  "@memoryTarget": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "memoryOwnCopyTarget": "→ Aliment perso (copie MFP)",
+  "memoryEmptyTitle": "Aucun aliment mémorisé",
+  "memoryEmptyDetail": "Chaque choix fait pendant un envoi\nest retenu ici pour la suite.",
+  "memoryUnitQuoted": "« {unit} »",
+  "@memoryUnitQuoted": {
+    "placeholders": {"unit": {"type": "String"}}
+  },
+  "memoryServedIn": "Servi en {units}",
+  "@memoryServedIn": {
+    "placeholders": {"units": {"type": "String"}}
+  },
+  "memoryChange": "Changer ›",
+  "memoryPerGrams": "pour {amount} g",
+  "@memoryPerGrams": {
+    "placeholders": {"amount": {"type": "double", "format": "decimalPattern"}}
+  },
+  "memoryPerMilliliters": "pour {amount} ml",
+  "@memoryPerMilliliters": {
+    "placeholders": {"amount": {"type": "double", "format": "decimalPattern"}}
+  },
+  "memoryPerPortion": "par portion",
+  "memoryUnitWeights": "POIDS PAR UNITÉ",
+  "memoryOneUnit": "1 {unit}",
+  "@memoryOneUnit": {
+    "placeholders": {"unit": {"type": "String"}}
+  },
+  "memoryUnitWeightNote": "Utilisé quand MyFitnessPal compte en {units}\net non en grammes.",
+  "@memoryUnitWeightNote": {
+    "placeholders": {"units": {"type": "String"}}
+  },
+  "memoryForget": "Oublier cet aliment",
+  "memoryForgetNote": "Le prochain envoi te redemandera quoi choisir.",
+  "memoryMealsNote": "Un repas MyFitnessPal sans correspondance\ngarde son nom dans Ekklo.",
+  "memoryChangeSubtitle": "Choisis l'aliment Ekklo à retenir pour la suite.",
+  "memoryEnergyPer": "{energy} · {portion}",
+  "@memoryEnergyPer": {
+    "placeholders": {"energy": {"type": "String"}, "portion": {"type": "String"}}
+  }
 }

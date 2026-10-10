@@ -10,6 +10,7 @@ import 'package:fujin/data/sessions/secure_ekklo_token_store.dart';
 import 'package:fujin/data/sessions/secure_mfp_session_store.dart';
 import 'package:fujin/domain/accounts/accounts_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
+import 'package:fujin/domain/memory/memory_service.dart';
 import 'package:fujin/domain/sending/send_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -92,6 +93,13 @@ final journalServiceProvider = Provider<JournalService>(
     links: ref.watch(sentLinkRepositoryProvider),
     memory: ref.watch(memoryRepositoryProvider),
     clock: ref.watch(clockProvider),
+  ),
+);
+
+final memoryServiceProvider = Provider<MemoryService>(
+  (ref) => MemoryService(
+    memory: ref.watch(memoryRepositoryProvider),
+    ekklo: ref.watch(ekkloClientProvider),
   ),
 );
 

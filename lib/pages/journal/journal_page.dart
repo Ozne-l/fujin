@@ -15,6 +15,7 @@ import 'package:fujin/pages/journal/widgets/journal_header.dart';
 import 'package:fujin/pages/journal/widgets/journal_problem_card.dart';
 import 'package:fujin/pages/journal/widgets/meal_card.dart';
 import 'package:fujin/pages/journal/widgets/week_band.dart';
+import 'package:fujin/pages/memory/memory_notifier.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -55,6 +56,7 @@ class JournalPage extends HookConsumerWidget {
 
     Future<void> send() async {
       await context.push<void>(FujinRoute.send.forDate(day));
+      ref.invalidate(memoryProvider);
       await notifier.reload();
     }
 
@@ -65,6 +67,7 @@ class JournalPage extends HookConsumerWidget {
 
     return Scaffold(
       body: SafeArea(
+        bottom: false,
         child: RefreshIndicator(
           onRefresh: refresh,
           child: CustomScrollView(
@@ -149,7 +152,11 @@ class JournalPage extends HookConsumerWidget {
       separatorBuilder: (context, index) =>
           const SizedBox(height: FujinSpace.s3),
     ),
-    const SliverToBoxAdapter(child: SizedBox(height: FujinSpace.s8)),
+    SliverToBoxAdapter(
+      child: SizedBox(
+        height: FujinSpace.s8 + MediaQuery.paddingOf(context).bottom,
+      ),
+    ),
   ];
 
   static void _showNothingNew(BuildContext context) {

@@ -13,12 +13,13 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0007](0007-dart-mappable-models.md) | dart_mappable models | Accepted |
 | [0008](0008-theme-from-design-tokens.md) | Theme from design tokens, motion with motor | Accepted |
 | [0009](0009-french-only-copy.md) | French-only copy | Superseded by 0015 |
-| [0010](0010-go-router-navigation.md) | go_router navigation | Accepted |
+| [0010](0010-go-router-navigation.md) | go_router navigation | Accepted (tab plans superseded by 0019) |
 | [0011](0011-sessions-in-secure-storage.md) | Sessions in secure storage | Accepted |
 | [0012](0012-test-doubles-at-process-edges.md) | Test doubles at process edges only | Accepted |
-| [0013](0013-layers.md) | Layers | Accepted |
+| [0013](0013-layers.md) | Layers | Accepted (planned memory and settings pages superseded by 0019) |
 | [0014](0014-lints-and-code-style.md) | Lints and code style | Accepted |
 | [0015](0015-french-and-english-copy.md) | French and English copy | Accepted |
 | [0016](0016-english-in-code-and-tokens.md) | English in code, design tokens and docs | Accepted |
 | [0017](0017-read-only-dev-environment.md) | Read-only dev environment | Accepted |
 | [0018](0018-send-flow.md) | Send flow: matching, review and execution | Accepted |
+| [0019](0019-tab-shell.md) | Tab shell: Journal and Mémoire tabs, Scanner disabled | Accepted |

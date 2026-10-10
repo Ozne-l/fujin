@@ -840,4 +840,117 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get sendFailedOther =>
       'L\'envoi n\'a pas pu commencer. Rien n\'a été envoyé.';
+
+  @override
+  String get tabJournal => 'Journal';
+
+  @override
+  String get tabMemory => 'Mémoire';
+
+  @override
+  String get tabSettings => 'Réglages';
+
+  @override
+  String get tabScanner => 'Scanner';
+
+  @override
+  String get memorySubtitle => 'Ce que Fūjin a appris de tes choix.';
+
+  @override
+  String memoryFoods(int count) {
+    return 'Aliments ($count)';
+  }
+
+  @override
+  String memoryMeals(int count) {
+    return 'Repas ($count)';
+  }
+
+  @override
+  String get memorySearchHint => 'Rechercher un aliment';
+
+  @override
+  String get memorySearchEmpty => 'Aucun aliment mémorisé ne correspond.';
+
+  @override
+  String memoryTarget(String name) {
+    return '→ $name';
+  }
+
+  @override
+  String get memoryOwnCopyTarget => '→ Aliment perso (copie MFP)';
+
+  @override
+  String get memoryEmptyTitle => 'Aucun aliment mémorisé';
+
+  @override
+  String get memoryEmptyDetail =>
+      'Chaque choix fait pendant un envoi\nest retenu ici pour la suite.';
+
+  @override
+  String memoryUnitQuoted(String unit) {
+    return '« $unit »';
+  }
+
+  @override
+  String memoryServedIn(String units) {
+    return 'Servi en $units';
+  }
+
+  @override
+  String get memoryChange => 'Changer ›';
+
+  @override
+  String memoryPerGrams(double amount) {
+    final intl.NumberFormat amountNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String amountString = amountNumberFormat.format(amount);
+
+    return 'pour $amountString g';
+  }
+
+  @override
+  String memoryPerMilliliters(double amount) {
+    final intl.NumberFormat amountNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String amountString = amountNumberFormat.format(amount);
+
+    return 'pour $amountString ml';
+  }
+
+  @override
+  String get memoryPerPortion => 'par portion';
+
+  @override
+  String get memoryUnitWeights => 'POIDS PAR UNITÉ';
+
+  @override
+  String memoryOneUnit(String unit) {
+    return '1 $unit';
+  }
+
+  @override
+  String memoryUnitWeightNote(String units) {
+    return 'Utilisé quand MyFitnessPal compte en $units\net non en grammes.';
+  }
+
+  @override
+  String get memoryForget => 'Oublier cet aliment';
+
+  @override
+  String get memoryForgetNote =>
+      'Le prochain envoi te redemandera quoi choisir.';
+
+  @override
+  String get memoryMealsNote =>
+      'Un repas MyFitnessPal sans correspondance\ngarde son nom dans Ekklo.';
+
+  @override
+  String get memoryChangeSubtitle =>
+      'Choisis l\'aliment Ekklo à retenir pour la suite.';
+
+  @override
+  String memoryEnergyPer(String energy, String portion) {
+    return '$energy · $portion';
+  }
 }

@@ -44,6 +44,7 @@ class SheetFrame extends HookWidget {
   }) => showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
+    useRootNavigator: true,
     useSafeArea: true,
     showDragHandle: true,
     builder: builder,

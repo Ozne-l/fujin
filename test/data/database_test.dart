@@ -218,6 +218,25 @@ void main() {
       check(loaded.hasOwnCopy(rice)).isFalse();
     });
 
+    test('forgets a matched food with its unit weights', () {
+      repository.forget(matched);
+
+      final loaded = repository.load();
+      check(loaded.matches).isEmpty();
+      check(loaded.units).isEmpty();
+    });
+
+    test('forgets an own copy in its unit only', () {
+      repository
+        ..saveFood(_ownRice(cup))
+        ..saveFood(_ownRice(grams))
+        ..forget(_ownRice(cup));
+
+      final loaded = repository.load();
+      check(loaded.food(rice, cup)).isNull();
+      check(loaded.food(rice, grams)).equals(_ownRice(grams));
+    });
+
     test('keeps nothing of a send whose unit weight is refused', () {
       check(
         () => repository.remember(

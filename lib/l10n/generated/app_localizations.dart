@@ -1147,6 +1147,168 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'L\'envoi n\'a pas pu commencer. Rien n\'a été envoyé.'**
   String get sendFailedOther;
+
+  /// No description provided for @tabJournal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Journal'**
+  String get tabJournal;
+
+  /// No description provided for @tabMemory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mémoire'**
+  String get tabMemory;
+
+  /// No description provided for @tabSettings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réglages'**
+  String get tabSettings;
+
+  /// No description provided for @tabScanner.
+  ///
+  /// In fr, this message translates to:
+  /// **'Scanner'**
+  String get tabScanner;
+
+  /// No description provided for @memorySubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce que Fūjin a appris de tes choix.'**
+  String get memorySubtitle;
+
+  /// No description provided for @memoryFoods.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aliments ({count})'**
+  String memoryFoods(int count);
+
+  /// No description provided for @memoryMeals.
+  ///
+  /// In fr, this message translates to:
+  /// **'Repas ({count})'**
+  String memoryMeals(int count);
+
+  /// No description provided for @memorySearchHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher un aliment'**
+  String get memorySearchHint;
+
+  /// No description provided for @memorySearchEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun aliment mémorisé ne correspond.'**
+  String get memorySearchEmpty;
+
+  /// No description provided for @memoryTarget.
+  ///
+  /// In fr, this message translates to:
+  /// **'→ {name}'**
+  String memoryTarget(String name);
+
+  /// No description provided for @memoryOwnCopyTarget.
+  ///
+  /// In fr, this message translates to:
+  /// **'→ Aliment perso (copie MFP)'**
+  String get memoryOwnCopyTarget;
+
+  /// No description provided for @memoryEmptyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun aliment mémorisé'**
+  String get memoryEmptyTitle;
+
+  /// No description provided for @memoryEmptyDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chaque choix fait pendant un envoi\nest retenu ici pour la suite.'**
+  String get memoryEmptyDetail;
+
+  /// No description provided for @memoryUnitQuoted.
+  ///
+  /// In fr, this message translates to:
+  /// **'« {unit} »'**
+  String memoryUnitQuoted(String unit);
+
+  /// No description provided for @memoryServedIn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Servi en {units}'**
+  String memoryServedIn(String units);
+
+  /// No description provided for @memoryChange.
+  ///
+  /// In fr, this message translates to:
+  /// **'Changer ›'**
+  String get memoryChange;
+
+  /// No description provided for @memoryPerGrams.
+  ///
+  /// In fr, this message translates to:
+  /// **'pour {amount} g'**
+  String memoryPerGrams(double amount);
+
+  /// No description provided for @memoryPerMilliliters.
+  ///
+  /// In fr, this message translates to:
+  /// **'pour {amount} ml'**
+  String memoryPerMilliliters(double amount);
+
+  /// No description provided for @memoryPerPortion.
+  ///
+  /// In fr, this message translates to:
+  /// **'par portion'**
+  String get memoryPerPortion;
+
+  /// No description provided for @memoryUnitWeights.
+  ///
+  /// In fr, this message translates to:
+  /// **'POIDS PAR UNITÉ'**
+  String get memoryUnitWeights;
+
+  /// No description provided for @memoryOneUnit.
+  ///
+  /// In fr, this message translates to:
+  /// **'1 {unit}'**
+  String memoryOneUnit(String unit);
+
+  /// No description provided for @memoryUnitWeightNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Utilisé quand MyFitnessPal compte en {units}\net non en grammes.'**
+  String memoryUnitWeightNote(String units);
+
+  /// No description provided for @memoryForget.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oublier cet aliment'**
+  String get memoryForget;
+
+  /// No description provided for @memoryForgetNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le prochain envoi te redemandera quoi choisir.'**
+  String get memoryForgetNote;
+
+  /// No description provided for @memoryMealsNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un repas MyFitnessPal sans correspondance\ngarde son nom dans Ekklo.'**
+  String get memoryMealsNote;
+
+  /// No description provided for @memoryChangeSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisis l\'aliment Ekklo à retenir pour la suite.'**
+  String get memoryChangeSubtitle;
+
+  /// No description provided for @memoryEnergyPer.
+  ///
+  /// In fr, this message translates to:
+  /// **'{energy} · {portion}'**
+  String memoryEnergyPer(String energy, String portion);
 }
 
 class _AppLocalizationsDelegate

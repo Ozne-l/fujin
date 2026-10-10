@@ -12,7 +12,7 @@ The words below have one meaning in Fūjin's code, docs and conversations. Frenc
 
 **Item (Ekklo).** One food inside an Ekklo meal: Ekklo food id, quantity, quantity type (grams or portion), creation date. Ekklo stores no free text on it, so Fūjin cannot tag it. Code: `EkkloDailyMealItem` inside `EkkloDailyMeal` from `package:ekklo_client`.
 
-**Memory (Mémoire).** What Fūjin has learned about how MyFitnessPal maps to Ekklo: remembered foods, remembered units and meal mappings. Built by the owner, kept in SQLite, backed up. Code: `Memory` (`lib/data/memory/memory.dart`), `MemoryRepository` (`lib/data/memory/memory_repository.dart`).
+**Memory (Mémoire).** What Fūjin has learned about how MyFitnessPal maps to Ekklo: remembered foods, remembered units and meal mappings. Built by the owner, kept in SQLite, backed up. Shown on the Mémoire tab, where the owner changes the Ekklo food of a remembered food, edits unit weights, changes meal mappings, or forgets a food so the next send asks again. Code: `Memory` (`lib/data/memory/memory.dart`), `MemoryRepository` (`lib/data/memory/memory_repository.dart`), `MemoryService` (`lib/domain/memory/memory_service.dart`).
 
 **Remembered food.** The Ekklo food that stands for a MyFitnessPal food. Either a matched food, an existing Ekklo food counted in grams, or an own copy ("aliment perso"), a food Fūjin created in Ekklo as an exact copy of a MyFitnessPal entry's values, tied to the serving unit and the MyFitnessPal food version it was copied from: per 100 g for a gram serving, one portion per unit otherwise. Code: sealed `RememberedFood` with `MatchedFood` and `OwnCopy` (`OwnCopy.mfpUnit`, `OwnCopy.mfpFoodVersion`) (`lib/data/memory/remembered_food.dart`), tables `memory_food` (matched foods) and `memory_own_copy` (own copies, one per food and serving unit).
 
@@ -89,6 +89,10 @@ Codes from the Figma file "Fūjin · Maquettes", as used in the docs.
 | 15 | "Envoi terminé", the send report. Code: `SentView` (`lib/pages/sending/widgets/sent_view.dart`) |
 | 16 | "Envoi interrompu": why, what is already in Ekklo, "Envoyer les N aliments restants". Code: `InterruptedView` (`lib/pages/sending/widgets/interrupted_view.dart`) |
 | 17 | Result of a send in "Mode automatique", a Réglages setting (planned) |
+| 18 | Mémoire tab, the second tab: remembered foods with their Ekklo food and unit weights, searchable without accents. Code: `MemoryPage` (`lib/pages/memory/memory_page.dart`) |
+| 19 | A remembered food: its MyFitnessPal and Ekklo sides, "Changer ›" (Ekklo search sheet, `showChangeFoodSheet`), unit weights, "Oublier cet aliment". Code: `MemoryFoodPage` (`lib/pages/memory/memory_food_page.dart`) |
+| 20 | Mémoire, "Repas": one row per meal mapping with a menu of Ekklo meal names. Code: `MealMappingsCard` (`lib/pages/memory/widgets/meal_mappings_card.dart`) |
+| 21 | Mémoire with nothing remembered yet. Code: `MemoryEmptyView` (`lib/pages/memory/widgets/memory_empty_view.dart`) |
 | 06e | Own copy whose MyFitnessPal food changed version since it was copied (planned) |
 | O1, O2 | Réglages tab, the third tab: "objectifs définis" (O1) and "aucun objectif" (O2) (planned) |
 | O3, O4, O5 | Goal editing: complete goals, empty fields, just saved (planned) |

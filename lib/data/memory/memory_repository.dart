@@ -62,6 +62,17 @@ final class MemoryRepository {
     }
   });
 
+  void forget(RememberedFood food) => switch (food) {
+    OwnCopy() => _database.execute(
+      'DELETE FROM memory_own_copy WHERE mfp_food_id = ? AND mfp_unit = ?',
+      [food.mfpFoodId, food.mfpUnit],
+    ),
+    MatchedFood() => _database.execute(
+      'DELETE FROM memory_food WHERE mfp_food_id = ?',
+      [food.mfpFoodId],
+    ),
+  };
+
   void saveUnit(RememberedUnit unit) => _database.upsert(
     FujinTable.memoryUnit,
     unit.toMap(),

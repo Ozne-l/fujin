@@ -90,6 +90,14 @@ final class FakeBackends {
       ('GET', final host, dailyMealsPath) when host == ekkloUri.host => _json([
         for (final meal in ekkloMeals) meal.toMap(),
       ]),
+      ('GET', final host, _mealHistory) when host == ekkloUri.host => _json(
+        EkkloMealHistoryPage(
+          currentPage: 1,
+          hasNext: false,
+          hasPrev: false,
+          items: ekkloMeals,
+        ).toMap(),
+      ),
       ('GET', final host, _foodSearch) when host == ekkloUri.host => _json([
         for (final food
             in ekkloSearches[request.url.queryParameters['q']] ??
@@ -147,6 +155,7 @@ final class FakeBackends {
   static const dailyMealsPath = '/api/v1/nutritions/daily-meals';
   static const _foodItems = '/api/v1/nutritions/food-items/';
   static const _foodSearch = '${_foodItems}search';
+  static const _mealHistory = '$dailyMealsPath/history';
 
   List<EkkloDailyMealItem> get ekkloItems => [
     for (final meal in ekkloMeals) ...meal.items,

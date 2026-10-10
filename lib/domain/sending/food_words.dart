@@ -63,8 +63,12 @@ String productName(MfpEntryFood food) {
   };
 }
 
-String searchTerms(MfpEntryFood food) =>
-    _words(productName(food)).take(_searchWords).join(' ');
+String searchTerms(MfpEntryFood food) => descriptionTerms(productName(food));
+
+String descriptionTerms(String description) =>
+    _words(description).take(_searchWords).join(' ');
+
+String folded(String text) => _normalize(text.toLowerCase());
 
 NameMatch nameMatchOf(EkkloFood candidate, MfpEntryFood food) {
   final candidateWords = [

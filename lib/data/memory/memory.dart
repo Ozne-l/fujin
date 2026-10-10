@@ -35,6 +35,14 @@ final class Memory with MemoryMappable {
       .firstOrNull
       ?.grams;
 
+  List<RememberedUnit> unitsOf(RememberedFood food) => switch (food) {
+    MatchedFood(:final mfpFoodId) => [
+      for (final unit in units)
+        if (unit.mfpFoodId == mfpFoodId) unit,
+    ],
+    OwnCopy() => const [],
+  };
+
   String? ekkloMealName(String mfpMealName) => meals
       .where((meal) => meal.mfpMealName == mfpMealName)
       .firstOrNull

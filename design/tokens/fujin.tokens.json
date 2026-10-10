@@ -360,6 +360,14 @@
     }
   },
   "radius": {
+    "menu": {
+      "$value": {
+        "value": 12,
+        "unit": "px"
+      },
+      "$description": "Menu button.",
+      "$type": "dimension"
+    },
     "bar": {
       "$value": {
         "value": 2,
@@ -551,6 +559,134 @@
         "unit": "px"
       },
       "$description": "Minimum touch target for every interactive element (48 dp).",
+      "$type": "dimension"
+    },
+    "tab-bar": {
+      "$value": {
+        "value": 68,
+        "unit": "px"
+      },
+      "$description": "Height of the floating tab bar, and side of the round Scanner button.",
+      "$type": "dimension"
+    },
+    "tab": {
+      "$value": {
+        "value": 56,
+        "unit": "px"
+      },
+      "$description": "Height of one tab inside the tab plate.",
+      "$type": "dimension"
+    },
+    "tab-plate-inset": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$description": "Padding between the tab plate and its tabs.",
+      "$type": "dimension"
+    },
+    "row-chevron": {
+      "$value": {
+        "value": 20,
+        "unit": "px"
+      },
+      "$description": "Chevron at the end of a list row.",
+      "$type": "dimension"
+    },
+    "meal-arrow": {
+      "$value": {
+        "value": 18,
+        "unit": "px"
+      },
+      "$description": "Arrow between a MyFitnessPal meal and its Ekklo meal.",
+      "$type": "dimension"
+    },
+    "menu-chevron": {
+      "$value": {
+        "value": 14,
+        "unit": "px"
+      },
+      "$description": "Chevron inside a menu button.",
+      "$type": "dimension"
+    },
+    "menu-width": {
+      "$value": {
+        "value": 140,
+        "unit": "px"
+      },
+      "$description": "Width of a menu button.",
+      "$type": "dimension"
+    },
+    "control-height": {
+      "$value": {
+        "value": 40,
+        "unit": "px"
+      },
+      "$description": "Height of a segmented control and of a menu button.",
+      "$type": "dimension"
+    },
+    "search-field": {
+      "$value": {
+        "value": 44,
+        "unit": "px"
+      },
+      "$description": "Height of a search field in a page.",
+      "$type": "dimension"
+    },
+    "weight-field": {
+      "$value": {
+        "value": 120,
+        "unit": "px"
+      },
+      "$description": "Width of the weight field of a remembered unit.",
+      "$type": "dimension"
+    },
+    "tab-gap": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      },
+      "$description": "Gap between two tabs inside the tab plate.",
+      "$type": "dimension"
+    },
+    "scan-icon": {
+      "$value": {
+        "value": 26,
+        "unit": "px"
+      },
+      "$description": "Scan icon in the Scanner button.",
+      "$type": "dimension"
+    },
+    "glass-blur": {
+      "$value": {
+        "value": 12,
+        "unit": "px"
+      },
+      "$description": "Backdrop blur sigma standing in for the Figma glass effect, which has no Flutter equivalent.",
+      "$type": "dimension"
+    },
+    "floating-shadow-blur": {
+      "$value": {
+        "value": 20,
+        "unit": "px"
+      },
+      "$description": "Blur radius of the floating glass drop shadow.",
+      "$type": "dimension"
+    },
+    "floating-shadow-offset": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$description": "Vertical offset of the floating glass drop shadow.",
+      "$type": "dimension"
+    },
+    "scroll-fade": {
+      "$value": {
+        "value": 110,
+        "unit": "px"
+      },
+      "$description": "Height of the fade at the bottom of a tab screen, behind the tab bar.",
       "$type": "dimension"
     },
     "button-medium": {
@@ -808,6 +944,64 @@
       "dark": {
         "$value": "{color.sumi}",
         "$description": "Background of camera screens and dark pills.",
+        "$type": "color"
+      },
+      "glass": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            0.9882,
+            0.9569
+          ],
+          "alpha": 0.4,
+          "hex": "#FFFCF4"
+        },
+        "$description": "Kinu at 40% over a blurred backdrop: the tab plate and the Scanner button.",
+        "$type": "color"
+      },
+      "tab-active": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8627,
+            0.9098,
+            0.8353
+          ],
+          "alpha": 0.8,
+          "hex": "#DCE8D5"
+        },
+        "$description": "Matcha at 80% behind the active tab.",
+        "$type": "color"
+      },
+      "scroll-fade": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9686,
+            0.9451,
+            0.8784
+          ],
+          "alpha": 0.55,
+          "hex": "#F7F1E0"
+        },
+        "$description": "Washi at 55%, the end of the fade content scrolls into under the tab bar.",
+        "$type": "color"
+      }
+    },
+    "shadow": {
+      "floating": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1059,
+            0.102,
+            0.0902
+          ],
+          "alpha": 0.12,
+          "hex": "#1B1A17"
+        },
+        "$description": "Drop shadow of floating glass: the tab plate and the Scanner button.",
         "$type": "color"
       }
     },
