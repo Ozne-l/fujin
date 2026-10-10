@@ -1,6 +1,7 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/journal/status_counts.dart';
+import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 part 'journal_meal.mapper.dart';
 
@@ -18,4 +19,9 @@ final class JournalMeal with JournalMealMappable {
     (total, compared) =>
         total + (compared.entry.nutrients.energy?.kilocalories ?? 0),
   );
+
+  static List<String> namesOf(
+    List<String> mealNames,
+    Iterable<MfpFoodEntry> entries,
+  ) => {...mealNames, for (final entry in entries) entry.mealName}.toList();
 }

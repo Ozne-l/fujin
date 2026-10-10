@@ -1,7 +1,9 @@
 import 'package:fujin/app/providers.dart';
-import 'package:fujin/domain/journal/journal_day.dart';
+import 'package:fujin/domain/journal/calendar_week.dart';
+import 'package:fujin/domain/journal/journal_read.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/pages/journal/refresh_outcome.dart';
+import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
 
@@ -12,29 +14,41 @@ final mealNamesProvider = FutureProvider<List<String>>(
   retry: _noRetry,
 );
 
-final AsyncNotifierProviderFamily<JournalNotifier, JournalDay, DateTime>
+final FutureProviderFamily<Map<DateTime, double?>, DateTime>
+weekKilocaloriesProvider = FutureProvider.autoDispose
+    .family<Map<DateTime, double?>, DateTime>((ref, monday) {
+      final today = ref.watch(todayProvider);
+      return ref
+          .watch(journalServiceProvider)
+          .loggedKilocalories(
+            CalendarWeek.daysOf(monday).where((day) => !day.isAfter(today)),
+          );
+    }, retry: _noRetry);
+
+final AsyncNotifierProviderFamily<JournalNotifier, JournalRead, DateTime>
 journalProvider = AsyncNotifierProvider.autoDispose
-    .family<JournalNotifier, JournalDay, DateTime>(
+    .family<JournalNotifier, JournalRead, DateTime>(
       JournalNotifier.new,
       retry: _noRetry,
     );
 
-final class JournalNotifier extends AsyncNotifier<JournalDay> {
+final class JournalNotifier extends AsyncNotifier<JournalRead> {
   JournalNotifier(this.date);
 
   final DateTime date;
 
   @override
-  Future<JournalDay> build() => _read(
+  Future<JournalRead> build() => _read(
     ref.watch(journalServiceProvider),
     ref.watch(mealNamesProvider.future),
   );
 
   Future<RefreshOutcome> refresh() async {
-    final before = state.value?.diary;
+    final before = state.value;
     final next = await _reread();
-    return switch ((before, next?.diary)) {
-      (final before?, final after?) when before == after =>
+    return switch ((before, next)) {
+      (BothSides(diary: final before), BothSides(diary: final after))
+          when before == after =>
         RefreshOutcome.nothingNew,
       _ => RefreshOutcome.changed,
     };
@@ -42,13 +56,14 @@ final class JournalNotifier extends AsyncNotifier<JournalDay> {
 
   Future<void> reload() => _reread();
 
-  Future<JournalDay?> _reread() async {
+  Future<JournalRead?> _reread() async {
     switch (ref.read(mealNamesProvider)) {
       case AsyncError():
         ref.invalidate(mealNamesProvider);
       case AsyncData() || AsyncLoading():
         break;
     }
+    ref.invalidate(weekKilocaloriesProvider(CalendarWeek.mondayOf(date)));
     final next = await AsyncValue.guard(
       () => _read(
         ref.read(journalServiceProvider),
@@ -59,8 +74,11 @@ final class JournalNotifier extends AsyncNotifier<JournalDay> {
     return next.value;
   }
 
-  Future<JournalDay> _read(
+  Future<JournalRead> _read(
     JournalService service,
     Future<List<String>> mealNames,
-  ) async => service.readDay(date, mealNames: await mealNames);
+  ) async => service.readJournal(
+    date,
+    mealNames: await mealNames.catchError((Object error) => const <String>[]),
+  );
 }

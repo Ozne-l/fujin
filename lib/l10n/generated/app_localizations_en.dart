@@ -124,7 +124,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get mealsOfTheDay => 'TODAY\'S MEALS';
+  String get mealsOfTheDay => 'MEALS OF THE DAY';
 
   @override
   String mealProgress(int inEkklo, int total) {
@@ -267,6 +267,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mfpReconnect => 'Sign in to MyFitnessPal again';
+
+  @override
+  String get splashTagline => 'Let the wind do it.';
 
   @override
   String get welcomeHeading => 'Log once,\nyour coach sees it all.';
@@ -1193,4 +1196,161 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get goalsSavedDetail => 'The Journal shows them from today.';
+
+  @override
+  String journalMonth(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.LLLL(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString';
+  }
+
+  @override
+  String get backToToday => 'Today ›';
+
+  @override
+  String get setGoals => 'Set my goals ›';
+
+  @override
+  String get previousWeek => 'Previous week';
+
+  @override
+  String get nextWeek => 'Next week';
+
+  @override
+  String kilocaloriesGoal(double goal) {
+    final intl.NumberFormat goalNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String goalString = goalNumberFormat.format(goal);
+
+    return '/ $goalString kcal';
+  }
+
+  @override
+  String kilocaloriesAt(double value, DateTime time) {
+    final intl.DateFormat timeDateFormat = intl.DateFormat.Hm(localeName);
+    final String timeString = timeDateFormat.format(time);
+
+    final intl.NumberFormat valueNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String valueString = valueNumberFormat.format(value);
+
+    return '$valueString kcal at $timeString';
+  }
+
+  @override
+  String ringValue(double value) {
+    final intl.NumberFormat valueNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String valueString = valueNumberFormat.format(value);
+
+    return '$valueString';
+  }
+
+  @override
+  String ringGoal(double goal) {
+    final intl.NumberFormat goalNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String goalString = goalNumberFormat.format(goal);
+
+    return '/ $goalString';
+  }
+
+  @override
+  String atLeast(String value) {
+    return '≥ $value';
+  }
+
+  @override
+  String get macroNameFiber => 'fiber';
+
+  @override
+  String ekkloFoodCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'foods',
+      one: 'food',
+    );
+    return '· $count $_temp0 ›';
+  }
+
+  @override
+  String get ekkloNoFood => '· no food';
+
+  @override
+  String get sideUnavailable => 'unavailable';
+
+  @override
+  String get ekkloUnavailable => 'Ekklo unavailable';
+
+  @override
+  String goalLine(String goals) {
+    return 'Goal · $goals';
+  }
+
+  @override
+  String get mealEmpty => 'Nothing yet';
+
+  @override
+  String get journalLoading => 'Reading MyFitnessPal\nand Ekklo…';
+
+  @override
+  String get dayDetailTitle => 'Day details';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String dayDetailPending(int count, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count foods of $total are not in Ekklo yet.',
+      one: '1 food of $total is not in Ekklo yet.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fiberNote =>
+      'MyFitnessPal does not always give fiber, hence the ≥.';
+
+  @override
+  String get offlineTitle => 'Offline';
+
+  @override
+  String get offlineHeadline => 'No internet connection.';
+
+  @override
+  String get offlineDetail =>
+      'Fūjin tries again as soon as the network is back.';
+
+  @override
+  String offlineSince(DateTime time) {
+    final intl.DateFormat timeDateFormat = intl.DateFormat.Hm(localeName);
+    final String timeString = timeDateFormat.format(time);
+
+    return 'Figures from $timeString. Fūjin tries again as soon as the network is back.';
+  }
+
+  @override
+  String get unavailableTitle => 'Unavailable';
+
+  @override
+  String serviceNotResponding(String service) {
+    return '$service is not responding.';
+  }
 }

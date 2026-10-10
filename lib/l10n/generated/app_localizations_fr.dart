@@ -271,6 +271,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get mfpReconnect => 'Se reconnecter à MyFitnessPal';
 
   @override
+  String get splashTagline => 'Laisse le vent faire.';
+
+  @override
   String get welcomeHeading => 'Note une fois,\nton coach voit tout.';
 
   @override
@@ -1195,4 +1198,160 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get goalsSavedDetail => 'Le Journal les affiche dès aujourd\'hui.';
+
+  @override
+  String journalMonth(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.LLLL(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString';
+  }
+
+  @override
+  String get backToToday => 'Aujourd\'hui ›';
+
+  @override
+  String get setGoals => 'Définir mes objectifs ›';
+
+  @override
+  String get previousWeek => 'Semaine précédente';
+
+  @override
+  String get nextWeek => 'Semaine suivante';
+
+  @override
+  String kilocaloriesGoal(double goal) {
+    final intl.NumberFormat goalNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String goalString = goalNumberFormat.format(goal);
+
+    return '/ $goalString kcal';
+  }
+
+  @override
+  String kilocaloriesAt(double value, DateTime time) {
+    final intl.DateFormat timeDateFormat = intl.DateFormat.Hm(localeName);
+    final String timeString = timeDateFormat.format(time);
+
+    final intl.NumberFormat valueNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String valueString = valueNumberFormat.format(value);
+
+    return '$valueString kcal à $timeString';
+  }
+
+  @override
+  String ringValue(double value) {
+    final intl.NumberFormat valueNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String valueString = valueNumberFormat.format(value);
+
+    return '$valueString';
+  }
+
+  @override
+  String ringGoal(double goal) {
+    final intl.NumberFormat goalNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String goalString = goalNumberFormat.format(goal);
+
+    return '/ $goalString';
+  }
+
+  @override
+  String atLeast(String value) {
+    return '≥ $value';
+  }
+
+  @override
+  String get macroNameFiber => 'fibres';
+
+  @override
+  String ekkloFoodCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'aliments',
+      one: 'aliment',
+    );
+    return '· $count $_temp0 ›';
+  }
+
+  @override
+  String get ekkloNoFood => '· aucun aliment';
+
+  @override
+  String get sideUnavailable => 'indisponible';
+
+  @override
+  String get ekkloUnavailable => 'Ekklo indisponible';
+
+  @override
+  String goalLine(String goals) {
+    return 'Objectif · $goals';
+  }
+
+  @override
+  String get mealEmpty => 'Rien pour l’instant';
+
+  @override
+  String get journalLoading => 'Lecture de MyFitnessPal\net d\'Ekklo…';
+
+  @override
+  String get dayDetailTitle => 'Détail du jour';
+
+  @override
+  String get close => 'Fermer';
+
+  @override
+  String dayDetailPending(int count, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count aliments sur $total ne sont pas encore dans Ekklo.',
+      one: '1 aliment sur $total n’est pas encore dans Ekklo.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fiberNote =>
+      'MyFitnessPal ne donne pas toujours les fibres, d\'où le ≥.';
+
+  @override
+  String get offlineTitle => 'Hors ligne';
+
+  @override
+  String get offlineHeadline => 'Pas de connexion internet.';
+
+  @override
+  String get offlineDetail => 'Fūjin réessaie dès que le réseau revient.';
+
+  @override
+  String offlineSince(DateTime time) {
+    final intl.DateFormat timeDateFormat = intl.DateFormat.Hm(localeName);
+    final String timeString = timeDateFormat.format(time);
+
+    return 'Les chiffres datent de $timeString. Fūjin réessaie dès que le réseau revient.';
+  }
+
+  @override
+  String get unavailableTitle => 'Indisponible';
+
+  @override
+  String serviceNotResponding(String service) {
+    return '$service ne répond pas.';
+  }
 }

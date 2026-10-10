@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/data/database/calendar_date_hook.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
@@ -37,6 +39,7 @@ final class FakeBackends {
   var _nextId = 0;
   bool ekkloReachable = true;
   bool mfpReachable = true;
+  Completer<void>? diaryGate;
   final requests = <http.Request>[];
 
   static const ekkloEmail = 'owner@example.com';
@@ -53,10 +56,15 @@ final class FakeBackends {
 
   late final httpClient = MockClient((request) async {
     requests.add(request);
+    if (diaryGate case final gate? when request.url.path == _diaryPath) {
+      await gate.future;
+    }
     return switch ((request.method, request.url.host, request.url.path)) {
       (_, final host, _) when host == ekkloUri.host && !ekkloReachable =>
         throw http.ClientException('Connection refused', request.url),
-      (_, final host, _) when host == mfpWebUri.host && !mfpReachable =>
+      (_, final host, _)
+          when (host == mfpWebUri.host || host == mfpApiUri.host) &&
+              !mfpReachable =>
         throw http.ClientException('Connection refused', request.url),
       ('POST', final host, '/api/v1/auth/login') when host == ekkloUri.host =>
         _ekkloLogin(request),
@@ -78,8 +86,13 @@ final class FakeBackends {
           'expires_in': 3600,
           'user_id': 'mfp-user',
         }),
-      ('GET', final host, '/v2/diary') when host == mfpApiUri.host => _json({
-        'items': [for (final entry in entries) entry.toMap()],
+      ('GET', final host, _diaryPath) when host == mfpApiUri.host => _json({
+        'items': [
+          for (final entry in entries)
+            if (CalendarDateHook.format(entry.date) ==
+                request.url.queryParameters[_entryDate])
+              entry.toMap(),
+        ],
       }),
       ('GET', final host, '/v2/users/mfp-user') when host == mfpApiUri.host =>
         _json({
@@ -140,10 +153,12 @@ final class FakeBackends {
     sessionStore: store,
   );
 
-  Future<EkkloClient> ekklo() async {
+  Future<EkkloClient> ekklo() async => ekkloWith(await ekkloTokenStore());
+
+  Future<EkkloTokenStore> ekkloTokenStore() async {
     final store = InMemoryEkkloTokenStore();
     await store.write(_ekkloTokens);
-    return ekkloWith(store);
+    return store;
   }
 
   EkkloClient ekkloWith(EkkloTokenStore store) => EkkloClient(
@@ -153,6 +168,8 @@ final class FakeBackends {
   );
 
   static const dailyMealsPath = '/api/v1/nutritions/daily-meals';
+  static const _diaryPath = '/v2/diary';
+  static const _entryDate = 'entry_date';
   static const _foodItems = '/api/v1/nutritions/food-items/';
   static const _foodSearch = '${_foodItems}search';
   static const _mealHistory = '$dailyMealsPath/history';

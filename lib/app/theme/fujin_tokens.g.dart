@@ -71,6 +71,7 @@ abstract final class FujinColorRole {
   static const backgroundScrollFade = Color(0x8CF7F1E0);
   static const backgroundTabActive = Color(0xCCDCE8D5);
   static const shadowFloating = Color(0x1F1B1A17);
+  static const shadowLogo = Color(0x1A1B1A17);
 }
 
 abstract final class FujinSpace {
@@ -88,9 +89,11 @@ abstract final class FujinRadius {
   static const double button = 28;
   static const double card = 20;
   static const double field = 16;
+  static const double logo = 36;
   static const double menu = 12;
   static const double pill = 999;
   static const double sheet = 28;
+  static const double stateCard = 28;
   static const double tile = 10;
   static const double toast = 16;
 }
@@ -100,6 +103,7 @@ abstract final class FujinStroke {
   static const double dayRing = 1.5;
   static const double fieldError = 1.5;
   static const double fieldFocus = 1.5;
+  static const double goldRule = 2;
   static const double icon = 1.75;
   static const double macroRing = 2;
   static const double radio = 1.5;
@@ -107,6 +111,7 @@ abstract final class FujinStroke {
 }
 
 abstract final class FujinSize {
+  static const double bandFade = 28;
   static const double breezeGap = 3;
   static const double breezeIndicator = 24;
   static const double breezeInsetBottom = 1;
@@ -124,14 +129,21 @@ abstract final class FujinSize {
   static const double glyphCard = 56;
   static const double glyphHero = 72;
   static const double goalFieldGap = 10;
+  static const double goldRuleWidth = 48;
   static const double icon = 24;
   static const double kcalBar = 6;
+  static const double logo = 160;
+  static const double logoShadowBlur = 24;
+  static const double logoShadowOffset = 8;
   static const double macroBar = 4;
   static const double macroRing = 52;
+  static const double macroRingDash = 3;
+  static const double macroRingDashGap = 2;
   static const double mealArrow = 18;
   static const double menuChevron = 14;
   static const double menuWidth = 140;
   static const double motifBand = 252;
+  static const double motifBandSplash = 180;
   static const double pictogram = 52;
   static const double pictogramIcon = 36;
   static const double pill = 26;
@@ -144,7 +156,19 @@ abstract final class FujinSize {
   static const double scrollFade = 110;
   static const double searchField = 44;
   static const double searchIcon = 20;
+  static const double skeletonLine = 10;
+  static const double skeletonMacro = 8;
+  static const double skeletonMacroWidth = 50;
+  static const double skeletonMealDetail = 180;
+  static const double skeletonMealTitle = 120;
+  static const double skeletonMedium = 140;
+  static const double skeletonPill = 22;
+  static const double skeletonPillWidth = 80;
+  static const double skeletonTitle = 12;
+  static const double skeletonWide = 200;
   static const double sourceDot = 8;
+  static const double splashRuleGap = 58;
+  static const double splashTitleGap = 36;
   static const double stepIcon = 14;
   static const double stepMarker = 28;
   static const double streakLong = 18;
@@ -165,6 +189,7 @@ abstract final class FujinSize {
   static const double touchTarget = 48;
   static const double transitLane = 38;
   static const double volute = 22;
+  static const double weekBand = 64;
   static const double weightField = 120;
 }
 

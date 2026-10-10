@@ -139,6 +139,7 @@
   "ekkloSignInUnreachable": "Ekklo ne répond pas",
   "ekkloSignInUnreachableDetail": "Vérifie ta connexion, puis réessaie.",
   "mfpReconnect": "Se reconnecter à MyFitnessPal",
+  "splashTagline": "Laisse le vent faire.",
   "welcomeHeading": "Note une fois,\nton coach voit tout.",
   "welcomeIntro": "Tu notes dans MyFitnessPal.\nFūjin envoie ta journée vers Ekklo.",
   "mfpAccountRole": "Ton journal, la source",
@@ -650,5 +651,82 @@
   "save": "Enregistrer",
   "saved": "Enregistré",
   "goalsSavedTitle": "✓ Objectifs enregistrés",
-  "goalsSavedDetail": "Le Journal les affiche dès aujourd'hui."
+  "goalsSavedDetail": "Le Journal les affiche dès aujourd'hui.",
+  "journalMonth": "{date}",
+  "@journalMonth": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "LLLL"}
+    }
+  },
+  "backToToday": "Aujourd'hui ›",
+  "setGoals": "Définir mes objectifs ›",
+  "previousWeek": "Semaine précédente",
+  "nextWeek": "Semaine suivante",
+  "kilocaloriesGoal": "/ {goal} kcal",
+  "@kilocaloriesGoal": {
+    "placeholders": {
+      "goal": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}}
+    }
+  },
+  "kilocaloriesAt": "{value} kcal à {time}",
+  "@kilocaloriesAt": {
+    "placeholders": {
+      "value": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}},
+      "time": {"type": "DateTime", "format": "Hm"}
+    }
+  },
+  "ringValue": "{value}",
+  "@ringValue": {
+    "placeholders": {
+      "value": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}}
+    }
+  },
+  "ringGoal": "/ {goal}",
+  "@ringGoal": {
+    "placeholders": {
+      "goal": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}}
+    }
+  },
+  "atLeast": "≥ {value}",
+  "@atLeast": {
+    "placeholders": {"value": {"type": "String"}}
+  },
+  "macroNameFiber": "fibres",
+  "ekkloFoodCount": "· {count} {count, plural, =1{aliment} other{aliments}} ›",
+  "@ekkloFoodCount": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "ekkloNoFood": "· aucun aliment",
+  "sideUnavailable": "indisponible",
+  "ekkloUnavailable": "Ekklo indisponible",
+  "goalLine": "Objectif · {goals}",
+  "@goalLine": {
+    "placeholders": {"goals": {"type": "String"}}
+  },
+  "mealEmpty": "Rien pour l’instant",
+  "journalLoading": "Lecture de MyFitnessPal\net d'Ekklo…",
+  "dayDetailTitle": "Détail du jour",
+  "close": "Fermer",
+  "dayDetailPending": "{count, plural, =1{1 aliment sur {total} n’est pas encore dans Ekklo.} other{{count} aliments sur {total} ne sont pas encore dans Ekklo.}}",
+  "@dayDetailPending": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "fiberNote": "MyFitnessPal ne donne pas toujours les fibres, d'où le ≥.",
+  "offlineTitle": "Hors ligne",
+  "offlineHeadline": "Pas de connexion internet.",
+  "offlineDetail": "Fūjin réessaie dès que le réseau revient.",
+  "offlineSince": "Les chiffres datent de {time}. Fūjin réessaie dès que le réseau revient.",
+  "@offlineSince": {
+    "placeholders": {
+      "time": {"type": "DateTime", "format": "Hm"}
+    }
+  },
+  "unavailableTitle": "Indisponible",
+  "serviceNotResponding": "{service} ne répond pas.",
+  "@serviceNotResponding": {
+    "placeholders": {"service": {"type": "String"}}
+  }
 }

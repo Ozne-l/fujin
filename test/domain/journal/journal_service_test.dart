@@ -1,10 +1,15 @@
 import 'package:checks/checks.dart';
-import 'package:flutter_test/flutter_test.dart' show setUp, tearDown, test;
+import 'package:ekklo_client/ekklo_client.dart';
+import 'package:flutter_test/flutter_test.dart'
+    show group, setUp, tearDown, test;
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
+import 'package:fujin/domain/journal/journal_read.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
+import 'package:fujin/domain/journal/read_problem.dart';
+import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../../support/fake_backends.dart';
 import '../../support/fixtures.dart';
@@ -14,9 +19,9 @@ void main() {
   late SentLinkRepository links;
   late FakeBackends backends;
 
-  Future<JournalService> service() async => JournalService(
+  Future<JournalService> service({EkkloClient? ekklo}) async => JournalService(
     mfp: await backends.mfp(),
-    ekklo: await backends.ekklo(),
+    ekklo: ekklo ?? await backends.ekklo(),
     links: links,
     memory: MemoryRepository(database),
     clock: () => now,
@@ -87,5 +92,56 @@ void main() {
     check(
       links.forDate(day).map((link) => (link.mfpEntryId, link.ekkloItemId)),
     ).deepEquals([('E-2', 'I-1')]);
+  });
+
+  group('the Journal read', () {
+    test(
+      'keeps the MyFitnessPal side when the Ekklo session expired',
+      () async {
+        backends = FakeBackends(
+          mealNames: [breakfast],
+          entries: [entry('E-1')],
+        );
+        final store = InMemoryEkkloTokenStore();
+        await store.write(FakeBackends.staleEkkloTokens);
+        final journal = await service(ekklo: backends.ekkloWith(store));
+
+        final read = await journal.readJournal(day, mealNames: [breakfast]);
+
+        check(read)
+            .isA<MfpOnly>()
+            .has((read) => read.ekkloProblem, 'Ekklo problem')
+            .equals(ReadProblem.ekkloSessionExpired);
+        check(read.diary?.entries).isNotNull().length.equals(1);
+      },
+    );
+
+    test('fails as offline when MyFitnessPal cannot be reached', () async {
+      backends = FakeBackends(entries: [entry('E-1')]);
+      final journal = await service();
+      backends.mfpReachable = false;
+
+      await check(journal.readJournal(day)).throws<MfpNetworkException>();
+    });
+  });
+
+  test('sums the kilocalories logged on each day, null when nothing is '
+      'logged', () async {
+    final yesterday = DateTime.utc(2026, 10, 6);
+    backends = FakeBackends(
+      entries: [
+        entry('E-1', nutrients: nutrients(kcal: 500)),
+        entry('E-2', nutrients: nutrients(kcal: 250)),
+      ],
+    );
+
+    final logged = await (await service()).loggedKilocalories([
+      yesterday,
+      day,
+    ]);
+
+    check(logged.keys).unorderedEquals([yesterday, day]);
+    check(logged[yesterday]).isNull();
+    check(logged[day]).equals(750);
   });
 }

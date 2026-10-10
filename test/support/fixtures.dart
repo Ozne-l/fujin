@@ -33,9 +33,10 @@ MfpFoodEntry entry(
   String? brand,
   String? version,
   MfpNutrients nutrients = const MfpNutrients(),
+  DateTime? date,
 }) => MfpFoodEntry(
   id: id,
-  date: day,
+  date: date ?? day,
   mealName: meal,
   mealPosition: 0,
   servings: servings,

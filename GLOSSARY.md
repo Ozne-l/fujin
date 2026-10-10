@@ -6,7 +6,7 @@ The words below have one meaning in Fūjin's code, docs and conversations. Frenc
 
 **Journal.** The main screen: one day of the owner's MyFitnessPal diary, with, for each entry, whether it is in Ekklo. Code: `JournalPage` (`lib/pages/journal/journal_page.dart`), presenter `JournalNotifier` (`lib/pages/journal/journal_notifier.dart`).
 
-**Day.** A calendar date with no time zone, stored as midnight UTC in memory and as `YYYY-MM-DD` in SQLite. The selected day defaults to today. Code: `SelectedDay`, `selectedDayProvider`, `todayProvider` (`lib/pages/journal/selected_day.dart`); `CalendarDateHook` (`lib/data/database/calendar_date_hook.dart`).
+**Day.** A calendar date with no time zone, stored as midnight UTC in memory and as `YYYY-MM-DD` in SQLite. The selected day defaults to today. A week runs Monday to Sunday. Code: `SelectedDay`, `selectedDayProvider`, `todayProvider` (`lib/pages/journal/selected_day.dart`); `CalendarWeek` (`lib/domain/journal/calendar_week.dart`); `CalendarDateHook` (`lib/data/database/calendar_date_hook.dart`).
 
 **Entry (MyFitnessPal).** One food logged in a MyFitnessPal meal: food, servings, serving size, nutrients, and an entry id that changes whenever the entry is edited in MyFitnessPal. Entries without an id cannot be linked. Code: `MfpFoodEntry` from `package:myfitnesspal_client`.
 
@@ -34,7 +34,15 @@ The words below have one meaning in Fūjin's code, docs and conversations. Frenc
 
 **Day comparison.** The result of comparing one day: each entry with its status, plus the links to adopt and the links to drop. Produced by the pure function `compareDay`. Code: `DayComparison` (`lib/domain/comparison/day_comparison.dart`), `ComparedEntry` (`lib/domain/comparison/compared_entry.dart`), `compareDay` (`lib/domain/comparison/compare_day.dart`).
 
-**Journal day.** Everything the Journal shows for one day: the MyFitnessPal diary, its meal names, the Ekklo meals and the day comparison, with derived meals, counts and energy totals. Code: `JournalDay` (`lib/domain/journal/journal_day.dart`), `JournalMeal` (`lib/domain/journal/journal_meal.dart`), built by `JournalService.readDay` (`lib/domain/journal/journal_service.dart`).
+**Journal day.** Everything the Journal shows for one day: the MyFitnessPal diary, its meal names, the Ekklo meals and the day comparison, with derived meals, counts and nutrient totals. Code: `JournalDay` (`lib/domain/journal/journal_day.dart`), `JournalMeal` (`lib/domain/journal/journal_meal.dart`), built by `JournalService.readDay` (`lib/domain/journal/journal_service.dart`).
+
+**Journal read.** What one read of the Journal got: both apps (`BothSides`, carrying the journal day), MyFitnessPal only (`MfpOnly`, the diary and why Ekklo failed) or Ekklo only (`EkkloOnly`, the Ekklo meals and why MyFitnessPal failed), with the time of the read. When neither app answers, or MyFitnessPal is offline, the read fails and the Journal keeps the previous read under the problem card. Code: sealed `JournalRead` (`lib/domain/journal/journal_read.dart`), built by `JournalService.readJournal`. ADR 0022.
+
+**Read problem.** Why one side of a Journal read failed, from the client exception: a MyFitnessPal or Ekklo session expired, offline, MyFitnessPal or Ekklo not responding, or unknown. It picks the problem card. Code: `ReadProblem` (`lib/domain/journal/read_problem.dart`), `JournalProblemCard` (`lib/pages/journal/widgets/journal_problem_card.dart`).
+
+**Day nutrients.** Kilocalories, protein, carbohydrates, fat and fiber added up over a day, from MyFitnessPal entries (with the nutrients some entries lack, shown as "≥") or from Ekklo meals (manual meal values first). Code: `DayNutrients` (`lib/domain/journal/day_nutrients.dart`).
+
+**Goal status.** How an amount compares with its goal: below under 98 %, reached within 2 %, exceeded beyond 102 %; fiber is a floor and never exceeded. A day of the week band adds upcoming, no goal, nothing logged, in progress (today) and missed (a past day below). Code: `GoalStatus` (`lib/domain/goals/goal_status.dart`), `DayGoalState` (`lib/domain/goals/day_goal_state.dart`). ADR 0022.
 
 **Status counts.** How many entries of a day or meal are in Ekklo, to send and to update; `pending` is the last two. They feed "N/M dans Ekklo" and the send button label. Code: `StatusCounts` (`lib/domain/journal/status_counts.dart`).
 
@@ -58,7 +66,7 @@ The words below have one meaning in Fūjin's code, docs and conversations. Frenc
 
 **Connected accounts.** Whether a session is stored for MyFitnessPal and for Ekklo; it does not ask either service whether the session still works. It decides between the welcome screen and the Journal. Code: `ConnectedAccounts`, `AccountsService` (`lib/domain/accounts/`).
 
-**Goals.** The owner's daily nutrition targets, the same every day: kilocalories (required) and optionally protein, carbohydrates, fat and fiber, all above zero. Stored by Fūjin, not MyFitnessPal, in one row of the `goals` table. The kilocalories of the macros (P×4 + C×4 + F×9) are compared with the kilocalorie goal for information only. Code: `Goals` (`lib/data/goals/goals.dart`), `GoalsRepository` (`lib/data/goals/goals_repository.dart`), `MacroEnergy` (`lib/domain/goals/macro_energy.dart`), `goalsProvider` (`lib/pages/settings/goals_notifier.dart`). ADR 0020.
+**Goals.** The owner's daily nutrition targets, the same every day: kilocalories (required) and optionally protein, carbohydrates, fat and fiber, all above zero. Stored by Fūjin, not MyFitnessPal, in one row of the `goals` table. The kilocalories of the macros (P×4 + C×4 + F×9) are compared with the kilocalorie goal for information only. Code: `Goals` (`lib/data/goals/goals.dart`), `GoalsRepository` (`lib/data/goals/goals_repository.dart`), `MacroEnergy` (`lib/domain/goals/macro_energy.dart`), `goalsProvider` (`lib/pages/common/goals_notifier.dart`). ADR 0020.
 
 **Backup file.** A JSON file `fujin-backup-YYYY-MM-DD.json` the owner exports and imports from Réglages: format `fujin-backup` version 1 with Memory, send links and goals, never sessions. Import is strict and replaces everything in one transaction after a confirmation. Code: `Backup` (`lib/data/backup/backup.dart`), `BackupCodec` (`lib/data/backup/backup_codec.dart`), `BackupRepository` (`lib/data/backup/backup_repository.dart`), `BackupService` (`lib/domain/backup/backup_service.dart`), `BackupFiles` (`lib/data/backup/backup_files.dart`). ADR 0021.
 
@@ -70,18 +78,27 @@ Codes from the Figma file "Fūjin · Maquettes", as used in the docs.
 
 | Code | Meaning |
 | --- | --- |
-| 00 | Splash (planned) |
+| 00 | Splash: the logo, "Fūjin", "Laisse le vent faire." and a gold rule over the seigaiha band. The first route: it heads for the Journal at once and stays on screen while the tab shell's redirect reads the connected accounts, which then open the Journal or 01. The Android and iOS launch windows use the same washi background. Code: `SplashPage` (`lib/pages/splash/splash_page.dart`), `FujinRoute.splash` |
 | 01 | Welcome: one card per account, MyFitnessPal and Ekklo, each with "Se connecter"; "Continuer" stays disabled until both are signed in. Shown instead of the Journal while either session is missing. Code: `WelcomePage` (`lib/pages/welcome/welcome_page.dart`) |
 | 02 | MyFitnessPal sign-in in a web view: Fūjin reads the session cookies after each page load and closes the page once MyFitnessPal accepts them. Code: `MfpSignInPage` (`lib/pages/mfp_sign_in/mfp_sign_in_page.dart`), reached from 01 and from "Se reconnecter à MyFitnessPal" on the Journal problem card |
 | 03 | Ekklo sign-in: email, password, "Se connecter". Code: `EkkloSignInPage` (`lib/pages/ekklo_sign_in/ekklo_sign_in_page.dart`), reached from 01 and from "Se reconnecter à Ekklo" on the Journal problem card |
 | 03b | Ekklo sign-in refused: banner "Ekklo a refusé la connexion" with Ekklo's own message in quotes, password field outlined in red until edited |
 | 03c | Ekklo sign-in with no answer from Ekklo (network, server error, unreadable reply): banner "Ekklo ne répond pas" |
 | 04 | Both accounts connected: 01 with a "Connecté" pill and "Session active" on each card, "Continuer" opens the Journal. The mockup shows the Ekklo email; Fūjin keeps no email, so the Ekklo card says "Session active" too |
-| K1 | Reference Journal: week band with rings, day card, meals |
-| K7 | Journal with the MyFitnessPal session expired ("Session MyFitnessPal expirée" in the Figma file) |
-| K12 | Journal with the Ekklo session expired: MyFitnessPal stays readable (planned; today any failure shows the problem card, which already offers "Se reconnecter à Ekklo") |
+| K1 | Reference Journal: title ("Aujourd'hui"), week band with one goal ring per day, day card with the MyFitnessPal kilocalories against the goal, the macros in rings and the Ekklo progress, meals. Code: `JournalPage` (`lib/pages/journal/journal_page.dart`), `WeekBand` (`lib/pages/journal/widgets/week_band.dart`), `DayRing`, `NutrientRing`, `DaySummaryCard` (`lib/pages/journal/widgets/`) |
+| K3 | A past day chosen: the title becomes the month, "Aujourd'hui ›" goes back to today; a day over its goal rings red. Code: `JournalHeader` (`lib/pages/journal/widgets/journal_header.dart`) |
+| K4 | A previous week, reached by swiping the band or touching a half-visible day; shows the missed, reached and exceeded rings. Code: `WeekBand` |
+| K5 | No goals: plain dates in the band, MyFitnessPal kilocalories and macros as text, "Définir mes objectifs ›" opens O4. Code: `JournalHeader`, `DaySummaryCard` |
+| K6 | Loading: the reading card "Lecture de MyFitnessPal et d'Ekklo…" and meal placeholders. Code: `LoadingSummaryCard`, `LoadingMealCard` (`lib/pages/journal/widgets/`) |
+| K7 | Journal with the MyFitnessPal session expired ("Session MyFitnessPal expirée" in the Figma file): storm card "Déconnecté", Ekklo stays readable, MyFitnessPal "indisponible" with the goals. Code: `JournalProblemCard`, `EkkloOnly` |
+| K8 | Day detail sheet, opened by touching the day card: MyFitnessPal and Ekklo nutrients side by side. Code: `showDayDetailSheet` (`lib/pages/journal/widgets/day_detail_sheet.dart`) |
+| K9 | Everything already in Ekklo: no send button, every meal "Dans Ekklo" |
+| K10 | Empty MyFitnessPal day: today's ring without arc, counters at 0, each meal "Rien pour l’instant", no send button |
+| K11 | Partial goals: a nutrient without goal shows its value alone in a dashed circle. Code: `NutrientRing` |
+| K12 | Journal with the Ekklo session expired: storm card "Déconnecté" with "Se reconnecter à Ekklo", MyFitnessPal stays readable, meals "Ekklo indisponible", send disabled. Code: `JournalProblemCard`, `MfpOnly`, `UnavailableMealCard` (`lib/pages/journal/widgets/unavailable_meal_card.dart`) |
+| K13 | Offline: storm card "Hors ligne", the last figures with their time, retried every 15 s while the app is open. ADR 0022 |
 | K14 | Access blocked by MyFitnessPal's anti-bot check (out of v1) |
-| K15 | Generic MyFitnessPal error banner |
+| K15 | MyFitnessPal (or Ekklo) not responding: storm card "Indisponible" with "Réessayer". Code: `JournalProblemCard` |
 | K19 | Journal with entries "À mettre à jour" |
 | K20 | "Rien de nouveau" snackbar after a pull that changed nothing |
 | 09 | "Recherche en cours": Fūjin plans the send, one Ekklo search per unknown food. Code: `SearchingView` (`lib/pages/sending/widgets/searching_view.dart`) |
@@ -99,5 +116,5 @@ Codes from the Figma file "Fūjin · Maquettes", as used in the docs.
 | 21 | Mémoire with nothing remembered yet. Code: `MemoryEmptyView` (`lib/pages/memory/widgets/memory_empty_view.dart`) |
 | 06e | Own copy whose MyFitnessPal food changed version since it was copied (planned) |
 | O1, O2 | Réglages tab, the third tab: "objectifs définis" (O1) and "aucun objectif" (O2): accounts, goals, backup, data on this phone, app version. Code: `SettingsPage` (`lib/pages/settings/settings_page.dart`) |
-| O3, O4, O5 | Goal editing: complete goals, empty fields, just saved. Code: `GoalsPage` (`lib/pages/settings/goals_page.dart`), `GoalsNotifier` (`lib/pages/settings/goals_notifier.dart`) |
+| O3, O4, O5 | Goal editing: complete goals, empty fields, just saved. Code: `GoalsPage` (`lib/pages/settings/goals_page.dart`), `GoalsNotifier` (`lib/pages/common/goals_notifier.dart`) |
 | O6, O7 | Backup file exported (O6) and imported (O7), reached from Réglages; the import replaces everything after a confirmation. Code: `BackupNotifier` (`lib/pages/settings/backup_notifier.dart`), confirmation sheet (`lib/pages/settings/sheets/confirm_sheet.dart`) |

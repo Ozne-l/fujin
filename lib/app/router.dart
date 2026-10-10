@@ -11,6 +11,7 @@ import 'package:fujin/pages/mfp_sign_in/mfp_sign_in_page.dart';
 import 'package:fujin/pages/sending/send_page.dart';
 import 'package:fujin/pages/settings/goals_page.dart';
 import 'package:fujin/pages/settings/settings_page.dart';
+import 'package:fujin/pages/splash/splash_page.dart';
 import 'package:fujin/pages/tabs/fujin_tab.dart';
 import 'package:fujin/pages/tabs/tab_shell.dart';
 import 'package:fujin/pages/welcome/welcome_page.dart';
@@ -21,8 +22,12 @@ final routerProvider = Provider<GoRouter>((ref) {
   final root = GlobalKey<NavigatorState>();
   final router = GoRouter(
     navigatorKey: root,
-    initialLocation: FujinRoute.journal.path,
+    initialLocation: FujinRoute.splash.path,
     routes: [
+      GoRoute(
+        path: FujinRoute.splash.path,
+        builder: (context, state) => const SplashPage(),
+      ),
       StatefulShellRoute.indexedStack(
         redirect: (context, state) async =>
             switch (await ref.read(accountsServiceProvider).read()) {

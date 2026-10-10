@@ -25,3 +25,4 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0019](0019-tab-shell.md) | Tab shell: Journal and Mémoire tabs, Scanner disabled | Accepted |
 | [0020](0020-goals.md) | Goals: one row in Fūjin's SQLite | Accepted |
 | [0021](0021-backup-file.md) | Backup file: fujin-backup v1 behind the BackupFiles seam | Accepted |
+| [0022](0022-journal-states-and-goal-rings.md) | Journal states and goal rings | Accepted |

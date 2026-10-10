@@ -46,10 +46,16 @@ class MealCard extends StatelessWidget {
               ),
             ),
           ),
-          if (counts.total > 0)
-            _Line(
+          switch (counts.total) {
+            0 => Text(
+              l10n.mealEmpty,
+              style: FujinText.inter13Regular.copyWith(
+                color: FujinColorRole.textSecondary,
+              ),
+            ),
+            final total => _Line(
               leading: Text(
-                l10n.mealProgress(counts.inEkklo, counts.total),
+                l10n.mealProgress(counts.inEkklo, total),
                 style: FujinText.inter13Regular.copyWith(
                   color: FujinColorRole.textSecondary,
                 ),
@@ -62,6 +68,7 @@ class MealCard extends StatelessWidget {
                 ],
               ),
             ),
+          },
           for (final compared in meal.entries) ...[
             const Divider(),
             _EntryRow(compared),

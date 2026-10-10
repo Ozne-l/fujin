@@ -2,6 +2,7 @@ import 'package:fujin/data/database/calendar_date_hook.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 
 enum FujinRoute {
+  splash('/splash'),
   journal('/'),
   memory('/memory'),
   memoryFood('/memory/food/:${FujinRoute.foodParameter}'),

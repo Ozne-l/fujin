@@ -1,11 +1,11 @@
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/data/backup/backup.dart';
 import 'package:fujin/domain/backup/backup_service.dart';
+import 'package:fujin/pages/common/goals_notifier.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
 import 'package:fujin/pages/memory/memory_notifier.dart';
 import 'package:fujin/pages/settings/backup_failure.dart';
 import 'package:fujin/pages/settings/backup_state.dart';
-import 'package:fujin/pages/settings/goals_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final NotifierProvider<BackupNotifier, BackupState> backupProvider =

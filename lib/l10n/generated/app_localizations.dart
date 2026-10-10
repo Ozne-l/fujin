@@ -398,6 +398,12 @@ abstract class AppLocalizations {
   /// **'Se reconnecter à MyFitnessPal'**
   String get mfpReconnect;
 
+  /// No description provided for @splashTagline.
+  ///
+  /// In fr, this message translates to:
+  /// **'Laisse le vent faire.'**
+  String get splashTagline;
+
   /// No description provided for @welcomeHeading.
   ///
   /// In fr, this message translates to:
@@ -1651,6 +1657,174 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Le Journal les affiche dès aujourd\'hui.'**
   String get goalsSavedDetail;
+
+  /// No description provided for @journalMonth.
+  ///
+  /// In fr, this message translates to:
+  /// **'{date}'**
+  String journalMonth(DateTime date);
+
+  /// No description provided for @backToToday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aujourd\'hui ›'**
+  String get backToToday;
+
+  /// No description provided for @setGoals.
+  ///
+  /// In fr, this message translates to:
+  /// **'Définir mes objectifs ›'**
+  String get setGoals;
+
+  /// No description provided for @previousWeek.
+  ///
+  /// In fr, this message translates to:
+  /// **'Semaine précédente'**
+  String get previousWeek;
+
+  /// No description provided for @nextWeek.
+  ///
+  /// In fr, this message translates to:
+  /// **'Semaine suivante'**
+  String get nextWeek;
+
+  /// No description provided for @kilocaloriesGoal.
+  ///
+  /// In fr, this message translates to:
+  /// **'/ {goal} kcal'**
+  String kilocaloriesGoal(double goal);
+
+  /// No description provided for @kilocaloriesAt.
+  ///
+  /// In fr, this message translates to:
+  /// **'{value} kcal à {time}'**
+  String kilocaloriesAt(double value, DateTime time);
+
+  /// No description provided for @ringValue.
+  ///
+  /// In fr, this message translates to:
+  /// **'{value}'**
+  String ringValue(double value);
+
+  /// No description provided for @ringGoal.
+  ///
+  /// In fr, this message translates to:
+  /// **'/ {goal}'**
+  String ringGoal(double goal);
+
+  /// No description provided for @atLeast.
+  ///
+  /// In fr, this message translates to:
+  /// **'≥ {value}'**
+  String atLeast(String value);
+
+  /// No description provided for @macroNameFiber.
+  ///
+  /// In fr, this message translates to:
+  /// **'fibres'**
+  String get macroNameFiber;
+
+  /// No description provided for @ekkloFoodCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'· {count} {count, plural, =1{aliment} other{aliments}} ›'**
+  String ekkloFoodCount(int count);
+
+  /// No description provided for @ekkloNoFood.
+  ///
+  /// In fr, this message translates to:
+  /// **'· aucun aliment'**
+  String get ekkloNoFood;
+
+  /// No description provided for @sideUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'indisponible'**
+  String get sideUnavailable;
+
+  /// No description provided for @ekkloUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ekklo indisponible'**
+  String get ekkloUnavailable;
+
+  /// No description provided for @goalLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Objectif · {goals}'**
+  String goalLine(String goals);
+
+  /// No description provided for @mealEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rien pour l’instant'**
+  String get mealEmpty;
+
+  /// No description provided for @journalLoading.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lecture de MyFitnessPal\net d\'Ekklo…'**
+  String get journalLoading;
+
+  /// No description provided for @dayDetailTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Détail du jour'**
+  String get dayDetailTitle;
+
+  /// No description provided for @close.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fermer'**
+  String get close;
+
+  /// No description provided for @dayDetailPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{1 aliment sur {total} n’est pas encore dans Ekklo.} other{{count} aliments sur {total} ne sont pas encore dans Ekklo.}}'**
+  String dayDetailPending(int count, int total);
+
+  /// No description provided for @fiberNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'MyFitnessPal ne donne pas toujours les fibres, d\'où le ≥.'**
+  String get fiberNote;
+
+  /// No description provided for @offlineTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Hors ligne'**
+  String get offlineTitle;
+
+  /// No description provided for @offlineHeadline.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas de connexion internet.'**
+  String get offlineHeadline;
+
+  /// No description provided for @offlineDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fūjin réessaie dès que le réseau revient.'**
+  String get offlineDetail;
+
+  /// No description provided for @offlineSince.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les chiffres datent de {time}. Fūjin réessaie dès que le réseau revient.'**
+  String offlineSince(DateTime time);
+
+  /// No description provided for @unavailableTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Indisponible'**
+  String get unavailableTitle;
+
+  /// No description provided for @serviceNotResponding.
+  ///
+  /// In fr, this message translates to:
+  /// **'{service} ne répond pas.'**
+  String serviceNotResponding(String service);
 }
 
 class _AppLocalizationsDelegate

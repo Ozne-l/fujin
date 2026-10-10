@@ -32,7 +32,7 @@ Each rule: what to do, why, where the repo already does it.
 
 3. **Give every identifier-like string or number a name: an enum carrying the value, or a `static const`.**
    Why: one spelling, one place to change it, and the compiler finds every use.
-   Examples: table names in `FujinTable` (`lib/data/database/fujin_table.dart`), secure storage keys in `SessionKey` (`lib/data/sessions/session_key.dart`), route paths in `FujinRoute` (`lib/app/fujin_route.dart`), conflict keys `MemoryRepository._mfpFoodId` (`lib/data/memory/memory_repository.dart`), `ExpectedItem.quantityTolerance` (`lib/domain/comparison/expected_item.dart`), `JournalPage._nothingNewDuration` (`lib/pages/journal/journal_page.dart`), `SelectedDay._daysPerWeek` (`lib/pages/journal/selected_day.dart`).
+   Examples: table names in `FujinTable` (`lib/data/database/fujin_table.dart`), secure storage keys in `SessionKey` (`lib/data/sessions/session_key.dart`), route paths in `FujinRoute` (`lib/app/fujin_route.dart`), conflict keys `MemoryRepository._mfpFoodId` (`lib/data/memory/memory_repository.dart`), `ExpectedItem.quantityTolerance` (`lib/domain/comparison/expected_item.dart`), `JournalPage._nothingNewDuration` (`lib/pages/journal/journal_page.dart`), `CalendarWeek._daysPerWeek` (`lib/domain/journal/calendar_week.dart`).
    ```dart
    enum FujinTable {
      memoryFood('memory_food'),

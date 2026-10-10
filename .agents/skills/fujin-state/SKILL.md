@@ -49,7 +49,7 @@ Riverpod 3 does both injection and state. Providers are written by hand; a notif
 
 5. **Treat a notifier as the presenter: it owns state and logic and never touches `BuildContext`, navigation or localized strings.**
    Why: the presenter stays testable without widgets, and copy is chosen in one layer, in the device language.
-   Example: `JournalNotifier` exposes a `JournalDay` and the methods `refresh()` and `reload()` (`lib/pages/journal/journal_notifier.dart`); the page turns `JournalDay.counts` into the localized button label and pills (`lib/pages/journal/widgets/meal_card.dart`, `lib/pages/journal/widgets/day_summary_card.dart`).
+   Example: `JournalNotifier` exposes a `JournalRead` and the methods `refresh()` and `reload()` (`lib/pages/journal/journal_notifier.dart`); the page turns `JournalDay.counts` into the localized button label and pills (`lib/pages/journal/widgets/meal_card.dart`, `lib/pages/journal/widgets/day_summary_card.dart`).
 
 6. **Key per-day state with an auto-disposed family and pass the argument through the notifier constructor.**
    Why: each day gets its own cache, released when no widget shows it any more (riverpod.dev, "Family" and "Auto dispose").
@@ -79,18 +79,15 @@ Riverpod 3 does both injection and state. Providers are written by hand; a notif
    Example: `if (ref.mounted) state = next;` in `JournalNotifier._reread`; `if (!context.mounted) return;` in the refresh callback of `JournalPage.build`.
 
 10. **Wrap reads in `AsyncValue.guard` and render `AsyncValue` with a `switch` on its patterns, data first.**
-    Why: errors become state instead of escaping, and matching `AsyncValue(value: ...)` first keeps the previous day on screen while a refresh runs.
+    Why: errors become state instead of escaping, and matching `AsyncValue(value: ...)` first keeps the previous day on screen while a refresh runs; an error set on a notifier that had a value keeps that value (Riverpod copies the previous state), which is how the offline Journal shows its last figures.
     Example: `JournalNotifier._reread` (`AsyncValue.guard`), and in `JournalPage.build`:
     ```dart
     ...switch (journal) {
-      AsyncValue(value: final JournalDay loaded) => _loaded(
-        context,
-        loaded,
-      ),
-      AsyncError(:final error) => [
-        SliverToBoxAdapter(child: JournalProblemCard(error: error)),
+      AsyncValue(value: final read?, error: final error?) => [
+        ...problem(ReadProblem.of(error), readAt: read.readAt),
+        summary(read, stale: true),
       ],
-      _ => [
+      AsyncValue(value: BothSides(:final day) && final read) => [
     ```
 
 11. **Write screens as `HookConsumerWidget` and use hooks for what one widget owns: lifecycle listeners, text controllers, view toggles.**

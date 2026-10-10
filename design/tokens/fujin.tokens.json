@@ -360,6 +360,14 @@
     }
   },
   "radius": {
+    "state-card": {
+      "$value": {
+        "value": 28,
+        "unit": "px"
+      },
+      "$description": "Storm state card of the Journal (offline, session expired, service down).",
+      "$type": "dimension"
+    },
     "menu": {
       "$value": {
         "value": 12,
@@ -426,6 +434,14 @@
       },
       "$description": "Icon tiles of the sent summary.",
       "$type": "dimension"
+    },
+    "logo": {
+      "$value": {
+        "value": 36,
+        "unit": "px"
+      },
+      "$description": "The Fūjin logo on the splash screen.",
+      "$type": "dimension"
     }
   },
   "stroke": {
@@ -486,6 +502,14 @@
         "unit": "px"
       },
       "$description": "Focused input field.",
+      "$type": "dimension"
+    },
+    "gold-rule": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      },
+      "$description": "Short gold rule under the splash tagline.",
       "$type": "dimension"
     }
   },
@@ -551,6 +575,118 @@
         "value": 26,
         "unit": "px"
       },
+      "$type": "dimension"
+    },
+    "week-band": {
+      "$value": {
+        "value": 64,
+        "unit": "px"
+      },
+      "$description": "Height of the Journal week band: weekday label and day ring.",
+      "$type": "dimension"
+    },
+    "band-fade": {
+      "$value": {
+        "value": 28,
+        "unit": "px"
+      },
+      "$description": "Fade over the half days at both ends of the Journal week band.",
+      "$type": "dimension"
+    },
+    "macro-ring-dash": {
+      "$value": {
+        "value": 3,
+        "unit": "px"
+      },
+      "$description": "Dash of the circle around a nutrient without a goal.",
+      "$type": "dimension"
+    },
+    "macro-ring-dash-gap": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      },
+      "$description": "Gap between the dashes of the circle around a nutrient without a goal.",
+      "$type": "dimension"
+    },
+    "skeleton-line": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$description": "Height of a text line placeholder while the Journal loads.",
+      "$type": "dimension"
+    },
+    "skeleton-macro": {
+      "$value": {
+        "value": 8,
+        "unit": "px"
+      },
+      "$description": "Height of a nutrient label placeholder while the Journal loads.",
+      "$type": "dimension"
+    },
+    "skeleton-title": {
+      "$value": {
+        "value": 12,
+        "unit": "px"
+      },
+      "$description": "Height of a meal name placeholder while the Journal loads.",
+      "$type": "dimension"
+    },
+    "skeleton-pill": {
+      "$value": {
+        "value": 22,
+        "unit": "px"
+      },
+      "$description": "Height of a status pill placeholder while the Journal loads.",
+      "$type": "dimension"
+    },
+    "skeleton-wide": {
+      "$value": {
+        "value": 200,
+        "unit": "px"
+      },
+      "$description": "Width of the long summary line placeholder.",
+      "$type": "dimension"
+    },
+    "skeleton-medium": {
+      "$value": {
+        "value": 140,
+        "unit": "px"
+      },
+      "$description": "Width of the short summary line placeholder.",
+      "$type": "dimension"
+    },
+    "skeleton-macro-width": {
+      "$value": {
+        "value": 50,
+        "unit": "px"
+      },
+      "$description": "Width of a nutrient label placeholder.",
+      "$type": "dimension"
+    },
+    "skeleton-meal-title": {
+      "$value": {
+        "value": 120,
+        "unit": "px"
+      },
+      "$description": "Width of a meal name placeholder.",
+      "$type": "dimension"
+    },
+    "skeleton-meal-detail": {
+      "$value": {
+        "value": 180,
+        "unit": "px"
+      },
+      "$description": "Width of a meal detail placeholder.",
+      "$type": "dimension"
+    },
+    "skeleton-pill-width": {
+      "$value": {
+        "value": 80,
+        "unit": "px"
+      },
+      "$description": "Width of a status pill placeholder.",
       "$type": "dimension"
     },
     "touch-target": {
@@ -740,6 +876,60 @@
         "unit": "px"
       },
       "$description": "Seigaiha band at the bottom of welcome screens.",
+      "$type": "dimension"
+    },
+    "motif-band-splash": {
+      "$value": {
+        "value": 180,
+        "unit": "px"
+      },
+      "$description": "Seigaiha band at the bottom of the splash screen.",
+      "$type": "dimension"
+    },
+    "logo": {
+      "$value": {
+        "value": 160,
+        "unit": "px"
+      },
+      "$description": "The Fūjin logo on the splash screen.",
+      "$type": "dimension"
+    },
+    "logo-shadow-blur": {
+      "$value": {
+        "value": 24,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "logo-shadow-offset": {
+      "$value": {
+        "value": 8,
+        "unit": "px"
+      },
+      "$type": "dimension"
+    },
+    "splash-title-gap": {
+      "$value": {
+        "value": 36,
+        "unit": "px"
+      },
+      "$description": "From the splash logo to the app name.",
+      "$type": "dimension"
+    },
+    "splash-rule-gap": {
+      "$value": {
+        "value": 58,
+        "unit": "px"
+      },
+      "$description": "From the splash tagline to the gold rule.",
+      "$type": "dimension"
+    },
+    "gold-rule-width": {
+      "$value": {
+        "value": 48,
+        "unit": "px"
+      },
+      "$description": "Short gold rule under the splash tagline.",
       "$type": "dimension"
     },
     "glyph-card": {
@@ -1026,6 +1216,20 @@
           "hex": "#1B1A17"
         },
         "$description": "Drop shadow of floating glass: the tab plate and the Scanner button.",
+        "$type": "color"
+      },
+      "logo": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1059,
+            0.102,
+            0.0902
+          ],
+          "alpha": 0.1,
+          "hex": "#1B1A17"
+        },
+        "$description": "Drop shadow of the Fūjin logo on the splash screen.",
         "$type": "color"
       }
     },
