@@ -74,6 +74,7 @@ Project skills in `.agents/skills/` (also reachable as `.claude/skills/`):
 - `fujin-state`: Riverpod providers, notifiers as presenters, injection, one-shot UI effects, hooks.
 - `fujin-storage`: `fujin.db`, migrations, repositories, Auto Backup, where sessions live.
 - `fujin-tests`: what to test and what to fake, fixtures, `FakeBackends`, `package:checks`.
+- `fujin-review`: the owner's review before a push (regressions against `origin/main`, bugs, duplication, AI slop, divergence, conventions), run only when he types `/fujin-review` (`.agents/commands/fujin-review.md` gives omp the same name).
 
 The other skills in `.agents/skills/` are vendored from a third party under MIT; `.agents/skills/THIRD_PARTY.md` lists them with source and commit. Do not edit them.
 
