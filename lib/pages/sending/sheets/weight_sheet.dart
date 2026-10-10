@@ -4,11 +4,11 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/common/grams_input.dart';
 import 'package:fujin/pages/sending/send_plan_notifier.dart';
 import 'package:fujin/pages/sending/send_text.dart';
 import 'package:fujin/pages/sending/sheets/sheet_frame.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
 
 Future<void> showWeightSheet(
   BuildContext context, {
@@ -25,8 +25,6 @@ Future<void> showWeightSheet(
 class _WeightSheet extends HookConsumerWidget {
   const _WeightSheet({required this.planned, required this.choice});
 
-  static const _decimals = 1;
-
   final PlannedEntry planned;
   final SendToEkkloFood choice;
 
@@ -38,11 +36,11 @@ class _WeightSheet extends HookConsumerWidget {
     final weight = useTextEditingController(
       text: switch (choice.gramsPerUnit) {
         null => '',
-        final grams => _format(context, grams),
+        final grams => GramsInput.format(context, grams),
       },
     );
     useListenable(weight);
-    final grams = _parse(context, weight.text);
+    final grams = GramsInput.parse(context, weight.text);
     final plan = ref.read(sendPlanProvider(entry.date).notifier);
     final navigator = Navigator.of(context);
 
@@ -172,20 +170,4 @@ class _WeightSheet extends HookConsumerWidget {
     ),
     _ => null,
   };
-
-  static NumberFormat _numbers(BuildContext context) =>
-      NumberFormat.decimalPattern(Localizations.localeOf(context).toString())
-        ..maximumFractionDigits = _decimals
-        ..turnOffGrouping();
-
-  static String _format(BuildContext context, double grams) =>
-      _numbers(context).format(grams);
-
-  static double? _parse(BuildContext context, String text) {
-    final grams = _numbers(context).tryParse(text.trim());
-    return switch (grams) {
-      final grams? when grams.isFinite && grams > 0 => grams.toDouble(),
-      _ => null,
-    };
-  }
 }

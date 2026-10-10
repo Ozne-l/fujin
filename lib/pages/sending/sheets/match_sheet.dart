@@ -17,6 +17,8 @@ import 'package:fujin/pages/sending/send_text.dart';
 import 'package:fujin/pages/sending/sheets/candidate_card.dart';
 import 'package:fujin/pages/sending/sheets/own_copy_sheet.dart';
 import 'package:fujin/pages/sending/sheets/sheet_frame.dart';
+import 'package:fujin/pages/sending/sheets/sheet_message.dart';
+import 'package:fujin/pages/sending/sheets/sheet_searching.dart';
 import 'package:fujin/pages/sending/widgets/delta_pills.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -121,7 +123,7 @@ class _MatchSheet extends HookConsumerWidget {
     ValueNotifier<String?> picked,
   ) => switch (search) {
     EkkloSearchFailed(:final failure) => [
-      _Message(
+      SheetMessage(
         text: switch (failure) {
           SendFailure.network => l10n.searchFailedNetwork,
           SendFailure.ekkloSession ||
@@ -133,9 +135,9 @@ class _MatchSheet extends HookConsumerWidget {
         color: FujinColorRole.textAlert,
       ),
     ],
-    EkkloSearchRunning() => [const _Searching()],
+    EkkloSearchRunning() => [const SheetSearching()],
     EkkloSearchDone(results: []) => [
-      _Message(
+      SheetMessage(
         text: l10n.noEkkloResult,
         color: FujinColorRole.textSecondary,
       ),
@@ -248,31 +250,4 @@ class _CandidateDetail extends StatelessWidget {
       ],
     );
   }
-}
-
-class _Message extends StatelessWidget {
-  const _Message({required this.text, required this.color});
-
-  final String text;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) => SheetFrame.inset(
-    Text(text, style: FujinText.inter13Regular.copyWith(color: color)),
-  );
-}
-
-class _Searching extends StatelessWidget {
-  const _Searching();
-
-  @override
-  Widget build(BuildContext context) => const Padding(
-    padding: EdgeInsets.symmetric(vertical: FujinSpace.s4),
-    child: Center(
-      child: SizedBox.square(
-        dimension: FujinSize.icon,
-        child: CircularProgressIndicator(strokeWidth: FujinStroke.icon),
-      ),
-    ),
-  );
 }
