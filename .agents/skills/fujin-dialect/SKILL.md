@@ -36,6 +36,7 @@ Each rule: what to do, why, where the repo already does it.
    ```dart
    enum FujinTable {
      memoryFood('memory_food'),
+     memoryOwnCopy('memory_own_copy'),
      memoryUnit('memory_unit'),
      memoryMeal('memory_meal'),
      sentLink('sent_link');

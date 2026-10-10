@@ -24,11 +24,12 @@ Fūjin keeps two kinds of local data: the Memory (which Ekklo food and grams sta
   - `transaction` opens `BEGIN IMMEDIATE`, commits, or rolls back and rethrows. Called inside another transaction, it simply runs its body as part of the outer one.
 - Hand-written SQL in repositories, one per aggregate: `MemoryRepository` (`lib/data/memory/memory_repository.dart`) and `SentLinkRepository` (`lib/data/links/sent_link_repository.dart`). Rows are decoded with `dart_mappable` mappers ([0007](0007-dart-mappable-models.md)); calendar dates are stored as `YYYY-MM-DD` through `CalendarDateHook` (`lib/data/database/calendar_date_hook.dart`).
 
-Schema version 1 (`lib/data/database/schema.dart`):
+Schema after migration 3 (`lib/data/database/schema.dart`):
 
 | Table | Key | Holds |
 | --- | --- | --- |
-| `memory_food` | `mfp_food_id` | `kind` (`ekklo` or `own_copy`), Ekklo food id and name, `mfp_food_version` and `mfp_unit` for own copies (`mfp_unit` added by migration 2, [0018](0018-send-flow.md)) |
+| `memory_food` | `mfp_food_id` | the Ekklo food a MyFitnessPal food is matched with: `kind` (`ekklo`), Ekklo food id and name |
+| `memory_own_copy` | `mfp_food_id`, `mfp_unit` | the own copy made for one serving unit: `kind` (`own_copy`), Ekklo food id and name, `mfp_food_version` (migration 3, [0018](0018-send-flow.md)) |
 | `memory_unit` | `mfp_food_id`, `mfp_unit` | grams per MyFitnessPal unit; `ON DELETE CASCADE` from `memory_food` |
 | `memory_meal` | `mfp_meal_name` | `ekklo_meal_name` |
 | `sent_link` | `mfp_entry_id` | date, food, meal, servings, `mfp_serving_value`, unit, Ekklo meal id, `ekklo_item_id` (`UNIQUE`), `sent_at`; index on `date` |
@@ -36,7 +37,7 @@ Schema version 1 (`lib/data/database/schema.dart`):
 ## Consequences
 
 - No ORM and no code generation for SQL; the schema is readable in one file.
-- Saving a food as an own copy deletes its units in the same transaction (`MemoryRepository.saveFood`), since an own copy is counted in portions.
+- A food is either matched or copied: saving an own copy deletes the food's match, and with it its units, in the same transaction (`MemoryRepository.saveFood`), since an own copy is counted in its own unit; saving a match deletes the food's own copies.
 - `UNIQUE (ekklo_item_id)` makes a double adoption fail loudly; `test/data/database_test.dart` ("are all kept when one adoption is refused") shows the whole replace rolls back.
 - Tests open the real engine, in memory or on a temporary file ([0012](0012-test-doubles-at-process-edges.md)).
 - A slow query would block frames; the size of the data makes that unlikely today.

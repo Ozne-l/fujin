@@ -17,7 +17,7 @@ Planning, per entry "À envoyer" or "À mettre à jour" that has a MyFitnessPal 
 - The Ekklo meal is the one Memory maps, else the MyFitnessPal meal name unchanged ("Un repas MyFitnessPal sans correspondance garde son nom dans Ekklo", screen 20).
 - A remembered matched food whose grams are known (gram serving, or a remembered unit) is sent without review ("Mémorisé").
 - A remembered matched food logged in a new unit is reviewed: Fūjin reads the Ekklo food (`foods.byId`) and estimates the unit's weight from the kilocalories ("Poids à confirmer"). If that Ekklo food cannot be evaluated (counted in portions, without energy, or the entry has no kcal), the entry is searched like an unknown food.
-- A remembered own copy is reused when it was made for the same serving unit and, when both are known, the same MyFitnessPal food version as the entry (`isFresh`); otherwise a new own copy is made without review.
+- A remembered own copy is reused when Memory holds one for the entry's serving unit with, when both are known, the same MyFitnessPal food version as the entry (`isFresh`); otherwise a new own copy is made without review, also when the food has own copies only in other units (`Memory.hasOwnCopy`).
 - Any other food is searched in Ekklo with the first three meaningful words of its product name (`searchTerms`, `lib/domain/sending/food_words.dart`); the first 8 results are ranked (`rankCandidates`, `lib/domain/sending/rank_candidates.dart`). The best acceptable candidate is proposed ("Nouvelle association"); with none, an own copy is proposed ("Aucun aliment proche") and the rejected candidates stay listed.
 
 Ranking and acceptance (`EkkloCandidate`, `NutrientDeltas`):
@@ -28,7 +28,7 @@ Ranking and acceptance (`EkkloCandidate`, `NutrientDeltas`):
 
 Review (screen 10): every planned entry that is not fully remembered is "à vérifier". "Sans changement de ta part, les propositions sont utilisées": sending uses the proposals as they are. The owner can confirm, choose another candidate or search Ekklo (11), set a unit's weight (12), choose an own copy (13) or skip an entry. Updates whose quantity is known skip the review; a plan made only of such updates starts sending at once (screen 14).
 
-Own copies: one Ekklo food per MyFitnessPal food and serving unit, an exact copy of the entry's values. For a gram serving it is counted in grams per 100 g; for any other unit it is one portion per unit, and the item quantity is servings × serving value. `OwnCopy.mfpUnit` (column `memory_food.mfp_unit`, migration 2) records the unit, and `ExpectedItem.forEntry` expects nothing for an entry logged in another unit.
+Own copies: one Ekklo food per MyFitnessPal food and serving unit, an exact copy of the entry's values. For a gram serving it is counted in grams per 100 g; for any other unit it is one portion per unit, and the item quantity is servings × serving value. Memory keeps one own copy per MyFitnessPal food and unit (table `memory_own_copy`, key `mfp_food_id` and `mfp_unit`, migration 3; migration 2 had added the unit to `memory_food`, which held one food per MyFitnessPal food). `Memory.food(mfpFoodId, mfpUnit)` returns the match, else the own copy of that unit, so `ExpectedItem.forEntry` expects nothing for an entry logged in a unit without a copy. Migration 3 drops an own copy saved before migration 2, whose unit is unknown; it is made again on its next send.
 
 Execution (`SendService.send`), in this order:
 
@@ -45,7 +45,7 @@ The entry's own food version (`MfpFoodEntry.food.version`) decides whether an ow
 ## Consequences
 
 - An interrupted send never duplicates an item or an own copy: tests cover a reply lost after Ekklo wrote the meal, a meal refused outright and an own copy made before a refused meal (`test/domain/sending/send_service_test.dart`).
-- Memory keeps one food per MyFitnessPal food, so of a food logged in two units the same day only the last own copy is remembered; the other one is made again on its next send.
+- A food logged in several units has one own copy per unit in Ekklo, each reused on later sends (`test/domain/sending/plan_entry_test.dart`, "reuses the own copy of each unit of a food copied in two").
 - Every choice made while sending is remembered, so a day of known foods is sent from screen 10 with nothing to review.
 - An estimated weight is retained even when the owner does not open sheet 12; screen 15 lists it ("poids retenu") so it can be corrected later in Mémoire.
 - Entries without a MyFitnessPal id cannot be linked and are left out of the send.

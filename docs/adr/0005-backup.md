@@ -33,7 +33,7 @@ C, manual file (planned, not built):
 
 - Export `fujin-backup-YYYY-MM-DD.json` through the system document picker.
 - Format version 1: `{format: "fujin-backup", version: 1, exportedAt, foods, meals, links}`. No credentials.
-- Import decodes strictly: an unknown `format` or `version` shows "Fichier illisible, rien n'a changé" and touches nothing. After a confirmation (O7), it replaces all four tables (`memory_food`, `memory_unit`, `memory_meal`, `sent_link`) in one transaction. Replace, never merge.
+- Import decodes strictly: an unknown `format` or `version` shows "Fichier illisible, rien n'a changé" and touches nothing. After a confirmation (O7), it replaces all five tables (`memory_food`, `memory_own_copy`, `memory_unit`, `memory_meal`, `sent_link`) in one transaction. Replace, never merge.
 - It will live in `lib/data/backup/`, with its own notifier ([0006](0006-riverpod-notifiers-as-presenters.md)).
 
 ## Consequences

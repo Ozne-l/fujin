@@ -14,8 +14,8 @@ advisors:
 
       1. One repository per aggregate (ADR 0004, ADR 0013).
          SQL lives only in lib/data, in the repository of the aggregate it touches:
-         MemoryRepository for memory_food, memory_unit and memory_meal; SentLinkRepository
-         for sent_link. FujinDatabase is the only class that imports package:sqlite3.
+         MemoryRepository for memory_food, memory_own_copy, memory_unit and memory_meal;
+         SentLinkRepository for sent_link. FujinDatabase is the only class that imports package:sqlite3.
          Flag SQL or FujinDatabase calls in lib/domain or lib/pages, a repository that
          writes another aggregate's table, and multi-row changes to one aggregate that
          are not wrapped in FujinDatabase.transaction.
