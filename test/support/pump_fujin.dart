@@ -4,7 +4,10 @@ import 'package:flutter_test/flutter_test.dart' show WidgetTester, addTearDown;
 import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/fujin_app.dart';
 import 'package:fujin/app/providers.dart';
+import 'package:fujin/data/backup/backup_files.dart';
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/goals/goals.dart';
+import 'package:fujin/data/goals/goals_repository.dart';
 import 'package:fujin/data/links/sent_link.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
@@ -14,7 +17,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import 'fake_backends.dart';
+import 'fake_backup_files.dart';
 import 'fixtures.dart';
+
+const appVersion = '0.1.0';
 
 Future<void> pumpFujin(
   WidgetTester tester,
@@ -24,6 +30,9 @@ Future<void> pumpFujin(
   List<SentLink> links = const [],
   List<OwnCopy> ownCopies = const [],
   List<RememberedUnit> units = const [],
+  Goals? goals,
+  BackupFiles? backupFiles,
+  Future<void> Function()? clearWebCookies,
 }) async {
   tester.platformDispatcher.localesTestValue = const [Locale('fr')];
   addTearDown(tester.platformDispatcher.clearLocalesTestValue);
@@ -35,6 +44,7 @@ Future<void> pumpFujin(
   ownCopies.forEach(memoryRepository.saveFood);
   units.forEach(memoryRepository.saveUnit);
   links.forEach(SentLinkRepository(database).add);
+  GoalsRepository(database).replace(goals);
   final signedInMfp = mfp ?? await backends.mfp();
   final signedInEkklo = ekklo ?? await backends.ekklo();
   await tester.pumpWidget(
@@ -45,6 +55,13 @@ Future<void> pumpFujin(
         clockProvider.overrideWithValue(() => now),
         mfpClientProvider.overrideWithValue(signedInMfp),
         ekkloClientProvider.overrideWithValue(signedInEkklo),
+        appVersionProvider.overrideWithValue(appVersion),
+        backupFilesProvider.overrideWithValue(
+          backupFiles ?? FakeBackupFiles(),
+        ),
+        clearWebCookiesProvider.overrideWithValue(
+          clearWebCookies ?? () async {},
+        ),
       ],
       child: const FujinApp(),
     ),

@@ -60,6 +60,7 @@ abstract final class FujinColorRole {
   static const Color textAlert = FujinColor.shu;
   static const Color textDisabled = FujinColor.usuzumi;
   static const Color textGold = FujinColor.kinDark;
+  static const Color textInfo = FujinColor.sora;
   static const Color textLink = FujinColor.fujin;
   static const Color textOnDark = FujinColor.kinu;
   static const Color textPrimary = FujinColor.sumi;
@@ -122,6 +123,7 @@ abstract final class FujinSize {
   static const double glassBlur = 12;
   static const double glyphCard = 56;
   static const double glyphHero = 72;
+  static const double goalFieldGap = 10;
   static const double icon = 24;
   static const double kcalBar = 6;
   static const double macroBar = 4;
@@ -130,6 +132,8 @@ abstract final class FujinSize {
   static const double menuChevron = 14;
   static const double menuWidth = 140;
   static const double motifBand = 252;
+  static const double pictogram = 52;
+  static const double pictogramIcon = 36;
   static const double pill = 26;
   static const double pillSmall = 20;
   static const double radio = 20;

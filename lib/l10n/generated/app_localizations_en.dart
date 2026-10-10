@@ -939,4 +939,258 @@ class AppLocalizationsEn extends AppLocalizations {
   String memoryEnergyPer(String energy, String portion) {
     return '$energy · $portion';
   }
+
+  @override
+  String get settingsAccounts => 'ACCOUNTS';
+
+  @override
+  String get settingsAccountActive => 'Connected · session active';
+
+  @override
+  String get signOut => 'Sign out';
+
+  @override
+  String get settingsGoals => 'GOALS';
+
+  @override
+  String get goalsEveryDay => 'Every day';
+
+  @override
+  String get goalsNone => 'No goal';
+
+  @override
+  String goalsSummaryPart(String nutrient, String value) {
+    return '$nutrient $value';
+  }
+
+  @override
+  String get summarySeparator => ' · ';
+
+  @override
+  String get settingsBackup => 'BACKUP';
+
+  @override
+  String get backupExport => 'Export a backup';
+
+  @override
+  String get backupExportDetail => 'Memory and sent links, in a file';
+
+  @override
+  String get backupImport => 'Import a backup';
+
+  @override
+  String get backupImportDetail => 'Replaces the memory on this phone';
+
+  @override
+  String get settingsData => 'DATA ON THIS PHONE';
+
+  @override
+  String get clearSessions => 'Clear the sessions';
+
+  @override
+  String get clearSessionsDetail =>
+      'You will have to sign in to both accounts again.';
+
+  @override
+  String get clearMemory => 'Clear the memory';
+
+  @override
+  String memoryCounts(int foods, int meals) {
+    String _temp0 = intl.Intl.pluralLogic(
+      foods,
+      locale: localeName,
+      other: 'foods',
+      one: 'food',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      meals,
+      locale: localeName,
+      other: 'meals',
+      one: 'meal',
+    );
+    return '$foods $_temp0 and $meals $_temp1';
+  }
+
+  @override
+  String appVersion(String version) {
+    return 'Fūjin · $version';
+  }
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get signOutMfpTitle => 'Sign out of MyFitnessPal?';
+
+  @override
+  String get signOutMfpDetail =>
+      'Fūjin forgets your MyFitnessPal session on this phone. You will have to sign in again to read your diary.';
+
+  @override
+  String get signOutEkkloTitle => 'Sign out of Ekklo?';
+
+  @override
+  String get signOutEkkloDetail =>
+      'Fūjin forgets your Ekklo session on this phone. You will have to sign in again to send to Ekklo.';
+
+  @override
+  String get clearSessionsTitle => 'Clear the sessions?';
+
+  @override
+  String get clearSessionsConfirm =>
+      'Fūjin forgets your MyFitnessPal and Ekklo sessions on this phone. You will have to sign in to both accounts again.';
+
+  @override
+  String get clearMemoryTitle => 'Clear the memory?';
+
+  @override
+  String clearMemoryConfirm(String counts) {
+    return 'Fūjin forgets $counts. Sent links stay: nothing will be sent twice.';
+  }
+
+  @override
+  String get importTitle => 'Import this backup?';
+
+  @override
+  String importDetail(DateTime date, int foods, int meals, int links) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      foods,
+      locale: localeName,
+      other: 'foods',
+      one: 'food',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      meals,
+      locale: localeName,
+      other: 'meals',
+      one: 'meal',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      links,
+      locale: localeName,
+      other: 'sent links',
+      one: 'sent link',
+    );
+    return 'Backup from $dateString: $foods $_temp0, $meals $_temp1 and $links $_temp2. It replaces the memory on this phone.';
+  }
+
+  @override
+  String get importConfirm => 'Import and replace';
+
+  @override
+  String get backupUnreadable => 'Unreadable file, nothing changed';
+
+  @override
+  String get backupExported => 'Backup exported';
+
+  @override
+  String get backupImported => 'Backup imported';
+
+  @override
+  String get backupNotWritten => 'File not written, nothing changed';
+
+  @override
+  String get goalsTitle => 'Goals';
+
+  @override
+  String get goalsHeading => 'Your goals';
+
+  @override
+  String get goalsSubtitle =>
+      'The same every day. Fūjin compares them\nwith your MyFitnessPal diary.';
+
+  @override
+  String get goalsSection => 'EVERY DAY';
+
+  @override
+  String get goalKilocalories => 'Calories';
+
+  @override
+  String get goalProtein => 'Protein · P';
+
+  @override
+  String get goalCarbohydrates => 'Carbs · C';
+
+  @override
+  String get goalFat => 'Fat · F';
+
+  @override
+  String get goalFiber => 'Fiber · Fi';
+
+  @override
+  String get goalOptional => 'Optional';
+
+  @override
+  String get macroNameProtein => 'protein';
+
+  @override
+  String get macroNameCarbohydrates => 'carbs';
+
+  @override
+  String get macroNameFat => 'fat';
+
+  @override
+  String macrosTotal(double energy) {
+    final intl.NumberFormat energyNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String energyString = energyNumberFormat.format(energy);
+
+    return 'Your macros add up to $energyString kcal.';
+  }
+
+  @override
+  String macrosGoal(double energy) {
+    final intl.NumberFormat energyNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String energyString = energyNumberFormat.format(energy);
+
+    return 'For a goal of $energyString kcal. For reference only.';
+  }
+
+  @override
+  String macrosPartial(int count, String macros, double energy) {
+    final intl.NumberFormat energyNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String energyString = energyNumberFormat.format(energy);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$macros add up to $energyString kcal.',
+      one: '$macros adds up to $energyString kcal.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String macrosMissing(String macros) {
+    return '$macros without a goal: no comparison.';
+  }
+
+  @override
+  String get listLastSeparator => ' and ';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get saved => 'Saved';
+
+  @override
+  String get goalsSavedTitle => '✓ Goals saved';
+
+  @override
+  String get goalsSavedDetail => 'The Journal shows them from today.';
 }

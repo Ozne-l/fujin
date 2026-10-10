@@ -6,6 +6,7 @@ enum FujinRoute {
   memory('/memory'),
   memoryFood('/memory/food/:${FujinRoute.foodParameter}'),
   settings('/settings'),
+  goals('/settings/${FujinRoute.goalsSegment}'),
   welcome('/welcome'),
   mfpSignIn('/mfp-sign-in'),
   ekkloSignIn('/ekklo-sign-in'),
@@ -16,6 +17,7 @@ enum FujinRoute {
   static const dateParameter = 'date';
   static const foodParameter = 'food';
   static const unitParameter = 'unit';
+  static const goalsSegment = 'goals';
 
   final String path;
 

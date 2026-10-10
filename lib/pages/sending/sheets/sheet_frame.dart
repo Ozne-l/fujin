@@ -11,6 +11,8 @@ class SheetFrame extends HookWidget {
     required this.primaryLabel,
     required this.onPrimary,
     this.titleStyle = FujinText.hina28,
+    this.subtitleStyle = FujinText.inter13Regular,
+    this.glyph,
     this.lead = const [],
     this.initialQuery = '',
     this.onSearch,
@@ -19,6 +21,7 @@ class SheetFrame extends HookWidget {
     this.secondaryLabel,
     this.onSecondary,
     this.onSkip,
+    this.skipLabel,
     super.key,
   });
 
@@ -27,6 +30,8 @@ class SheetFrame extends HookWidget {
   final String title;
   final String subtitle;
   final TextStyle titleStyle;
+  final TextStyle subtitleStyle;
+  final Widget? glyph;
   final List<Widget> lead;
   final String initialQuery;
   final ValueChanged<String>? onSearch;
@@ -37,6 +42,7 @@ class SheetFrame extends HookWidget {
   final String? secondaryLabel;
   final VoidCallback? onSecondary;
   final VoidCallback? onSkip;
+  final String? skipLabel;
 
   static Future<void> show(
     BuildContext context, {
@@ -83,6 +89,13 @@ class SheetFrame extends HookWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       spacing: FujinSpace.s2,
                       children: [
+                        if (glyph case final glyph?)
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: FujinSpace.s1,
+                            ),
+                            child: glyph,
+                          ),
                         Text(
                           title,
                           style: titleStyle.copyWith(
@@ -91,7 +104,7 @@ class SheetFrame extends HookWidget {
                         ),
                         Text(
                           subtitle,
-                          style: FujinText.inter13Regular.copyWith(
+                          style: subtitleStyle.copyWith(
                             color: FujinColorRole.textSecondary,
                           ),
                         ),
@@ -141,7 +154,7 @@ class SheetFrame extends HookWidget {
                             child: TextButton(
                               onPressed: onSkip,
                               style: _skipStyle,
-                              child: Text(l10n.skip),
+                              child: Text(skipLabel ?? l10n.skip),
                             ),
                           ),
                       ],

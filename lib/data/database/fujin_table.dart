@@ -3,7 +3,8 @@ enum FujinTable {
   memoryOwnCopy('memory_own_copy'),
   memoryUnit('memory_unit'),
   memoryMeal('memory_meal'),
-  sentLink('sent_link');
+  sentLink('sent_link'),
+  goals('goals');
 
   const FujinTable(this.sqlName);
 

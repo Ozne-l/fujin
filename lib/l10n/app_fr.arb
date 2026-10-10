@@ -553,5 +553,102 @@
   "memoryEnergyPer": "{energy} · {portion}",
   "@memoryEnergyPer": {
     "placeholders": {"energy": {"type": "String"}, "portion": {"type": "String"}}
-  }
+  },
+  "settingsAccounts": "COMPTES",
+  "settingsAccountActive": "Connecté · session active",
+  "signOut": "Déconnecter",
+  "settingsGoals": "OBJECTIFS",
+  "goalsEveryDay": "Tous les jours",
+  "goalsNone": "Aucun objectif",
+  "goalsSummaryPart": "{nutrient} {value}",
+  "@goalsSummaryPart": {
+    "placeholders": {"nutrient": {"type": "String"}, "value": {"type": "String"}}
+  },
+  "summarySeparator": " · ",
+  "settingsBackup": "SAUVEGARDE",
+  "backupExport": "Exporter une sauvegarde",
+  "backupExportDetail": "Mémoire et liens d’envoi, dans un fichier",
+  "backupImport": "Importer une sauvegarde",
+  "backupImportDetail": "Remplace la mémoire de ce téléphone",
+  "settingsData": "DONNÉES SUR CE TÉLÉPHONE",
+  "clearSessions": "Effacer les sessions",
+  "clearSessionsDetail": "Il faudra te reconnecter aux deux comptes.",
+  "clearMemory": "Effacer la mémoire",
+  "memoryCounts": "{foods} {foods, plural, =1{aliment} other{aliments}} et {meals} repas",
+  "@memoryCounts": {
+    "placeholders": {"foods": {"type": "int"}, "meals": {"type": "int"}}
+  },
+  "appVersion": "Fūjin · {version}",
+  "@appVersion": {
+    "placeholders": {"version": {"type": "String"}}
+  },
+  "cancel": "Annuler",
+  "signOutMfpTitle": "Te déconnecter de MyFitnessPal ?",
+  "signOutMfpDetail": "Fūjin oublie ta session MyFitnessPal sur ce téléphone. Il faudra te reconnecter pour lire ton journal.",
+  "signOutEkkloTitle": "Te déconnecter d'Ekklo ?",
+  "signOutEkkloDetail": "Fūjin oublie ta session Ekklo sur ce téléphone. Il faudra te reconnecter pour envoyer vers Ekklo.",
+  "clearSessionsTitle": "Effacer les sessions ?",
+  "clearSessionsConfirm": "Fūjin oublie tes sessions MyFitnessPal et Ekklo sur ce téléphone. Il faudra te reconnecter aux deux comptes.",
+  "clearMemoryTitle": "Effacer la mémoire ?",
+  "clearMemoryConfirm": "Fūjin oublie {counts}. Les liens d’envoi restent : rien ne sera envoyé deux fois.",
+  "@clearMemoryConfirm": {
+    "placeholders": {"counts": {"type": "String"}}
+  },
+  "importTitle": "Importer cette sauvegarde ?",
+  "importDetail": "Sauvegarde du {date} : {foods} {foods, plural, =1{aliment} other{aliments}}, {meals} repas et {links} {links, plural, =1{lien d’envoi} other{liens d’envoi}}. Elle remplace la mémoire de ce téléphone.",
+  "@importDetail": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "yMMMMd"},
+      "foods": {"type": "int"},
+      "meals": {"type": "int"},
+      "links": {"type": "int"}
+    }
+  },
+  "importConfirm": "Importer et remplacer",
+  "backupUnreadable": "Fichier illisible, rien n'a changé",
+  "backupExported": "Sauvegarde exportée",
+  "backupImported": "Sauvegarde importée",
+  "backupNotWritten": "Fichier non écrit, rien n'a changé",
+  "goalsTitle": "Objectifs",
+  "goalsHeading": "Tes objectifs",
+  "goalsSubtitle": "Les mêmes chaque jour. Fūjin les compare\nà ton journal MyFitnessPal.",
+  "goalsSection": "TOUS LES JOURS",
+  "goalKilocalories": "Calories",
+  "goalProtein": "Protéines · P",
+  "goalCarbohydrates": "Glucides · G",
+  "goalFat": "Lipides · L",
+  "goalFiber": "Fibres · F",
+  "goalOptional": "Facultatif",
+  "macroNameProtein": "protéines",
+  "macroNameCarbohydrates": "glucides",
+  "macroNameFat": "lipides",
+  "macrosTotal": "Tes macros font {energy} kcal.",
+  "@macrosTotal": {
+    "placeholders": {
+      "energy": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}}
+    }
+  },
+  "macrosGoal": "Pour un objectif de {energy} kcal. À titre indicatif.",
+  "@macrosGoal": {
+    "placeholders": {
+      "energy": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}}
+    }
+  },
+  "macrosPartial": "{count, plural, =1{{macros} fait {energy} kcal.} other{{macros} font {energy} kcal.}}",
+  "@macrosPartial": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "macros": {"type": "String"},
+      "energy": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}}
+    }
+  },
+  "macrosMissing": "{macros} sans objectif : pas de comparaison.",
+  "@macrosMissing": {
+    "placeholders": {"macros": {"type": "String"}}
+  },
+  "listLastSeparator": " et ",
+  "save": "Enregistrer",
+  "saved": "Enregistré",
+  "goalsSavedTitle": "✓ Objectifs enregistrés",
+  "goalsSavedDetail": "Le Journal les affiche dès aujourd'hui."
 }

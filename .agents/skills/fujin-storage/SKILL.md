@@ -7,7 +7,7 @@ description: Local persistence in Fūjin: the SQLite file fujin.db, FujinDatabas
 
 Everything Fūjin remembers lives in one SQLite file, `fujin.db`, opened through `FujinDatabase` (`lib/data/database/fujin_database.dart`) with the `sqlite3` package. SQL is hand-written; rows are written from and decoded by the `dart_mappable` mappers. Only that file is backed up. Credentials live elsewhere, in `flutter_secure_storage`.
 
-The database runs synchronously on the UI isolate: the tables are tiny (a few hundred rows of Memory and links), and `sqlite3` 3.5.2 is pinned because 3.6+ needs a newer `meta` than Flutter 3.44 allows (`pubspec.yaml`).
+The database runs synchronously on the UI isolate: the tables are tiny (a few hundred rows of Memory and links, one row of goals), and `sqlite3` 3.5.2 is pinned because 3.6+ needs a newer `meta` than Flutter 3.44 allows (`pubspec.yaml`).
 
 ## Rules
 
@@ -57,7 +57,7 @@ The database runs synchronously on the UI isolate: the tables are tiny (a few hu
 
 9. **Change the schema by appending a script to `schemaMigrations`; never edit a script that has shipped.**
    Why: `PRAGMA user_version` records how many scripts a device has run; `_migrate` runs only the ones after it, each in its own transaction, then sets `user_version` to its position (sqlite.org, "PRAGMA user_version"). Editing an applied script never reaches existing installs.
-   Example: `lib/data/database/schema.dart` and `FujinDatabase._migrate` (`lib/data/database/fujin_database.dart`); the second script adds `memory_food.mfp_unit`; the third moves own copies to `memory_own_copy`, one row per food and unit, then drops the columns `memory_food` no longer needs (ADR 0018). A new table also gets a `FujinTable` value. The test "reopening a database file keeps its rows and runs no migration twice" (`test/data/database_test.dart`) checks `schemaVersion` against `schemaMigrations.length`; a script that moves rows gets a test that rebuilds the older schema from the earlier scripts, sets `user_version`, and reopens the file ("moves the own copies of a version 2 database to one row per unit").
+   Example: `lib/data/database/schema.dart` and `FujinDatabase._migrate` (`lib/data/database/fujin_database.dart`); the second script adds `memory_food.mfp_unit`; the third moves own copies to `memory_own_copy`, one row per food and unit, then drops the columns `memory_food` no longer needs (ADR 0018); the fourth creates the one-row `goals` table (ADR 0020). A new table also gets a `FujinTable` value. The test "reopening a database file keeps its rows and runs no migration twice" (`test/data/database_test.dart`) checks `schemaVersion` against `schemaMigrations.length`; a script that moves rows gets a test that rebuilds the older schema from the earlier scripts, sets `user_version`, and reopens the file ("moves the own copies of a version 2 database to one row per unit").
    Status: the first script is installed on the owner's phone (dev app) and on the emulator, so scripts are append only.
 
 10. **Give each aggregate one repository that owns its SQL and returns models.**
@@ -86,6 +86,6 @@ The database runs synchronously on the UI isolate: the tables are tiny (a few hu
     Example: `SecureEkkloTokenStore` and `SecureMfpSessionStore` implement the client packages' `EkkloTokenStore` and `MfpSessionStore` (`lib/data/sessions/secure_ekklo_token_store.dart`, `lib/data/sessions/secure_mfp_session_store.dart`), keyed by `SessionKey` (`lib/data/sessions/session_key.dart`), wired in `mfpClientProvider` and `ekkloClientProvider` (`lib/app/providers.dart`).
     Status: both sign-ins are built (`lib/pages/ekklo_sign_in/`, `lib/pages/mfp_sign_in/`). The MyFitnessPal User-Agent is not stored: `lib/main.dart` reads the web view's at each launch ([ADR 0011](../../../docs/adr/0011-sessions-in-secure-storage.md)).
 
-15. **Planned: export the five tables to `fujin-backup-YYYY-MM-DD.json` (`format: "fujin-backup"`, `version: 1`, no credentials) and import such a file by replacing all five tables in one transaction.**
+15. **Export the six tables to `fujin-backup-YYYY-MM-DD.json` (`format: "fujin-backup"`, `version: 1`, no credentials) and import such a file by replacing all six tables in one transaction.**
     Why: Auto Backup restore is unverified for a sideloaded app; a file the owner keeps is the fallback. Import is strict and never merges.
-    Status: not built; nothing under `lib/data/` handles it yet. It will reuse `FujinDatabase.transaction` (rule 7) and the mappers (rule 11).
+    Example: `BackupRepository.snapshot` and `BackupRepository.restore` (`lib/data/backup/backup_repository.dart`) call `MemoryRepository.replace`, `SentLinkRepository.replaceAll` and `GoalsRepository.replace` inside `FujinDatabase.transaction` (rule 7); `BackupCodec.decode` (`lib/data/backup/backup_codec.dart`) returns null for anything but a complete version 1 file. A new table must be added to `Backup` (`lib/data/backup/backup.dart`) or deliberately left out ([ADR 0021](../../../docs/adr/0021-backup-file.md)).

@@ -58,6 +58,10 @@ The words below have one meaning in Fūjin's code, docs and conversations. Frenc
 
 **Connected accounts.** Whether a session is stored for MyFitnessPal and for Ekklo; it does not ask either service whether the session still works. It decides between the welcome screen and the Journal. Code: `ConnectedAccounts`, `AccountsService` (`lib/domain/accounts/`).
 
+**Goals.** The owner's daily nutrition targets, the same every day: kilocalories (required) and optionally protein, carbohydrates, fat and fiber, all above zero. Stored by Fūjin, not MyFitnessPal, in one row of the `goals` table. The kilocalories of the macros (P×4 + C×4 + F×9) are compared with the kilocalorie goal for information only. Code: `Goals` (`lib/data/goals/goals.dart`), `GoalsRepository` (`lib/data/goals/goals_repository.dart`), `MacroEnergy` (`lib/domain/goals/macro_energy.dart`), `goalsProvider` (`lib/pages/settings/goals_notifier.dart`). ADR 0020.
+
+**Backup file.** A JSON file `fujin-backup-YYYY-MM-DD.json` the owner exports and imports from Réglages: format `fujin-backup` version 1 with Memory, send links and goals, never sessions. Import is strict and replaces everything in one transaction after a confirmation. Code: `Backup` (`lib/data/backup/backup.dart`), `BackupCodec` (`lib/data/backup/backup_codec.dart`), `BackupRepository` (`lib/data/backup/backup_repository.dart`), `BackupService` (`lib/domain/backup/backup_service.dart`), `BackupFiles` (`lib/data/backup/backup_files.dart`). ADR 0021.
+
 **Fake backends.** The test stand-in for both services: an `http` `MockClient` that serves MyFitnessPal and Ekklo routes from in-memory data and records requests. For runs on a device, separate local fake servers play the same role through `--dart-define`. Code: `FakeBackends` (`test/support/fake_backends.dart`).
 
 ## Screens
@@ -94,6 +98,6 @@ Codes from the Figma file "Fūjin · Maquettes", as used in the docs.
 | 20 | Mémoire, "Repas": one row per meal mapping with a menu of Ekklo meal names. Code: `MealMappingsCard` (`lib/pages/memory/widgets/meal_mappings_card.dart`) |
 | 21 | Mémoire with nothing remembered yet. Code: `MemoryEmptyView` (`lib/pages/memory/widgets/memory_empty_view.dart`) |
 | 06e | Own copy whose MyFitnessPal food changed version since it was copied (planned) |
-| O1, O2 | Réglages tab, the third tab: "objectifs définis" (O1) and "aucun objectif" (O2) (planned) |
-| O3, O4, O5 | Goal editing: complete goals, empty fields, just saved (planned) |
-| O6, O7 | Backup file exported (O6) and imported (O7), reached from Réglages; the import replaces everything after a confirmation (planned) |
+| O1, O2 | Réglages tab, the third tab: "objectifs définis" (O1) and "aucun objectif" (O2): accounts, goals, backup, data on this phone, app version. Code: `SettingsPage` (`lib/pages/settings/settings_page.dart`) |
+| O3, O4, O5 | Goal editing: complete goals, empty fields, just saved. Code: `GoalsPage` (`lib/pages/settings/goals_page.dart`), `GoalsNotifier` (`lib/pages/settings/goals_notifier.dart`) |
+| O6, O7 | Backup file exported (O6) and imported (O7), reached from Réglages; the import replaces everything after a confirmation. Code: `BackupNotifier` (`lib/pages/settings/backup_notifier.dart`), confirmation sheet (`lib/pages/settings/sheets/confirm_sheet.dart`) |

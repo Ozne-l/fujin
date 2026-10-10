@@ -69,4 +69,14 @@ const schemaMigrations = [
   ALTER TABLE memory_food DROP COLUMN mfp_unit;
   ALTER TABLE memory_food DROP COLUMN mfp_food_version;
   ''',
+  '''
+  CREATE TABLE goals (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    kilocalories REAL NOT NULL CHECK (kilocalories > 0),
+    protein REAL CHECK (protein > 0),
+    carbohydrates REAL CHECK (carbohydrates > 0),
+    fat REAL CHECK (fat > 0),
+    fiber REAL CHECK (fiber > 0)
+  );
+  ''',
 ];

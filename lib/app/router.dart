@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/domain/accounts/connected_accounts.dart';
@@ -8,6 +9,8 @@ import 'package:fujin/pages/memory/memory_food_page.dart';
 import 'package:fujin/pages/memory/memory_page.dart';
 import 'package:fujin/pages/mfp_sign_in/mfp_sign_in_page.dart';
 import 'package:fujin/pages/sending/send_page.dart';
+import 'package:fujin/pages/settings/goals_page.dart';
+import 'package:fujin/pages/settings/settings_page.dart';
 import 'package:fujin/pages/tabs/fujin_tab.dart';
 import 'package:fujin/pages/tabs/tab_shell.dart';
 import 'package:fujin/pages/welcome/welcome_page.dart';
@@ -15,7 +18,9 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
+  final root = GlobalKey<NavigatorState>();
   final router = GoRouter(
+    navigatorKey: root,
     initialLocation: FujinRoute.journal.path,
     routes: [
       StatefulShellRoute.indexedStack(
@@ -55,6 +60,19 @@ final routerProvider = Provider<GoRouter>((ref) {
                         '${FujinRoute.foodParameter}',
                       ),
                     },
+                  ),
+                ],
+                FujinTab.settings => [
+                  GoRoute(
+                    path: FujinRoute.settings.path,
+                    builder: (context, state) => const SettingsPage(),
+                    routes: [
+                      GoRoute(
+                        path: FujinRoute.goalsSegment,
+                        parentNavigatorKey: root,
+                        builder: (context, state) => const GoalsPage(),
+                      ),
+                    ],
                   ),
                 ],
               },

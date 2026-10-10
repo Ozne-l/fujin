@@ -1309,6 +1309,348 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'{energy} · {portion}'**
   String memoryEnergyPer(String energy, String portion);
+
+  /// No description provided for @settingsAccounts.
+  ///
+  /// In fr, this message translates to:
+  /// **'COMPTES'**
+  String get settingsAccounts;
+
+  /// No description provided for @settingsAccountActive.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connecté · session active'**
+  String get settingsAccountActive;
+
+  /// No description provided for @signOut.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déconnecter'**
+  String get signOut;
+
+  /// No description provided for @settingsGoals.
+  ///
+  /// In fr, this message translates to:
+  /// **'OBJECTIFS'**
+  String get settingsGoals;
+
+  /// No description provided for @goalsEveryDay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous les jours'**
+  String get goalsEveryDay;
+
+  /// No description provided for @goalsNone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun objectif'**
+  String get goalsNone;
+
+  /// No description provided for @goalsSummaryPart.
+  ///
+  /// In fr, this message translates to:
+  /// **'{nutrient} {value}'**
+  String goalsSummaryPart(String nutrient, String value);
+
+  /// No description provided for @summarySeparator.
+  ///
+  /// In fr, this message translates to:
+  /// **' · '**
+  String get summarySeparator;
+
+  /// No description provided for @settingsBackup.
+  ///
+  /// In fr, this message translates to:
+  /// **'SAUVEGARDE'**
+  String get settingsBackup;
+
+  /// No description provided for @backupExport.
+  ///
+  /// In fr, this message translates to:
+  /// **'Exporter une sauvegarde'**
+  String get backupExport;
+
+  /// No description provided for @backupExportDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mémoire et liens d’envoi, dans un fichier'**
+  String get backupExportDetail;
+
+  /// No description provided for @backupImport.
+  ///
+  /// In fr, this message translates to:
+  /// **'Importer une sauvegarde'**
+  String get backupImport;
+
+  /// No description provided for @backupImportDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remplace la mémoire de ce téléphone'**
+  String get backupImportDetail;
+
+  /// No description provided for @settingsData.
+  ///
+  /// In fr, this message translates to:
+  /// **'DONNÉES SUR CE TÉLÉPHONE'**
+  String get settingsData;
+
+  /// No description provided for @clearSessions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Effacer les sessions'**
+  String get clearSessions;
+
+  /// No description provided for @clearSessionsDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Il faudra te reconnecter aux deux comptes.'**
+  String get clearSessionsDetail;
+
+  /// No description provided for @clearMemory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Effacer la mémoire'**
+  String get clearMemory;
+
+  /// No description provided for @memoryCounts.
+  ///
+  /// In fr, this message translates to:
+  /// **'{foods} {foods, plural, =1{aliment} other{aliments}} et {meals} repas'**
+  String memoryCounts(int foods, int meals);
+
+  /// No description provided for @appVersion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fūjin · {version}'**
+  String appVersion(String version);
+
+  /// No description provided for @cancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler'**
+  String get cancel;
+
+  /// No description provided for @signOutMfpTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Te déconnecter de MyFitnessPal ?'**
+  String get signOutMfpTitle;
+
+  /// No description provided for @signOutMfpDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fūjin oublie ta session MyFitnessPal sur ce téléphone. Il faudra te reconnecter pour lire ton journal.'**
+  String get signOutMfpDetail;
+
+  /// No description provided for @signOutEkkloTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Te déconnecter d\'Ekklo ?'**
+  String get signOutEkkloTitle;
+
+  /// No description provided for @signOutEkkloDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fūjin oublie ta session Ekklo sur ce téléphone. Il faudra te reconnecter pour envoyer vers Ekklo.'**
+  String get signOutEkkloDetail;
+
+  /// No description provided for @clearSessionsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Effacer les sessions ?'**
+  String get clearSessionsTitle;
+
+  /// No description provided for @clearSessionsConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fūjin oublie tes sessions MyFitnessPal et Ekklo sur ce téléphone. Il faudra te reconnecter aux deux comptes.'**
+  String get clearSessionsConfirm;
+
+  /// No description provided for @clearMemoryTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Effacer la mémoire ?'**
+  String get clearMemoryTitle;
+
+  /// No description provided for @clearMemoryConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fūjin oublie {counts}. Les liens d’envoi restent : rien ne sera envoyé deux fois.'**
+  String clearMemoryConfirm(String counts);
+
+  /// No description provided for @importTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Importer cette sauvegarde ?'**
+  String get importTitle;
+
+  /// No description provided for @importDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sauvegarde du {date} : {foods} {foods, plural, =1{aliment} other{aliments}}, {meals} repas et {links} {links, plural, =1{lien d’envoi} other{liens d’envoi}}. Elle remplace la mémoire de ce téléphone.'**
+  String importDetail(DateTime date, int foods, int meals, int links);
+
+  /// No description provided for @importConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Importer et remplacer'**
+  String get importConfirm;
+
+  /// No description provided for @backupUnreadable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fichier illisible, rien n\'a changé'**
+  String get backupUnreadable;
+
+  /// No description provided for @backupExported.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sauvegarde exportée'**
+  String get backupExported;
+
+  /// No description provided for @backupImported.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sauvegarde importée'**
+  String get backupImported;
+
+  /// No description provided for @backupNotWritten.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fichier non écrit, rien n\'a changé'**
+  String get backupNotWritten;
+
+  /// No description provided for @goalsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Objectifs'**
+  String get goalsTitle;
+
+  /// No description provided for @goalsHeading.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tes objectifs'**
+  String get goalsHeading;
+
+  /// No description provided for @goalsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les mêmes chaque jour. Fūjin les compare\nà ton journal MyFitnessPal.'**
+  String get goalsSubtitle;
+
+  /// No description provided for @goalsSection.
+  ///
+  /// In fr, this message translates to:
+  /// **'TOUS LES JOURS'**
+  String get goalsSection;
+
+  /// No description provided for @goalKilocalories.
+  ///
+  /// In fr, this message translates to:
+  /// **'Calories'**
+  String get goalKilocalories;
+
+  /// No description provided for @goalProtein.
+  ///
+  /// In fr, this message translates to:
+  /// **'Protéines · P'**
+  String get goalProtein;
+
+  /// No description provided for @goalCarbohydrates.
+  ///
+  /// In fr, this message translates to:
+  /// **'Glucides · G'**
+  String get goalCarbohydrates;
+
+  /// No description provided for @goalFat.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lipides · L'**
+  String get goalFat;
+
+  /// No description provided for @goalFiber.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fibres · F'**
+  String get goalFiber;
+
+  /// No description provided for @goalOptional.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facultatif'**
+  String get goalOptional;
+
+  /// No description provided for @macroNameProtein.
+  ///
+  /// In fr, this message translates to:
+  /// **'protéines'**
+  String get macroNameProtein;
+
+  /// No description provided for @macroNameCarbohydrates.
+  ///
+  /// In fr, this message translates to:
+  /// **'glucides'**
+  String get macroNameCarbohydrates;
+
+  /// No description provided for @macroNameFat.
+  ///
+  /// In fr, this message translates to:
+  /// **'lipides'**
+  String get macroNameFat;
+
+  /// No description provided for @macrosTotal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tes macros font {energy} kcal.'**
+  String macrosTotal(double energy);
+
+  /// No description provided for @macrosGoal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour un objectif de {energy} kcal. À titre indicatif.'**
+  String macrosGoal(double energy);
+
+  /// No description provided for @macrosPartial.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{{macros} fait {energy} kcal.} other{{macros} font {energy} kcal.}}'**
+  String macrosPartial(int count, String macros, double energy);
+
+  /// No description provided for @macrosMissing.
+  ///
+  /// In fr, this message translates to:
+  /// **'{macros} sans objectif : pas de comparaison.'**
+  String macrosMissing(String macros);
+
+  /// No description provided for @listLastSeparator.
+  ///
+  /// In fr, this message translates to:
+  /// **' et '**
+  String get listLastSeparator;
+
+  /// No description provided for @save.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer'**
+  String get save;
+
+  /// No description provided for @saved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistré'**
+  String get saved;
+
+  /// No description provided for @goalsSavedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'✓ Objectifs enregistrés'**
+  String get goalsSavedTitle;
+
+  /// No description provided for @goalsSavedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le Journal les affiche dès aujourd\'hui.'**
+  String get goalsSavedDetail;
 }
 
 class _AppLocalizationsDelegate

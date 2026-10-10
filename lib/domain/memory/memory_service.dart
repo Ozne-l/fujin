@@ -19,6 +19,8 @@ final class MemoryService {
 
   void saveMeal(MealMapping meal) => _memory.saveMeal(meal);
 
+  void clear() => _memory.clear();
+
   void associate(RememberedFood food, EkkloFood ekkloFood) => _memory.saveFood(
     MatchedFood(
       mfpFoodId: food.mfpFoodId,

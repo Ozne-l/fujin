@@ -6,8 +6,11 @@ import 'package:flutter_test/flutter_test.dart'
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/database/schema.dart';
+import 'package:fujin/data/goals/goals.dart';
+import 'package:fujin/data/goals/goals_repository.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/meal_mapping.dart';
+import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
@@ -15,6 +18,7 @@ import 'package:fujin/data/memory/remembered_unit.dart';
 import '../support/fixtures.dart';
 
 const _versionWithOneCopyPerFood = 2;
+const _versionBeforeGoals = 3;
 const _oilSpoonGrams = 14.0;
 
 OwnCopy _ownRice(String unit) => OwnCopy(
@@ -25,12 +29,27 @@ OwnCopy _ownRice(String unit) => OwnCopy(
   mfpUnit: unit,
 );
 
+String _databasePath() {
+  final directory = Directory.systemTemp.createTempSync('fujin_db_');
+  addTearDown(() => directory.deleteSync(recursive: true));
+  return '${directory.path}/${FujinDatabase.fileName}';
+}
+
+(String, FujinDatabase) _legacyDatabase(int version) {
+  final path = _databasePath();
+  final legacy = FujinDatabase.open(path);
+  for (final table in FujinTable.values) {
+    legacy.execute('DROP TABLE ${table.sqlName}');
+  }
+  schemaMigrations.take(version).forEach(legacy.execute);
+  legacy.execute('PRAGMA user_version = $version');
+  return (path, legacy);
+}
+
 void main() {
   test('reopening a database file keeps its rows and runs no migration '
       'twice', () {
-    final directory = Directory.systemTemp.createTempSync('fujin_db_');
-    addTearDown(() => directory.deleteSync(recursive: true));
-    final path = '${directory.path}/${FujinDatabase.fileName}';
+    final path = _databasePath();
     final first = FujinDatabase.open(path);
     SentLinkRepository(first).add(link('E-1', 'I-1'));
     first.close();
@@ -46,16 +65,8 @@ void main() {
 
   test('moves the own copies of a version 2 database to one row per '
       'unit', () {
-    final directory = Directory.systemTemp.createTempSync('fujin_db_');
-    addTearDown(() => directory.deleteSync(recursive: true));
-    final path = '${directory.path}/${FujinDatabase.fileName}';
-    final legacy = FujinDatabase.open(path);
-    for (final table in FujinTable.values) {
-      legacy.execute('DROP TABLE ${table.sqlName}');
-    }
-    schemaMigrations.take(_versionWithOneCopyPerFood).forEach(legacy.execute);
+    final (path, legacy) = _legacyDatabase(_versionWithOneCopyPerFood);
     legacy
-      ..execute('PRAGMA user_version = $_versionWithOneCopyPerFood')
       ..execute(
         'INSERT INTO memory_food (mfp_food_id, mfp_description, kind, '
         'ekklo_food_id, ekklo_food_name, mfp_food_version, mfp_unit) VALUES '
@@ -282,6 +293,81 @@ void main() {
           mfpUnit: cup,
         ),
       );
+    });
+
+    test('clears every remembered food, unit and meal but no sent link', () {
+      final links = SentLinkRepository(database)..add(link('E-1', 'I-1'));
+      repository
+        ..saveFood(_ownRice(grams))
+        ..saveMeal(memory.meals.first)
+        ..clear();
+
+      check(repository.load()).equals(const Memory());
+      check(links.all()).deepEquals([link('E-1', 'I-1')]);
+    });
+  });
+
+  test('keeps the memory and links of a version 3 database when the goals '
+      'table arrives', () {
+    final (path, legacy) = _legacyDatabase(_versionBeforeGoals);
+    SentLinkRepository(legacy).add(link('E-1', 'I-1'));
+    MemoryRepository(legacy).remember(
+      meals: memory.meals,
+      foods: memory.matches,
+      units: memory.units,
+    );
+    legacy.close();
+
+    final migrated = FujinDatabase.open(path);
+    addTearDown(migrated.close);
+
+    check(migrated.schemaVersion).equals(schemaMigrations.length);
+    check(MemoryRepository(migrated).load()).equals(memory);
+    check(SentLinkRepository(migrated).all()).deepEquals([link('E-1', 'I-1')]);
+    check(GoalsRepository(migrated).load()).isNull();
+  });
+
+  group('goals', () {
+    late FujinDatabase database;
+    late GoalsRepository goals;
+    const complete = Goals(
+      kilocalories: 3000,
+      protein: 160,
+      carbohydrates: 400,
+      fat: 70,
+      fiber: 40,
+    );
+
+    setUp(() {
+      database = FujinDatabase.inMemory();
+      goals = GoalsRepository(database);
+    });
+
+    tearDown(() => database.close());
+
+    test('are read back as saved, one row for every day', () {
+      goals.save(complete);
+
+      check(goals.load()).equals(complete);
+      check(database.select('SELECT * FROM goals')).length.equals(1);
+    });
+
+    test('forget a macro left empty when saved again', () {
+      goals
+        ..save(complete)
+        ..save(const Goals(kilocalories: 2500, protein: 150));
+
+      check(
+        goals.load(),
+      ).equals(const Goals(kilocalories: 2500, protein: 150));
+    });
+
+    test('are gone after a replace with none', () {
+      goals
+        ..save(complete)
+        ..replace(null);
+
+      check(goals.load()).isNull();
     });
   });
 }

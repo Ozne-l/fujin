@@ -95,6 +95,23 @@ final class MemoryRepository {
     units.forEach(saveUnit);
   });
 
+  void clear() => _database.transaction(() {
+    _database
+      ..execute('DELETE FROM memory_unit')
+      ..execute('DELETE FROM memory_food')
+      ..execute('DELETE FROM memory_own_copy')
+      ..execute('DELETE FROM memory_meal');
+  });
+
+  void replace(Memory memory) => _database.transaction(() {
+    clear();
+    remember(
+      meals: memory.meals,
+      foods: [...memory.matches, ...memory.ownCopies],
+      units: memory.units,
+    );
+  });
+
   static const _mfpFoodId = 'mfp_food_id';
   static const _mfpUnit = 'mfp_unit';
   static const _mfpMealName = 'mfp_meal_name';

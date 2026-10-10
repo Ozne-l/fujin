@@ -641,6 +641,30 @@
       "$description": "Width of the weight field of a remembered unit.",
       "$type": "dimension"
     },
+    "goal-field-gap": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$description": "Gap between two goal fields.",
+      "$type": "dimension"
+    },
+    "pictogram": {
+      "$value": {
+        "value": 52,
+        "unit": "px"
+      },
+      "$description": "Round pictogram heading a confirmation sheet.",
+      "$type": "dimension"
+    },
+    "pictogram-icon": {
+      "$value": {
+        "value": 36,
+        "unit": "px"
+      },
+      "$description": "Icon inside the round pictogram of a confirmation sheet.",
+      "$type": "dimension"
+    },
     "tab-gap": {
       "$value": {
         "value": 2,
@@ -1050,6 +1074,10 @@
       },
       "on-dark": {
         "$value": "{color.kinu}",
+        "$type": "color"
+      },
+      "info": {
+        "$value": "{color.sora}",
         "$type": "color"
       }
     },

@@ -1,14 +1,20 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/config.dart';
+import 'package:fujin/data/backup/backup_files.dart';
+import 'package:fujin/data/backup/backup_repository.dart';
+import 'package:fujin/data/backup/picker_backup_files.dart';
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/goals/goals_repository.dart';
 import 'package:fujin/data/http/read_only_http_client.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/sessions/secure_ekklo_token_store.dart';
 import 'package:fujin/data/sessions/secure_mfp_session_store.dart';
 import 'package:fujin/domain/accounts/accounts_service.dart';
+import 'package:fujin/domain/backup/backup_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/memory/memory_service.dart';
 import 'package:fujin/domain/sending/send_service.dart';
@@ -25,6 +31,20 @@ final databaseProvider = Provider<FujinDatabase>(
 final appEnvironmentProvider = Provider<AppEnvironment>(
   (ref) =>
       throw StateError('appEnvironmentProvider is overridden in bootstrap'),
+);
+
+final appVersionProvider = Provider<String>(
+  (ref) => throw StateError('appVersionProvider is overridden in bootstrap'),
+);
+
+final clearWebCookiesProvider = Provider<Future<void> Function()>(
+  (ref) => () async {
+    await CookieManager.instance().deleteAllCookies();
+  },
+);
+
+final backupFilesProvider = Provider<BackupFiles>(
+  (ref) => const PickerBackupFiles(),
 );
 
 final httpClientProvider = Provider<http.Client>((ref) {
@@ -79,10 +99,32 @@ final memoryRepositoryProvider = Provider<MemoryRepository>(
   (ref) => MemoryRepository(ref.watch(databaseProvider)),
 );
 
+final goalsRepositoryProvider = Provider<GoalsRepository>(
+  (ref) => GoalsRepository(ref.watch(databaseProvider)),
+);
+
+final backupRepositoryProvider = Provider<BackupRepository>(
+  (ref) => BackupRepository(
+    database: ref.watch(databaseProvider),
+    memory: ref.watch(memoryRepositoryProvider),
+    links: ref.watch(sentLinkRepositoryProvider),
+    goals: ref.watch(goalsRepositoryProvider),
+  ),
+);
+
 final accountsServiceProvider = Provider<AccountsService>(
   (ref) => AccountsService(
     mfp: ref.watch(mfpClientProvider),
     ekklo: ref.watch(ekkloClientProvider),
+    clearWebCookies: ref.watch(clearWebCookiesProvider),
+  ),
+);
+
+final backupServiceProvider = Provider<BackupService>(
+  (ref) => BackupService(
+    backups: ref.watch(backupRepositoryProvider),
+    files: ref.watch(backupFilesProvider),
+    clock: ref.watch(clockProvider),
   ),
 );
 

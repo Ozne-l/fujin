@@ -6,8 +6,8 @@ import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/alert_banner.dart';
-import 'package:fujin/pages/common/fujin_icon_button.dart';
 import 'package:fujin/pages/common/sign_in_failure.dart';
+import 'package:fujin/pages/common/top_bar.dart';
 import 'package:fujin/pages/ekklo_sign_in/ekklo_sign_in_notifier.dart';
 import 'package:fujin/pages/ekklo_sign_in/ekklo_sign_in_state.dart';
 import 'package:go_router/go_router.dart';
@@ -53,7 +53,7 @@ class EkkloSignInPage extends HookConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _TopBar(title: l10n.ekkloSignInTitle),
+            TopBar(title: l10n.ekkloSignInTitle),
             Expanded(
               child: AutofillGroup(
                 child: ListView(
@@ -158,36 +158,6 @@ class EkkloSignInPage extends HookConsumerWidget {
     ),
     EkkloSignInIdle() || EkkloSignInRunning() || EkkloSignInDone() => null,
   };
-}
-
-class _TopBar extends StatelessWidget {
-  const _TopBar({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) => SizedBox(
-    height: FujinSize.touchTarget,
-    child: Stack(
-      alignment: Alignment.center,
-      children: [
-        Text(
-          title,
-          style: FujinText.inter15Medium.copyWith(
-            color: FujinColorRole.textPrimary,
-          ),
-        ),
-        PositionedDirectional(
-          start: FujinSize.screenMargin,
-          child: FujinIconButton(
-            icon: Icons.chevron_left,
-            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-            onPressed: () => context.pop(),
-          ),
-        ),
-      ],
-    ),
-  );
 }
 
 class _Inset extends StatelessWidget {

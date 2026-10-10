@@ -40,4 +40,9 @@ final class SentLinkRepository {
     }
     adopted.forEach(add);
   });
+
+  void replaceAll(Iterable<SentLink> links) => _database.transaction(() {
+    _database.execute('DELETE FROM sent_link');
+    links.forEach(add);
+  });
 }

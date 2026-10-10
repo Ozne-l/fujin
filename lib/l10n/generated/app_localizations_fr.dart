@@ -953,4 +953,246 @@ class AppLocalizationsFr extends AppLocalizations {
   String memoryEnergyPer(String energy, String portion) {
     return '$energy · $portion';
   }
+
+  @override
+  String get settingsAccounts => 'COMPTES';
+
+  @override
+  String get settingsAccountActive => 'Connecté · session active';
+
+  @override
+  String get signOut => 'Déconnecter';
+
+  @override
+  String get settingsGoals => 'OBJECTIFS';
+
+  @override
+  String get goalsEveryDay => 'Tous les jours';
+
+  @override
+  String get goalsNone => 'Aucun objectif';
+
+  @override
+  String goalsSummaryPart(String nutrient, String value) {
+    return '$nutrient $value';
+  }
+
+  @override
+  String get summarySeparator => ' · ';
+
+  @override
+  String get settingsBackup => 'SAUVEGARDE';
+
+  @override
+  String get backupExport => 'Exporter une sauvegarde';
+
+  @override
+  String get backupExportDetail => 'Mémoire et liens d’envoi, dans un fichier';
+
+  @override
+  String get backupImport => 'Importer une sauvegarde';
+
+  @override
+  String get backupImportDetail => 'Remplace la mémoire de ce téléphone';
+
+  @override
+  String get settingsData => 'DONNÉES SUR CE TÉLÉPHONE';
+
+  @override
+  String get clearSessions => 'Effacer les sessions';
+
+  @override
+  String get clearSessionsDetail =>
+      'Il faudra te reconnecter aux deux comptes.';
+
+  @override
+  String get clearMemory => 'Effacer la mémoire';
+
+  @override
+  String memoryCounts(int foods, int meals) {
+    String _temp0 = intl.Intl.pluralLogic(
+      foods,
+      locale: localeName,
+      other: 'aliments',
+      one: 'aliment',
+    );
+    return '$foods $_temp0 et $meals repas';
+  }
+
+  @override
+  String appVersion(String version) {
+    return 'Fūjin · $version';
+  }
+
+  @override
+  String get cancel => 'Annuler';
+
+  @override
+  String get signOutMfpTitle => 'Te déconnecter de MyFitnessPal ?';
+
+  @override
+  String get signOutMfpDetail =>
+      'Fūjin oublie ta session MyFitnessPal sur ce téléphone. Il faudra te reconnecter pour lire ton journal.';
+
+  @override
+  String get signOutEkkloTitle => 'Te déconnecter d\'Ekklo ?';
+
+  @override
+  String get signOutEkkloDetail =>
+      'Fūjin oublie ta session Ekklo sur ce téléphone. Il faudra te reconnecter pour envoyer vers Ekklo.';
+
+  @override
+  String get clearSessionsTitle => 'Effacer les sessions ?';
+
+  @override
+  String get clearSessionsConfirm =>
+      'Fūjin oublie tes sessions MyFitnessPal et Ekklo sur ce téléphone. Il faudra te reconnecter aux deux comptes.';
+
+  @override
+  String get clearMemoryTitle => 'Effacer la mémoire ?';
+
+  @override
+  String clearMemoryConfirm(String counts) {
+    return 'Fūjin oublie $counts. Les liens d’envoi restent : rien ne sera envoyé deux fois.';
+  }
+
+  @override
+  String get importTitle => 'Importer cette sauvegarde ?';
+
+  @override
+  String importDetail(DateTime date, int foods, int meals, int links) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      foods,
+      locale: localeName,
+      other: 'aliments',
+      one: 'aliment',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      links,
+      locale: localeName,
+      other: 'liens d’envoi',
+      one: 'lien d’envoi',
+    );
+    return 'Sauvegarde du $dateString : $foods $_temp0, $meals repas et $links $_temp1. Elle remplace la mémoire de ce téléphone.';
+  }
+
+  @override
+  String get importConfirm => 'Importer et remplacer';
+
+  @override
+  String get backupUnreadable => 'Fichier illisible, rien n\'a changé';
+
+  @override
+  String get backupExported => 'Sauvegarde exportée';
+
+  @override
+  String get backupImported => 'Sauvegarde importée';
+
+  @override
+  String get backupNotWritten => 'Fichier non écrit, rien n\'a changé';
+
+  @override
+  String get goalsTitle => 'Objectifs';
+
+  @override
+  String get goalsHeading => 'Tes objectifs';
+
+  @override
+  String get goalsSubtitle =>
+      'Les mêmes chaque jour. Fūjin les compare\nà ton journal MyFitnessPal.';
+
+  @override
+  String get goalsSection => 'TOUS LES JOURS';
+
+  @override
+  String get goalKilocalories => 'Calories';
+
+  @override
+  String get goalProtein => 'Protéines · P';
+
+  @override
+  String get goalCarbohydrates => 'Glucides · G';
+
+  @override
+  String get goalFat => 'Lipides · L';
+
+  @override
+  String get goalFiber => 'Fibres · F';
+
+  @override
+  String get goalOptional => 'Facultatif';
+
+  @override
+  String get macroNameProtein => 'protéines';
+
+  @override
+  String get macroNameCarbohydrates => 'glucides';
+
+  @override
+  String get macroNameFat => 'lipides';
+
+  @override
+  String macrosTotal(double energy) {
+    final intl.NumberFormat energyNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String energyString = energyNumberFormat.format(energy);
+
+    return 'Tes macros font $energyString kcal.';
+  }
+
+  @override
+  String macrosGoal(double energy) {
+    final intl.NumberFormat energyNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String energyString = energyNumberFormat.format(energy);
+
+    return 'Pour un objectif de $energyString kcal. À titre indicatif.';
+  }
+
+  @override
+  String macrosPartial(int count, String macros, double energy) {
+    final intl.NumberFormat energyNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String energyString = energyNumberFormat.format(energy);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$macros font $energyString kcal.',
+      one: '$macros fait $energyString kcal.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String macrosMissing(String macros) {
+    return '$macros sans objectif : pas de comparaison.';
+  }
+
+  @override
+  String get listLastSeparator => ' et ';
+
+  @override
+  String get save => 'Enregistrer';
+
+  @override
+  String get saved => 'Enregistré';
+
+  @override
+  String get goalsSavedTitle => '✓ Objectifs enregistrés';
+
+  @override
+  String get goalsSavedDetail => 'Le Journal les affiche dès aujourd\'hui.';
 }

@@ -44,6 +44,11 @@ final class MemoryNotifier extends Notifier<Memory> {
     reload();
   }
 
+  void clear() {
+    ref.read(memoryServiceProvider).clear();
+    reload();
+  }
+
   void associate(RememberedFood food, EkkloFood ekkloFood) {
     ref.read(memoryServiceProvider).associate(food, ekkloFood);
     reload();
