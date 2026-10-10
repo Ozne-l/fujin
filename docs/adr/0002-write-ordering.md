@@ -20,7 +20,7 @@ Client capabilities (from `~/Dev/myfitnesspal_client` and `~/Dev/ekklo_client`):
 - Own copies: before reusing an own copy, re-read the MyFitnessPal food with `foods.byId` and compare its `version` with the one stored in Memory (`OwnCopy.mfpFoodVersion`, `lib/data/memory/remembered_food.dart`). A different version means the copy is stale (screen 06e).
 - The anti-bot block from MyFitnessPal (K14) is out of v1. K15 is the generic MyFitnessPal error banner.
 
-The executors will live under `lib/domain/sending/` with one notifier per write use case ([0006](0006-riverpod-notifiers-as-presenters.md)). Both are planned.
+Each write use case gets one service in `lib/domain/` and one notifier ([0006](0006-riverpod-notifiers-as-presenters.md)). Sending is `SendService` (`lib/domain/sending/send_service.dart`) with `SendNotifier` (`lib/pages/sending/send_notifier.dart`); adding a food and undo are planned.
 
 ## Consequences
 
