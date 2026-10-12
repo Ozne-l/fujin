@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/sending/send_plan.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
-import 'package:fujin/pages/common/fujin_icon_button.dart';
+import 'package:fujin/pages/common/flow_header.dart';
 import 'package:fujin/pages/common/title_text.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,54 +14,14 @@ class SendHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        FujinSize.screenMargin,
-        FujinSpace.s2,
-        FujinSize.screenMargin,
-        FujinSpace.s4,
-      ),
-      child: Row(
-        spacing: FujinSpace.s4,
-        children: [
-          if (closable)
-            FujinIconButton(
-              icon: Icons.close,
-              tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-              onPressed: context.pop,
-            ),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsetsDirectional.only(
-                start: switch (closable) {
-                  true => 0,
-                  false => FujinSpace.s2,
-                },
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: FujinSpace.s1,
-                children: [
-                  Text(
-                    l10n.sendTitle,
-                    style: FujinText.inter16Medium.copyWith(
-                      color: FujinColorRole.textPrimary,
-                    ),
-                  ),
-                  Text(
-                    TitleText.capitalized(
-                      l10n.sendSubtitle(plan.date, plan.total),
-                    ),
-                    style: FujinText.inter13Regular.copyWith(
-                      color: FujinColorRole.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+    return FlowHeader(
+      title: l10n.sendTitle,
+      subtitle: TitleText.capitalized(l10n.sendSubtitle(plan.date, plan.total)),
+      closes: true,
+      onBack: switch (closable) {
+        true => context.pop,
+        false => null,
+      },
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/common/scan_icon.dart';
 import 'package:fujin/pages/tabs/fujin_tab.dart';
 
 class FloatingTabBar extends StatelessWidget {
@@ -16,7 +17,6 @@ class FloatingTabBar extends StatelessWidget {
   final FujinTab selected;
   final ValueChanged<FujinTab> onSelect;
 
-  static const _scanIcon = 'assets/icons/scan.svg';
   static const double _fadeTop =
       FujinSize.scrollFade - FujinSize.tabBar - FujinSpace.s6;
 
@@ -84,7 +84,7 @@ class FloatingTabBar extends StatelessWidget {
                       dimension: FujinSize.tabBar,
                       child: Center(
                         child: SvgPicture.asset(
-                          _scanIcon,
+                          ScanIcon.asset,
                           width: FujinSize.scanIcon,
                           height: FujinSize.scanIcon,
                           theme: const SvgTheme(
