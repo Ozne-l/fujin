@@ -1353,9 +1353,47 @@ class AppLocalizationsFr extends AppLocalizations {
   String get mealEmpty => 'Rien pour l’instant';
 
   @override
+  String get mealAddFood => 'Ajouter un aliment';
+
+  @override
   String mealFolded(int inEkklo, int total, String foods) {
     return '$inEkklo/$total · $foods';
   }
+
+  @override
+  String foodAdded(String food) {
+    return '$food ajouté';
+  }
+
+  @override
+  String foodAddedBothSides(String meal) {
+    return 'MyFitnessPal et Ekklo · $meal';
+  }
+
+  @override
+  String foodAddedMfpOnly(String meal) {
+    return 'MyFitnessPal seulement · $meal';
+  }
+
+  @override
+  String get addUndone => 'Ajout annulé';
+
+  @override
+  String get addUndoneDetail => 'Supprimé de MyFitnessPal et d’Ekklo';
+
+  @override
+  String get addStillInMfp => 'Encore dans MyFitnessPal';
+
+  @override
+  String addStillInMfpDetail(String food) {
+    return '$food retiré d\'Ekklo seulement';
+  }
+
+  @override
+  String get addNotUndone => 'Ajout non annulé';
+
+  @override
+  String get undoAdd => 'Annuler';
 
   @override
   String get journalLoading => 'Lecture de MyFitnessPal\net d\'Ekklo…';

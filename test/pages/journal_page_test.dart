@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/preferences/fujin_preferences.dart';
 import 'package:fujin/domain/goals/day_goal_state.dart';
+import 'package:fujin/pages/adding/add_search_notifier.dart';
 import 'package:fujin/pages/journal/widgets/day_ring.dart';
 import 'package:fujin/pages/journal/widgets/nutrient_ring.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
@@ -60,6 +61,30 @@ Future<void> _tap(WidgetTester tester, Finder target) async {
   await tester.pumpAndSettle();
   await tester.tap(target);
   await tester.pumpAndSettle();
+}
+
+final MfpFood _basmati = mfpFood(
+  rice,
+  description: 'Riz basmati',
+  brand: 'Taureau Ailé',
+  nutrients: nutrients(kcal: 350, protein: 8.5, carbs: 77, fat: 0.9),
+);
+
+FakeBackends _basmatiBackends() => FakeBackends(
+  mealNames: [breakfast, lunch],
+  mfpFoods: [_basmati],
+  mfpSearches: {
+    'riz basmati': [_basmati],
+  },
+);
+
+Future<void> _addBasmatiToLunch(WidgetTester tester) async {
+  await _tap(tester, find.text('Ajouter un aliment').last);
+  await tester.enterText(find.byType(TextField), 'riz basmati');
+  await tester.pump(AddSearchNotifier.typingPause);
+  await tester.pumpAndSettle();
+  await _tap(tester, find.text('Riz basmati').first);
+  await _tap(tester, find.text('Ajouter à MFP et Ekklo'));
 }
 
 FilledButton _button(WidgetTester tester, String label) =>
@@ -335,6 +360,7 @@ void main() {
   testWidgets('says each meal is empty on a day with nothing logged', (
     tester,
   ) async {
+    _tallView(tester);
     await pumpFujin(
       tester,
       FakeBackends(mealNames: [breakfast, lunch]),
@@ -389,6 +415,7 @@ void main() {
     check(find.text('1/1 · Flocons d’avoine').evaluate()).length.equals(1);
     check(find.text('0/2 dans Ekklo').evaluate()).length.equals(1);
     check(find.text('À envoyer').evaluate()).length.equals(2);
+    check(find.text('Ajouter un aliment').evaluate()).length.equals(2);
 
     await tester.ensureVisible(find.text(breakfast));
     await tester.tap(find.text(breakfast));
@@ -525,6 +552,111 @@ void main() {
       ).length.equals(1);
       check(
         find.text('Fūjin réessaie dès que le réseau revient.').evaluate(),
+      ).length.equals(1);
+    });
+  });
+
+  group('adding a food', () {
+    testWidgets('writes the food in the meal and day it was opened from, '
+        'then says so with a way to undo it', (tester) async {
+      _tallView(tester);
+      final backends = _basmatiBackends();
+      await pumpFujin(tester, backends);
+
+      await _addBasmatiToLunch(tester);
+
+      check(backends.entries.single)
+        ..has((entry) => entry.mealName, 'meal').equals(lunch)
+        ..has((entry) => entry.date, 'date').equals(day);
+      check(backends.ekkloItems).length.equals(1);
+      check(find.text('Riz basmati ajouté').evaluate()).length.equals(1);
+      check(
+        find.text('MyFitnessPal et Ekklo · $lunch').evaluate(),
+      ).length.equals(1);
+      check(find.text('Annuler').evaluate()).length.equals(1);
+      check(find.text('1/1 · Riz basmati').evaluate()).length.equals(1);
+    });
+
+    testWidgets('removes the food from both apps on Annuler', (tester) async {
+      _tallView(tester);
+      final backends = _basmatiBackends();
+      await pumpFujin(tester, backends);
+      await _addBasmatiToLunch(tester);
+
+      await _tap(tester, find.text('Annuler'));
+
+      check(backends.entries).isEmpty();
+      check(backends.ekkloItems).isEmpty();
+      check(find.text('Ajout annulé').evaluate()).length.equals(1);
+      check(
+        find.text('Supprimé de MyFitnessPal et d’Ekklo').evaluate(),
+      ).length.equals(1);
+      check(find.text('Rien pour l’instant').evaluate()).length.equals(2);
+    });
+
+    testWidgets('says the food is still in MyFitnessPal when only Ekklo '
+        'let go of it, and finishes the undo on Réessayer', (tester) async {
+      _tallView(tester);
+      final backends = _basmatiBackends();
+      await pumpFujin(tester, backends);
+      await _addBasmatiToLunch(tester);
+
+      backends.mfpWritesFail = true;
+      await _tap(tester, find.text('Annuler'));
+
+      check(backends.ekkloItems).isEmpty();
+      check(backends.entries).length.equals(1);
+      check(find.text('Encore dans MyFitnessPal').evaluate()).length.equals(1);
+      check(
+        find.text("Riz basmati retiré d'Ekklo seulement").evaluate(),
+      ).length.equals(1);
+      check(find.text('0/1 dans Ekklo').evaluate()).length.equals(1);
+
+      backends.mfpWritesFail = false;
+      await _tap(tester, find.text('Réessayer'));
+
+      check(backends.entries).isEmpty();
+      check(find.text('Ajout annulé').evaluate()).length.equals(1);
+    });
+
+    testWidgets('says the food went to MyFitnessPal only when Ekklo refused '
+        'it', (tester) async {
+      _tallView(tester);
+      final backends = _basmatiBackends();
+      backends.failingMeals.add(dejeuner);
+      await pumpFujin(tester, backends);
+
+      await _addBasmatiToLunch(tester);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      check(backends.entries).length.equals(1);
+      check(backends.ekkloItems).isEmpty();
+      check(
+        find.text('MyFitnessPal seulement · $lunch').evaluate(),
+      ).length.equals(1);
+    });
+
+    testWidgets('says the add was not undone and why when nothing could be '
+        'removed', (tester) async {
+      _tallView(tester);
+      final backends = _basmatiBackends();
+      await pumpFujin(tester, backends);
+      await _addBasmatiToLunch(tester);
+
+      backends.ekkloReachable = false;
+      await _tap(tester, find.text('Annuler'));
+
+      check(backends.entries).length.equals(1);
+      check(backends.ekkloItems).length.equals(1);
+      check(find.text('Ajout non annulé').evaluate()).length.equals(1);
+      check(
+        find
+            .descendant(
+              of: find.byType(SnackBar),
+              matching: find.text('Pas de connexion internet.'),
+            )
+            .evaluate(),
       ).length.equals(1);
     });
   });

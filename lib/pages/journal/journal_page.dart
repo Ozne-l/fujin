@@ -5,14 +5,21 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/goals/goals.dart';
+import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/journal/journal_read.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
+import 'package:fujin/domain/sending/food_words.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
 import 'package:fujin/pages/common/gold_separator.dart';
+import 'package:fujin/pages/common/snack_bar_content.dart';
+import 'package:fujin/pages/common/snack_bar_glyph.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
+import 'package:fujin/pages/journal/journal_text.dart';
 import 'package:fujin/pages/journal/refresh_outcome.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
+import 'package:fujin/pages/journal/undo_add_notifier.dart';
+import 'package:fujin/pages/journal/undo_add_state.dart';
 import 'package:fujin/pages/journal/widgets/day_detail_sheet.dart';
 import 'package:fujin/pages/journal/widgets/day_summary_card.dart';
 import 'package:fujin/pages/journal/widgets/journal_header.dart';
@@ -32,6 +39,14 @@ class JournalPage extends HookConsumerWidget {
   static const _nothingNewDuration = Duration(seconds: 6);
   static const _offlineRetry = Duration(seconds: 15);
   static const _loadingMeals = 3;
+  static const _undoWindow = Duration(seconds: 8);
+  static const _undoneDuration = Duration(seconds: 4);
+  static const _snackBarPadding = EdgeInsetsDirectional.fromSTEB(
+    FujinSpace.s3,
+    FujinSpace.s2,
+    FujinSpace.s2,
+    FujinSpace.s2,
+  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -41,6 +56,7 @@ class JournalPage extends HookConsumerWidget {
     final goals = ref.watch(goalsProvider);
     final journal = ref.watch(journalProvider(day));
     final notifier = ref.read(journalProvider(day).notifier);
+    final undo = ref.read(undoAddProvider.notifier);
     final lifecycle = useAppLifecycleState();
     final offline = switch (journal) {
       AsyncValue(:final error?) => ReadProblem.of(error) == ReadProblem.offline,
@@ -86,6 +102,41 @@ class JournalPage extends HookConsumerWidget {
       await context.push<void>(FujinRoute.send.forDate(day));
       ref.invalidate(memoryProvider);
       await notifier.reload();
+    }
+
+    ref.listen(undoAddProvider, (previous, next) {
+      switch (next) {
+        case UndoAddDone():
+          unawaited(notifier.reload());
+          _showUndone(context);
+        case UndoAddFailed(
+          :final added,
+          :final problem,
+          :final removedFromEkklo,
+        ):
+          unawaited(notifier.reload());
+          _showUndoFailed(
+            context,
+            added,
+            problem,
+            removedFromEkklo: removedFromEkklo,
+            onRetry: () => unawaited(undo.undo(added)),
+          );
+        case UndoAddIdle() || UndoAddRunning():
+          break;
+      }
+    });
+
+    Future<void> add(String meal) async {
+      final added = await context.push<AddedFood>(
+        FujinRoute.addFood.forMeal(day, meal),
+      );
+      ref.invalidate(memoryProvider);
+      await notifier.reload();
+      if (!context.mounted) return;
+      if (added case final added?) {
+        _showAdded(context, added, onUndo: () => unawaited(undo.undo(added)));
+      }
     }
 
     Future<void> signIn(FujinRoute route) async {
@@ -174,6 +225,7 @@ class JournalPage extends HookConsumerWidget {
                       MealCard(
                         key: ValueKey((day.date, meal.name)),
                         meal: meal,
+                        onAdd: () => unawaited(add(meal.name)),
                       ),
                   ]),
                 ],
@@ -272,5 +324,83 @@ class JournalPage extends HookConsumerWidget {
         ),
       ),
     );
+  }
+
+  static void _showAdded(
+    BuildContext context,
+    AddedFood added, {
+    required VoidCallback onUndo,
+  }) {
+    final l10n = AppLocalizations.of(context);
+    final entry = added.entry;
+    _show(
+      context,
+      duration: _undoWindow,
+      content: SnackBarContent(
+        glyph: SnackBarGlyph.done,
+        title: l10n.foodAdded(productName(entry.food)),
+        detail: switch (added.ekkloWritten) {
+          true => l10n.foodAddedBothSides(entry.mealName),
+          false => l10n.foodAddedMfpOnly(entry.mealName),
+        },
+        action: (l10n.undoAdd, onUndo),
+      ),
+    );
+  }
+
+  static void _showUndone(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    _show(
+      context,
+      duration: _undoneDuration,
+      content: SnackBarContent(
+        glyph: SnackBarGlyph.undone,
+        title: l10n.addUndone,
+        detail: l10n.addUndoneDetail,
+      ),
+    );
+  }
+
+  static void _showUndoFailed(
+    BuildContext context,
+    AddedFood added,
+    ReadProblem problem, {
+    required bool removedFromEkklo,
+    required VoidCallback onRetry,
+  }) {
+    final l10n = AppLocalizations.of(context);
+    final (title, detail) = switch (removedFromEkklo) {
+      true => (
+        l10n.addStillInMfp,
+        l10n.addStillInMfpDetail(productName(added.entry.food)),
+      ),
+      false => (l10n.addNotUndone, JournalText.problemHeadline(l10n, problem)),
+    };
+    _show(
+      context,
+      duration: _undoWindow,
+      content: SnackBarContent(
+        glyph: SnackBarGlyph.alert,
+        title: title,
+        detail: detail,
+        action: (l10n.tryAgain, onRetry),
+      ),
+    );
+  }
+
+  static void _show(
+    BuildContext context, {
+    required Widget content,
+    required Duration duration,
+  }) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          duration: duration,
+          padding: _snackBarPadding,
+          content: content,
+        ),
+      );
   }
 }

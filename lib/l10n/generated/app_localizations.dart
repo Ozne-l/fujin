@@ -1832,11 +1832,71 @@ abstract class AppLocalizations {
   /// **'Rien pour l’instant'**
   String get mealEmpty;
 
+  /// No description provided for @mealAddFood.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un aliment'**
+  String get mealAddFood;
+
   /// No description provided for @mealFolded.
   ///
   /// In fr, this message translates to:
   /// **'{inEkklo}/{total} · {foods}'**
   String mealFolded(int inEkklo, int total, String foods);
+
+  /// No description provided for @foodAdded.
+  ///
+  /// In fr, this message translates to:
+  /// **'{food} ajouté'**
+  String foodAdded(String food);
+
+  /// No description provided for @foodAddedBothSides.
+  ///
+  /// In fr, this message translates to:
+  /// **'MyFitnessPal et Ekklo · {meal}'**
+  String foodAddedBothSides(String meal);
+
+  /// No description provided for @foodAddedMfpOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'MyFitnessPal seulement · {meal}'**
+  String foodAddedMfpOnly(String meal);
+
+  /// No description provided for @addUndone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajout annulé'**
+  String get addUndone;
+
+  /// No description provided for @addUndoneDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimé de MyFitnessPal et d’Ekklo'**
+  String get addUndoneDetail;
+
+  /// No description provided for @addStillInMfp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encore dans MyFitnessPal'**
+  String get addStillInMfp;
+
+  /// No description provided for @addStillInMfpDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'{food} retiré d\'Ekklo seulement'**
+  String addStillInMfpDetail(String food);
+
+  /// No description provided for @addNotUndone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajout non annulé'**
+  String get addNotUndone;
+
+  /// No description provided for @undoAdd.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler'**
+  String get undoAdd;
 
   /// No description provided for @journalLoading.
   ///

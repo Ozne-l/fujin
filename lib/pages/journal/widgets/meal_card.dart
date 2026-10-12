@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
@@ -12,11 +13,13 @@ import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
 
 class MealCard extends HookWidget {
-  const MealCard({required this.meal, super.key});
+  const MealCard({required this.meal, required this.onAdd, super.key});
 
+  static const _plusIcon = 'assets/icons/plus.svg';
   static const _foodSeparator = ', ';
 
   final JournalMeal meal;
+  final VoidCallback onAdd;
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +105,12 @@ class MealCard extends HookWidget {
     };
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
-      padding: const EdgeInsets.all(FujinSpace.s5),
+      padding: const EdgeInsets.fromLTRB(
+        FujinSpace.s5,
+        FujinSpace.s4,
+        FujinSpace.s5,
+        FujinSpace.s2,
+      ),
       decoration: BoxDecoration(
         color: FujinColorRole.backgroundCard,
         borderRadius: BorderRadius.circular(FujinRadius.card),
@@ -141,6 +149,28 @@ class MealCard extends HookWidget {
               ),
               _ => const SizedBox(width: double.infinity),
             },
+          ),
+          const SizedBox(height: FujinSpace.s3),
+          const Divider(),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TextButton.icon(
+              onPressed: onAdd,
+              style: TextButton.styleFrom(
+                foregroundColor: FujinColorRole.textLink,
+                textStyle: FujinText.inter14Medium,
+                minimumSize: const Size.square(FujinSize.touchTarget),
+                padding: EdgeInsets.zero,
+              ),
+              icon: SvgPicture.asset(
+                _plusIcon,
+                width: FujinSize.tileIcon,
+                height: FujinSize.tileIcon,
+                theme: const SvgTheme(currentColor: FujinColorRole.textLink),
+                excludeFromSemantics: true,
+              ),
+              label: Text(l10n.mealAddFood),
+            ),
           ),
         ],
       ),

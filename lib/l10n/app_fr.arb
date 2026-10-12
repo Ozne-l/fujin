@@ -727,6 +727,7 @@
     "placeholders": {"goals": {"type": "String"}}
   },
   "mealEmpty": "Rien pour l’instant",
+  "mealAddFood": "Ajouter un aliment",
   "mealFolded": "{inEkklo}/{total} · {foods}",
   "@mealFolded": {
     "placeholders": {
@@ -735,6 +736,27 @@
       "foods": {"type": "String"}
     }
   },
+  "foodAdded": "{food} ajouté",
+  "@foodAdded": {
+    "placeholders": {"food": {"type": "String"}}
+  },
+  "foodAddedBothSides": "MyFitnessPal et Ekklo · {meal}",
+  "@foodAddedBothSides": {
+    "placeholders": {"meal": {"type": "String"}}
+  },
+  "foodAddedMfpOnly": "MyFitnessPal seulement · {meal}",
+  "@foodAddedMfpOnly": {
+    "placeholders": {"meal": {"type": "String"}}
+  },
+  "addUndone": "Ajout annulé",
+  "addUndoneDetail": "Supprimé de MyFitnessPal et d’Ekklo",
+  "addStillInMfp": "Encore dans MyFitnessPal",
+  "addStillInMfpDetail": "{food} retiré d'Ekklo seulement",
+  "@addStillInMfpDetail": {
+    "placeholders": {"food": {"type": "String"}}
+  },
+  "addNotUndone": "Ajout non annulé",
+  "undoAdd": "Annuler",
   "journalLoading": "Lecture de MyFitnessPal\net d'Ekklo…",
   "dayDetailTitle": "Détail du jour",
   "close": "Fermer",

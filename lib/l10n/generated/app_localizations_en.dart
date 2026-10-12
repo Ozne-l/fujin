@@ -1350,9 +1350,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mealEmpty => 'Nothing yet';
 
   @override
+  String get mealAddFood => 'Add a food';
+
+  @override
   String mealFolded(int inEkklo, int total, String foods) {
     return '$inEkklo/$total · $foods';
   }
+
+  @override
+  String foodAdded(String food) {
+    return '$food added';
+  }
+
+  @override
+  String foodAddedBothSides(String meal) {
+    return 'MyFitnessPal and Ekklo · $meal';
+  }
+
+  @override
+  String foodAddedMfpOnly(String meal) {
+    return 'MyFitnessPal only · $meal';
+  }
+
+  @override
+  String get addUndone => 'Addition undone';
+
+  @override
+  String get addUndoneDetail => 'Removed from MyFitnessPal and Ekklo';
+
+  @override
+  String get addStillInMfp => 'Still in MyFitnessPal';
+
+  @override
+  String addStillInMfpDetail(String food) {
+    return '$food removed from Ekklo only';
+  }
+
+  @override
+  String get addNotUndone => 'Addition not undone';
+
+  @override
+  String get undoAdd => 'Undo';
 
   @override
   String get journalLoading => 'Reading MyFitnessPal\nand Ekklo…';
