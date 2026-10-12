@@ -26,7 +26,7 @@ class ProgressBar extends StatelessWidget {
         motion: FujinMotion.progress,
         value: fraction.clamp(0, 1),
         builder: (context, value, child) => FractionallySizedBox(
-          widthFactor: value,
+          widthFactor: value.clamp(0, 1),
           heightFactor: 1,
           child: child,
         ),
