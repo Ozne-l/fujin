@@ -6,6 +6,7 @@ import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/fujin_weather.dart';
 import 'package:fujin/pages/common/fujin_weather_glyph.dart';
+import 'package:fujin/pages/journal/journal_text.dart';
 
 class JournalProblemCard extends StatelessWidget {
   const JournalProblemCard({
@@ -24,40 +25,26 @@ class JournalProblemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final (title, headline, detail) = switch (problem) {
+    final headline = JournalText.problemHeadline(l10n, problem);
+    final (title, detail) = switch (problem) {
       ReadProblem.mfpSessionExpired => (
         l10n.disconnected,
-        l10n.mfpSessionExpired,
         l10n.mfpSessionExpiredDetail,
       ),
       ReadProblem.ekkloSessionExpired => (
         l10n.disconnected,
-        l10n.ekkloSessionExpired,
         l10n.ekkloSessionExpiredDetail,
       ),
       ReadProblem.offline => (
         l10n.offlineTitle,
-        l10n.offlineHeadline,
         switch (readAt) {
           final readAt? => l10n.offlineSince(readAt),
           null => l10n.offlineDetail,
         },
       ),
-      ReadProblem.mfpUnavailable => (
-        l10n.unavailableTitle,
-        l10n.serviceNotResponding(l10n.sourceMyFitnessPal),
-        l10n.readFailedDetail,
-      ),
-      ReadProblem.ekkloUnavailable => (
-        l10n.unavailableTitle,
-        l10n.serviceNotResponding(l10n.sourceEkklo),
-        l10n.readFailedDetail,
-      ),
-      ReadProblem.unknown => (
-        l10n.unavailableTitle,
-        l10n.readFailed,
-        l10n.readFailedDetail,
-      ),
+      ReadProblem.mfpUnavailable ||
+      ReadProblem.ekkloUnavailable ||
+      ReadProblem.unknown => (l10n.unavailableTitle, l10n.readFailedDetail),
     };
     final (action, onPressed) = switch (problem) {
       ReadProblem.mfpSessionExpired => (

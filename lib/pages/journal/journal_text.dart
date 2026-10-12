@@ -1,4 +1,5 @@
 import 'package:fujin/domain/journal/day_nutrients.dart';
+import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/title_text.dart';
@@ -20,6 +21,20 @@ abstract final class JournalText {
         ),
         Nutrient.fat => TitleText.capitalized(l10n.macroNameFat),
         Nutrient.fiber => TitleText.capitalized(l10n.macroNameFiber),
+      };
+
+  static String problemHeadline(AppLocalizations l10n, ReadProblem problem) =>
+      switch (problem) {
+        ReadProblem.mfpSessionExpired => l10n.mfpSessionExpired,
+        ReadProblem.ekkloSessionExpired => l10n.ekkloSessionExpired,
+        ReadProblem.offline => l10n.offlineHeadline,
+        ReadProblem.mfpUnavailable => l10n.serviceNotResponding(
+          l10n.sourceMyFitnessPal,
+        ),
+        ReadProblem.ekkloUnavailable => l10n.serviceNotResponding(
+          l10n.sourceEkklo,
+        ),
+        ReadProblem.unknown => l10n.readFailed,
       };
 
   static String macroLine(AppLocalizations l10n, DayNutrients nutrients) {
