@@ -6,13 +6,6 @@ final class HintRepository {
 
   final SharedPreferencesWithCache _preferences;
 
-  static Future<SharedPreferencesWithCache> openPreferences() =>
-      SharedPreferencesWithCache.create(
-        cacheOptions: SharedPreferencesWithCacheOptions(
-          allowList: {for (final hint in Hint.values) hint.preferenceKey},
-        ),
-      );
-
   bool wasShown(Hint hint) => _preferences.getBool(hint.preferenceKey) ?? false;
 
   Future<void> markShown(Hint hint) =>

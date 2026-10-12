@@ -14,6 +14,7 @@ import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/sessions/secure_ekklo_token_store.dart';
 import 'package:fujin/data/sessions/secure_mfp_session_store.dart';
+import 'package:fujin/data/settings/settings_repository.dart';
 import 'package:fujin/data/unattended/unattended_item_repository.dart';
 import 'package:fujin/domain/accounts/accounts_service.dart';
 import 'package:fujin/domain/backup/backup_service.dart';
@@ -116,6 +117,10 @@ final unattendedItemRepositoryProvider = Provider<UnattendedItemRepository>(
 
 final hintRepositoryProvider = Provider<HintRepository>(
   (ref) => HintRepository(ref.watch(preferencesProvider)),
+);
+
+final settingsRepositoryProvider = Provider<SettingsRepository>(
+  (ref) => SettingsRepository(ref.watch(preferencesProvider)),
 );
 
 final backupRepositoryProvider = Provider<BackupRepository>(

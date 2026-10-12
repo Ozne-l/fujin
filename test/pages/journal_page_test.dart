@@ -5,7 +5,7 @@ import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/data/goals/goals.dart';
-import 'package:fujin/data/hints/hint_repository.dart';
+import 'package:fujin/data/preferences/fujin_preferences.dart';
 import 'package:fujin/domain/goals/day_goal_state.dart';
 import 'package:fujin/pages/journal/widgets/day_ring.dart';
 import 'package:fujin/pages/journal/widgets/nutrient_ring.dart';
@@ -211,7 +211,7 @@ void main() {
       await pumpFujin(
         tester,
         FakeBackends(mealNames: [breakfast]),
-        preferences: await HintRepository.openPreferences(),
+        preferences: await FujinPreferences.open(),
       );
       check(find.text(_bandHint).evaluate()).isEmpty();
     });
