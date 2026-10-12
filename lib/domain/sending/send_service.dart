@@ -1,10 +1,13 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/links/sent_link.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/meal_mapping.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
+import 'package:fujin/data/unattended/unattended_item.dart';
+import 'package:fujin/data/unattended/unattended_item_repository.dart';
 import 'package:fujin/domain/comparison/entry_quantity.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/comparison/expected_item.dart';
@@ -20,6 +23,7 @@ import 'package:fujin/domain/sending/rank_candidates.dart';
 import 'package:fujin/domain/sending/retained_weight.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/domain/sending/send_interruption.dart';
+import 'package:fujin/domain/sending/send_mode.dart';
 import 'package:fujin/domain/sending/send_plan.dart';
 import 'package:fujin/domain/sending/send_progress.dart';
 import 'package:fujin/domain/sending/send_report.dart';
@@ -45,6 +49,8 @@ final class SendService {
     required this._ekklo,
     required this._memory,
     required this._links,
+    required this._unattended,
+    required this._database,
     required this._clock,
   });
 
@@ -52,6 +58,8 @@ final class SendService {
   final EkkloClient _ekklo;
   final MemoryRepository _memory;
   final SentLinkRepository _links;
+  final UnattendedItemRepository _unattended;
+  final FujinDatabase _database;
   final DateTime Function() _clock;
 
   Future<SendPlan> plan(
@@ -115,6 +123,7 @@ final class SendService {
 
   Future<SendReport> send(
     SendPlan plan, {
+    required SendMode mode,
     required void Function(SendProgress progress) onProgress,
   }) async {
     final day = await _journal.readDay(plan.date);
@@ -131,7 +140,7 @@ final class SendService {
             InEkklo() || null => null,
           },
     ];
-    _remember(active);
+    if (mode == SendMode.reviewed) _remember(active);
     final ownCopyIds = <_OwnCopyKey, String>{
       for (final planned in active)
         if (planned.choice case SendAsOwnCopy(reuse: final OwnCopy copy))
@@ -140,6 +149,7 @@ final class SendService {
     final createdCopies = <String>[];
     final work = _work(
       plan.date,
+      mode,
       active,
       day.ekkloMeals,
       ownCopyIds,
@@ -160,7 +170,22 @@ final class SendService {
       progress = progress.marking(index, StepState.done);
       onProgress(progress);
     }
-    return _report(plan.date, active, createdCopies);
+    return _report(plan.date, mode, active, createdCopies);
+  }
+
+  Future<void> keep(PlannedEntry planned) async {
+    if (planned.choice case SendAsOwnCopy()) await _ownCopy(planned.entry);
+    _remember([planned]);
+    if ((
+          ExpectedItem.forEntry(planned.entry, _memory.load()),
+          _unattended.forEntry(planned.entryId),
+        )
+        case (
+          final ExpectedItem expected,
+          final UnattendedItem sent,
+        ) when expected.sameAs(ExpectedItem.unattended(sent))) {
+      _unattended.forget(planned.entryId);
+    }
   }
 
   Future<PlannedEntry> _planOne(
@@ -222,6 +247,7 @@ final class SendService {
 
   List<_Work> _work(
     DateTime date,
+    SendMode mode,
     List<PlannedEntry> active,
     List<EkkloDailyMeal> before,
     Map<_OwnCopyKey, String> ownCopyIds,
@@ -264,7 +290,7 @@ final class SendService {
             entryId: update.planned.entryId,
             name: productName(update.planned.entry.food),
           ),
-          () => _updateQuantity(update),
+          () => _updateQuantity(mode, update),
         ),
       for (final MapEntry(key: name, value: entries) in meals.entries)
         (
@@ -272,7 +298,7 @@ final class SendService {
             ekkloMealName: name,
             entryIds: [for (final planned in entries) planned.entryId],
           ),
-          () => _sendMeal(date, name, entries, before, ownCopyIds),
+          () => _sendMeal(mode, date, name, entries, before, ownCopyIds),
         ),
     ];
   }
@@ -338,27 +364,72 @@ final class SendService {
     }
   }
 
-  Future<void> _updateQuantity(_Update update) async {
+  List<String> _recordUnattended(
+    SendMode mode,
+    List<(PlannedEntry, ExpectedItem)> targets,
+  ) {
+    final memory = _memory.load();
+    final unattended = {
+      for (final (planned, target) in targets)
+        if (switch (mode) {
+          SendMode.reviewed => false,
+          SendMode.automatic =>
+            planned.reviewed ||
+                !(ExpectedItem.forEntry(
+                      planned.entry,
+                      memory,
+                    )?.sameAs(target) ??
+                    false),
+        })
+          planned.entryId: target.unattendedFor(
+            planned.entryId,
+            planned.entry.date,
+          ),
+    };
+    _unattended.record(unattended.values);
+    return [
+      for (final (planned, _) in targets)
+        if (!unattended.containsKey(planned.entryId)) planned.entryId,
+    ];
+  }
+
+  void _settle({
+    required List<SentLink> dropped,
+    required List<SentLink> adopted,
+    required List<String> attended,
+  }) => _database.transaction(() {
+    _links.replace(dropped: dropped, adopted: adopted);
+    _unattended.forgetAll(attended);
+  });
+
+  Future<void> _updateQuantity(SendMode mode, _Update update) async {
     final (:planned, :link, :expected) = update;
+    final attended = _recordUnattended(mode, [(planned, expected)]);
     final item = await _ekklo.meals.updateItemQuantity(
       mealId: link.ekkloMealId,
       itemId: link.ekkloItemId,
       quantity: expected.quantity,
       quantityType: expected.quantityType,
     );
-    _links.replace(
+    _settle(
       dropped: [link],
       adopted: [_link(planned, link.ekkloMealId, item.id)],
+      attended: attended,
     );
   }
 
   Future<void> _sendMeal(
+    SendMode mode,
     DateTime date,
     String ekkloMealName,
     List<PlannedEntry> entries,
     List<EkkloDailyMeal> before,
     Map<_OwnCopyKey, String> ownCopyIds,
   ) async {
+    final expected = [
+      for (final planned in entries) (planned, _target(planned, ownCopyIds)),
+    ];
+    final attended = _recordUnattended(mode, expected);
     for (final planned in entries) {
       if (planned.replacing case final SentLink link) {
         await _ekklo.meals.removeItem(
@@ -368,9 +439,6 @@ final class SendService {
         _links.replace(dropped: [link], adopted: const []);
       }
     }
-    final expected = [
-      for (final planned in entries) (planned, _target(planned, ownCopyIds)),
-    ];
     final known = {
       for (final meal in before)
         if (meal.name == ekkloMealName)
@@ -407,7 +475,7 @@ final class SendService {
         adopted.add(_link(planned, meal.id, match.id));
       }
     }
-    _links.replace(dropped: const [], adopted: adopted);
+    _settle(dropped: const [], adopted: adopted, attended: attended);
   }
 
   SentLink _link(PlannedEntry planned, String mealId, String itemId) =>
@@ -421,6 +489,7 @@ final class SendService {
 
   SendReport _report(
     DateTime date,
+    SendMode mode,
     List<PlannedEntry> active,
     List<String> createdCopies,
   ) {
@@ -441,6 +510,7 @@ final class SendService {
     return SendReport(
       date: date,
       sentAt: _clock(),
+      mode: mode,
       sent: active.length,
       reused: active
           .where(
@@ -460,6 +530,13 @@ final class SendService {
       }.toList(),
       weights: weights.values.toList(),
       ownCopies: createdCopies,
+      unattended: switch (mode) {
+        SendMode.reviewed => const [],
+        SendMode.automatic => [
+          for (final planned in active)
+            if (planned.reviewed) planned,
+        ],
+      },
     );
   }
 }

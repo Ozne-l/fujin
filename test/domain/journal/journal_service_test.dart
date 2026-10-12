@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart'
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
+import 'package:fujin/data/unattended/unattended_item_repository.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/journal/journal_read.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
@@ -17,19 +18,23 @@ import '../../support/fixtures.dart';
 void main() {
   late FujinDatabase database;
   late SentLinkRepository links;
+  late UnattendedItemRepository unattended;
   late FakeBackends backends;
 
   Future<JournalService> service({EkkloClient? ekklo}) async => JournalService(
     mfp: await backends.mfp(),
     ekklo: ekklo ?? await backends.ekklo(),
     links: links,
+    unattended: unattended,
     memory: MemoryRepository(database),
+    database: database,
     clock: () => now,
   );
 
   setUp(() {
     database = FujinDatabase.inMemory();
     links = SentLinkRepository(database);
+    unattended = UnattendedItemRepository(database);
     final repository = MemoryRepository(database);
     memory.matches.forEach(repository.saveFood);
     memory.units.forEach(repository.saveUnit);
@@ -92,6 +97,33 @@ void main() {
     check(
       links.forDate(day).map((link) => (link.mfpEntryId, link.ekkloItemId)),
     ).deepEquals([('E-2', 'I-1')]);
+  });
+
+  test('forgets the unattended item of an entry that left the day', () async {
+    unattended.record([unattendedItem('E-1'), unattendedItem('E-9')]);
+    backends = FakeBackends(entries: [entry('E-1')]);
+
+    await (await service()).readDay(day);
+
+    check(
+      unattended.forDate(day).map((item) => item.mfpEntryId),
+    ).deepEquals(['E-1']);
+  });
+
+  test('moves the unattended item of an entry re-saved in MyFitnessPal '
+      'to its new id', () async {
+    links.add(link('E-1', 'I-1'));
+    unattended.record([unattendedItem('E-1')]);
+    backends = FakeBackends(
+      entries: [entry('E-2')],
+      ekkloMeals: [
+        meal('meal-1', [item('I-1')]),
+      ],
+    );
+
+    await (await service()).readDay(day);
+
+    check(unattended.forDate(day)).deepEquals([unattendedItem('E-2')]);
   });
 
   group('the Journal read', () {

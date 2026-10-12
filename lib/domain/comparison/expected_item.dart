@@ -2,6 +2,7 @@ import 'package:dart_mappable/dart_mappable.dart';
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
+import 'package:fujin/data/unattended/unattended_item.dart';
 import 'package:fujin/domain/comparison/entry_quantity.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -26,6 +27,13 @@ final class ExpectedItem with ExpectedItemMappable {
     ekkloFoodId: ekkloFoodId,
     quantity: double.parse(quantity.toStringAsFixed(_decimals)),
     quantityType: quantityType,
+  );
+
+  factory ExpectedItem.unattended(UnattendedItem item) => ExpectedItem(
+    ekkloMealName: item.ekkloMealName,
+    ekkloFoodId: item.ekkloFoodId,
+    quantity: item.quantity,
+    quantityType: item.quantityType,
   );
 
   static const quantityTolerance = 0.1;
@@ -75,5 +83,24 @@ final class ExpectedItem with ExpectedItemMappable {
       meal.name == ekkloMealName &&
       item.foodId == ekkloFoodId &&
       item.quantityType == quantityType &&
-      (item.quantity - quantity).abs() <= quantityTolerance + _epsilon;
+      _near(item.quantity);
+
+  bool sameAs(ExpectedItem other) =>
+      other.ekkloMealName == ekkloMealName &&
+      other.ekkloFoodId == ekkloFoodId &&
+      other.quantityType == quantityType &&
+      _near(other.quantity);
+
+  bool _near(double other) =>
+      (other - quantity).abs() <= quantityTolerance + _epsilon;
+
+  UnattendedItem unattendedFor(String mfpEntryId, DateTime date) =>
+      UnattendedItem(
+        mfpEntryId: mfpEntryId,
+        date: date,
+        ekkloMealName: ekkloMealName,
+        ekkloFoodId: ekkloFoodId,
+        quantity: quantity,
+        quantityType: quantityType,
+      );
 }

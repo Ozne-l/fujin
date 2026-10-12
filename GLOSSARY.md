@@ -20,7 +20,9 @@ The words below have one meaning in Fūjin's code, docs and conversations. Frenc
 
 **Meal mapping.** Which Ekklo meal receives a given MyFitnessPal meal. Without one, an entry of that meal has no expected item; the first send of that meal keeps its name in Ekklo and records the mapping. Code: `MealMapping` (`lib/data/memory/meal_mapping.dart`), table `memory_meal`.
 
-**Send link.** Fūjin's record that one MyFitnessPal entry is represented by one Ekklo item: entry id, date, food, meal, servings, serving value and unit, Ekklo meal and item ids, send time. The only state Fūjin keeps about sending. Code: `SentLink` (`lib/data/links/sent_link.dart`), `SentLinkRepository` (`lib/data/links/sent_link_repository.dart`), table `sent_link`.
+**Send link.** Fūjin's record that one MyFitnessPal entry is represented by one Ekklo item: entry id, date, food, meal, servings, serving value and unit, Ekklo meal and item ids, send time. With unattended items, the only state Fūjin keeps about sending. Code: `SentLink` (`lib/data/links/sent_link.dart`), `SentLinkRepository` (`lib/data/links/sent_link_repository.dart`), table `sent_link`.
+
+**Unattended item.** Fūjin's record, written before the Ekklo write, of the item an automatic send gives an entry when Memory does not predict it or the owner would have had to review it: entry id, date, Ekklo meal, food, quantity and quantity type. It lets adoption find that item after an interrupted send, and makes the linked entry "À mettre à jour" once Memory expects another item. Forgotten when a later send writes the entry with the owner's choices, when "Revoir" keeps exactly what was sent, or when the entry leaves the day. Not in the backup file. Code: `UnattendedItem` (`lib/data/unattended/unattended_item.dart`), `UnattendedItemRepository` (`lib/data/unattended/unattended_item_repository.dart`), table `unattended_item`. ADR 0025.
 
 **Orphan link.** A send link whose Ekklo item still exists but whose MyFitnessPal entry id no longer appears in the day, usually because the entry was edited and got a new id. Code: `_Orphan` in `lib/domain/comparison/compare_day.dart`.
 
@@ -28,7 +30,7 @@ The words below have one meaning in Fūjin's code, docs and conversations. Frenc
 
 **Relink.** Moving an orphan link to the new id of an edited entry when the orphan's Ekklo item still matches what the edited entry expects: the old link is dropped and a new one adopted, and the entry stays "Dans Ekklo". Code: the `(true, _)` case of the orphan pass in `compareDay` (`adopt(..., replacing: link)`).
 
-**Status.** Where an entry stands, recomputed on every read: "Dans Ekklo" (`InEkklo`, carries its link), "À envoyer" (`ToSend`), "À mettre à jour" (`ToUpdate`, carries the orphan link and an `UpdateKind`: `quantityOnly` when the Ekklo meal is unchanged, `mealChanged` otherwise). Code: sealed `EntryStatus` (`lib/domain/comparison/entry_status.dart`), `UpdateKind` (`lib/domain/comparison/update_kind.dart`).
+**Status.** Where an entry stands, recomputed on every read: "Dans Ekklo" (`InEkklo`, carries its link), "À envoyer" (`ToSend`), "À mettre à jour" (`ToUpdate`, carries the orphan link, or the link of an entry with an unattended item whose item Memory no longer expects, and an `UpdateKind`: `quantityOnly` when the Ekklo meal is unchanged, `mealChanged` otherwise). Code: sealed `EntryStatus` (`lib/domain/comparison/entry_status.dart`), `UpdateKind` (`lib/domain/comparison/update_kind.dart`).
 
 **Expected item.** The Ekklo item Memory predicts for an entry: Ekklo meal name, Ekklo food id, quantity rounded to 0.1, quantity type. Null when Memory lacks the food, the meal mapping, or the grams of a non-gram unit. Matches an item within 0.1. Code: `ExpectedItem.forEntry` and `ExpectedItem.matches` (`lib/domain/comparison/expected_item.dart`).
 

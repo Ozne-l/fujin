@@ -4,7 +4,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 
 | # | Decision | Status |
 | --- | --- | --- |
-| [0001](0001-recompute-statuses-from-both-sides.md) | Recompute statuses from both sides, with a send-link registry and no queue | Accepted (own-copy expectation settled by 0018) |
+| [0001](0001-recompute-statuses-from-both-sides.md) | Recompute statuses from both sides, with a send-link registry and no queue | Accepted (own-copy expectation settled by 0018; unattended items added by 0025) |
 | [0002](0002-write-ordering.md) | Write ordering for add, undo, send and own copies | Accepted (sending implemented by 0018; add and undo planned) |
 | [0003](0003-refresh-on-foreground-and-pull.md) | Refresh on foreground return and pull to refresh | Accepted |
 | [0004](0004-one-sqlite-file.md) | One SQLite file, schema and migrations | Accepted |
@@ -21,10 +21,11 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0015](0015-french-and-english-copy.md) | French and English copy | Accepted |
 | [0016](0016-english-in-code-and-tokens.md) | English in code, design tokens and docs | Accepted |
 | [0017](0017-read-only-dev-environment.md) | Read-only dev environment | Accepted |
-| [0018](0018-send-flow.md) | Send flow: matching, review and execution | Accepted |
+| [0018](0018-send-flow.md) | Send flow: matching, review and execution | Accepted (automatic sends amended by 0025) |
 | [0019](0019-tab-shell.md) | Tab shell: Journal and Mémoire tabs, Scanner disabled | Accepted |
 | [0020](0020-goals.md) | Goals: one row in Fūjin's SQLite | Accepted |
 | [0021](0021-backup-file.md) | Backup file: fujin-backup v1 behind the BackupFiles seam | Accepted |
 | [0022](0022-journal-states-and-goal-rings.md) | Journal states and goal rings | Accepted |
 | [0023](0023-ui-flags-in-shared-preferences.md) | UI flags in shared preferences | Accepted |
 | [0024](0024-splash-from-the-first-frame.md) | Splash from the first frame | Accepted |
+| [0025](0025-automatic-mode.md) | Automatic mode: unattended items instead of Memory, a setting in shared preferences | Accepted |

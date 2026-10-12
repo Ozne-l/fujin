@@ -1,5 +1,6 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:fujin/data/links/sent_link.dart';
+import 'package:fujin/data/unattended/unattended_item.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 
 part 'day_comparison.mapper.dart';
@@ -10,9 +11,11 @@ final class DayComparison with DayComparisonMappable {
     this.entries = const [],
     this.linksToAdopt = const [],
     this.linksToDrop = const [],
+    this.unattendedToAdopt = const [],
   });
 
   final List<ComparedEntry> entries;
   final List<SentLink> linksToAdopt;
   final List<SentLink> linksToDrop;
+  final List<UnattendedItem> unattendedToAdopt;
 }

@@ -17,6 +17,7 @@ class DayComparisonMapper extends ClassMapperBase<DayComparison> {
       MapperContainer.globals.use(_instance = DayComparisonMapper._());
       ComparedEntryMapper.ensureInitialized();
       SentLinkMapper.ensureInitialized();
+      UnattendedItemMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -47,12 +48,23 @@ class DayComparisonMapper extends ClassMapperBase<DayComparison> {
     opt: true,
     def: const [],
   );
+  static List<UnattendedItem> _$unattendedToAdopt(DayComparison v) =>
+      v.unattendedToAdopt;
+  static const Field<DayComparison, List<UnattendedItem>> _f$unattendedToAdopt =
+      Field(
+        'unattendedToAdopt',
+        _$unattendedToAdopt,
+        key: r'unattended_to_adopt',
+        opt: true,
+        def: const [],
+      );
 
   @override
   final MappableFields<DayComparison> fields = const {
     #entries: _f$entries,
     #linksToAdopt: _f$linksToAdopt,
     #linksToDrop: _f$linksToDrop,
+    #unattendedToAdopt: _f$unattendedToAdopt,
   };
   @override
   final bool ignoreNull = true;
@@ -62,6 +74,7 @@ class DayComparisonMapper extends ClassMapperBase<DayComparison> {
       entries: data.dec(_f$entries),
       linksToAdopt: data.dec(_f$linksToAdopt),
       linksToDrop: data.dec(_f$linksToDrop),
+      unattendedToAdopt: data.dec(_f$unattendedToAdopt),
     );
   }
 
@@ -137,10 +150,17 @@ abstract class DayComparisonCopyWith<$R, $In extends DayComparison, $Out>
   get linksToAdopt;
   ListCopyWith<$R, SentLink, SentLinkCopyWith<$R, SentLink, SentLink>>
   get linksToDrop;
+  ListCopyWith<
+    $R,
+    UnattendedItem,
+    UnattendedItemCopyWith<$R, UnattendedItem, UnattendedItem>
+  >
+  get unattendedToAdopt;
   $R call({
     List<ComparedEntry>? entries,
     List<SentLink>? linksToAdopt,
     List<SentLink>? linksToDrop,
+    List<UnattendedItem>? unattendedToAdopt,
   });
   DayComparisonCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -179,15 +199,28 @@ class _DayComparisonCopyWithImpl<$R, $Out>
     (v) => call(linksToDrop: v),
   );
   @override
+  ListCopyWith<
+    $R,
+    UnattendedItem,
+    UnattendedItemCopyWith<$R, UnattendedItem, UnattendedItem>
+  >
+  get unattendedToAdopt => ListCopyWith(
+    $value.unattendedToAdopt,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(unattendedToAdopt: v),
+  );
+  @override
   $R call({
     List<ComparedEntry>? entries,
     List<SentLink>? linksToAdopt,
     List<SentLink>? linksToDrop,
+    List<UnattendedItem>? unattendedToAdopt,
   }) => $apply(
     FieldCopyWithData({
       if (entries != null) #entries: entries,
       if (linksToAdopt != null) #linksToAdopt: linksToAdopt,
       if (linksToDrop != null) #linksToDrop: linksToDrop,
+      if (unattendedToAdopt != null) #unattendedToAdopt: unattendedToAdopt,
     }),
   );
   @override
@@ -195,6 +228,10 @@ class _DayComparisonCopyWithImpl<$R, $Out>
     entries: data.get(#entries, or: $value.entries),
     linksToAdopt: data.get(#linksToAdopt, or: $value.linksToAdopt),
     linksToDrop: data.get(#linksToDrop, or: $value.linksToDrop),
+    unattendedToAdopt: data.get(
+      #unattendedToAdopt,
+      or: $value.unattendedToAdopt,
+    ),
   );
 
   @override

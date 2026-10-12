@@ -4,6 +4,7 @@ import 'package:fujin/data/memory/meal_mapping.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
+import 'package:fujin/data/unattended/unattended_item.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 final day = DateTime.utc(2026, 10, 7);
@@ -136,6 +137,21 @@ SentLink link(
   ekkloMealId: ekkloMeal,
   ekkloItemId: itemId,
   sentAt: DateTime.utc(2026, 10, 7, 9),
+);
+
+UnattendedItem unattendedItem(
+  String entryId, {
+  String food = oatsInEkklo,
+  String ekkloMeal = petitDejeuner,
+  double quantity = 100,
+  EkkloQuantityType type = EkkloQuantityType.grams,
+}) => UnattendedItem(
+  mfpEntryId: entryId,
+  date: day,
+  ekkloMealName: ekkloMeal,
+  ekkloFoodId: food,
+  quantity: quantity,
+  quantityType: type,
 );
 
 const memory = Memory(

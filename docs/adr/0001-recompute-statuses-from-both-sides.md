@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Accepted. The own-copy expectation below was an assumption; [0018](0018-send-flow.md) settles it.
+Accepted. The own-copy expectation below was an assumption; [0018](0018-send-flow.md) settles it. [0025](0025-automatic-mode.md) adds unattended items: adoption also accepts them, and a linked entry sent without the owner can be "À mettre à jour".
 
 ## Context
 

@@ -4,7 +4,7 @@ Date: 2026-10-08
 
 ## Status
 
-Accepted. Settles the own-copy expectation left open in [0001](0001-recompute-statuses-from-both-sides.md) and implements the sending part of [0002](0002-write-ordering.md).
+Accepted. Settles the own-copy expectation left open in [0001](0001-recompute-statuses-from-both-sides.md) and implements the sending part of [0002](0002-write-ordering.md). [0025](0025-automatic-mode.md) amends execution for automatic sends: step 2 writes no Memory, unattended items are recorded before each Ekklo write, and only the own copies created are remembered, so "Every choice made while sending is remembered" holds for reviewed sends only.
 
 ## Context
 

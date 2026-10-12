@@ -10,6 +10,7 @@ Everything of the owner's that Fūjin remembers lives in one SQLite file, `fujin
 | What | Where | Backed up |
 | --- | --- | --- |
 | Memory, send links, goals | `fujin.db` (SQLite) | Auto Backup and the backup file |
+| Unattended items (automatic sends) | `fujin.db` (SQLite) | Auto Backup only |
 | Ekklo tokens, MyFitnessPal cookies | `flutter_secure_storage` | never |
 | UI flags (hints shown) | `shared_preferences` | never |
 
@@ -63,7 +64,7 @@ The database runs synchronously on the UI isolate: the tables are tiny (a few hu
 
 9. **Change the schema by appending a script to `schemaMigrations`; never edit a script that has shipped.**
    Why: `PRAGMA user_version` records how many scripts a device has run; `_migrate` runs only the ones after it, each in its own transaction, then sets `user_version` to its position (sqlite.org, "PRAGMA user_version"). Editing an applied script never reaches existing installs.
-   Example: `lib/data/database/schema.dart` and `FujinDatabase._migrate` (`lib/data/database/fujin_database.dart`); the second script adds `memory_food.mfp_unit`; the third moves own copies to `memory_own_copy`, one row per food and unit, then drops the columns `memory_food` no longer needs (ADR 0018); the fourth creates the one-row `goals` table (ADR 0020). A new table also gets a `FujinTable` value. The test "reopening a database file keeps its rows and runs no migration twice" (`test/data/database_test.dart`) checks `schemaVersion` against `schemaMigrations.length`; a script that moves rows gets a test that rebuilds the older schema from the earlier scripts, sets `user_version`, and reopens the file ("moves the own copies of a version 2 database to one row per unit").
+   Example: `lib/data/database/schema.dart` and `FujinDatabase._migrate` (`lib/data/database/fujin_database.dart`); the second script adds `memory_food.mfp_unit`; the third moves own copies to `memory_own_copy`, one row per food and unit, then drops the columns `memory_food` no longer needs (ADR 0018); the fourth creates the one-row `goals` table (ADR 0020); the fifth creates `unattended_item`, owned by `UnattendedItemRepository` (ADR 0025). A new table also gets a `FujinTable` value. The test "reopening a database file keeps its rows and runs no migration twice" (`test/data/database_test.dart`) checks `schemaVersion` against `schemaMigrations.length`; a script that moves rows gets a test that rebuilds the older schema from the earlier scripts, sets `user_version`, and reopens the file ("moves the own copies of a version 2 database to one row per unit").
    Status: the first script is installed on the owner's phone (dev app) and on the emulator, so scripts are append only.
 
 10. **Give each aggregate one repository that owns its SQL and returns models.**
@@ -94,7 +95,7 @@ The database runs synchronously on the UI isolate: the tables are tiny (a few hu
 
 15. **Export the six tables to `fujin-backup-YYYY-MM-DD.json` (`format: "fujin-backup"`, `version: 1`, no credentials) and import such a file by replacing all six tables in one transaction.**
     Why: Auto Backup restore is unverified for a sideloaded app; a file the owner keeps is the fallback. Import is strict and never merges.
-    Example: `BackupRepository.snapshot` and `BackupRepository.restore` (`lib/data/backup/backup_repository.dart`) call `MemoryRepository.replace`, `SentLinkRepository.replaceAll` and `GoalsRepository.replace` inside `FujinDatabase.transaction` (rule 7); `BackupCodec.decode` (`lib/data/backup/backup_codec.dart`) returns null for anything but a complete version 1 file. A new table must be added to `Backup` (`lib/data/backup/backup.dart`) or deliberately left out ([ADR 0021](../../../docs/adr/0021-backup-file.md)).
+    Example: `BackupRepository.snapshot` and `BackupRepository.restore` (`lib/data/backup/backup_repository.dart`) call `MemoryRepository.replace`, `SentLinkRepository.replaceAll` and `GoalsRepository.replace` inside `FujinDatabase.transaction` (rule 7); `BackupCodec.decode` (`lib/data/backup/backup_codec.dart`) returns null for anything but a complete version 1 file. A new table must be added to `Backup` (`lib/data/backup/backup.dart`) or deliberately left out ([ADR 0021](../../../docs/adr/0021-backup-file.md)): `unattended_item` is left out and untouched by an import, since it describes items in Ekklo ([ADR 0025](../../../docs/adr/0025-automatic-mode.md)).
 
 16. **Keep UI flags (a hint already shown) in `shared_preferences` behind `HintRepository`, never in `fujin.db` or the backup file.**
     Why: a lost flag only replays a hint once, so it is not the owner's data; keeping it out of `fujin.db` keeps it out of the six tables an import replaces and out of the backup file ([ADR 0023](../../../docs/adr/0023-ui-flags-in-shared-preferences.md)). On Android, `SharedPreferencesWithCache` writes through DataStore to `files/datastore/FlutterSharedPreferences.preferences_pb`, which the Auto Backup whitelist (rule 13) leaves out.

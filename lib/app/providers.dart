@@ -14,6 +14,7 @@ import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/sessions/secure_ekklo_token_store.dart';
 import 'package:fujin/data/sessions/secure_mfp_session_store.dart';
+import 'package:fujin/data/unattended/unattended_item_repository.dart';
 import 'package:fujin/domain/accounts/accounts_service.dart';
 import 'package:fujin/domain/backup/backup_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
@@ -109,6 +110,10 @@ final goalsRepositoryProvider = Provider<GoalsRepository>(
   (ref) => GoalsRepository(ref.watch(databaseProvider)),
 );
 
+final unattendedItemRepositoryProvider = Provider<UnattendedItemRepository>(
+  (ref) => UnattendedItemRepository(ref.watch(databaseProvider)),
+);
+
 final hintRepositoryProvider = Provider<HintRepository>(
   (ref) => HintRepository(ref.watch(preferencesProvider)),
 );
@@ -143,7 +148,9 @@ final journalServiceProvider = Provider<JournalService>(
     mfp: ref.watch(mfpClientProvider),
     ekklo: ref.watch(ekkloClientProvider),
     links: ref.watch(sentLinkRepositoryProvider),
+    unattended: ref.watch(unattendedItemRepositoryProvider),
     memory: ref.watch(memoryRepositoryProvider),
+    database: ref.watch(databaseProvider),
     clock: ref.watch(clockProvider),
   ),
 );
@@ -161,6 +168,8 @@ final sendServiceProvider = Provider<SendService>(
     ekklo: ref.watch(ekkloClientProvider),
     memory: ref.watch(memoryRepositoryProvider),
     links: ref.watch(sentLinkRepositoryProvider),
+    unattended: ref.watch(unattendedItemRepositoryProvider),
+    database: ref.watch(databaseProvider),
     clock: ref.watch(clockProvider),
   ),
 );

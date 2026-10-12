@@ -5,6 +5,7 @@ import 'package:fujin/data/links/sent_link.dart';
 import 'package:fujin/data/memory/meal_mapping.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
+import 'package:fujin/data/unattended/unattended_item.dart';
 import 'package:fujin/domain/comparison/compare_day.dart';
 import 'package:fujin/domain/comparison/day_comparison.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
@@ -18,10 +19,12 @@ DayComparison compare(
   List<EkkloDailyMeal> meals, [
   List<SentLink> links = const [],
   Memory remembered = memory,
+  List<UnattendedItem> unattended = const [],
 ]) => compareDay(
   entries: entries,
   meals: meals,
   links: links,
+  unattended: unattended,
   memory: remembered,
   now: now,
 );
@@ -353,5 +356,150 @@ void main() {
       check(result.linksToDrop).isEmpty();
       check(result.linksToAdopt).isEmpty();
     });
+  });
+
+  group('an entry sent without the owner', () {
+    const forgetful = Memory();
+
+    test('adopts the item its automatic send recorded although Memory '
+        'expects nothing', () {
+      final result = compare(
+        [entry('E-1')],
+        [
+          meal('meal-1', [item('I-1')]),
+        ],
+        const [],
+        forgetful,
+        [unattendedItem('E-1')],
+      );
+
+      final adopted = adoptedLink('E-1', 'I-1');
+      check(statusesOf(result)).deepEquals([InEkklo(adopted)]);
+      check(result.linksToAdopt).deepEquals([adopted]);
+    });
+
+    test('stays in Ekklo while Memory expects nothing for it', () {
+      final sent = link('E-1', 'I-1');
+
+      final result = compare(
+        [entry('E-1')],
+        [
+          meal('meal-1', [item('I-1')]),
+        ],
+        [sent],
+        forgetful,
+        [unattendedItem('E-1')],
+      );
+
+      check(statusesOf(result)).deepEquals([InEkklo(sent)]);
+    });
+
+    test('is to update once Memory expects another item', () {
+      final sent = link('E-1', 'I-1');
+
+      final result = compare(
+        [entry('E-1')],
+        [
+          meal('meal-1', [item('I-1', food: 'ekklo-other')]),
+        ],
+        [sent],
+        memory,
+        [unattendedItem('E-1', food: 'ekklo-other')],
+      );
+
+      check(
+        statusesOf(result),
+      ).deepEquals([ToUpdate(sent, UpdateKind.quantityOnly)]);
+      check(result.linksToDrop).isEmpty();
+    });
+
+    test('is in Ekklo once Memory expects the item it got', () {
+      final sent = link('E-1', 'I-1');
+
+      final result = compare(
+        [entry('E-1')],
+        [
+          meal('meal-1', [item('I-1')]),
+        ],
+        [sent],
+        memory,
+        [unattendedItem('E-1')],
+      );
+
+      check(statusesOf(result)).deepEquals([InEkklo(sent)]);
+    });
+
+    test('is relinked after it was re-saved in MyFitnessPal', () {
+      final orphan = link('E-1', 'I-1');
+
+      final result = compare(
+        [entry('E-9')],
+        [
+          meal('meal-1', [item('I-1')]),
+        ],
+        [orphan],
+        forgetful,
+        [unattendedItem('E-1')],
+      );
+
+      final adopted = adoptedLink('E-9', 'I-1');
+      check(statusesOf(result)).deepEquals([InEkklo(adopted)]);
+      check(result.linksToDrop).deepEquals([orphan]);
+      check(result.linksToAdopt).deepEquals([adopted]);
+      check(result.unattendedToAdopt).deepEquals([unattendedItem('E-9')]);
+    });
+
+    test('keeps its meal when re-saved in MyFitnessPal with another '
+        'quantity', () {
+      final orphan = link('E-1', 'I-1');
+
+      final result = compare(
+        [entry('E-9', servings: 2)],
+        [
+          meal('meal-1', [item('I-1')]),
+        ],
+        [orphan],
+        forgetful,
+        [unattendedItem('E-1')],
+      );
+
+      check(
+        statusesOf(result),
+      ).deepEquals([ToUpdate(orphan, UpdateKind.quantityOnly)]);
+      check(result.unattendedToAdopt).deepEquals([unattendedItem('E-9')]);
+    });
+
+    test('changes meal when re-saved in another MyFitnessPal meal', () {
+      final orphan = link('E-1', 'I-1');
+
+      final result = compare(
+        [entry('E-9', meal: lunch)],
+        [
+          meal('meal-1', [item('I-1')]),
+        ],
+        [orphan],
+        forgetful,
+        [unattendedItem('E-1')],
+      );
+
+      check(
+        statusesOf(result),
+      ).deepEquals([ToUpdate(orphan, UpdateKind.mealChanged)]);
+    });
+  });
+
+  test('a linked entry sent with the owner stays in Ekklo whatever Memory '
+      'now expects', () {
+    final sent = link('E-1', 'I-1');
+
+    final result = compare(
+      [entry('E-1')],
+      [
+        meal('meal-1', [item('I-1', food: 'ekklo-other')]),
+      ],
+      [sent],
+    );
+
+    check(statusesOf(result)).deepEquals([InEkklo(sent)]);
   });
 }

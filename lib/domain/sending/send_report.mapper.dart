@@ -15,7 +15,9 @@ class SendReportMapper extends ClassMapperBase<SendReport> {
   static SendReportMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = SendReportMapper._());
+      SendModeMapper.ensureInitialized();
       RetainedWeightMapper.ensureInitialized();
+      PlannedEntryMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -31,6 +33,8 @@ class SendReportMapper extends ClassMapperBase<SendReport> {
     _$sentAt,
     key: r'sent_at',
   );
+  static SendMode _$mode(SendReport v) => v.mode;
+  static const Field<SendReport, SendMode> _f$mode = Field('mode', _$mode);
   static int _$sent(SendReport v) => v.sent;
   static const Field<SendReport, int> _f$sent = Field(
     'sent',
@@ -75,17 +79,26 @@ class SendReportMapper extends ClassMapperBase<SendReport> {
     opt: true,
     def: const [],
   );
+  static List<PlannedEntry> _$unattended(SendReport v) => v.unattended;
+  static const Field<SendReport, List<PlannedEntry>> _f$unattended = Field(
+    'unattended',
+    _$unattended,
+    opt: true,
+    def: const [],
+  );
 
   @override
   final MappableFields<SendReport> fields = const {
     #date: _f$date,
     #sentAt: _f$sentAt,
+    #mode: _f$mode,
     #sent: _f$sent,
     #reused: _f$reused,
     #updated: _f$updated,
     #newAssociations: _f$newAssociations,
     #weights: _f$weights,
     #ownCopies: _f$ownCopies,
+    #unattended: _f$unattended,
   };
   @override
   final bool ignoreNull = true;
@@ -94,12 +107,14 @@ class SendReportMapper extends ClassMapperBase<SendReport> {
     return SendReport(
       date: data.dec(_f$date),
       sentAt: data.dec(_f$sentAt),
+      mode: data.dec(_f$mode),
       sent: data.dec(_f$sent),
       reused: data.dec(_f$reused),
       updated: data.dec(_f$updated),
       newAssociations: data.dec(_f$newAssociations),
       weights: data.dec(_f$weights),
       ownCopies: data.dec(_f$ownCopies),
+      unattended: data.dec(_f$unattended),
     );
   }
 
@@ -172,15 +187,23 @@ abstract class SendReportCopyWith<$R, $In extends SendReport, $Out>
   >
   get weights;
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get ownCopies;
+  ListCopyWith<
+    $R,
+    PlannedEntry,
+    PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry>
+  >
+  get unattended;
   $R call({
     DateTime? date,
     DateTime? sentAt,
+    SendMode? mode,
     int? sent,
     int? reused,
     int? updated,
     List<String>? newAssociations,
     List<RetainedWeight>? weights,
     List<String>? ownCopies,
+    List<PlannedEntry>? unattended,
   });
   SendReportCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -219,37 +242,54 @@ class _SendReportCopyWithImpl<$R, $Out>
         (v) => call(ownCopies: v),
       );
   @override
+  ListCopyWith<
+    $R,
+    PlannedEntry,
+    PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry>
+  >
+  get unattended => ListCopyWith(
+    $value.unattended,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(unattended: v),
+  );
+  @override
   $R call({
     DateTime? date,
     DateTime? sentAt,
+    SendMode? mode,
     int? sent,
     int? reused,
     int? updated,
     List<String>? newAssociations,
     List<RetainedWeight>? weights,
     List<String>? ownCopies,
+    List<PlannedEntry>? unattended,
   }) => $apply(
     FieldCopyWithData({
       if (date != null) #date: date,
       if (sentAt != null) #sentAt: sentAt,
+      if (mode != null) #mode: mode,
       if (sent != null) #sent: sent,
       if (reused != null) #reused: reused,
       if (updated != null) #updated: updated,
       if (newAssociations != null) #newAssociations: newAssociations,
       if (weights != null) #weights: weights,
       if (ownCopies != null) #ownCopies: ownCopies,
+      if (unattended != null) #unattended: unattended,
     }),
   );
   @override
   SendReport $make(CopyWithData data) => SendReport(
     date: data.get(#date, or: $value.date),
     sentAt: data.get(#sentAt, or: $value.sentAt),
+    mode: data.get(#mode, or: $value.mode),
     sent: data.get(#sent, or: $value.sent),
     reused: data.get(#reused, or: $value.reused),
     updated: data.get(#updated, or: $value.updated),
     newAssociations: data.get(#newAssociations, or: $value.newAssociations),
     weights: data.get(#weights, or: $value.weights),
     ownCopies: data.get(#ownCopies, or: $value.ownCopies),
+    unattended: data.get(#unattended, or: $value.unattended),
   );
 
   @override

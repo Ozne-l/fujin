@@ -1,6 +1,8 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
+import 'package:fujin/data/unattended/unattended_item_repository.dart';
 import 'package:fujin/domain/comparison/compare_day.dart';
 import 'package:fujin/domain/journal/day_nutrients.dart';
 import 'package:fujin/domain/journal/journal_day.dart';
@@ -14,14 +16,18 @@ final class JournalService {
     required this._mfp,
     required this._ekklo,
     required this._links,
+    required this._unattended,
     required this._memory,
+    required this._database,
     required this._clock,
   });
 
   final MyFitnessPalClient _mfp;
   final EkkloClient _ekklo;
   final SentLinkRepository _links;
+  final UnattendedItemRepository _unattended;
   final MemoryRepository _memory;
+  final FujinDatabase _database;
   final DateTime Function() _clock;
 
   Future<JournalDay> readDay(
@@ -94,13 +100,19 @@ final class JournalService {
       entries: diary.entries,
       meals: ekkloMeals,
       links: _links.forDate(date),
+      unattended: _unattended.forDate(date),
       memory: _memory.load(),
       now: _clock(),
     );
-    _links.replace(
-      dropped: comparison.linksToDrop,
-      adopted: comparison.linksToAdopt,
-    );
+    _database.transaction(() {
+      _links.replace(
+        dropped: comparison.linksToDrop,
+        adopted: comparison.linksToAdopt,
+      );
+      _unattended
+        ..record(comparison.unattendedToAdopt)
+        ..prune(date, {for (final entry in diary.entries) ?entry.id});
+    });
     return JournalDay(
       diary: diary,
       mealNames: mealNames,

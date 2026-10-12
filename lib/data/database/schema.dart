@@ -79,4 +79,15 @@ const schemaMigrations = [
     fiber REAL CHECK (fiber > 0)
   );
   ''',
+  '''
+  CREATE TABLE unattended_item (
+    mfp_entry_id TEXT PRIMARY KEY,
+    date TEXT NOT NULL,
+    ekklo_meal_name TEXT NOT NULL,
+    ekklo_food_id TEXT NOT NULL,
+    quantity REAL NOT NULL,
+    quantity_type TEXT NOT NULL
+  );
+  CREATE INDEX unattended_item_date ON unattended_item (date);
+  ''',
 ];
