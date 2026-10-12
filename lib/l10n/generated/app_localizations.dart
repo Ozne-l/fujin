@@ -1903,6 +1903,581 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'{service} ne répond pas.'**
   String serviceNotResponding(String service);
+
+  /// No description provided for @addSearchHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher dans MyFitnessPal'**
+  String get addSearchHint;
+
+  /// No description provided for @addVerifiedOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifiés uniquement'**
+  String get addVerifiedOnly;
+
+  /// No description provided for @addRecents.
+  ///
+  /// In fr, this message translates to:
+  /// **'RÉCENTS'**
+  String get addRecents;
+
+  /// No description provided for @addRecentsAddedFromFujin.
+  ///
+  /// In fr, this message translates to:
+  /// **'ajoutés depuis Fūjin'**
+  String get addRecentsAddedFromFujin;
+
+  /// No description provided for @addRecentsOnPhone.
+  ///
+  /// In fr, this message translates to:
+  /// **'sur ce téléphone'**
+  String get addRecentsOnPhone;
+
+  /// No description provided for @addRecentsNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gardés sur ce téléphone, du plus récent au plus ancien.'**
+  String get addRecentsNote;
+
+  /// No description provided for @addRecentsEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les aliments ajoutés depuis Fūjin apparaîtront ici.'**
+  String get addRecentsEmpty;
+
+  /// No description provided for @addRecentLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'{detail} · {when}'**
+  String addRecentLine(String detail, String when);
+
+  /// No description provided for @addThisMorning.
+  ///
+  /// In fr, this message translates to:
+  /// **'ce matin'**
+  String get addThisMorning;
+
+  /// No description provided for @addThisAfternoon.
+  ///
+  /// In fr, this message translates to:
+  /// **'cet après-midi'**
+  String get addThisAfternoon;
+
+  /// No description provided for @addThisEvening.
+  ///
+  /// In fr, this message translates to:
+  /// **'ce soir'**
+  String get addThisEvening;
+
+  /// No description provided for @addYesterday.
+  ///
+  /// In fr, this message translates to:
+  /// **'hier'**
+  String get addYesterday;
+
+  /// No description provided for @addWeekday.
+  ///
+  /// In fr, this message translates to:
+  /// **'{date}'**
+  String addWeekday(DateTime date);
+
+  /// No description provided for @addShortDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'{date}'**
+  String addShortDate(DateTime date);
+
+  /// No description provided for @addServing.
+  ///
+  /// In fr, this message translates to:
+  /// **'{value} {unit}'**
+  String addServing(double value, String unit);
+
+  /// No description provided for @addMfpResults.
+  ///
+  /// In fr, this message translates to:
+  /// **'RÉSULTATS MYFITNESSPAL'**
+  String get addMfpResults;
+
+  /// No description provided for @addFirstResults.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} premiers'**
+  String addFirstResults(int count);
+
+  /// No description provided for @addResultCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{1 résultat} other{{count} résultats}}'**
+  String addResultCount(int count);
+
+  /// No description provided for @addSearching.
+  ///
+  /// In fr, this message translates to:
+  /// **'recherche…'**
+  String get addSearching;
+
+  /// No description provided for @addBarcodeChip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code-barres · {format}'**
+  String addBarcodeChip(String format);
+
+  /// No description provided for @addSearchBarcode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chercher ce code-barres'**
+  String get addSearchBarcode;
+
+  /// No description provided for @addBarcodeValid.
+  ///
+  /// In fr, this message translates to:
+  /// **'{format} · chiffre de contrôle correct'**
+  String addBarcodeValid(String format);
+
+  /// No description provided for @addSearchAsText.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chercher « {query} » comme texte'**
+  String addSearchAsText(String query);
+
+  /// No description provided for @addBarcodeUnknownTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code-barres inconnu'**
+  String get addBarcodeUnknownTitle;
+
+  /// No description provided for @addBarcodeUnknownDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le code {code} n’est pas dans la base MyFitnessPal. Cherche le produit par son nom, ou crée-le dans l’app MyFitnessPal.'**
+  String addBarcodeUnknownDetail(String code);
+
+  /// No description provided for @addBarcodeUnresolvedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Produit reconnu, sans fiche'**
+  String get addBarcodeUnresolvedTitle;
+
+  /// No description provided for @addBarcodeUnresolvedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'MyFitnessPal connaît ce code ({name}) mais n’a pas ses valeurs nutritionnelles.'**
+  String addBarcodeUnresolvedDetail(String name);
+
+  /// No description provided for @addSearchQuoted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chercher « {query} »'**
+  String addSearchQuoted(String query);
+
+  /// No description provided for @addNoResultTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun résultat'**
+  String get addNoResultTitle;
+
+  /// No description provided for @addNoResultDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'MyFitnessPal ne trouve rien pour cette recherche.'**
+  String get addNoResultDetail;
+
+  /// No description provided for @addTryInstead.
+  ///
+  /// In fr, this message translates to:
+  /// **'ESSAIE PLUTÔT'**
+  String get addTryInstead;
+
+  /// No description provided for @addShorten.
+  ///
+  /// In fr, this message translates to:
+  /// **'Raccourcir : « {query} »'**
+  String addShorten(String query);
+
+  /// No description provided for @addIncludeUnverified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Inclure les non vérifiés'**
+  String get addIncludeUnverified;
+
+  /// No description provided for @addOfflineTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas de connexion'**
+  String get addOfflineTitle;
+
+  /// No description provided for @addOfflineDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'La recherche reprendra au retour du réseau. Tes récents restent là.'**
+  String get addOfflineDetail;
+
+  /// No description provided for @addServerTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'MyFitnessPal ne répond pas'**
+  String get addServerTitle;
+
+  /// No description provided for @addServerDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le serveur a renvoyé une erreur. Ta recherche est gardée.'**
+  String get addServerDetail;
+
+  /// No description provided for @addServerCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code {code} · pour le support'**
+  String addServerCode(int code);
+
+  /// No description provided for @addToMeal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter à {meal}'**
+  String addToMeal(String meal);
+
+  /// No description provided for @addVerified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifié'**
+  String get addVerified;
+
+  /// No description provided for @addUnverified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non vérifié'**
+  String get addUnverified;
+
+  /// No description provided for @addEan.
+  ///
+  /// In fr, this message translates to:
+  /// **'EAN {code}'**
+  String addEan(String code);
+
+  /// No description provided for @addServingSize.
+  ///
+  /// In fr, this message translates to:
+  /// **'TAILLE DE PORTION'**
+  String get addServingSize;
+
+  /// No description provided for @addServings.
+  ///
+  /// In fr, this message translates to:
+  /// **'NOMBRE DE PORTIONS'**
+  String get addServings;
+
+  /// No description provided for @addServingsOther.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autre'**
+  String get addServingsOther;
+
+  /// No description provided for @addServingsUnit.
+  ///
+  /// In fr, this message translates to:
+  /// **'portions'**
+  String get addServingsUnit;
+
+  /// No description provided for @addMealDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'{date}'**
+  String addMealDate(DateTime date);
+
+  /// No description provided for @addFor.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour {serving}'**
+  String addFor(String serving);
+
+  /// No description provided for @addForGrams.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour {serving}, soit {grams}'**
+  String addForGrams(String serving, String grams);
+
+  /// No description provided for @addMyDay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ma journée'**
+  String get addMyDay;
+
+  /// No description provided for @addRemaining.
+  ///
+  /// In fr, this message translates to:
+  /// **'Il restera {value} kcal'**
+  String addRemaining(double value);
+
+  /// No description provided for @addExceeds.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dépassera de {value} kcal'**
+  String addExceeds(double value);
+
+  /// No description provided for @addMacroGrams.
+  ///
+  /// In fr, this message translates to:
+  /// **'{value} g'**
+  String addMacroGrams(double value);
+
+  /// No description provided for @addEkkloFood.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ekklo : {name}, {amount}'**
+  String addEkkloFood(String name, String amount);
+
+  /// No description provided for @addRemembered.
+  ///
+  /// In fr, this message translates to:
+  /// **'mémorisé'**
+  String get addRemembered;
+
+  /// No description provided for @addFoundAutomatically.
+  ///
+  /// In fr, this message translates to:
+  /// **'trouvé automatiquement, écart {percent} %'**
+  String addFoundAutomatically(double percent);
+
+  /// No description provided for @addWillBeCreated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ekklo : sera créé depuis MFP'**
+  String get addWillBeCreated;
+
+  /// No description provided for @addWillBeCreatedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'aliment perso copié de MFP, {amount}'**
+  String addWillBeCreatedDetail(String amount);
+
+  /// No description provided for @addToChoose.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ekklo : à choisir'**
+  String get addToChoose;
+
+  /// No description provided for @addToChooseDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'candidats proches à confirmer'**
+  String get addToChooseDetail;
+
+  /// No description provided for @addToChooseWeightDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'candidats proches et poids d’une {unit} à confirmer'**
+  String addToChooseWeightDetail(String unit);
+
+  /// No description provided for @addChosen.
+  ///
+  /// In fr, this message translates to:
+  /// **'choisi'**
+  String get addChosen;
+
+  /// No description provided for @addChosenWeight.
+  ///
+  /// In fr, this message translates to:
+  /// **'choisi, poids d’une {unit} retenu : {grams}'**
+  String addChosenWeight(String unit, String grams);
+
+  /// No description provided for @addWriteOrder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écrit d’abord dans MyFitnessPal, puis dans Ekklo.'**
+  String get addWriteOrder;
+
+  /// No description provided for @addToBoth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter à MFP et Ekklo'**
+  String get addToBoth;
+
+  /// No description provided for @addChooseEkkloFood.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir l’aliment Ekklo'**
+  String get addChooseEkkloFood;
+
+  /// No description provided for @addConfirmAndAdd.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer et ajouter'**
+  String get addConfirmAndAdd;
+
+  /// No description provided for @addDaySubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'{date}, avec {food}, {amount}'**
+  String addDaySubtitle(String date, String food, String amount);
+
+  /// No description provided for @addThisFood.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cet aliment'**
+  String get addThisFood;
+
+  /// No description provided for @addAfterAdding.
+  ///
+  /// In fr, this message translates to:
+  /// **'Après l’ajout'**
+  String get addAfterAdding;
+
+  /// No description provided for @addGoal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Objectif'**
+  String get addGoal;
+
+  /// No description provided for @addPlus.
+  ///
+  /// In fr, this message translates to:
+  /// **'+{value}'**
+  String addPlus(String value);
+
+  /// No description provided for @addDayNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Calories en kcal, nutriments en grammes. Objectifs réglables dans Réglages.'**
+  String get addDayNote;
+
+  /// No description provided for @addDayExtras.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sucres +{sugar} g, sodium +{sodium} mg.'**
+  String addDayExtras(double sugar, double sodium);
+
+  /// No description provided for @addingTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajout en cours'**
+  String get addingTitle;
+
+  /// No description provided for @addWrittenIn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écrit dans {meal}'**
+  String addWrittenIn(String meal);
+
+  /// No description provided for @addWriting.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écriture…'**
+  String get addWriting;
+
+  /// No description provided for @addAdding.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajout en cours…'**
+  String get addAdding;
+
+  /// No description provided for @addAddingNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le bouton reste bloqué jusqu’à la réponse des deux côtés : un double tap n’ajoute rien deux fois.'**
+  String get addAddingNote;
+
+  /// No description provided for @addEkkloNoReply.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ekklo n’a pas répondu'**
+  String get addEkkloNoReply;
+
+  /// No description provided for @addNotWritten.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non écrit'**
+  String get addNotWritten;
+
+  /// No description provided for @addEkkloFailedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'L’entrée MyFitnessPal est gardée. Réessayer Ekklo n’écrit pas une deuxième fois dans MyFitnessPal.'**
+  String get addEkkloFailedDetail;
+
+  /// No description provided for @addRetryEkklo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer Ekklo'**
+  String get addRetryEkklo;
+
+  /// No description provided for @addCancelMfpEntry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler l\'entrée MFP'**
+  String get addCancelMfpEntry;
+
+  /// No description provided for @addMfpNoReply.
+  ///
+  /// In fr, this message translates to:
+  /// **'MyFitnessPal n’a pas répondu'**
+  String get addMfpNoReply;
+
+  /// No description provided for @addNotSent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas envoyé'**
+  String get addNotSent;
+
+  /// No description provided for @addMfpFailedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rien n’a été écrit, ni dans MyFitnessPal ni dans Ekklo. Ta saisie est gardée.'**
+  String get addMfpFailedDetail;
+
+  /// No description provided for @addEditEntry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier la saisie'**
+  String get addEditEntry;
+
+  /// No description provided for @addFoodChangedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cet aliment a changé dans MyFitnessPal'**
+  String get addFoodChangedTitle;
+
+  /// No description provided for @addFoodChangedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valeurs rechargées : {before} → {after} kcal / {serving}. Ce qui a bougé est surligné en jaune.'**
+  String addFoodChangedDetail(double before, double after, String serving);
+
+  /// No description provided for @addMfpSessionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Session MyFitnessPal expirée'**
+  String get addMfpSessionTitle;
+
+  /// No description provided for @addMfpSessionDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Reconnecte-toi pour ajouter. Ta saisie est gardée : {food}, {serving}, {meal} du {date}.'**
+  String addMfpSessionDetail(
+    String food,
+    String serving,
+    String meal,
+    DateTime date,
+  );
+
+  /// No description provided for @addMfpSessionSearchDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Reconnecte-toi pour chercher. Ta recherche est gardée.'**
+  String get addMfpSessionSearchDetail;
+
+  /// No description provided for @addEkkloSessionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Session Ekklo expirée'**
+  String get addEkkloSessionTitle;
+
+  /// No description provided for @addEkkloSessionDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'MyFitnessPal reste connecté. Reconnecte Ekklo pour écrire des deux côtés ; ta saisie est gardée.'**
+  String get addEkkloSessionDetail;
 }
 
 class _AppLocalizationsDelegate

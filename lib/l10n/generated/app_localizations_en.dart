@@ -1403,4 +1403,444 @@ class AppLocalizationsEn extends AppLocalizations {
   String serviceNotResponding(String service) {
     return '$service is not responding.';
   }
+
+  @override
+  String get addSearchHint => 'Search MyFitnessPal';
+
+  @override
+  String get addVerifiedOnly => 'Verified only';
+
+  @override
+  String get addRecents => 'RECENT';
+
+  @override
+  String get addRecentsAddedFromFujin => 'added from Fūjin';
+
+  @override
+  String get addRecentsOnPhone => 'on this phone';
+
+  @override
+  String get addRecentsNote => 'Kept on this phone, newest first.';
+
+  @override
+  String get addRecentsEmpty => 'Foods added from Fūjin will show up here.';
+
+  @override
+  String addRecentLine(String detail, String when) {
+    return '$detail · $when';
+  }
+
+  @override
+  String get addThisMorning => 'this morning';
+
+  @override
+  String get addThisAfternoon => 'this afternoon';
+
+  @override
+  String get addThisEvening => 'this evening';
+
+  @override
+  String get addYesterday => 'yesterday';
+
+  @override
+  String addWeekday(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.EEEE(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString';
+  }
+
+  @override
+  String addShortDate(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString';
+  }
+
+  @override
+  String addServing(double value, String unit) {
+    final intl.NumberFormat valueNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String valueString = valueNumberFormat.format(value);
+
+    return '$valueString $unit';
+  }
+
+  @override
+  String get addMfpResults => 'MYFITNESSPAL RESULTS';
+
+  @override
+  String addFirstResults(int count) {
+    return 'first $count';
+  }
+
+  @override
+  String addResultCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count results',
+      one: '1 result',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get addSearching => 'searching…';
+
+  @override
+  String addBarcodeChip(String format) {
+    return 'Barcode · $format';
+  }
+
+  @override
+  String get addSearchBarcode => 'Look up this barcode';
+
+  @override
+  String addBarcodeValid(String format) {
+    return '$format · check digit correct';
+  }
+
+  @override
+  String addSearchAsText(String query) {
+    return 'Search “$query” as text';
+  }
+
+  @override
+  String get addBarcodeUnknownTitle => 'Unknown barcode';
+
+  @override
+  String addBarcodeUnknownDetail(String code) {
+    return 'The code $code is not in the MyFitnessPal database. Search the product by name, or create it in the MyFitnessPal app.';
+  }
+
+  @override
+  String get addBarcodeUnresolvedTitle => 'Product known, no details';
+
+  @override
+  String addBarcodeUnresolvedDetail(String name) {
+    return 'MyFitnessPal knows this code ($name) but has no nutrition values for it.';
+  }
+
+  @override
+  String addSearchQuoted(String query) {
+    return 'Search “$query”';
+  }
+
+  @override
+  String get addNoResultTitle => 'No results';
+
+  @override
+  String get addNoResultDetail => 'MyFitnessPal finds nothing for this search.';
+
+  @override
+  String get addTryInstead => 'TRY INSTEAD';
+
+  @override
+  String addShorten(String query) {
+    return 'Shorten: “$query”';
+  }
+
+  @override
+  String get addIncludeUnverified => 'Include unverified';
+
+  @override
+  String get addOfflineTitle => 'No connection';
+
+  @override
+  String get addOfflineDetail =>
+      'Search resumes when the network is back. Your recent foods stay here.';
+
+  @override
+  String get addServerTitle => 'MyFitnessPal is not responding';
+
+  @override
+  String get addServerDetail =>
+      'The server returned an error. Your search is kept.';
+
+  @override
+  String addServerCode(int code) {
+    return 'Code $code · for support';
+  }
+
+  @override
+  String addToMeal(String meal) {
+    return 'Add to $meal';
+  }
+
+  @override
+  String get addVerified => 'Verified';
+
+  @override
+  String get addUnverified => 'Not verified';
+
+  @override
+  String addEan(String code) {
+    return 'EAN $code';
+  }
+
+  @override
+  String get addServingSize => 'SERVING SIZE';
+
+  @override
+  String get addServings => 'NUMBER OF SERVINGS';
+
+  @override
+  String get addServingsOther => 'Other';
+
+  @override
+  String get addServingsUnit => 'servings';
+
+  @override
+  String addMealDate(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMEd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString';
+  }
+
+  @override
+  String addFor(String serving) {
+    return 'For $serving';
+  }
+
+  @override
+  String addForGrams(String serving, String grams) {
+    return 'For $serving, that is $grams';
+  }
+
+  @override
+  String get addMyDay => 'My day';
+
+  @override
+  String addRemaining(double value) {
+    final intl.NumberFormat valueNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String valueString = valueNumberFormat.format(value);
+
+    return '$valueString kcal left';
+  }
+
+  @override
+  String addExceeds(double value) {
+    final intl.NumberFormat valueNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String valueString = valueNumberFormat.format(value);
+
+    return 'Over by $valueString kcal';
+  }
+
+  @override
+  String addMacroGrams(double value) {
+    final intl.NumberFormat valueNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 1,
+        );
+    final String valueString = valueNumberFormat.format(value);
+
+    return '$valueString g';
+  }
+
+  @override
+  String addEkkloFood(String name, String amount) {
+    return 'Ekklo: $name, $amount';
+  }
+
+  @override
+  String get addRemembered => 'remembered';
+
+  @override
+  String addFoundAutomatically(double percent) {
+    final intl.NumberFormat percentNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String percentString = percentNumberFormat.format(percent);
+
+    return 'found automatically, $percentString % apart';
+  }
+
+  @override
+  String get addWillBeCreated => 'Ekklo: will be created from MFP';
+
+  @override
+  String addWillBeCreatedDetail(String amount) {
+    return 'own food copied from MFP, $amount';
+  }
+
+  @override
+  String get addToChoose => 'Ekklo: to choose';
+
+  @override
+  String get addToChooseDetail => 'close candidates to confirm';
+
+  @override
+  String addToChooseWeightDetail(String unit) {
+    return 'close candidates and weight of one $unit to confirm';
+  }
+
+  @override
+  String get addChosen => 'chosen';
+
+  @override
+  String addChosenWeight(String unit, String grams) {
+    return 'chosen, weight of one $unit kept: $grams';
+  }
+
+  @override
+  String get addWriteOrder => 'Written to MyFitnessPal first, then to Ekklo.';
+
+  @override
+  String get addToBoth => 'Add to MFP and Ekklo';
+
+  @override
+  String get addChooseEkkloFood => 'Choose the Ekklo food';
+
+  @override
+  String get addConfirmAndAdd => 'Confirm and add';
+
+  @override
+  String addDaySubtitle(String date, String food, String amount) {
+    return '$date, with $food, $amount';
+  }
+
+  @override
+  String get addThisFood => 'This food';
+
+  @override
+  String get addAfterAdding => 'After adding';
+
+  @override
+  String get addGoal => 'Goal';
+
+  @override
+  String addPlus(String value) {
+    return '+$value';
+  }
+
+  @override
+  String get addDayNote =>
+      'Calories in kcal, nutrients in grams. Goals can be set in Settings.';
+
+  @override
+  String addDayExtras(double sugar, double sodium) {
+    final intl.NumberFormat sugarNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 1,
+        );
+    final String sugarString = sugarNumberFormat.format(sugar);
+    final intl.NumberFormat sodiumNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String sodiumString = sodiumNumberFormat.format(sodium);
+
+    return 'Sugar +$sugarString g, sodium +$sodiumString mg.';
+  }
+
+  @override
+  String get addingTitle => 'Adding';
+
+  @override
+  String addWrittenIn(String meal) {
+    return 'Written to $meal';
+  }
+
+  @override
+  String get addWriting => 'Writing…';
+
+  @override
+  String get addAdding => 'Adding…';
+
+  @override
+  String get addAddingNote =>
+      'The button stays locked until both sides answer: a double tap never adds twice.';
+
+  @override
+  String get addEkkloNoReply => 'Ekklo did not answer';
+
+  @override
+  String get addNotWritten => 'Not written';
+
+  @override
+  String get addEkkloFailedDetail =>
+      'The MyFitnessPal entry is kept. Retrying Ekklo does not write to MyFitnessPal a second time.';
+
+  @override
+  String get addRetryEkklo => 'Retry Ekklo';
+
+  @override
+  String get addCancelMfpEntry => 'Undo the MFP entry';
+
+  @override
+  String get addMfpNoReply => 'MyFitnessPal did not answer';
+
+  @override
+  String get addNotSent => 'Not sent';
+
+  @override
+  String get addMfpFailedDetail =>
+      'Nothing was written, neither to MyFitnessPal nor to Ekklo. Your entry is kept.';
+
+  @override
+  String get addEditEntry => 'Edit the entry';
+
+  @override
+  String get addFoodChangedTitle => 'This food changed in MyFitnessPal';
+
+  @override
+  String addFoodChangedDetail(double before, double after, String serving) {
+    final intl.NumberFormat beforeNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String beforeString = beforeNumberFormat.format(before);
+    final intl.NumberFormat afterNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String afterString = afterNumberFormat.format(after);
+
+    return 'Values reloaded: $beforeString → $afterString kcal / $serving. What changed is highlighted in yellow.';
+  }
+
+  @override
+  String get addMfpSessionTitle => 'MyFitnessPal session expired';
+
+  @override
+  String addMfpSessionDetail(
+    String food,
+    String serving,
+    String meal,
+    DateTime date,
+  ) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Sign in again to add. Your entry is kept: $food, $serving, $meal on $dateString.';
+  }
+
+  @override
+  String get addMfpSessionSearchDetail =>
+      'Sign in again to search. Your search is kept.';
+
+  @override
+  String get addEkkloSessionTitle => 'Ekklo session expired';
+
+  @override
+  String get addEkkloSessionDetail =>
+      'MyFitnessPal stays connected. Reconnect Ekklo to write to both sides; your entry is kept.';
 }

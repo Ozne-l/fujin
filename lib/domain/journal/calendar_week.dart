@@ -1,10 +1,10 @@
 abstract final class CalendarWeek {
-  static const _daysPerWeek = 7;
+  static const daysPerWeek = 7;
 
   static List<DateTime> daysOf(DateTime day) {
     final monday = mondayOf(day);
     return [
-      for (var offset = 0; offset < _daysPerWeek; offset++)
+      for (var offset = 0; offset < daysPerWeek; offset++)
         DateTime.utc(monday.year, monday.month, monday.day + offset),
     ];
   }
@@ -15,11 +15,11 @@ abstract final class CalendarWeek {
   static DateTime weeksBefore(DateTime monday, int weeks) => DateTime.utc(
     monday.year,
     monday.month,
-    monday.day - _daysPerWeek * weeks,
+    monday.day - daysPerWeek * weeks,
   );
 
   static int weeksBetween(DateTime earlier, DateTime later) =>
-      mondayOf(later).difference(mondayOf(earlier)).inDays ~/ _daysPerWeek;
+      mondayOf(later).difference(mondayOf(earlier)).inDays ~/ daysPerWeek;
 
   static DateTime sameWeekday(
     DateTime day, {

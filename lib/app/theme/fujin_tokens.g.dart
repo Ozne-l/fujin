@@ -31,6 +31,7 @@ abstract final class FujinColorRole {
   static const Color backgroundAlert = FujinColor.shuLight;
   static const Color backgroundCard = FujinColor.kinu;
   static const Color backgroundDark = FujinColor.sumi;
+  static const Color backgroundHighlight = FujinColor.kinLight;
   static const Color backgroundInfo = FujinColor.soraLight;
   static const Color backgroundPage = FujinColor.washi;
   static const Color backgroundSuccess = FujinColor.matcha;

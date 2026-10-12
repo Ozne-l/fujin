@@ -11,10 +11,16 @@ abstract final class EntryText {
       );
 
   static String brandedServing(AppLocalizations l10n, MfpFoodEntry entry) =>
-      switch (entry.food.brandName) {
-        null || '' => serving(l10n, entry),
-        final brand => l10n.brandedServingLine(brand, serving(l10n, entry)),
-      };
+      branded(l10n, entry.food.brandName, serving(l10n, entry));
+
+  static String branded(
+    AppLocalizations l10n,
+    String? brand,
+    String serving,
+  ) => switch (brand?.trim()) {
+    null || '' => serving,
+    final brand => l10n.brandedServingLine(brand, serving),
+  };
 
   static String linkedServing(AppLocalizations l10n, SentLink link) =>
       l10n.inEkkloAs(

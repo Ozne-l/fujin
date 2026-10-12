@@ -1,0 +1,359 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fujin/app/fujin_route.dart';
+import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/recents/recent_food.dart';
+import 'package:fujin/domain/adding/add_draft.dart';
+import 'package:fujin/domain/journal/read_problem.dart';
+import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/adding/add_search_notifier.dart';
+import 'package:fujin/pages/adding/add_search_state.dart';
+import 'package:fujin/pages/adding/add_text.dart';
+import 'package:fujin/pages/adding/widgets/add_chip.dart';
+import 'package:fujin/pages/adding/widgets/add_search_field.dart';
+import 'package:fujin/pages/adding/widgets/add_section_label.dart';
+import 'package:fujin/pages/adding/widgets/add_state_panel.dart';
+import 'package:fujin/pages/adding/widgets/barcode_card.dart';
+import 'package:fujin/pages/adding/widgets/food_list.dart';
+import 'package:fujin/pages/adding/widgets/offline_card.dart';
+import 'package:fujin/pages/adding/widgets/open_draft.dart';
+import 'package:fujin/pages/adding/widgets/suggestion_row.dart';
+import 'package:fujin/pages/common/entry_text.dart';
+import 'package:fujin/pages/common/flow_header.dart';
+import 'package:fujin/pages/common/scan_icon.dart';
+import 'package:fujin/pages/common/title_text.dart';
+import 'package:fujin/pages/journal/journal_text.dart';
+import 'package:fujin/pages/journal/selected_day.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:myfitnesspal_client/myfitnesspal_client.dart';
+
+class SearchView extends HookConsumerWidget {
+  const SearchView({
+    required this.date,
+    required this.mfpMealName,
+    required this.onOpen,
+    super.key,
+  });
+
+  static const _wordSeparator = ' ';
+
+  final DateTime date;
+  final String mfpMealName;
+  final OpenDraft onOpen;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final search = ref.watch(addSearchProvider);
+    final notifier = ref.read(addSearchProvider.notifier);
+    final recents = search.recents;
+    final today = ref.watch(todayProvider);
+    final query = useTextEditingController(text: search.query);
+    useListenable(query);
+    final barcode = switch ((search, checkBarcode(search.query))) {
+      (
+        AddSearchIdle() || AddSearchRunning() || AddSearchFailed(),
+        final MfpValidBarcode valid,
+      ) =>
+        valid,
+      _ => null,
+    };
+
+    void searchText(String text) {
+      query.value = TextEditingValue(
+        text: text,
+        selection: TextSelection.collapsed(offset: text.length),
+      );
+      unawaited(notifier.search(text));
+    }
+
+    void open(MfpFood food, {String? barcode}) {
+      if (AddDraft.of(food, mfpMealName: mfpMealName, date: date)
+          case final draft?) {
+        onOpen(draft, barcode: barcode);
+      }
+    }
+
+    Future<void> reopen(RecentFood recent) async {
+      if (await notifier.reopen(recent, mfpMealName: mfpMealName, date: date)
+          case final draft?) {
+        onOpen(draft);
+      }
+    }
+
+    Future<void> lookUp(String code) async {
+      if (await notifier.lookUp() case final food?) open(food, barcode: code);
+    }
+
+    void retry() => switch (barcode) {
+      final barcode? => unawaited(lookUp(barcode.barcode)),
+      null => unawaited(notifier.search(search.query)),
+    };
+
+    Future<void> signIn() async {
+      final signedIn = await context.push<bool>(FujinRoute.mfpSignIn.path);
+      if (signedIn case true) await notifier.search(search.query);
+    }
+
+    List<Widget> recentList(String trailing) => [
+      AddSectionLabel(label: l10n.addRecents, trailing: trailing),
+      switch (recents) {
+        [] => _note(l10n.addRecentsEmpty),
+        _ => FoodList(
+          rows: [
+            for (final recent in recents)
+              (
+                title: recent.description,
+                detail: AddText.recent(l10n, recent, today: today),
+                verified: false,
+                energy: switch (recent.kilocalories) {
+                  final energy? => l10n.kilocalories(energy),
+                  null => null,
+                },
+                onTap: () => unawaited(reopen(recent)),
+              ),
+          ],
+        ),
+      },
+    ];
+
+    final body = switch (search) {
+      AddSearchIdle() || AddSearchRunning() when barcode != null => [
+        BarcodeCard(
+          format: _formatName(barcode.format),
+          running: search is AddSearchRunning,
+          onTap: () => unawaited(lookUp(barcode.barcode)),
+        ),
+        Center(
+          child: TextButton(
+            onPressed: () => searchText(barcode.barcode),
+            child: Text(l10n.addSearchAsText(barcode.barcode)),
+          ),
+        ),
+      ],
+      AddSearchIdle() => [
+        ...recentList(l10n.addRecentsAddedFromFujin),
+        if (recents.isNotEmpty) _note(l10n.addRecentsNote),
+      ],
+      AddSearchRunning() => [
+        AddSectionLabel(
+          label: l10n.addMfpResults,
+          trailing: l10n.addSearching,
+          dot: FujinColorRole.sourceMfp,
+        ),
+      ],
+      AddSearchResults(foods: []) => [
+        AddStatePanel(
+          icon: Icons.search,
+          title: l10n.addNoResultTitle,
+          detail: l10n.addNoResultDetail,
+        ),
+        ..._suggestions(l10n, search, searchText, notifier),
+      ],
+      AddSearchResults(:final foods) => [
+        AddSectionLabel(
+          label: l10n.addMfpResults,
+          trailing: switch (foods.length) {
+            MfpFoods.defaultMaxResults => l10n.addFirstResults(foods.length),
+            final count => l10n.addResultCount(count),
+          },
+          dot: FujinColorRole.sourceMfp,
+        ),
+        FoodList(
+          rows: [
+            for (final food in foods)
+              (
+                title: food.description,
+                detail: AddText.result(l10n, food),
+                verified: food.verified ?? false,
+                energy: switch (AddText.kilocalories(food)) {
+                  final energy? => l10n.kilocalories(energy),
+                  null => null,
+                },
+                onTap: () => open(food),
+              ),
+          ],
+        ),
+      ],
+      AddBarcodeMissing(
+        result: MfpBarcodeUnresolved(:final description, :final brandName),
+      ) =>
+        [_unresolved(l10n, description, brandName, searchText)],
+      AddBarcodeMissing(:final result) => [
+        AddStatePanel(
+          icon: Icons.qr_code_2,
+          title: l10n.addBarcodeUnknownTitle,
+          detail: l10n.addBarcodeUnknownDetail(result.barcode),
+        ),
+      ],
+      AddSearchFailed(problem: ReadProblem.offline) => [
+        OfflineCard(onRetry: retry),
+        ...recentList(l10n.addRecentsOnPhone),
+      ],
+      AddSearchFailed(problem: ReadProblem.mfpSessionExpired) => [
+        AddStatePanel(
+          icon: Icons.lock_outline,
+          alert: true,
+          title: l10n.addMfpSessionTitle,
+          detail: l10n.addMfpSessionSearchDetail,
+          actionIcon: Icons.login,
+          action: (l10n.mfpReconnect, () => unawaited(signIn())),
+        ),
+      ],
+      AddSearchFailed(:final problem, :final statusCode) => [
+        AddStatePanel(
+          icon: Icons.dns_outlined,
+          alert: true,
+          title: switch (problem) {
+            ReadProblem.mfpUnavailable => l10n.addServerTitle,
+            ReadProblem.offline ||
+            ReadProblem.mfpSessionExpired ||
+            ReadProblem.ekkloSessionExpired ||
+            ReadProblem.ekkloUnavailable ||
+            ReadProblem.unknown => JournalText.problemHeadline(l10n, problem),
+          },
+          detail: l10n.addServerDetail,
+          action: (l10n.tryAgain, retry),
+          note: switch (statusCode) {
+            final code? => l10n.addServerCode(code),
+            null => null,
+          },
+        ),
+      ],
+    };
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        FlowHeader(
+          title: mfpMealName,
+          subtitle: TitleText.capitalized(l10n.journalDay(date)),
+          onBack: () => context.pop(),
+        ),
+        AddSearchField(
+          controller: query,
+          onChanged: notifier.type,
+          onSubmitted: (text) => unawaited(notifier.search(text)),
+          onClear: () {
+            query.clear();
+            notifier.type('');
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            FujinSize.screenMargin,
+            FujinSpace.s3,
+            FujinSize.screenMargin,
+            FujinSpace.s4,
+          ),
+          child: Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: switch (barcode) {
+              final barcode? => AddChip(
+                label: l10n.addBarcodeChip(_formatName(barcode.format)),
+                selected: true,
+                icon: SvgPicture.asset(
+                  ScanIcon.asset,
+                  width: FujinSize.searchIcon,
+                  height: FujinSize.searchIcon,
+                  theme: const SvgTheme(currentColor: FujinColorRole.textLink),
+                ),
+              ),
+              null => AddChip(
+                label: l10n.addVerifiedOnly,
+                selected: search.verifiedOnly,
+                icon: switch (search.verifiedOnly) {
+                  true => const Icon(Icons.check),
+                  false => null,
+                },
+                onTap: () => unawaited(
+                  notifier.verifiedOnly(only: !search.verifiedOnly),
+                ),
+              ),
+            },
+          ),
+        ),
+        Expanded(
+          child: ListView(
+            padding: EdgeInsets.only(
+              bottom: FujinSpace.s8 + MediaQuery.paddingOf(context).bottom,
+            ),
+            children: [
+              for (final (index, child) in body.indexed) ...[
+                if (index > 0) const SizedBox(height: FujinSpace.s3),
+                child,
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  static Widget _note(String text) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: FujinSize.textInset),
+    child: Text(
+      text,
+      style: FujinText.inter12Regular.copyWith(
+        color: FujinColorRole.textSecondary,
+      ),
+    ),
+  );
+
+  static Widget _unresolved(
+    AppLocalizations l10n,
+    String description,
+    String? brandName,
+    ValueChanged<String> searchText,
+  ) {
+    final text = [description, ?brandName].join(_wordSeparator);
+    return AddStatePanel(
+      icon: Icons.qr_code_2,
+      title: l10n.addBarcodeUnresolvedTitle,
+      detail: l10n.addBarcodeUnresolvedDetail(
+        EntryText.branded(l10n, brandName, description),
+      ),
+      actionIcon: Icons.search,
+      action: (l10n.addSearchQuoted(text), () => searchText(text)),
+    );
+  }
+
+  static List<Widget> _suggestions(
+    AppLocalizations l10n,
+    AddSearchState search,
+    ValueChanged<String> searchText,
+    AddSearchNotifier notifier,
+  ) {
+    final words = search.query.split(_wordSeparator);
+    final shorter = words.take(words.length - 1).join(_wordSeparator);
+    final rows = [
+      if (shorter.isNotEmpty)
+        SuggestionRow(
+          icon: Icons.search,
+          label: l10n.addShorten(shorter),
+          onTap: () => searchText(shorter),
+        ),
+      if (search.verifiedOnly)
+        SuggestionRow(
+          icon: Icons.check,
+          label: l10n.addIncludeUnverified,
+          onTap: () => unawaited(notifier.verifiedOnly(only: false)),
+        ),
+    ];
+    return [
+      if (rows.isNotEmpty) AddSectionLabel(label: l10n.addTryInstead),
+      ...rows,
+    ];
+  }
+
+  static String _formatName(MfpBarcodeFormat format) => switch (format) {
+    MfpBarcodeFormat.ean8 => 'EAN-8',
+    MfpBarcodeFormat.upcA => 'UPC-A',
+    MfpBarcodeFormat.ean13 => 'EAN-13',
+    MfpBarcodeFormat.gtin14 => 'GTIN-14',
+  };
+}

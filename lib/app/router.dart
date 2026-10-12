@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/domain/accounts/connected_accounts.dart';
+import 'package:fujin/pages/adding/add_food_page.dart';
 import 'package:fujin/pages/ekklo_sign_in/ekklo_sign_in_page.dart';
 import 'package:fujin/pages/journal/journal_page.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
@@ -107,6 +108,22 @@ final routerProvider = Provider<GoRouter>((ref) {
                 '${FujinRoute.send.path} needs ${FujinRoute.dateParameter}',
               ),
             },
+      ),
+      GoRoute(
+        path: FujinRoute.addFood.path,
+        builder: (context, state) => switch ((
+          state.pathParameters[FujinRoute.dateParameter],
+          state.uri.queryParameters[FujinRoute.mealParameter],
+        )) {
+          (final date?, final meal?) => AddFoodPage(
+            date: SelectedDay.calendarDay(DateTime.parse(date)),
+            mfpMealName: meal,
+          ),
+          _ => throw StateError(
+            '${FujinRoute.addFood.path} needs ${FujinRoute.dateParameter} '
+            'and ${FujinRoute.mealParameter}',
+          ),
+        },
       ),
     ],
   );

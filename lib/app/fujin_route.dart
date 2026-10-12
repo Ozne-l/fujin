@@ -11,11 +11,13 @@ enum FujinRoute {
   welcome('/welcome'),
   mfpSignIn('/mfp-sign-in'),
   ekkloSignIn('/ekklo-sign-in'),
-  send('/send/:${FujinRoute.dateParameter}');
+  send('/send/:${FujinRoute.dateParameter}'),
+  addFood('/add/:${FujinRoute.dateParameter}');
 
   const FujinRoute(this.path);
 
   static const dateParameter = 'date';
+  static const mealParameter = 'meal';
   static const foodParameter = 'food';
   static const unitParameter = 'unit';
   static const goalsSegment = 'goals';
@@ -24,6 +26,11 @@ enum FujinRoute {
 
   String forDate(DateTime date) =>
       path.replaceFirst(':$dateParameter', CalendarDateHook.format(date));
+
+  String forMeal(DateTime date, String meal) => Uri(
+    path: forDate(date),
+    queryParameters: {mealParameter: meal},
+  ).toString();
 
   String forFood(RememberedFood food) => Uri(
     path: path.replaceFirst(':$foodParameter', food.mfpFoodId),

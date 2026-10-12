@@ -759,5 +759,244 @@
   "serviceNotResponding": "{service} ne répond pas.",
   "@serviceNotResponding": {
     "placeholders": {"service": {"type": "String"}}
-  }
+  },
+  "addSearchHint": "Rechercher dans MyFitnessPal",
+  "addVerifiedOnly": "Vérifiés uniquement",
+  "addRecents": "RÉCENTS",
+  "addRecentsAddedFromFujin": "ajoutés depuis Fūjin",
+  "addRecentsOnPhone": "sur ce téléphone",
+  "addRecentsNote": "Gardés sur ce téléphone, du plus récent au plus ancien.",
+  "addRecentsEmpty": "Les aliments ajoutés depuis Fūjin apparaîtront ici.",
+  "addRecentLine": "{detail} · {when}",
+  "@addRecentLine": {
+    "placeholders": {
+      "detail": {"type": "String"},
+      "when": {"type": "String"}
+    }
+  },
+  "addThisMorning": "ce matin",
+  "addThisAfternoon": "cet après-midi",
+  "addThisEvening": "ce soir",
+  "addYesterday": "hier",
+  "addWeekday": "{date}",
+  "@addWeekday": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "EEEE"}
+    }
+  },
+  "addShortDate": "{date}",
+  "@addShortDate": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "MMMd"}
+    }
+  },
+  "addServing": "{value} {unit}",
+  "@addServing": {
+    "placeholders": {
+      "value": {"type": "double", "format": "decimalPattern"},
+      "unit": {"type": "String"}
+    }
+  },
+  "addMfpResults": "RÉSULTATS MYFITNESSPAL",
+  "addFirstResults": "{count} premiers",
+  "@addFirstResults": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "addResultCount": "{count, plural, =1{1 résultat} other{{count} résultats}}",
+  "@addResultCount": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "addSearching": "recherche…",
+  "addBarcodeChip": "Code-barres · {format}",
+  "@addBarcodeChip": {
+    "placeholders": {"format": {"type": "String"}}
+  },
+  "addSearchBarcode": "Chercher ce code-barres",
+  "addBarcodeValid": "{format} · chiffre de contrôle correct",
+  "@addBarcodeValid": {
+    "placeholders": {"format": {"type": "String"}}
+  },
+  "addSearchAsText": "Chercher « {query} » comme texte",
+  "@addSearchAsText": {
+    "placeholders": {"query": {"type": "String"}}
+  },
+  "addBarcodeUnknownTitle": "Code-barres inconnu",
+  "addBarcodeUnknownDetail": "Le code {code} n’est pas dans la base MyFitnessPal. Cherche le produit par son nom, ou crée-le dans l’app MyFitnessPal.",
+  "@addBarcodeUnknownDetail": {
+    "placeholders": {"code": {"type": "String"}}
+  },
+  "addBarcodeUnresolvedTitle": "Produit reconnu, sans fiche",
+  "addBarcodeUnresolvedDetail": "MyFitnessPal connaît ce code ({name}) mais n’a pas ses valeurs nutritionnelles.",
+  "@addBarcodeUnresolvedDetail": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "addSearchQuoted": "Chercher « {query} »",
+  "@addSearchQuoted": {
+    "placeholders": {"query": {"type": "String"}}
+  },
+  "addNoResultTitle": "Aucun résultat",
+  "addNoResultDetail": "MyFitnessPal ne trouve rien pour cette recherche.",
+  "addTryInstead": "ESSAIE PLUTÔT",
+  "addShorten": "Raccourcir : « {query} »",
+  "@addShorten": {
+    "placeholders": {"query": {"type": "String"}}
+  },
+  "addIncludeUnverified": "Inclure les non vérifiés",
+  "addOfflineTitle": "Pas de connexion",
+  "addOfflineDetail": "La recherche reprendra au retour du réseau. Tes récents restent là.",
+  "addServerTitle": "MyFitnessPal ne répond pas",
+  "addServerDetail": "Le serveur a renvoyé une erreur. Ta recherche est gardée.",
+  "addServerCode": "Code {code} · pour le support",
+  "@addServerCode": {
+    "placeholders": {"code": {"type": "int"}}
+  },
+  "addToMeal": "Ajouter à {meal}",
+  "@addToMeal": {
+    "placeholders": {"meal": {"type": "String"}}
+  },
+  "addVerified": "Vérifié",
+  "addUnverified": "Non vérifié",
+  "addEan": "EAN {code}",
+  "@addEan": {
+    "placeholders": {"code": {"type": "String"}}
+  },
+  "addServingSize": "TAILLE DE PORTION",
+  "addServings": "NOMBRE DE PORTIONS",
+  "addServingsOther": "Autre",
+  "addServingsUnit": "portions",
+  "addMealDate": "{date}",
+  "@addMealDate": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "MMMEd"}
+    }
+  },
+  "addFor": "Pour {serving}",
+  "@addFor": {
+    "placeholders": {"serving": {"type": "String"}}
+  },
+  "addForGrams": "Pour {serving}, soit {grams}",
+  "@addForGrams": {
+    "placeholders": {
+      "serving": {"type": "String"},
+      "grams": {"type": "String"}
+    }
+  },
+  "addMyDay": "Ma journée",
+  "addRemaining": "Il restera {value} kcal",
+  "@addRemaining": {
+    "placeholders": {
+      "value": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}}
+    }
+  },
+  "addExceeds": "Dépassera de {value} kcal",
+  "@addExceeds": {
+    "placeholders": {
+      "value": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}}
+    }
+  },
+  "addMacroGrams": "{value} g",
+  "@addMacroGrams": {
+    "placeholders": {
+      "value": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 1}}
+    }
+  },
+  "addEkkloFood": "Ekklo : {name}, {amount}",
+  "@addEkkloFood": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "amount": {"type": "String"}
+    }
+  },
+  "addRemembered": "mémorisé",
+  "addFoundAutomatically": "trouvé automatiquement, écart {percent} %",
+  "@addFoundAutomatically": {
+    "placeholders": {
+      "percent": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}}
+    }
+  },
+  "addWillBeCreated": "Ekklo : sera créé depuis MFP",
+  "addWillBeCreatedDetail": "aliment perso copié de MFP, {amount}",
+  "@addWillBeCreatedDetail": {
+    "placeholders": {"amount": {"type": "String"}}
+  },
+  "addToChoose": "Ekklo : à choisir",
+  "addToChooseDetail": "candidats proches à confirmer",
+  "addToChooseWeightDetail": "candidats proches et poids d’une {unit} à confirmer",
+  "@addToChooseWeightDetail": {
+    "placeholders": {"unit": {"type": "String"}}
+  },
+  "addChosen": "choisi",
+  "addChosenWeight": "choisi, poids d’une {unit} retenu : {grams}",
+  "@addChosenWeight": {
+    "placeholders": {
+      "unit": {"type": "String"},
+      "grams": {"type": "String"}
+    }
+  },
+  "addWriteOrder": "Écrit d’abord dans MyFitnessPal, puis dans Ekklo.",
+  "addToBoth": "Ajouter à MFP et Ekklo",
+  "addChooseEkkloFood": "Choisir l’aliment Ekklo",
+  "addConfirmAndAdd": "Confirmer et ajouter",
+  "addDaySubtitle": "{date}, avec {food}, {amount}",
+  "@addDaySubtitle": {
+    "placeholders": {
+      "date": {"type": "String"},
+      "food": {"type": "String"},
+      "amount": {"type": "String"}
+    }
+  },
+  "addThisFood": "Cet aliment",
+  "addAfterAdding": "Après l’ajout",
+  "addGoal": "Objectif",
+  "addPlus": "+{value}",
+  "@addPlus": {
+    "placeholders": {"value": {"type": "String"}}
+  },
+  "addDayNote": "Calories en kcal, nutriments en grammes. Objectifs réglables dans Réglages.",
+  "addDayExtras": "Sucres +{sugar} g, sodium +{sodium} mg.",
+  "@addDayExtras": {
+    "placeholders": {
+      "sugar": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 1}},
+      "sodium": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}}
+    }
+  },
+  "addingTitle": "Ajout en cours",
+  "addWrittenIn": "Écrit dans {meal}",
+  "@addWrittenIn": {
+    "placeholders": {"meal": {"type": "String"}}
+  },
+  "addWriting": "Écriture…",
+  "addAdding": "Ajout en cours…",
+  "addAddingNote": "Le bouton reste bloqué jusqu’à la réponse des deux côtés : un double tap n’ajoute rien deux fois.",
+  "addEkkloNoReply": "Ekklo n’a pas répondu",
+  "addNotWritten": "Non écrit",
+  "addEkkloFailedDetail": "L’entrée MyFitnessPal est gardée. Réessayer Ekklo n’écrit pas une deuxième fois dans MyFitnessPal.",
+  "addRetryEkklo": "Réessayer Ekklo",
+  "addCancelMfpEntry": "Annuler l'entrée MFP",
+  "addMfpNoReply": "MyFitnessPal n’a pas répondu",
+  "addNotSent": "Pas envoyé",
+  "addMfpFailedDetail": "Rien n’a été écrit, ni dans MyFitnessPal ni dans Ekklo. Ta saisie est gardée.",
+  "addEditEntry": "Modifier la saisie",
+  "addFoodChangedTitle": "Cet aliment a changé dans MyFitnessPal",
+  "addFoodChangedDetail": "Valeurs rechargées : {before} → {after} kcal / {serving}. Ce qui a bougé est surligné en jaune.",
+  "@addFoodChangedDetail": {
+    "placeholders": {
+      "before": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}},
+      "after": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}},
+      "serving": {"type": "String"}
+    }
+  },
+  "addMfpSessionTitle": "Session MyFitnessPal expirée",
+  "addMfpSessionDetail": "Reconnecte-toi pour ajouter. Ta saisie est gardée : {food}, {serving}, {meal} du {date}.",
+  "@addMfpSessionDetail": {
+    "placeholders": {
+      "food": {"type": "String"},
+      "serving": {"type": "String"},
+      "meal": {"type": "String"},
+      "date": {"type": "DateTime", "format": "MMMMd"}
+    }
+  },
+  "addMfpSessionSearchDetail": "Reconnecte-toi pour chercher. Ta recherche est gardée.",
+  "addEkkloSessionTitle": "Session Ekklo expirée",
+  "addEkkloSessionDetail": "MyFitnessPal reste connecté. Reconnecte Ekklo pour écrire des deux côtés ; ta saisie est gardée."
 }

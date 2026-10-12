@@ -1205,6 +1205,11 @@
         "$value": "{color.matcha}",
         "$type": "color"
       },
+      "highlight": {
+        "$value": "{color.kin-light}",
+        "$type": "color",
+        "$description": "Light gold behind what needs the owner: the Ekklo food to choose (04d) and values that moved in MyFitnessPal (06e)."
+      },
       "scrim": {
         "$value": {
           "colorSpace": "srgb",
