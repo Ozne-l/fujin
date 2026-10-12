@@ -417,9 +417,7 @@ void main() {
     check(find.text('À envoyer').evaluate()).length.equals(2);
     check(find.text('Ajouter un aliment').evaluate()).length.equals(2);
 
-    await tester.ensureVisible(find.text(breakfast));
-    await tester.tap(find.text(breakfast));
-    await tester.pumpAndSettle();
+    await _tap(tester, find.text(breakfast));
 
     check(find.text('1/1 dans Ekklo').evaluate()).length.equals(1);
     check(find.text('Flocons d’avoine').evaluate()).length.equals(1);

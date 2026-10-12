@@ -61,6 +61,6 @@ The vocabulary comes from Vladimir Khorikov, *Unit Testing Principles, Practices
     Why: they have no logic of their own, and their failures already surface through the behaviour tests above.
     Examples of what has no test on purpose: the providers in `lib/app/providers.dart`, `toMap`/`fromMap` round trips of `*.mapper.dart` files, `FujinTheme.light()` and `lib/app/theme/fujin_tokens.g.dart`, constructor defaults such as `Memory()` or `StatusCounts()`.
 
-11. **Run `flutter test` from the repo root before handing work back, together with `dart analyze --fatal-infos` and `dart format --set-exit-if-changed .`.**
+11. **Run `flutter test` from the repo root before handing work back, together with `dart analyze --fatal-infos` and `dart format --set-exit-if-changed lib test tool`.**
     Why: tests are only useful if they are green at every hand-off.
     Example: the suite lives under `test/` (`test/data/`, `test/domain/`, `test/pages/`, helpers in `test/support/`).

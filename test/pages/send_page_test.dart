@@ -66,8 +66,8 @@ void main() {
     _sees('1 nouvelle association : Skyr nature');
 
     await _tap(tester, 'Retour au journal');
-    check(find.text('1/1 · $oats').evaluate()).length.equals(1);
-    check(find.text('1/1 · Skyr nature').evaluate()).length.equals(1);
+    _sees('1/1 · $oats');
+    _sees('1/1 · Skyr nature');
     check(backends.ekkloItems).length.equals(2);
   });
 
@@ -113,6 +113,7 @@ void main() {
     _sees('1 aliment mis à jour');
     check(backends.ekkloItems.single.quantity).equals(200);
   });
+
   testWidgets('sends the candidate chosen on sheet 11 and remembers it for '
       'the next send', (tester) async {
     final backends = FakeBackends(

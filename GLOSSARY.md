@@ -66,13 +66,13 @@ The words below have one meaning in Fūjin's code, docs and conversations. Frenc
 
 **Send report.** What screen 15 sums up: foods sent, remembered foods reused, new associations, retained unit weights, own copies created, updates; for an automatic send, what screen 17 lists: the send mode and the planned entries decided without the owner. Code: `SendReport` (`lib/domain/sending/send_report.dart`).
 
-**Add draft.** What the add fiche (04) edits before anything is written: a MyFitnessPal food, one of its serving sizes, the servings, the MyFitnessPal meal and the day. Its entry is the MyFitnessPal entry it would log, nutrients scaled from the food's. Code: `AddDraft` (`lib/domain/adding/add_draft.dart`). ADR 0026.
+**Add draft.** What the add fiche (A04) edits before anything is written: a MyFitnessPal food, one of its serving sizes, the servings, the MyFitnessPal meal and the day. Its entry is the MyFitnessPal entry it would log, nutrients scaled from the food's. Code: `AddDraft` (`lib/domain/adding/add_draft.dart`). ADR 0026.
 
 **Ekklo side.** The Ekklo summary line of the add fiche, from the draft's planned entry: "mémorisé" (`remembered`), "trouvé automatiquement" (`foundAutomatically`), "sera créé depuis MFP" (`willBeCreated`), "à choisir" (`toChoose`, an estimated unit weight to confirm before adding), "choisi" (`chosen`). Code: `EkkloSide` (`lib/domain/adding/ekklo_side.dart`), planned by `AddFoodService.plan` with the send flow's `planEntry`.
 
 **Added food.** The result of adding a food from Fūjin, handed back to the Journal: the planned entry with its new MyFitnessPal entry id, and whether Ekklo was written (otherwise the entry stays "À envoyer"). Undo removes the Ekklo item first, then the MyFitnessPal entry; when the second step fails the entry is "encore dans MyFitnessPal" and undo can run again. Code: `AddedFood` (`lib/domain/adding/added_food.dart`), `AddOutcome`, `UndoOutcome`, `AddFoodService` (`lib/domain/adding/add_food_service.dart`). ADR 0026.
 
-**Recent food.** A MyFitnessPal food Fūjin added, kept on this phone with its last serving, servings, kilocalories and time, shown as "Récents" on the add search (02a), newest first, at most 20. Not in the backup file. Code: `RecentFood` (`lib/data/recents/recent_food.dart`), `RecentFoodRepository` (`lib/data/recents/recent_food_repository.dart`), table `recent_food`. ADR 0026.
+**Recent food.** A MyFitnessPal food Fūjin added, kept on this phone with its last serving, servings, kilocalories and time, shown as "Récents" on the add search (A02a), newest first, at most 20. Not in the backup file. Code: `RecentFood` (`lib/data/recents/recent_food.dart`), `RecentFoodRepository` (`lib/data/recents/recent_food_repository.dart`), table `recent_food`. ADR 0026.
 
 **Session.** The credentials a client needs: Ekklo tokens or MyFitnessPal session cookies, kept in secure storage, never backed up. Code: `SecureEkkloTokenStore`, `SecureMfpSessionStore`, `SessionKey` (`lib/data/sessions/`).
 
