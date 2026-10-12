@@ -90,4 +90,16 @@ const schemaMigrations = [
   );
   CREATE INDEX unattended_item_date ON unattended_item (date);
   ''',
+  '''
+  CREATE TABLE recent_food (
+    mfp_food_id TEXT PRIMARY KEY,
+    description TEXT NOT NULL,
+    brand_name TEXT,
+    serving_value REAL NOT NULL,
+    serving_unit TEXT NOT NULL,
+    servings REAL NOT NULL,
+    kilocalories REAL,
+    added_at TEXT NOT NULL
+  );
+  ''',
 ];

@@ -26,6 +26,7 @@ Never point a run or a test at the owner's real MyFitnessPal or Ekklo accounts. 
 flutter run --flavor production \
   --dart-define=MFP_WEB_URI=http://10.0.2.2:<port> \
   --dart-define=MFP_API_URI=http://10.0.2.2:<port> \
+  --dart-define=MFP_SYNC_URI=http://10.0.2.2:<port> \
   --dart-define=EKKLO_BASE_URI=http://10.0.2.2:<port>
 ```
 

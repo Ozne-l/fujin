@@ -12,11 +12,13 @@ import 'package:fujin/data/hints/hint_repository.dart';
 import 'package:fujin/data/http/read_only_http_client.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
+import 'package:fujin/data/recents/recent_food_repository.dart';
 import 'package:fujin/data/sessions/secure_ekklo_token_store.dart';
 import 'package:fujin/data/sessions/secure_mfp_session_store.dart';
 import 'package:fujin/data/settings/settings_repository.dart';
 import 'package:fujin/data/unattended/unattended_item_repository.dart';
 import 'package:fujin/domain/accounts/accounts_service.dart';
+import 'package:fujin/domain/adding/add_food_service.dart';
 import 'package:fujin/domain/backup/backup_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/memory/memory_service.dart';
@@ -81,6 +83,7 @@ final mfpClientProvider = Provider<MyFitnessPalClient>((ref) {
     httpClient: ref.watch(httpClientProvider),
     webUri: Config.mfpWebUri,
     apiUri: Config.mfpApiUri,
+    syncUri: Config.mfpSyncUri,
     userAgent: ref.watch(mfpUserAgentProvider),
     clock: ref.watch(clockProvider),
   );
@@ -113,6 +116,10 @@ final goalsRepositoryProvider = Provider<GoalsRepository>(
 
 final unattendedItemRepositoryProvider = Provider<UnattendedItemRepository>(
   (ref) => UnattendedItemRepository(ref.watch(databaseProvider)),
+);
+
+final recentFoodRepositoryProvider = Provider<RecentFoodRepository>(
+  (ref) => RecentFoodRepository(ref.watch(databaseProvider)),
 );
 
 final hintRepositoryProvider = Provider<HintRepository>(
@@ -175,6 +182,19 @@ final sendServiceProvider = Provider<SendService>(
     links: ref.watch(sentLinkRepositoryProvider),
     unattended: ref.watch(unattendedItemRepositoryProvider),
     database: ref.watch(databaseProvider),
+    clock: ref.watch(clockProvider),
+  ),
+);
+
+final addFoodServiceProvider = Provider<AddFoodService>(
+  (ref) => AddFoodService(
+    mfp: ref.watch(mfpClientProvider),
+    ekklo: ref.watch(ekkloClientProvider),
+    journal: ref.watch(journalServiceProvider),
+    sending: ref.watch(sendServiceProvider),
+    memory: ref.watch(memoryRepositoryProvider),
+    links: ref.watch(sentLinkRepositoryProvider),
+    recents: ref.watch(recentFoodRepositoryProvider),
     clock: ref.watch(clockProvider),
   ),
 );

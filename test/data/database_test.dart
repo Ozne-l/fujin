@@ -14,6 +14,8 @@ import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
+import 'package:fujin/data/recents/recent_food.dart';
+import 'package:fujin/data/recents/recent_food_repository.dart';
 
 import '../support/fixtures.dart';
 
@@ -368,6 +370,35 @@ void main() {
         ..replace(null);
 
       check(goals.load()).isNull();
+    });
+  });
+
+  group('recent foods', () {
+    late FujinDatabase database;
+
+    setUp(() => database = FujinDatabase.inMemory());
+    tearDown(() => database.close());
+
+    test('keeps the 20 latest foods', () {
+      final recents = RecentFoodRepository(database);
+      for (var minute = 0; minute <= 20; minute++) {
+        recents.record(
+          RecentFood(
+            mfpFoodId: 'food-$minute',
+            description: 'food-$minute',
+            servingValue: 100,
+            servingUnit: grams,
+            servings: 1,
+            addedAt: now.add(Duration(minutes: minute)),
+          ),
+        );
+      }
+
+      final latest = recents.latest();
+
+      check(latest).length.equals(20);
+      check(latest.first.mfpFoodId).equals('food-20');
+      check(latest.last.mfpFoodId).equals('food-1');
     });
   });
 }

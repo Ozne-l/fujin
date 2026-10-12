@@ -15,6 +15,10 @@ abstract final class Config {
     const String.fromEnvironment('MFP_API_URI'),
     MyFitnessPalClient.defaultApiUri,
   );
+  static final Uri mfpSyncUri = _uri(
+    const String.fromEnvironment('MFP_SYNC_URI'),
+    MyFitnessPalClient.defaultSyncUri,
+  );
   static final Uri mfpSignInUri = mfpWebUri.resolve(_mfpSignInPath);
   static final Uri ekkloBaseUri = _uri(
     const String.fromEnvironment('EKKLO_BASE_URI'),

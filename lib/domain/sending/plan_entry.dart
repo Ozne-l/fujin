@@ -32,7 +32,7 @@ EntryPlanning planEntry({
   final base = PlannedEntry(
     entry: entry,
     entryId: entryId,
-    ekkloMealName: memory.ekkloMealName(entry.mealName) ?? entry.mealName,
+    ekkloMealName: ekkloMealFor(entry, memory),
     choice: const SendAsOwnCopy(),
     reviewed: false,
     rememberedEkkloFoodId: switch (remembered) {
@@ -101,6 +101,9 @@ EntryPlanning planEntry({
     null => search(),
   };
 }
+
+String ekkloMealFor(MfpFoodEntry entry, Memory memory) =>
+    memory.ekkloMealName(entry.mealName) ?? entry.mealName;
 
 bool isFresh(OwnCopy copy, MfpFoodEntry entry) =>
     switch ((copy.mfpFoodVersion, entry.food.version)) {

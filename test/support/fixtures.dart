@@ -235,3 +235,23 @@ final EkkloFood oliveOil = ekkloFood(
   calories: 884,
   fats: 100,
 );
+
+MfpFood mfpFood(
+  String id, {
+  String? description,
+  String? brand,
+  String version = '1',
+  bool verified = true,
+  List<MfpServingSize> servingSizes = const [
+    MfpServingSize(value: 100, unit: grams, nutritionMultiplier: 1),
+  ],
+  MfpNutrients nutrients = const MfpNutrients(),
+}) => MfpFood(
+  id: id,
+  version: version,
+  description: description ?? id,
+  brandName: brand,
+  verified: verified,
+  servingSizes: servingSizes,
+  nutrients: nutrients,
+);

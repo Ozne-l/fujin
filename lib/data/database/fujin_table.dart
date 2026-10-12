@@ -5,7 +5,8 @@ enum FujinTable {
   memoryMeal('memory_meal'),
   sentLink('sent_link'),
   goals('goals'),
-  unattendedItem('unattended_item');
+  unattendedItem('unattended_item'),
+  recentFood('recent_food');
 
   const FujinTable(this.sqlName);
 

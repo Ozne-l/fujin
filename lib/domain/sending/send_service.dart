@@ -112,6 +112,19 @@ final class SendService {
     return plan;
   }
 
+  Future<PlannedEntry> planOne(MfpFoodEntry entry, {required String entryId}) {
+    final memory = _memory.load();
+    return _planOne(
+      (food, results) => planEntry(
+        entry: entry,
+        entryId: entryId,
+        memory: memory,
+        rememberedFood: food,
+        searchResults: results,
+      ),
+    );
+  }
+
   Future<List<EkkloCandidate>> search(
     PlannedEntry planned,
     String query,
