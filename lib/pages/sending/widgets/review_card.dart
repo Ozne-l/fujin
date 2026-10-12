@@ -10,6 +10,7 @@ import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/status_pill.dart';
+import 'package:fujin/pages/sending/entry_choices.dart';
 import 'package:fujin/pages/sending/send_plan_notifier.dart';
 import 'package:fujin/pages/sending/send_text.dart';
 import 'package:fujin/pages/sending/sheets/match_sheet.dart';
@@ -85,7 +86,10 @@ class ReviewCard extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: FujinSpace.s1,
             children: [
-              _Proposal(planned: planned, onChange: () => _change(context)),
+              _Proposal(
+                planned: planned,
+                onChange: () => _change(context, ref),
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: FujinSpace.s2),
                 child: ConstrainedBox(
@@ -131,10 +135,23 @@ class ReviewCard extends ConsumerWidget {
     ReviewReason.skipped || ReviewReason.confirmed => false,
   };
 
+  EntryChoices _choices(WidgetRef ref) {
+    final plan = ref.read(sendPlanProvider(planned.entry.date).notifier);
+    final entryId = planned.entryId;
+    return (
+      choose: (candidate) => plan.choose(entryId, candidate),
+      ownCopy: () => plan.ownCopy(entryId),
+      weigh: (gramsPerUnit) => plan.weigh(entryId, gramsPerUnit),
+      skip: () => plan.skip(entryId),
+    );
+  }
+
   void _confirm(BuildContext context, WidgetRef ref) {
     switch (planned.reason) {
       case ReviewReason.weightToConfirm:
-        unawaited(showWeightSheet(context, planned: planned));
+        unawaited(
+          showWeightSheet(context, planned: planned, choices: _choices(ref)),
+        );
       case ReviewReason.newAssociation ||
           ReviewReason.noCloseFood ||
           ReviewReason.skipped ||
@@ -145,12 +162,15 @@ class ReviewCard extends ConsumerWidget {
     }
   }
 
-  void _change(BuildContext context) {
+  void _change(BuildContext context, WidgetRef ref) {
+    final choices = _choices(ref);
     switch (planned.choice) {
       case SendAsOwnCopy(reuse: null):
-        unawaited(showOwnCopySheet(context, planned: planned));
+        unawaited(
+          showOwnCopySheet(context, planned: planned, choices: choices),
+        );
       case SendToEkkloFood() || SendAsOwnCopy() || SkipEntry():
-        unawaited(showMatchSheet(context, planned: planned));
+        unawaited(showMatchSheet(context, planned: planned, choices: choices));
     }
   }
 }

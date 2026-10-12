@@ -1058,6 +1058,54 @@ abstract class AppLocalizations {
   /// **'Retour au journal'**
   String get backToJournal;
 
+  /// No description provided for @automaticSentNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode automatique : rien ne t\'a été demandé.'**
+  String get automaticSentNote;
+
+  /// No description provided for @unattendedChoices.
+  ///
+  /// In fr, this message translates to:
+  /// **'CHOIX FAITS SANS TOI ({count})'**
+  String unattendedChoices(int count);
+
+  /// No description provided for @unattendedClosest.
+  ///
+  /// In fr, this message translates to:
+  /// **'→ {name} (le plus proche)'**
+  String unattendedClosest(String name);
+
+  /// No description provided for @unattendedWeight.
+  ///
+  /// In fr, this message translates to:
+  /// **'→ {amount}, poids déduit des kcal'**
+  String unattendedWeight(String amount);
+
+  /// No description provided for @unattendedOwnCopy.
+  ///
+  /// In fr, this message translates to:
+  /// **'→ aliment perso créé'**
+  String get unattendedOwnCopy;
+
+  /// No description provided for @unattendedNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ces choix ne sont pas mémorisés. « Revoir » permet\nde les garder pour les prochaines fois.'**
+  String get unattendedNote;
+
+  /// No description provided for @review.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revoir'**
+  String get review;
+
+  /// No description provided for @keepFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choix non gardé : l\'aliment perso n\'a pas pu être créé dans Ekklo.'**
+  String get keepFailed;
+
   /// No description provided for @interruptedTitle.
   ///
   /// In fr, this message translates to:
@@ -1363,6 +1411,24 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **' · '**
   String get summarySeparator;
+
+  /// No description provided for @settingsSending.
+  ///
+  /// In fr, this message translates to:
+  /// **'ENVOI'**
+  String get settingsSending;
+
+  /// No description provided for @automaticMode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode automatique'**
+  String get automaticMode;
+
+  /// No description provided for @automaticModeDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ne me demande rien : aliments mémorisés,\npuis meilleur candidat, sinon aliment perso.'**
+  String get automaticModeDetail;
 
   /// No description provided for @settingsBackup.
   ///

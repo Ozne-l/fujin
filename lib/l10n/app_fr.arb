@@ -447,6 +447,25 @@
   },
   "listSeparator": ", ",
   "backToJournal": "Retour au journal",
+  "automaticSentNote": "Mode automatique : rien ne t'a été demandé.",
+  "unattendedChoices": "CHOIX FAITS SANS TOI ({count})",
+  "@unattendedChoices": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "unattendedClosest": "→ {name} (le plus proche)",
+  "@unattendedClosest": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "unattendedWeight": "→ {amount}, poids déduit des kcal",
+  "@unattendedWeight": {
+    "placeholders": {"amount": {"type": "String"}}
+  },
+  "unattendedOwnCopy": "→ aliment perso créé",
+  "unattendedNote": "Ces choix ne sont pas mémorisés. « Revoir » permet\nde les garder pour les prochaines fois.",
+  "review": "Revoir",
+  "keepFailed": "Choix non gardé : l'aliment perso n'a pas pu être créé dans Ekklo.",
   "interruptedTitle": "Envoi interrompu",
   "interruptedNetwork": "Plus de réseau pendant l'envoi : {step}.",
   "@interruptedNetwork": {
@@ -566,6 +585,9 @@
     "placeholders": {"nutrient": {"type": "String"}, "value": {"type": "String"}}
   },
   "summarySeparator": " · ",
+  "settingsSending": "ENVOI",
+  "automaticMode": "Mode automatique",
+  "automaticModeDetail": "Ne me demande rien : aliments mémorisés,\npuis meilleur candidat, sinon aliment perso.",
   "settingsBackup": "SAUVEGARDE",
   "backupExport": "Exporter une sauvegarde",
   "backupExportDetail": "Mémoire et liens d’envoi, dans un fichier",

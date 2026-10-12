@@ -11,8 +11,8 @@ import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/source_dot.dart';
 import 'package:fujin/pages/sending/ekklo_search_notifier.dart';
 import 'package:fujin/pages/sending/ekklo_search_state.dart';
+import 'package:fujin/pages/sending/entry_choices.dart';
 import 'package:fujin/pages/sending/send_failure.dart';
-import 'package:fujin/pages/sending/send_plan_notifier.dart';
 import 'package:fujin/pages/sending/send_text.dart';
 import 'package:fujin/pages/sending/sheets/candidate_card.dart';
 import 'package:fujin/pages/sending/sheets/own_copy_sheet.dart';
@@ -25,20 +25,28 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 Future<void> showMatchSheet(
   BuildContext context, {
   required PlannedEntry planned,
+  required EntryChoices choices,
   String? query,
 }) => SheetFrame.show(
   context,
-  builder: (_) => _MatchSheet(planned: planned, query: query, opener: context),
+  builder: (_) => _MatchSheet(
+    planned: planned,
+    choices: choices,
+    query: query,
+    opener: context,
+  ),
 );
 
 class _MatchSheet extends HookConsumerWidget {
   const _MatchSheet({
     required this.planned,
+    required this.choices,
     required this.query,
     required this.opener,
   });
 
   final PlannedEntry planned;
+  final EntryChoices choices;
   final String? query;
   final BuildContext opener;
 
@@ -62,7 +70,6 @@ class _MatchSheet extends HookConsumerWidget {
       }
       return null;
     }, const []);
-    final plan = ref.read(sendPlanProvider(entry.date).notifier);
     final navigator = Navigator.of(context);
 
     return SheetFrame(
@@ -88,7 +95,7 @@ class _MatchSheet extends HookConsumerWidget {
       primaryLabel: l10n.associateAndRemember,
       onPrimary: switch (selected) {
         final candidate? => () {
-          plan.choose(planned.entryId, candidate);
+          choices.choose(candidate);
           navigator.pop();
         },
         null => null,
@@ -96,11 +103,16 @@ class _MatchSheet extends HookConsumerWidget {
       secondaryLabel: l10n.ownCopy,
       onSecondary: () {
         navigator.pop();
-        unawaited(showOwnCopySheet(opener, planned: planned));
+        unawaited(
+          showOwnCopySheet(opener, planned: planned, choices: choices),
+        );
       },
-      onSkip: () {
-        plan.skip(planned.entryId);
-        navigator.pop();
+      onSkip: switch (choices.skip) {
+        final skip? => () {
+          skip();
+          navigator.pop();
+        },
+        null => null,
       },
     );
   }

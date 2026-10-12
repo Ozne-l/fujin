@@ -56,13 +56,15 @@ The words below have one meaning in Fūjin's code, docs and conversations. Frenc
 
 **Automatic / to review.** A planned entry is automatic ("Mémorisé") when Memory fully decides it; an automatic new own copy says why instead: "Nouvelle unité" when the food has an own copy only in another unit, "Aliment modifié" when its own copy is stale (`OwnCopyRenewal`, `lib/domain/sending/own_copy_renewal.dart`); every other one is to review ("à vérifier") on screen 10 and shows why: "Poids à confirmer", "Nouvelle association", "Aucun aliment proche", then "Confirmé" or "Sauté". Code: `PlannedEntry.reviewed`, `ReviewReason` (`lib/domain/sending/review_reason.dart`).
 
+**Automatic mode (Mode automatique).** A Réglages setting, off by default and kept on this phone only (shared preferences), under which "Envoyer vers Ekklo" skips screen 10 and sends every proposal as is, then shows screen 17. Such a send remembers nothing but the own copies it creates; the entries that would have been to review are the "choix faits sans toi", each with "Revoir" to keep its choice in Memory. Not to be confused with an automatic planned entry ("Mémorisé"). Code: `Setting.automaticMode` (`lib/data/settings/setting.dart`), `SettingsRepository` (`lib/data/settings/settings_repository.dart`), `automaticModeProvider` (`lib/pages/common/automatic_mode_notifier.dart`), `SendMode` (`lib/domain/sending/send_mode.dart`), `SendService.keep`. ADR 0025.
+
 **Candidate.** An Ekklo food proposed for a MyFitnessPal entry, with the grams to send, whether they were estimated from the kilocalories, the nutrient gaps and how the names match. Acceptable when a name or brand word is shared and the gaps are within tolerance (kcal 12 %, each macro 10 % or 5 kcal). Code: `EkkloCandidate` (`lib/domain/sending/ekklo_candidate.dart`), `NutrientDeltas` (`lib/domain/sending/nutrient_deltas.dart`), `NameMatch`, `rankCandidates` (`lib/domain/sending/rank_candidates.dart`).
 
 **Unit weight.** How a planned Ekklo food got the grams of a non-gram serving: remembered, estimated from the kilocalories, or confirmed by the owner (screen 12). Estimated and confirmed weights become remembered units when the send runs. Code: `UnitWeight` (`lib/domain/sending/unit_weight.dart`).
 
 **Send step.** One write of a send, shown on screens 14 and 16: create an own copy, update a quantity in place, or send one Ekklo meal. Code: sealed `SendStep` (`OwnCopyStep`, `QuantityUpdateStep`, `MealStep`, `lib/domain/sending/send_step.dart`), `SendProgress`, `StepState`.
 
-**Send report.** What screen 15 sums up: foods sent, remembered foods reused, new associations, retained unit weights, own copies created, updates. Code: `SendReport` (`lib/domain/sending/send_report.dart`).
+**Send report.** What screen 15 sums up: foods sent, remembered foods reused, new associations, retained unit weights, own copies created, updates; for an automatic send, what screen 17 lists: the send mode and the planned entries decided without the owner. Code: `SendReport` (`lib/domain/sending/send_report.dart`).
 
 **Session.** The credentials a client needs: Ekklo tokens or MyFitnessPal session cookies, kept in secure storage, never backed up. Code: `SecureEkkloTokenStore`, `SecureMfpSessionStore`, `SessionKey` (`lib/data/sessions/`).
 
@@ -112,12 +114,12 @@ Codes from the Figma file "Fūjin · Maquettes", as used in the docs.
 | 14 | "Envoi en cours", send progress per step. Code: `SendingView` (`lib/pages/sending/widgets/sending_view.dart`) |
 | 15 | "Envoi terminé", the send report. Code: `SentView` (`lib/pages/sending/widgets/sent_view.dart`) |
 | 16 | "Envoi interrompu": why, what is already in Ekklo, "Envoyer les N aliments restants". Code: `InterruptedView` (`lib/pages/sending/widgets/interrupted_view.dart`) |
-| 17 | Result of a send in "Mode automatique", a Réglages setting (planned) |
+| 17 | Result of a send in "Mode automatique": "Mode automatique : rien ne t'a été demandé.", "CHOIX FAITS SANS TOI (N)" with one row per entry decided alone and "Revoir", which opens sheet 11, 12 or 13 and keeps the choice in Memory; a kept row shows "Mémorisé". Code: `AutomaticSentView` (`lib/pages/sending/widgets/automatic_sent_view.dart`), `KeptChoicesNotifier` (`lib/pages/sending/kept_choices_notifier.dart`) |
 | 18 | Mémoire tab, the second tab: remembered foods with their Ekklo food and unit weights, searchable without accents. Code: `MemoryPage` (`lib/pages/memory/memory_page.dart`) |
 | 19 | A remembered food: its MyFitnessPal and Ekklo sides, "Changer ›" (Ekklo search sheet, `showChangeFoodSheet`), unit weights, "Oublier cet aliment". Code: `MemoryFoodPage` (`lib/pages/memory/memory_food_page.dart`) |
 | 20 | Mémoire, "Repas": one row per meal mapping with a menu of Ekklo meal names. Code: `MealMappingsCard` (`lib/pages/memory/widgets/meal_mappings_card.dart`) |
 | 21 | Mémoire with nothing remembered yet. Code: `MemoryEmptyView` (`lib/pages/memory/widgets/memory_empty_view.dart`) |
 | 06e | Own copy whose MyFitnessPal food changed version since it was copied (planned) |
-| O1, O2 | Réglages tab, the third tab: "objectifs définis" (O1) and "aucun objectif" (O2): accounts, goals, backup, data on this phone, app version. Code: `SettingsPage` (`lib/pages/settings/settings_page.dart`) |
+| O1, O2 | Réglages tab, the third tab: "objectifs définis" (O1) and "aucun objectif" (O2): accounts, goals, sending ("Mode automatique" switch), backup, data on this phone, app version. Code: `SettingsPage` (`lib/pages/settings/settings_page.dart`), `SettingsSwitchRow` (`lib/pages/settings/widgets/settings_switch_row.dart`) |
 | O3, O4, O5 | Goal editing: complete goals, empty fields, just saved. Code: `GoalsPage` (`lib/pages/settings/goals_page.dart`), `GoalsNotifier` (`lib/pages/common/goals_notifier.dart`) |
 | O6, O7 | Backup file exported (O6) and imported (O7), reached from Réglages; the import replaces everything after a confirmation. Code: `BackupNotifier` (`lib/pages/settings/backup_notifier.dart`), confirmation sheet (`lib/pages/settings/sheets/confirm_sheet.dart`) |

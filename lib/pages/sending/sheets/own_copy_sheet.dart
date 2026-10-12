@@ -10,38 +10,43 @@ import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/pill_size.dart';
 import 'package:fujin/pages/common/status_pill.dart';
-import 'package:fujin/pages/sending/send_plan_notifier.dart';
+import 'package:fujin/pages/sending/entry_choices.dart';
 import 'package:fujin/pages/sending/send_text.dart';
 import 'package:fujin/pages/sending/sheets/candidate_card.dart';
 import 'package:fujin/pages/sending/sheets/match_sheet.dart';
 import 'package:fujin/pages/sending/sheets/sheet_frame.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 Future<void> showOwnCopySheet(
   BuildContext context, {
   required PlannedEntry planned,
+  required EntryChoices choices,
 }) => SheetFrame.show(
   context,
-  builder: (_) => _OwnCopySheet(planned: planned, opener: context),
+  builder: (_) =>
+      _OwnCopySheet(planned: planned, choices: choices, opener: context),
 );
 
-class _OwnCopySheet extends ConsumerWidget {
-  const _OwnCopySheet({required this.planned, required this.opener});
+class _OwnCopySheet extends StatelessWidget {
+  const _OwnCopySheet({
+    required this.planned,
+    required this.choices,
+    required this.opener,
+  });
 
   final PlannedEntry planned;
+  final EntryChoices choices;
   final BuildContext opener;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final entry = planned.entry;
-    final plan = ref.read(sendPlanProvider(entry.date).notifier);
     final navigator = Navigator.of(context);
     final energy = EntryText.energy(l10n, entry);
 
     void chooseCandidate() {
       navigator.pop();
-      unawaited(showMatchSheet(opener, planned: planned));
+      unawaited(showMatchSheet(opener, planned: planned, choices: choices));
     }
 
     return SheetFrame(
@@ -86,7 +91,14 @@ class _OwnCopySheet extends ConsumerWidget {
       ],
       onSearch: (text) {
         navigator.pop();
-        unawaited(showMatchSheet(opener, planned: planned, query: text));
+        unawaited(
+          showMatchSheet(
+            opener,
+            planned: planned,
+            choices: choices,
+            query: text,
+          ),
+        );
       },
       sectionLabel: l10n.rejectedCandidates,
       body: [
@@ -95,14 +107,17 @@ class _OwnCopySheet extends ConsumerWidget {
       ],
       primaryLabel: l10n.createOwnCopy,
       onPrimary: () {
-        plan.ownCopy(planned.entryId);
+        choices.ownCopy();
         navigator.pop();
       },
       secondaryLabel: l10n.chooseCandidate,
       onSecondary: chooseCandidate,
-      onSkip: () {
-        plan.skip(planned.entryId);
-        navigator.pop();
+      onSkip: switch (choices.skip) {
+        final skip? => () {
+          skip();
+          navigator.pop();
+        },
+        null => null,
       },
     );
   }

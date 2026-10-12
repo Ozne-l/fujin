@@ -5,31 +5,37 @@ import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/grams_input.dart';
-import 'package:fujin/pages/sending/send_plan_notifier.dart';
+import 'package:fujin/pages/sending/entry_choices.dart';
 import 'package:fujin/pages/sending/send_text.dart';
 import 'package:fujin/pages/sending/sheets/sheet_frame.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 Future<void> showWeightSheet(
   BuildContext context, {
   required PlannedEntry planned,
+  required EntryChoices choices,
 }) async {
   if (planned.choice case final SendToEkkloFood choice) {
     await SheetFrame.show(
       context,
-      builder: (_) => _WeightSheet(planned: planned, choice: choice),
+      builder: (_) =>
+          _WeightSheet(planned: planned, choice: choice, choices: choices),
     );
   }
 }
 
-class _WeightSheet extends HookConsumerWidget {
-  const _WeightSheet({required this.planned, required this.choice});
+class _WeightSheet extends HookWidget {
+  const _WeightSheet({
+    required this.planned,
+    required this.choice,
+    required this.choices,
+  });
 
   final PlannedEntry planned;
   final SendToEkkloFood choice;
+  final EntryChoices choices;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final entry = planned.entry;
     final unit = entry.servingSize.unit;
@@ -41,7 +47,6 @@ class _WeightSheet extends HookConsumerWidget {
     );
     useListenable(weight);
     final grams = GramsInput.parse(context, weight.text);
-    final plan = ref.read(sendPlanProvider(entry.date).notifier);
     final navigator = Navigator.of(context);
 
     return SheetFrame(
@@ -148,7 +153,7 @@ class _WeightSheet extends HookConsumerWidget {
       primaryLabel: l10n.validate,
       onPrimary: switch (grams) {
         final grams? => () {
-          plan.weigh(planned.entryId, grams);
+          choices.weigh(grams);
           navigator.pop();
         },
         null => null,

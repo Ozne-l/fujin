@@ -67,6 +67,25 @@ abstract final class SendText {
     ReviewReason.confirmed => (l10n.pillConfirmed, PillTone.validated),
   };
 
+  static String unattended(AppLocalizations l10n, PlannedEntry planned) =>
+      switch ((planned.reason, planned.choice)) {
+        (ReviewReason.weightToConfirm, SendToEkkloFood(:final grams)) =>
+          l10n.unattendedWeight(SendText.grams(l10n, grams)),
+        (_, SendToEkkloFood(:final ekkloFoodName, :final food)) =>
+          l10n.unattendedClosest(switch (food?.brands) {
+            final brands? => l10n.weightFoodBrand(ekkloFoodName, brands),
+            null => ekkloFoodName,
+          }),
+        (_, SendAsOwnCopy()) => l10n.unattendedOwnCopy,
+        (_, SkipEntry()) => l10n.skippedDetail,
+      };
+
+  static String kept(AppLocalizations l10n, PlannedEntry planned) =>
+      switch (planned.choice) {
+        SendAsOwnCopy() => l10n.towards(l10n.ownCopy),
+        SendToEkkloFood() || SkipEntry() => target(l10n, planned),
+      };
+
   static String target(AppLocalizations l10n, PlannedEntry planned) =>
       switch (planned.choice) {
         SendToEkkloFood(:final ekkloFoodName, :final grams) =>

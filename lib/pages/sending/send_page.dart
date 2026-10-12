@@ -1,10 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:fujin/domain/sending/send_mode.dart';
+import 'package:fujin/pages/common/automatic_mode_notifier.dart';
 import 'package:fujin/pages/sending/send_notifier.dart';
 import 'package:fujin/pages/sending/send_plan_notifier.dart';
 import 'package:fujin/pages/sending/send_plan_state.dart';
 import 'package:fujin/pages/sending/send_state.dart';
+import 'package:fujin/pages/sending/widgets/automatic_sent_view.dart';
 import 'package:fujin/pages/sending/widgets/interrupted_view.dart';
 import 'package:fujin/pages/sending/widgets/plan_failed_view.dart';
 import 'package:fujin/pages/sending/widgets/review_view.dart';
@@ -24,7 +27,9 @@ class SendPage extends HookConsumerWidget {
     final sendState = ref.watch(sendProvider(date));
 
     ref.listen(sendPlanProvider(date), (previous, next) {
-      if (next case SendPlanReady(:final plan) when plan.updatesOnly) {
+      if (next case SendPlanReady(:final plan)
+          when plan.updatesOnly ||
+              (ref.read(automaticModeProvider) && plan.sendCount > 0)) {
         unawaited(ref.read(sendProvider(date).notifier).send(plan));
       }
     });
@@ -34,7 +39,10 @@ class SendPage extends HookConsumerWidget {
       child: Scaffold(
         body: SafeArea(
           child: switch ((sendState, planState)) {
-            (SendDone(:final report), _) => SentView(report: report),
+            (SendDone(:final report), _) => switch (report.mode) {
+              SendMode.reviewed => SentView(report: report),
+              SendMode.automatic => AutomaticSentView(report: report),
+            },
             (SendRunning(:final progress), SendPlanReady(:final plan)) =>
               SendingView(plan: plan, progress: progress),
             (

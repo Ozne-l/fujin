@@ -755,6 +755,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backToJournal => 'Back to the journal';
 
   @override
+  String get automaticSentNote => 'Automatic mode: nothing was asked of you.';
+
+  @override
+  String unattendedChoices(int count) {
+    return 'CHOICES MADE WITHOUT YOU ($count)';
+  }
+
+  @override
+  String unattendedClosest(String name) {
+    return '→ $name (the closest)';
+  }
+
+  @override
+  String unattendedWeight(String amount) {
+    return '→ $amount, weight inferred from kcal';
+  }
+
+  @override
+  String get unattendedOwnCopy => '→ own food created';
+
+  @override
+  String get unattendedNote =>
+      'These choices are not remembered. “Review” lets you\nkeep them for the next times.';
+
+  @override
+  String get review => 'Review';
+
+  @override
+  String get keepFailed =>
+      'Choice not kept: the own food could not be created in Ekklo.';
+
+  @override
   String get interruptedTitle => 'Sending stopped';
 
   @override
@@ -968,6 +1000,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get summarySeparator => ' · ';
+
+  @override
+  String get settingsSending => 'SENDING';
+
+  @override
+  String get automaticMode => 'Automatic mode';
+
+  @override
+  String get automaticModeDetail =>
+      'Don\'t ask me anything: remembered foods,\nthen the best candidate, else an own food.';
 
   @override
   String get settingsBackup => 'BACKUP';

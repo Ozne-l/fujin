@@ -7,6 +7,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/backup/backup.dart';
 import 'package:fujin/domain/accounts/account.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/common/automatic_mode_notifier.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
 import 'package:fujin/pages/common/goals_text.dart';
 import 'package:fujin/pages/common/text_inset.dart';
@@ -20,6 +21,7 @@ import 'package:fujin/pages/settings/sheets/confirm_sheet.dart';
 import 'package:fujin/pages/settings/widgets/account_row.dart';
 import 'package:fujin/pages/settings/widgets/settings_row.dart';
 import 'package:fujin/pages/settings/widgets/settings_section.dart';
+import 'package:fujin/pages/settings/widgets/settings_switch_row.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -35,6 +37,7 @@ class SettingsPage extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final memory = ref.watch(memoryProvider);
     final goals = ref.watch(goalsProvider);
+    final automaticMode = ref.watch(automaticModeProvider);
     final version = ref.watch(appVersionProvider);
     final backup = ref.watch(backupProvider);
     final backups = ref.read(backupProvider.notifier);
@@ -155,6 +158,19 @@ class SettingsPage extends ConsumerWidget {
                   detail: GoalsText.summary(l10n, goals),
                   onTap: () =>
                       unawaited(context.push<void>(FujinRoute.goals.path)),
+                ),
+              ],
+            ),
+            SettingsSection(
+              label: l10n.settingsSending,
+              rows: [
+                SettingsSwitchRow(
+                  title: l10n.automaticMode,
+                  detail: l10n.automaticModeDetail,
+                  value: automaticMode,
+                  onChanged: (on) => unawaited(
+                    ref.read(automaticModeProvider.notifier).turn(on: on),
+                  ),
                 ),
               ],
             ),

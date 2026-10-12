@@ -12,10 +12,11 @@ Works today:
 - The Mémoire tab (`lib/pages/memory/`) and the Réglages tab (`lib/pages/settings/`) with the daily goals and the backup file ([ADR 0019](docs/adr/0019-tab-shell.md), [ADR 0020](docs/adr/0020-goals.md), [ADR 0021](docs/adr/0021-backup-file.md)).
 - MyFitnessPal sign-in in a web view (`lib/pages/mfp_sign_in/mfp_sign_in_page.dart`) and Ekklo sign-in (`lib/pages/ekklo_sign_in/ekklo_sign_in_page.dart`), opened from the welcome screen or from the Journal when a session has expired; the Journal reads the day again after a successful sign-in.
 - The send flow (`lib/pages/sending/send_page.dart`, `lib/domain/sending/`): Ekklo search and ranking of candidates, review with the sheets to choose a food, set a unit's weight or create an own copy, then sending per Ekklo meal with progress, a summary and the interrupted state; updates of entries changed in MyFitnessPal; every choice remembered in Memory ([ADR 0018](docs/adr/0018-send-flow.md)).
-- Local storage in one SQLite file, `fujin.db` (Memory and send links), Android Auto Backup limited to that file, sessions in secure storage, hints already shown in shared preferences ([ADR 0023](docs/adr/0023-ui-flags-in-shared-preferences.md)).
+- The "Mode automatique" setting in Réglages: a send without review that remembers none of the choices it made alone (only the own copies it created), then lists them with "Revoir" to keep them ([ADR 0025](docs/adr/0025-automatic-mode.md)).
+- Local storage in one SQLite file, `fujin.db` (Memory, send links, goals and the items sent in automatic mode), Android Auto Backup limited to that file, sessions in secure storage, hints already shown and the automatic mode in shared preferences ([ADR 0023](docs/adr/0023-ui-flags-in-shared-preferences.md)).
 - Theme generated from design tokens, French and English copy through gen-l10n, tests for the comparison, storage, the Journal, the welcome screen, both sign-ins, the send planning and execution, and the send flow.
 
-Planned: undo, the "Mode automatique" setting, Scanner and adding a food from the Journal.
+Planned: Scanner and adding a food from the Journal, with its undo.
 
 ## Build and run
 

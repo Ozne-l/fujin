@@ -2,9 +2,16 @@ import 'package:checks/checks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
+import 'package:fujin/data/settings/setting.dart';
+import 'package:fujin/pages/sending/kept_choices_notifier.dart';
+import 'package:fujin/pages/sending/send_notifier.dart';
+import 'package:fujin/pages/sending/send_state.dart';
+import 'package:fujin/pages/sending/widgets/automatic_sent_view.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
+import '../support/in_memory_preferences.dart';
 import '../support/pump_fujin.dart';
 
 Future<void> _tap(WidgetTester tester, String text) async {
@@ -252,5 +259,165 @@ void main() {
     await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
     _sees('Nouvelle unité');
     check(find.text('Mémorisé').evaluate()).isEmpty();
+  });
+
+  group('in automatic mode', () {
+    FakeBackends automaticDay() => FakeBackends(
+      mealNames: [breakfast],
+      entries: [skyrEntry, entry('E-2')],
+      ekkloSearches: {
+        'skyr': [isey, siggis],
+      },
+    );
+
+    Future<void> pumpAutomatic(
+      WidgetTester tester,
+      FakeBackends backends,
+    ) async => pumpFujin(
+      tester,
+      backends,
+      preferences: await inMemoryPreferences(on: [Setting.automaticMode]),
+    );
+
+    testWidgets('sends without review and lists the choices made without '
+        'the owner', (tester) async {
+      final backends = automaticDay();
+      await pumpAutomatic(tester, backends);
+
+      await _tap(tester, 'Envoyer 2 aliments vers Ekklo');
+      _sees('Envoi terminé');
+      _sees('Fūjin a envoyé 2 aliments vers Ekklo.');
+      _sees("Mode automatique : rien ne t'a été demandé.");
+      _sees('CHOIX FAITS SANS TOI (1)');
+      _sees('→ Skyr nature 0 % · Isey (le plus proche)');
+      check(find.text('1 à vérifier').evaluate()).isEmpty();
+      check(backends.ekkloItems).length.equals(2);
+
+      await _tap(tester, 'Retour au journal');
+      check(find.text('À envoyer').evaluate()).isEmpty();
+      check(find.text('À mettre à jour').evaluate()).isEmpty();
+    });
+
+    testWidgets('keeps a choice reviewed with Revoir', (tester) async {
+      final backends = automaticDay();
+      await pumpAutomatic(tester, backends);
+      await _tap(tester, 'Envoyer 2 aliments vers Ekklo');
+
+      await _tap(tester, 'Revoir');
+      await _tap(tester, 'Associer et mémoriser');
+      _sees('Mémorisé');
+      check(find.text('Revoir').evaluate()).isEmpty();
+
+      await _tap(tester, 'Retour au journal');
+      check(find.text('À mettre à jour').evaluate()).isEmpty();
+      await _tap(tester, 'Réglages');
+      _sees('3 aliments et 2 repas');
+    });
+
+    testWidgets('keeps a choice once when Revoir is confirmed twice', (
+      tester,
+    ) async {
+      final backends = automaticDay();
+      await pumpAutomatic(tester, backends);
+      await _tap(tester, 'Envoyer 2 aliments vers Ekklo');
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(AutomaticSentView)),
+      );
+      final report = switch (container.read(sendProvider(day))) {
+        SendDone(:final report) => report,
+        _ => throw StateError('send not done'),
+      };
+      final planned = report.unattended.single.asOwnCopy();
+      final kept = container.read(keptChoicesProvider(day).notifier);
+      final ownCopiesBefore = backends.ekkloFoods.length;
+
+      final first = kept.keep(planned);
+      final second = kept.keep(planned);
+      check(
+        container.read(keptChoicesProvider(day)).keeping,
+      ).deepEquals({planned.entryId});
+      await Future.wait([first, second]);
+      await tester.pumpAndSettle();
+
+      check(backends.ekkloFoods).length.equals(ownCopiesBefore + 1);
+      _sees('Mémorisé');
+    });
+
+    testWidgets('says the network is gone and keeps Revoir when a choice '
+        'cannot be kept', (tester) async {
+      final backends = automaticDay();
+      await pumpAutomatic(tester, backends);
+      await _tap(tester, 'Envoyer 2 aliments vers Ekklo');
+
+      backends.ekkloReachable = false;
+      await _tap(tester, 'Revoir');
+      await _tap(tester, 'Aliment perso');
+      await _tap(tester, "Créer l'aliment perso");
+      _sees('Pas de connexion internet.');
+      _sees('Revoir');
+      check(find.text('Mémorisé').evaluate()).isEmpty();
+    });
+
+    testWidgets('lists a weight deduced from the kcal and an own copy made '
+        'without the owner', (tester) async {
+      final backends = FakeBackends(
+        mealNames: [breakfast],
+        entries: [
+          entry(
+            'E-1',
+            food: rice,
+            unit: cup,
+            servingValue: 1,
+            servings: 2,
+            nutrients: nutrients(kcal: 468, carbs: 100),
+          ),
+          entry('E-2', food: 'Tofu fumé', description: 'Tofu fumé'),
+        ],
+        ekkloFoods: [ekkloFood(riceInEkklo, calories: 130, carbs: 28)],
+      );
+      await pumpAutomatic(tester, backends);
+
+      await _tap(tester, 'Envoyer 2 aliments vers Ekklo');
+      _sees('CHOIX FAITS SANS TOI (2)');
+      check(
+        find.textContaining(', poids déduit des kcal').evaluate(),
+      ).length.equals(1);
+      _sees('→ aliment perso créé');
+    });
+
+    testWidgets('leaves an entry to update when Revoir keeps another food', (
+      tester,
+    ) async {
+      final backends = automaticDay();
+      await pumpAutomatic(tester, backends);
+      await _tap(tester, 'Envoyer 2 aliments vers Ekklo');
+
+      await _tap(tester, 'Revoir');
+      await _tap(tester, 'Skyr');
+      await _tap(tester, 'Associer et mémoriser');
+      _sees('Mémorisé');
+      check(
+        backends.ekkloItems.map((item) => item.foodId),
+      ).contains(isey.id);
+
+      await _tap(tester, 'Retour au journal');
+      _sees('À mettre à jour');
+      _sees('Mettre à jour 1 aliment dans Ekklo');
+    });
+
+    testWidgets('says what stopped an automatic send and ends on its '
+        'result', (tester) async {
+      final backends = automaticDay();
+      backends.failingMeals.add(petitDejeuner);
+      await pumpAutomatic(tester, backends);
+
+      await _tap(tester, 'Envoyer 2 aliments vers Ekklo');
+      _sees('Envoi interrompu');
+
+      backends.failingMeals.clear();
+      await _tap(tester, 'Envoyer les 2 aliments restants');
+      _sees("Mode automatique : rien ne t'a été demandé.");
+      check(backends.ekkloItems).length.equals(2);
+    });
   });
 }

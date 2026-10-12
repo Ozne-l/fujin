@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:checks/checks.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/data/backup/backup.dart';
 import 'package:fujin/data/backup/backup_codec.dart';
 import 'package:fujin/data/goals/goals.dart';
+import 'package:fujin/data/preferences/fujin_preferences.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fake_backup_files.dart';
@@ -61,6 +63,29 @@ void main() {
     check(_count('Aucun objectif')).equals(1);
     check(_count('2 aliments et 2 repas')).equals(1);
     check(_count('Fūjin · $appVersion')).equals(1);
+  });
+
+  testWidgets('keeps the automatic mode, off at first, across launches', (
+    tester,
+  ) async {
+    bool switchedOn() =>
+        tester.widget<CupertinoSwitch>(find.byType(CupertinoSwitch)).value;
+
+    await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+    await _tap(tester, 'Réglages');
+    check(switchedOn()).isFalse();
+
+    await _tap(tester, 'Mode automatique');
+    check(switchedOn()).isTrue();
+
+    await tester.pumpWidget(const SizedBox());
+    await pumpFujin(
+      tester,
+      FakeBackends(mealNames: [breakfast]),
+      preferences: await FujinPreferences.open(),
+    );
+    await _tap(tester, 'Réglages');
+    check(switchedOn()).isTrue();
   });
 
   testWidgets('saves the goals and sums them up in the OBJECTIFS card', (

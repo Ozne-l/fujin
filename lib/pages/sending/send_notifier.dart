@@ -1,8 +1,8 @@
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/domain/sending/send_interruption.dart';
-import 'package:fujin/domain/sending/send_mode.dart';
 import 'package:fujin/domain/sending/send_plan.dart';
 import 'package:fujin/domain/sending/send_progress.dart';
+import 'package:fujin/pages/common/automatic_mode_notifier.dart';
 import 'package:fujin/pages/sending/send_failure.dart';
 import 'package:fujin/pages/sending/send_state.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -29,7 +29,7 @@ final class SendNotifier extends Notifier<SendState> {
           .read(sendServiceProvider)
           .send(
             plan,
-            mode: SendMode.reviewed,
+            mode: ref.read(automaticModeProvider.notifier).sendMode,
             onProgress: (progress) {
               if (ref.mounted) state = SendRunning(progress);
             },

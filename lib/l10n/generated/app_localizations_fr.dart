@@ -767,6 +767,39 @@ class AppLocalizationsFr extends AppLocalizations {
   String get backToJournal => 'Retour au journal';
 
   @override
+  String get automaticSentNote =>
+      'Mode automatique : rien ne t\'a été demandé.';
+
+  @override
+  String unattendedChoices(int count) {
+    return 'CHOIX FAITS SANS TOI ($count)';
+  }
+
+  @override
+  String unattendedClosest(String name) {
+    return '→ $name (le plus proche)';
+  }
+
+  @override
+  String unattendedWeight(String amount) {
+    return '→ $amount, poids déduit des kcal';
+  }
+
+  @override
+  String get unattendedOwnCopy => '→ aliment perso créé';
+
+  @override
+  String get unattendedNote =>
+      'Ces choix ne sont pas mémorisés. « Revoir » permet\nde les garder pour les prochaines fois.';
+
+  @override
+  String get review => 'Revoir';
+
+  @override
+  String get keepFailed =>
+      'Choix non gardé : l\'aliment perso n\'a pas pu être créé dans Ekklo.';
+
+  @override
   String get interruptedTitle => 'Envoi interrompu';
 
   @override
@@ -982,6 +1015,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get summarySeparator => ' · ';
+
+  @override
+  String get settingsSending => 'ENVOI';
+
+  @override
+  String get automaticMode => 'Mode automatique';
+
+  @override
+  String get automaticModeDetail =>
+      'Ne me demande rien : aliments mémorisés,\npuis meilleur candidat, sinon aliment perso.';
 
   @override
   String get settingsBackup => 'SAUVEGARDE';
