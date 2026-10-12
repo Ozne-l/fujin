@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Accepted
+Accepted. Of the planned motion users, the goal rings (`ProgressRing`, [0022](0022-journal-states-and-goal-rings.md)) and the send progress of screen 14 (`ProgressCard`, [0018](0018-send-flow.md)) exist; status pill changes and custom sheet or snackbar motion do not.
 
 ## Context
 

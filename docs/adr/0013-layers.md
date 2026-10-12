@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Accepted
+Accepted. Of the planned folders, the memory and settings pages are superseded by [0019](0019-tab-shell.md); `lib/domain/sending/` and `lib/pages/sending/` are built by [0018](0018-send-flow.md), `lib/data/backup/` by [0021](0021-backup-file.md), the settings pages by [0020](0020-goals.md) and 0021, and the add-food pages as `lib/pages/adding/` by [0026](0026-adding-a-food.md). The scanner pages are not built.
 
 ## Context
 

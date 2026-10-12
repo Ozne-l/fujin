@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Accepted. Four routes exist: the Journal, the welcome screen, and the MyFitnessPal and Ekklo sign-ins pushed above either of them.
+Accepted. The tab plans are superseded by [0019](0019-tab-shell.md). The routes that exist are the values of `FujinRoute` (`lib/app/fujin_route.dart`), not the list below.
 
 ## Context
 

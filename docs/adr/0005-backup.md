@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Accepted. B (Android Auto Backup) is implemented; C (manual file) is planned.
+Accepted. B (Android Auto Backup) is implemented; C (manual file) is implemented by [0021](0021-backup-file.md).
 
 ## Context
 
