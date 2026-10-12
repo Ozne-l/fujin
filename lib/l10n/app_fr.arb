@@ -727,6 +727,14 @@
     "placeholders": {"goals": {"type": "String"}}
   },
   "mealEmpty": "Rien pour l’instant",
+  "mealFolded": "{inEkklo}/{total} · {foods}",
+  "@mealFolded": {
+    "placeholders": {
+      "inEkklo": {"type": "int"},
+      "total": {"type": "int"},
+      "foods": {"type": "String"}
+    }
+  },
   "journalLoading": "Lecture de MyFitnessPal\net d'Ekklo…",
   "dayDetailTitle": "Détail du jour",
   "close": "Fermer",

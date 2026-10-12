@@ -66,7 +66,8 @@ void main() {
     _sees('1 nouvelle association : Skyr nature');
 
     await _tap(tester, 'Retour au journal');
-    check(find.text('1/1 dans Ekklo').evaluate()).length.equals(2);
+    check(find.text('1/1 · $oats').evaluate()).length.equals(1);
+    check(find.text('1/1 · Skyr nature').evaluate()).length.equals(1);
     check(backends.ekkloItems).length.equals(2);
   });
 

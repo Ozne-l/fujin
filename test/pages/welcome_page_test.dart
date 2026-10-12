@@ -69,7 +69,7 @@ void main() {
       await tester.tap(find.text('Continuer'));
       await tester.pumpAndSettle();
 
-      check(find.text('1/1 dans Ekklo').evaluate()).length.equals(1);
+      check(find.text('1/1 · $oats').evaluate()).length.equals(1);
     },
   );
 }

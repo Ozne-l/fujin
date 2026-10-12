@@ -1353,6 +1353,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get mealEmpty => 'Rien pour l’instant';
 
   @override
+  String mealFolded(int inEkklo, int total, String foods) {
+    return '$inEkklo/$total · $foods';
+  }
+
+  @override
   String get journalLoading => 'Lecture de MyFitnessPal\net d\'Ekklo…';
 
   @override

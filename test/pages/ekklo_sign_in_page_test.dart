@@ -50,7 +50,7 @@ void main() {
 
     check(await store.read()).isNotNull();
     check(find.text('Ta session Ekklo a expiré.').evaluate()).isEmpty();
-    check(find.text('1/1 dans Ekklo').evaluate()).length.equals(1);
+    check(find.text('1/1 · $oats').evaluate()).length.equals(1);
   });
 
   testWidgets('waits for both fields before calling Ekklo', (tester) async {

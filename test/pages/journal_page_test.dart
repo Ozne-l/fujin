@@ -48,6 +48,20 @@ double? _goalOf(WidgetTester tester, String label) => tester
 
 Finder _rich(String text) => find.text(text, findRichText: true);
 
+void _tallView(WidgetTester tester) {
+  addTearDown(tester.view.reset);
+  tester.view
+    ..physicalSize = const Size(800, 1800)
+    ..devicePixelRatio = 1;
+}
+
+Future<void> _tap(WidgetTester tester, Finder target) async {
+  await tester.ensureVisible(target);
+  await tester.pumpAndSettle();
+  await tester.tap(target);
+  await tester.pumpAndSettle();
+}
+
 FilledButton _button(WidgetTester tester, String label) =>
     tester.widget<FilledButton>(
       find.ancestor(of: find.text(label), matching: find.byType(FilledButton)),
@@ -351,6 +365,62 @@ void main() {
 
     check(find.byType(FilledButton).evaluate()).isEmpty();
     check(_rich('0 kcal · 1 aliment sur 1 ›').evaluate()).length.equals(1);
+  });
+
+  testWidgets('folds a meal all in Ekklo and unfolds it on touch', (
+    tester,
+  ) async {
+    _tallView(tester);
+    await pumpFujin(
+      tester,
+      FakeBackends(
+        mealNames: [breakfast, lunch],
+        entries: [
+          entry('E-1', description: 'Flocons d’avoine'),
+          entry('E-2', description: 'Pain', meal: lunch, food: rice),
+          entry('E-3', meal: lunch, food: rice),
+        ],
+        ekkloMeals: [
+          meal('meal-1', [item('I-1')]),
+        ],
+      ),
+    );
+
+    check(find.text('1/1 · Flocons d’avoine').evaluate()).length.equals(1);
+    check(find.text('0/2 dans Ekklo').evaluate()).length.equals(1);
+    check(find.text('À envoyer').evaluate()).length.equals(2);
+
+    await tester.ensureVisible(find.text(breakfast));
+    await tester.tap(find.text(breakfast));
+    await tester.pumpAndSettle();
+
+    check(find.text('1/1 dans Ekklo').evaluate()).length.equals(1);
+    check(find.text('Flocons d’avoine').evaluate()).length.equals(1);
+  });
+
+  testWidgets('folds a meal to send by touch and folds it again once it is '
+      'all in Ekklo, whatever was touched before', (tester) async {
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [entry('E-1', description: 'Flocons d’avoine')],
+    );
+    await pumpFujin(tester, backends);
+    check(find.text('Flocons d’avoine').evaluate()).length.equals(1);
+
+    await _tap(tester, find.text(breakfast));
+    check(find.text('Flocons d’avoine').evaluate()).isEmpty();
+
+    await _tap(tester, find.text(breakfast));
+    check(find.text('Flocons d’avoine').evaluate()).length.equals(1);
+
+    backends.ekkloMeals = [
+      meal('meal-1', [item('I-1')]),
+    ];
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, 1500));
+    await tester.pumpAndSettle();
+    await _pullToRefresh(tester);
+    check(find.text('1/1 · Flocons d’avoine').evaluate()).length.equals(1);
+    check(find.text('Flocons d’avoine').evaluate()).isEmpty();
   });
 
   testWidgets('keeps MyFitnessPal readable when the Ekklo session expired', (

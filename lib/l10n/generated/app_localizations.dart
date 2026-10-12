@@ -1832,6 +1832,12 @@ abstract class AppLocalizations {
   /// **'Rien pour l’instant'**
   String get mealEmpty;
 
+  /// No description provided for @mealFolded.
+  ///
+  /// In fr, this message translates to:
+  /// **'{inEkklo}/{total} · {foods}'**
+  String mealFolded(int inEkklo, int total, String foods);
+
   /// No description provided for @journalLoading.
   ///
   /// In fr, this message translates to:

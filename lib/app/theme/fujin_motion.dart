@@ -8,6 +8,10 @@ abstract final class FujinMotion {
     Duration(milliseconds: 350),
     Curves.easeOutCubic,
   );
+  static const CurvedMotion mealFold = CurvedMotion(
+    Duration(milliseconds: 250),
+    Curves.easeOutCubic,
+  );
   static const Motion bandNudge = CupertinoMotion(
     duration: Duration(milliseconds: 300),
   );

@@ -170,7 +170,11 @@ class JournalPage extends HookConsumerWidget {
                 AsyncValue(value: BothSides(:final day) && final read) => [
                   summary(read, stale: false),
                   ..._meals(context, [
-                    for (final meal in day.meals) MealCard(meal: meal),
+                    for (final meal in day.meals)
+                      MealCard(
+                        key: ValueKey((day.date, meal.name)),
+                        meal: meal,
+                      ),
                   ]),
                 ],
                 AsyncValue(value: MfpOnly() && final read) => [

@@ -1350,6 +1350,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mealEmpty => 'Nothing yet';
 
   @override
+  String mealFolded(int inEkklo, int total, String foods) {
+    return '$inEkklo/$total · $foods';
+  }
+
+  @override
   String get journalLoading => 'Reading MyFitnessPal\nand Ekklo…';
 
   @override
