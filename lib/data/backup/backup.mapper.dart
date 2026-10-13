@@ -20,6 +20,7 @@ class BackupMapper extends ClassMapperBase<Backup> {
       RememberedUnitMapper.ensureInitialized();
       MealMappingMapper.ensureInitialized();
       SentLinkMapper.ensureInitialized();
+      BarcodeLinkMapper.ensureInitialized();
       GoalsMapper.ensureInitialized();
     }
     return _instance!;
@@ -57,6 +58,12 @@ class BackupMapper extends ClassMapperBase<Backup> {
   );
   static List<SentLink> _$links(Backup v) => v.links;
   static const Field<Backup, List<SentLink>> _f$links = Field('links', _$links);
+  static List<BarcodeLink> _$barcodeLinks(Backup v) => v.barcodeLinks;
+  static const Field<Backup, List<BarcodeLink>> _f$barcodeLinks = Field(
+    'barcodeLinks',
+    _$barcodeLinks,
+    key: r'barcode_links',
+  );
   static Goals? _$goals(Backup v) => v.goals;
   static const Field<Backup, Goals> _f$goals = Field(
     'goals',
@@ -86,6 +93,7 @@ class BackupMapper extends ClassMapperBase<Backup> {
     #units: _f$units,
     #meals: _f$meals,
     #links: _f$links,
+    #barcodeLinks: _f$barcodeLinks,
     #goals: _f$goals,
     #format: _f$format,
     #version: _f$version,
@@ -101,6 +109,7 @@ class BackupMapper extends ClassMapperBase<Backup> {
       units: data.dec(_f$units),
       meals: data.dec(_f$meals),
       links: data.dec(_f$links),
+      barcodeLinks: data.dec(_f$barcodeLinks),
       goals: data.dec(_f$goals),
       format: data.dec(_f$format),
       version: data.dec(_f$version),
@@ -175,6 +184,12 @@ abstract class BackupCopyWith<$R, $In extends Backup, $Out>
   get meals;
   ListCopyWith<$R, SentLink, SentLinkCopyWith<$R, SentLink, SentLink>>
   get links;
+  ListCopyWith<
+    $R,
+    BarcodeLink,
+    BarcodeLinkCopyWith<$R, BarcodeLink, BarcodeLink>
+  >
+  get barcodeLinks;
   GoalsCopyWith<$R, Goals, Goals>? get goals;
   $R call({
     DateTime? exportedAt,
@@ -183,6 +198,7 @@ abstract class BackupCopyWith<$R, $In extends Backup, $Out>
     List<RememberedUnit>? units,
     List<MealMapping>? meals,
     List<SentLink>? links,
+    List<BarcodeLink>? barcodeLinks,
     Goals? goals,
     String? format,
     int? version,
@@ -244,6 +260,17 @@ class _BackupCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Backup, $Out>
     (v) => call(links: v),
   );
   @override
+  ListCopyWith<
+    $R,
+    BarcodeLink,
+    BarcodeLinkCopyWith<$R, BarcodeLink, BarcodeLink>
+  >
+  get barcodeLinks => ListCopyWith(
+    $value.barcodeLinks,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(barcodeLinks: v),
+  );
+  @override
   GoalsCopyWith<$R, Goals, Goals>? get goals =>
       $value.goals?.copyWith.$chain((v) => call(goals: v));
   @override
@@ -254,6 +281,7 @@ class _BackupCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Backup, $Out>
     List<RememberedUnit>? units,
     List<MealMapping>? meals,
     List<SentLink>? links,
+    List<BarcodeLink>? barcodeLinks,
     Object? goals = $none,
     String? format,
     int? version,
@@ -265,6 +293,7 @@ class _BackupCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Backup, $Out>
       if (units != null) #units: units,
       if (meals != null) #meals: meals,
       if (links != null) #links: links,
+      if (barcodeLinks != null) #barcodeLinks: barcodeLinks,
       if (goals != $none) #goals: goals,
       if (format != null) #format: format,
       if (version != null) #version: version,
@@ -278,6 +307,7 @@ class _BackupCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Backup, $Out>
     units: data.get(#units, or: $value.units),
     meals: data.get(#meals, or: $value.meals),
     links: data.get(#links, or: $value.links),
+    barcodeLinks: data.get(#barcodeLinks, or: $value.barcodeLinks),
     goals: data.get(#goals, or: $value.goals),
     format: data.get(#format, or: $value.format),
     version: data.get(#version, or: $value.version),

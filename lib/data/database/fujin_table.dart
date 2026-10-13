@@ -3,6 +3,7 @@ enum FujinTable {
   memoryOwnCopy('memory_own_copy'),
   memoryUnit('memory_unit'),
   memoryMeal('memory_meal'),
+  memoryBarcode('memory_barcode'),
   sentLink('sent_link'),
   goals('goals'),
   unattendedItem('unattended_item'),

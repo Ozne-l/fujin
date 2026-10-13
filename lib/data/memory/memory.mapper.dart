@@ -19,6 +19,7 @@ class MemoryMapper extends ClassMapperBase<Memory> {
       OwnCopyMapper.ensureInitialized();
       RememberedUnitMapper.ensureInitialized();
       MealMappingMapper.ensureInitialized();
+      BarcodeLinkMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -55,6 +56,14 @@ class MemoryMapper extends ClassMapperBase<Memory> {
     opt: true,
     def: const [],
   );
+  static List<BarcodeLink> _$barcodeLinks(Memory v) => v.barcodeLinks;
+  static const Field<Memory, List<BarcodeLink>> _f$barcodeLinks = Field(
+    'barcodeLinks',
+    _$barcodeLinks,
+    key: r'barcode_links',
+    opt: true,
+    def: const [],
+  );
 
   @override
   final MappableFields<Memory> fields = const {
@@ -62,6 +71,7 @@ class MemoryMapper extends ClassMapperBase<Memory> {
     #ownCopies: _f$ownCopies,
     #units: _f$units,
     #meals: _f$meals,
+    #barcodeLinks: _f$barcodeLinks,
   };
   @override
   final bool ignoreNull = true;
@@ -72,6 +82,7 @@ class MemoryMapper extends ClassMapperBase<Memory> {
       ownCopies: data.dec(_f$ownCopies),
       units: data.dec(_f$units),
       meals: data.dec(_f$meals),
+      barcodeLinks: data.dec(_f$barcodeLinks),
     );
   }
 
@@ -141,11 +152,18 @@ abstract class MemoryCopyWith<$R, $In extends Memory, $Out>
     MealMappingCopyWith<$R, MealMapping, MealMapping>
   >
   get meals;
+  ListCopyWith<
+    $R,
+    BarcodeLink,
+    BarcodeLinkCopyWith<$R, BarcodeLink, BarcodeLink>
+  >
+  get barcodeLinks;
   $R call({
     List<MatchedFood>? matches,
     List<OwnCopy>? ownCopies,
     List<RememberedUnit>? units,
     List<MealMapping>? meals,
+    List<BarcodeLink>? barcodeLinks,
   });
   MemoryCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -197,17 +215,30 @@ class _MemoryCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Memory, $Out>
     (v) => call(meals: v),
   );
   @override
+  ListCopyWith<
+    $R,
+    BarcodeLink,
+    BarcodeLinkCopyWith<$R, BarcodeLink, BarcodeLink>
+  >
+  get barcodeLinks => ListCopyWith(
+    $value.barcodeLinks,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(barcodeLinks: v),
+  );
+  @override
   $R call({
     List<MatchedFood>? matches,
     List<OwnCopy>? ownCopies,
     List<RememberedUnit>? units,
     List<MealMapping>? meals,
+    List<BarcodeLink>? barcodeLinks,
   }) => $apply(
     FieldCopyWithData({
       if (matches != null) #matches: matches,
       if (ownCopies != null) #ownCopies: ownCopies,
       if (units != null) #units: units,
       if (meals != null) #meals: meals,
+      if (barcodeLinks != null) #barcodeLinks: barcodeLinks,
     }),
   );
   @override
@@ -216,6 +247,7 @@ class _MemoryCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Memory, $Out>
     ownCopies: data.get(#ownCopies, or: $value.ownCopies),
     units: data.get(#units, or: $value.units),
     meals: data.get(#meals, or: $value.meals),
+    barcodeLinks: data.get(#barcodeLinks, or: $value.barcodeLinks),
   );
 
   @override

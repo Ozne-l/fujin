@@ -1,5 +1,6 @@
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_table.dart';
+import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/meal_mapping.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
@@ -35,6 +36,26 @@ final class MemoryRepository {
       ))
         MealMappingMapper.fromMap(row),
     ],
+    barcodeLinks: [
+      for (final row in _database.select(
+        'SELECT * FROM memory_barcode ORDER BY barcode',
+      ))
+        BarcodeLinkMapper.fromMap(row),
+    ],
+  );
+
+  String? barcodeFood(String barcode) => switch (_database.select(
+    'SELECT * FROM memory_barcode WHERE barcode = ?',
+    [barcode],
+  )) {
+    [final row] => BarcodeLinkMapper.fromMap(row).mfpFoodId,
+    _ => null,
+  };
+
+  void saveBarcodeLink(BarcodeLink link) => _database.upsert(
+    FujinTable.memoryBarcode,
+    link.toMap(),
+    key: const [_barcode],
   );
 
   void saveFood(RememberedFood food) => _database.transaction(() {
@@ -100,7 +121,8 @@ final class MemoryRepository {
       ..execute('DELETE FROM memory_unit')
       ..execute('DELETE FROM memory_food')
       ..execute('DELETE FROM memory_own_copy')
-      ..execute('DELETE FROM memory_meal');
+      ..execute('DELETE FROM memory_meal')
+      ..execute('DELETE FROM memory_barcode');
   });
 
   void replace(Memory memory) => _database.transaction(() {
@@ -110,9 +132,11 @@ final class MemoryRepository {
       foods: [...memory.matches, ...memory.ownCopies],
       units: memory.units,
     );
+    memory.barcodeLinks.forEach(saveBarcodeLink);
   });
 
   static const _mfpFoodId = 'mfp_food_id';
   static const _mfpUnit = 'mfp_unit';
   static const _mfpMealName = 'mfp_meal_name';
+  static const _barcode = 'barcode';
 }

@@ -3,13 +3,14 @@ import 'dart:typed_data';
 
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart'
-    show group, setUp, tearDown, test;
+    show addTearDown, group, setUp, tearDown, test;
 import 'package:fujin/data/backup/backup.dart';
 import 'package:fujin/data/backup/backup_repository.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/goals/goals_repository.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
+import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/backup/backup_service.dart';
@@ -18,6 +19,9 @@ import '../../support/fake_backup_files.dart';
 import '../../support/fixtures.dart';
 
 const _fileName = 'fujin-backup-2026-10-07.json';
+const _skyrBarcode = '3033490004521';
+const _barcodeLinks = 'barcode_links';
+const _versionWithoutBarcodeLinks = 1;
 const _goals = Goals(kilocalories: 3000, protein: 160, fat: 70);
 const _ownCopy = OwnCopy(
   mfpFoodId: skyr,
@@ -45,6 +49,9 @@ void main() {
         meals: memory.meals,
         foods: [...memory.matches, _ownCopy],
         units: memory.units,
+      )
+      ..saveBarcodeLink(
+        const BarcodeLink(barcode: _skyrBarcode, mfpFoodId: skyr),
       );
     links = SentLinkRepository(database)..add(link('E-1', 'I-1'));
     goals = GoalsRepository(database)..save(_goals);
@@ -62,6 +69,26 @@ void main() {
   });
 
   tearDown(() => database.close());
+
+  Map<String, Object?> exportedJson() => switch (jsonDecode(
+    utf8.decode(files.saved[_fileName] ?? Uint8List(0)),
+  )) {
+    final Map<String, Object?> file => file,
+    _ => throw StateError('export is not an object'),
+  };
+
+  MemoryRepository restoredInFreshDatabase(Backup? file) {
+    final fresh = FujinDatabase.inMemory();
+    addTearDown(fresh.close);
+    final freshMemories = MemoryRepository(fresh);
+    BackupRepository(
+      database: fresh,
+      memory: freshMemories,
+      links: SentLinkRepository(fresh),
+      goals: GoalsRepository(fresh),
+    ).restore(file ?? (throw StateError('file is unreadable')));
+    return freshMemories;
+  }
 
   Future<Backup?> exported() async {
     await backups.export();
@@ -98,20 +125,39 @@ void main() {
     check(goals.load()).equals(_goals);
   });
 
+  test('carries the barcode links into a fresh database', () async {
+    final restored = restoredInFreshDatabase(await exported());
+
+    check(restored.barcodeFood(_skyrBarcode)).equals(skyr);
+    check(restored.load()).equals(memories.load());
+  });
+
+  test('imports a version 1 file, which has no barcode link', () async {
+    await backups.export();
+    final versionOne = {
+      ...exportedJson(),
+      'version': _versionWithoutBarcodeLinks,
+    }..remove(_barcodeLinks);
+
+    final before = memories.load();
+
+    final file = backups.read(_json(versionOne));
+    backups.restore(file ?? (throw StateError('version 1 is unreadable')));
+
+    check(memories.barcodeFood(_skyrBarcode)).isNull();
+    check(memories.load()).equals(before.copyWith(barcodeLinks: const []));
+  });
+
   group('refuses', () {
     test('a file of another format or version, or missing a table', () async {
       await backups.export();
-      final file = switch (jsonDecode(
-        utf8.decode(files.saved[_fileName] ?? Uint8List(0)),
-      )) {
-        final Map<String, Object?> file => file,
-        _ => throw StateError('export is not an object'),
-      };
+      final file = exportedJson();
 
       for (final changed in [
         {...file, 'format': 'other-backup'},
         {...file, 'version': Backup.currentVersion + 1},
         {...file}..remove('links'),
+        {...file}..remove(_barcodeLinks),
         {...file, 'links': 'all of them'},
       ]) {
         check(backups.read(_json(changed))).isNull();
@@ -129,6 +175,7 @@ void main() {
         units: const [],
         meals: const [],
         links: [link('E-7', 'I-7'), link('E-8', 'I-7')],
+        barcodeLinks: const [],
       );
 
       check(() => backups.restore(broken)).throws<Exception>();

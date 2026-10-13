@@ -26,6 +26,7 @@ final class BackupRepository {
       units: memory.units,
       meals: memory.meals,
       links: _links.all(),
+      barcodeLinks: memory.barcodeLinks,
       goals: _goals.load(),
     );
   }

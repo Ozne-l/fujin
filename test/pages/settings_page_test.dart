@@ -184,6 +184,7 @@ void main() {
           units: const [],
           meals: [memory.meals.first],
           links: [link('E-1', 'I-1')],
+          barcodeLinks: const [],
           goals: const Goals(kilocalories: 2500),
         ),
       );

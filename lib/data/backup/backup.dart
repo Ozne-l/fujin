@@ -1,6 +1,7 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/links/sent_link.dart';
+import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/meal_mapping.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
@@ -17,13 +18,14 @@ final class Backup with BackupMappable {
     required this.units,
     required this.meals,
     required this.links,
+    required this.barcodeLinks,
     this.goals,
     this.format = formatName,
     this.version = currentVersion,
   });
 
   static const formatName = 'fujin-backup';
-  static const currentVersion = 1;
+  static const currentVersion = 2;
 
   final String format;
   final int version;
@@ -33,6 +35,7 @@ final class Backup with BackupMappable {
   final List<RememberedUnit> units;
   final List<MealMapping> meals;
   final List<SentLink> links;
+  final List<BarcodeLink> barcodeLinks;
   final Goals? goals;
 
   Memory get memory => Memory(
@@ -40,6 +43,7 @@ final class Backup with BackupMappable {
     ownCopies: ownCopies,
     units: units,
     meals: meals,
+    barcodeLinks: barcodeLinks,
   );
 
   int get foodCount => matches.length + ownCopies.length;

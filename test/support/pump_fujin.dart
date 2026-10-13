@@ -10,6 +10,7 @@ import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/goals/goals_repository.dart';
 import 'package:fujin/data/links/sent_link.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
+import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
@@ -36,6 +37,7 @@ Future<void> pumpFujin(
   BackupFiles? backupFiles,
   Future<void> Function()? clearWebCookies,
   SharedPreferencesWithCache? preferences,
+  List<BarcodeLink> barcodeLinks = const [],
 }) async {
   tester.platformDispatcher.localesTestValue = const [Locale('fr')];
   addTearDown(tester.platformDispatcher.clearLocalesTestValue);
@@ -46,6 +48,7 @@ Future<void> pumpFujin(
   memory.meals.forEach(memoryRepository.saveMeal);
   ownCopies.forEach(memoryRepository.saveFood);
   units.forEach(memoryRepository.saveUnit);
+  barcodeLinks.forEach(memoryRepository.saveBarcodeLink);
   links.forEach(SentLinkRepository(database).add);
   GoalsRepository(database).replace(goals);
   final signedInMfp = mfp ?? await backends.mfp();

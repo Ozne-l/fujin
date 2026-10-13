@@ -7,6 +7,8 @@ import 'package:fujin/data/backup/backup.dart';
 abstract final class BackupCodec {
   static const _format = 'format';
   static const _version = 'version';
+  static const _barcodeLinks = 'barcode_links';
+  static const _versionWithoutBarcodeLinks = 1;
 
   static Uint8List encode(Backup backup) => utf8.encode(backup.toJson());
 
@@ -16,6 +18,12 @@ abstract final class BackupCodec {
         {_format: Backup.formatName, _version: Backup.currentVersion} &&
             final Map<String, Object?> file =>
           BackupMapper.fromMap(file),
+        {
+              _format: Backup.formatName,
+              _version: _versionWithoutBarcodeLinks,
+            } &&
+            final Map<String, Object?> file =>
+          BackupMapper.fromMap({...file, _barcodeLinks: const <Object?>[]}),
         _ => null,
       };
     } on FormatException {

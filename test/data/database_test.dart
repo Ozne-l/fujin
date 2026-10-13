@@ -9,6 +9,7 @@ import 'package:fujin/data/database/schema.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/goals/goals_repository.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
+import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/meal_mapping.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
@@ -22,6 +23,7 @@ import '../support/fixtures.dart';
 const _versionWithOneCopyPerFood = 2;
 const _versionBeforeGoals = 3;
 const _oilSpoonGrams = 14.0;
+const _riceBarcode = '3017620422003';
 
 OwnCopy _ownRice(String unit) => OwnCopy(
   mfpFoodId: rice,
@@ -297,15 +299,37 @@ void main() {
       );
     });
 
-    test('clears every remembered food, unit and meal but no sent link', () {
+    test('clears every remembered food, unit, meal and barcode link but no '
+        'sent link', () {
       final links = SentLinkRepository(database)..add(link('E-1', 'I-1'));
       repository
         ..saveFood(_ownRice(grams))
         ..saveMeal(memory.meals.first)
+        ..saveBarcodeLink(
+          const BarcodeLink(barcode: _riceBarcode, mfpFoodId: rice),
+        )
         ..clear();
 
       check(repository.load()).equals(const Memory());
+      check(repository.barcodeFood(_riceBarcode)).isNull();
       check(links.all()).deepEquals([link('E-1', 'I-1')]);
+    });
+
+    test('offers the food last linked to a barcode', () {
+      check(repository.barcodeFood(_riceBarcode)).isNull();
+
+      repository.saveBarcodeLink(
+        const BarcodeLink(barcode: _riceBarcode, mfpFoodId: oats),
+      );
+      check(repository.barcodeFood(_riceBarcode)).equals(oats);
+
+      repository.saveBarcodeLink(
+        const BarcodeLink(barcode: _riceBarcode, mfpFoodId: rice),
+      );
+      check(repository.barcodeFood(_riceBarcode)).equals(rice);
+      check(
+        repository.load().barcodeLinks,
+      ).deepEquals([const BarcodeLink(barcode: _riceBarcode, mfpFoodId: rice)]);
     });
   });
 

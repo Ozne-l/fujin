@@ -1,4 +1,5 @@
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/meal_mapping.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
@@ -12,12 +13,14 @@ final class Memory with MemoryMappable {
     this.ownCopies = const [],
     this.units = const [],
     this.meals = const [],
+    this.barcodeLinks = const [],
   });
 
   final List<MatchedFood> matches;
   final List<OwnCopy> ownCopies;
   final List<RememberedUnit> units;
   final List<MealMapping> meals;
+  final List<BarcodeLink> barcodeLinks;
 
   RememberedFood? food(String mfpFoodId, String mfpUnit) =>
       matches.where((food) => food.mfpFoodId == mfpFoodId).firstOrNull ??

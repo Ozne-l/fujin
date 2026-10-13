@@ -102,4 +102,10 @@ const schemaMigrations = [
     added_at TEXT NOT NULL
   );
   ''',
+  '''
+  CREATE TABLE memory_barcode (
+    barcode TEXT PRIMARY KEY,
+    mfp_food_id TEXT NOT NULL
+  );
+  ''',
 ];
