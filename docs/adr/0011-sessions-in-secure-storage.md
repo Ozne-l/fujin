@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Accepted. Stores and both sign-ins implemented.
+Accepted. Stores and both sign-ins implemented. Ekklo sessions observed on 2026-10-13 with a read-only probe: the access token lives 1 hour and the refresh token 416 days; a refresh returns a new refresh token, yet the old one and the old access token keep working; a rejected access token or refresh token gets HTTP 401, as `ekklo_client` expects; a new sign-in elsewhere leaves Fūjin's session alive, and a password change ends it, which the Journal shows on its problem card ("Déconnecté", "Ta session Ekklo a expiré.").
 
 ## Context
 
