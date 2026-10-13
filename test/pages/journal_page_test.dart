@@ -423,6 +423,29 @@ void main() {
     check(find.text('Flocons d’avoine').evaluate()).length.equals(1);
   });
 
+  testWidgets('shows only the new status of an entry that reached Ekklo '
+      'after a pull', (tester) async {
+    _tallView(tester);
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [
+        entry('E-1'),
+        entry('E-2', food: rice),
+      ],
+    );
+    await pumpFujin(tester, backends);
+    check(find.text('À envoyer').evaluate()).length.equals(2);
+
+    backends.ekkloMeals = [
+      meal('meal-1', [item('I-1')]),
+    ];
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, 1500));
+    await tester.pumpAndSettle();
+
+    check(find.text('À envoyer').evaluate()).length.equals(1);
+    check(find.text('Dans Ekklo').evaluate()).length.equals(1);
+  });
+
   testWidgets('folds a meal to send by touch and folds it again once it is '
       'all in Ekklo, whatever was touched before', (tester) async {
     final backends = FakeBackends(

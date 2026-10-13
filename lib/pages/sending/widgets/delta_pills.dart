@@ -21,6 +21,7 @@ class DeltaPills extends StatelessWidget {
       children: [
         for (final nutrient in Nutrient.values)
           StatusPill(
+            key: ValueKey(nutrient),
             label: SendText.delta(l10n, deltas, nutrient),
             tone: SendText.deltaTone(deltas, nutrient),
             size: PillSize.small,

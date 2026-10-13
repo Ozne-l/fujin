@@ -42,6 +42,7 @@ class RememberedFoodList extends StatelessWidget {
                 color: FujinColorRole.borderHairline,
               ),
             _FoodRow(
+              key: ValueKey(food),
               food: food,
               units: unitsOf(food),
               onTap: () => onOpen(food),
@@ -58,6 +59,7 @@ class _FoodRow extends StatelessWidget {
     required this.food,
     required this.units,
     required this.onTap,
+    super.key,
   });
 
   final RememberedFood food;
@@ -108,6 +110,7 @@ class _FoodRow extends StatelessWidget {
                   children: [
                     for (final unit in units)
                       StatusPill(
+                        key: ValueKey(unit),
                         label: l10n.unitWeight(
                           unit.mfpUnit,
                           SendText.grams(l10n, unit.grams),

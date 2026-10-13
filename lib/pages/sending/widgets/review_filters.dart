@@ -7,7 +7,13 @@ class ReviewFilters extends StatelessWidget {
   const ReviewFilters({required this.chips, super.key});
 
   final List<
-    ({String label, PillTone tone, bool selected, VoidCallback onSelected})
+    ({
+      Key key,
+      String label,
+      PillTone tone,
+      bool selected,
+      VoidCallback onSelected,
+    })
   >
   chips;
 
@@ -20,6 +26,7 @@ class ReviewFilters extends StatelessWidget {
       children: [
         for (final chip in chips)
           Semantics(
+            key: chip.key,
             button: true,
             selected: chip.selected,
             child: InkWell(

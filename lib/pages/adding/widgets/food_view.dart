@@ -32,6 +32,7 @@ import 'package:fujin/pages/adding/widgets/servings_picker.dart';
 import 'package:fujin/pages/adding/widgets/write_panel.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/flow_header.dart';
+import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
 import 'package:fujin/pages/common/title_text.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
@@ -354,7 +355,7 @@ class FoodView extends HookConsumerWidget {
 
   static void _showUndoFailed(BuildContext context, ReadProblem problem) {
     final l10n = AppLocalizations.of(context);
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showFujinSnackBar(
       SnackBar(content: Text(JournalText.problemHeadline(l10n, problem))),
     );
   }

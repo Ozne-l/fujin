@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
@@ -53,6 +54,7 @@ class SheetFrame extends HookWidget {
     useRootNavigator: true,
     useSafeArea: true,
     showDragHandle: true,
+    sheetAnimationStyle: FujinMotion.sheet,
     builder: builder,
   );
 

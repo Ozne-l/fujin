@@ -14,16 +14,17 @@ import 'package:fujin/pages/sending/send_text.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 class PlanRow extends StatelessWidget {
-  PlanRow.planned(PlannedEntry planned, {super.key}) : _row = _Planned(planned);
+  PlanRow.planned(PlannedEntry planned)
+    : _row = _Planned(planned),
+      super(key: ValueKey(planned.entry));
 
-  PlanRow.pending(
-    MfpFoodEntry entry, {
-    required bool searching,
-    super.key,
-  }) : _row = _Pending(entry, searching: searching);
+  PlanRow.pending(MfpFoodEntry entry, {required bool searching})
+    : _row = _Pending(entry, searching: searching),
+      super(key: ValueKey(entry));
 
-  PlanRow.inEkklo(MfpFoodEntry entry, SentLink link, {super.key})
-    : _row = _InEkkloRow(entry, link);
+  PlanRow.inEkklo(MfpFoodEntry entry, SentLink link)
+    : _row = _InEkkloRow(entry, link),
+      super(key: ValueKey(entry));
 
   final _RowKind _row;
 

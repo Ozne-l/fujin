@@ -157,6 +157,7 @@ class _MatchSheet extends HookConsumerWidget {
     EkkloSearchDone(:final results) => [
       for (final candidate in results)
         CandidateCard(
+          key: ValueKey(candidate.food.id),
           selected: candidate == selected,
           onTap: () => picked.value = candidate.food.id,
           child: _CandidateDetail(candidate: candidate),

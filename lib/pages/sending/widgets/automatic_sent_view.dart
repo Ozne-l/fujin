@@ -7,6 +7,7 @@ import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/review_reason.dart';
 import 'package:fujin/domain/sending/send_report.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
 import 'package:fujin/pages/common/text_inset.dart';
@@ -150,7 +151,7 @@ class _ChoiceRow extends ConsumerWidget {
     void keep(PlannedEntry planned) => unawaited(
       kept.keep(planned).then((failure) {
         if (failure case final failure?) {
-          messenger.showSnackBar(
+          messenger.showFujinSnackBar(
             SnackBar(
               content: Text(_failed(l10n, failure)),
               action: switch (failure) {

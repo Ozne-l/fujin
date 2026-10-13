@@ -8,6 +8,7 @@ import 'package:fujin/data/backup/backup.dart';
 import 'package:fujin/domain/accounts/account.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/automatic_mode_notifier.dart';
+import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
 import 'package:fujin/pages/common/goals_text.dart';
 import 'package:fujin/pages/common/text_inset.dart';
@@ -265,7 +266,7 @@ class SettingsPage extends ConsumerWidget {
   }
 
   static void _tell(BuildContext context, String message) =>
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showFujinSnackBar(
         SnackBar(content: Text(message)),
       );
 }

@@ -36,7 +36,7 @@ class MealCard extends HookWidget {
       spacing: FujinSpace.s1,
       children: [
         for (final (label, tone) in _mealPills(l10n, counts))
-          StatusPill(label: label, tone: tone),
+          StatusPill(key: ValueKey(tone), label: label, tone: tone),
       ],
     );
     final header = switch ((counts.total, open)) {
@@ -142,7 +142,7 @@ class MealCard extends HookWidget {
                   children: [
                     for (final compared in meal.entries) ...[
                       const Divider(),
-                      _EntryRow(compared),
+                      _EntryRow(compared, key: ValueKey(compared.entry)),
                     ],
                   ],
                 ),
@@ -209,7 +209,7 @@ class MealCard extends HookWidget {
 }
 
 class _EntryRow extends StatelessWidget {
-  const _EntryRow(this.compared);
+  const _EntryRow(this.compared, {super.key});
 
   final ComparedEntry compared;
 

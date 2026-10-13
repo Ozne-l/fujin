@@ -42,6 +42,7 @@ class ReviewView extends HookConsumerWidget {
             chips: [
               for (final filter in available)
                 (
+                  key: ValueKey(filter),
                   label: filter.label(l10n, filter.count(plan)),
                   tone: filter.tone,
                   selected: filter == section,

@@ -1,6 +1,7 @@
 import 'package:checks/checks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:fujin/data/memory/remembered_unit.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
@@ -49,6 +50,26 @@ void main() {
     await tester.pumpAndSettle();
     check(_count(oats)).equals(1);
     check(_count(rice)).equals(0);
+  });
+
+  testWidgets('never shows the unit weight of a food the search left out', (
+    tester,
+  ) async {
+    await pumpFujin(
+      tester,
+      FakeBackends(mealNames: [breakfast]),
+      units: [
+        ...memory.units,
+        const RememberedUnit(mfpFoodId: oats, mfpUnit: 'bowl', grams: 40),
+      ],
+    );
+    await _tap(tester, 'Mémoire');
+    check(_count('1 bowl = 40 g')).equals(1);
+
+    await tester.enterText(find.byType(TextField), 'rice');
+    await tester.pump();
+    check(_count('1 cup = 180 g')).equals(1);
+    check(_count('1 bowl = 40 g')).equals(0);
   });
 
   testWidgets('shows the Ekklo values of a remembered food and saves its '

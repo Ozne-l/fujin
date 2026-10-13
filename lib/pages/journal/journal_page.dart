@@ -15,6 +15,7 @@ import 'package:fujin/pages/common/gold_separator.dart';
 import 'package:fujin/pages/common/snack_bar_content.dart';
 import 'package:fujin/pages/common/snack_bar_glyph.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
+import 'package:fujin/pages/journal/journal_snack_bar.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
 import 'package:fujin/pages/journal/refresh_outcome.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
@@ -39,14 +40,7 @@ class JournalPage extends HookConsumerWidget {
   static const _nothingNewDuration = Duration(seconds: 6);
   static const _offlineRetry = Duration(seconds: 15);
   static const _loadingMeals = 3;
-  static const _undoWindow = Duration(seconds: 8);
   static const _undoneDuration = Duration(seconds: 4);
-  static const _snackBarPadding = EdgeInsetsDirectional.fromSTEB(
-    FujinSpace.s3,
-    FujinSpace.s2,
-    FujinSpace.s2,
-    FujinSpace.s2,
-  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -135,7 +129,11 @@ class JournalPage extends HookConsumerWidget {
       await notifier.reload();
       if (!context.mounted) return;
       if (added case final added?) {
-        _showAdded(context, added, onUndo: () => unawaited(undo.undo(added)));
+        JournalSnackBar.added(
+          context,
+          added,
+          onUndo: () => unawaited(undo.undo(added)),
+        );
       }
     }
 
@@ -300,57 +298,20 @@ class JournalPage extends HookConsumerWidget {
 
   static void _showNothingNew(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: _nothingNewDuration,
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          spacing: FujinSpace.s1,
-          children: [
-            Text(
-              l10n.nothingNewTitle,
-              style: FujinText.inter14Semibold.copyWith(
-                color: FujinColorRole.textOnDark,
-              ),
-            ),
-            Text(
-              l10n.nothingNewDetail,
-              style: FujinText.inter13Regular.copyWith(
-                color: FujinColorRole.textOnDark,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  static void _showAdded(
-    BuildContext context,
-    AddedFood added, {
-    required VoidCallback onUndo,
-  }) {
-    final l10n = AppLocalizations.of(context);
-    final entry = added.entry;
-    _show(
+    JournalSnackBar.show(
       context,
-      duration: _undoWindow,
+      duration: _nothingNewDuration,
       content: SnackBarContent(
-        glyph: SnackBarGlyph.done,
-        title: l10n.foodAdded(productName(entry.food)),
-        detail: switch (added.ekkloWritten) {
-          true => l10n.foodAddedBothSides(entry.mealName),
-          false => l10n.foodAddedMfpOnly(entry.mealName),
-        },
-        action: (l10n.undoAdd, onUndo),
+        glyph: SnackBarGlyph.refresh,
+        title: l10n.nothingNewTitle,
+        detail: l10n.nothingNewDetail,
       ),
     );
   }
 
   static void _showUndone(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    _show(
+    JournalSnackBar.show(
       context,
       duration: _undoneDuration,
       content: SnackBarContent(
@@ -376,9 +337,9 @@ class JournalPage extends HookConsumerWidget {
       ),
       false => (l10n.addNotUndone, JournalText.problemHeadline(l10n, problem)),
     };
-    _show(
+    JournalSnackBar.show(
       context,
-      duration: _undoWindow,
+      duration: JournalSnackBar.undoWindow,
       content: SnackBarContent(
         glyph: SnackBarGlyph.alert,
         title: title,
@@ -386,21 +347,5 @@ class JournalPage extends HookConsumerWidget {
         action: (l10n.tryAgain, onRetry),
       ),
     );
-  }
-
-  static void _show(
-    BuildContext context, {
-    required Widget content,
-    required Duration duration,
-  }) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          duration: duration,
-          padding: _snackBarPadding,
-          content: content,
-        ),
-      );
   }
 }
