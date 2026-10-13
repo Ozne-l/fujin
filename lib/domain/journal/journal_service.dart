@@ -4,11 +4,11 @@ import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/unattended/unattended_item_repository.dart';
 import 'package:fujin/domain/comparison/compare_day.dart';
-import 'package:fujin/domain/journal/day_nutrients.dart';
+import 'package:fujin/domain/comparison/day_comparison.dart';
+import 'package:fujin/domain/journal/fetch.dart';
 import 'package:fujin/domain/journal/journal_day.dart';
 import 'package:fujin/domain/journal/journal_read.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
-import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 final class JournalService {
@@ -33,119 +33,117 @@ final class JournalService {
   Future<JournalDay> readDay(
     DateTime date, {
     List<String> mealNames = const [],
-  }) async => switch (await _sides(date)) {
-    (_Read(value: final diary), _Read(value: final meals)) => _compare(
-      date,
-      diary,
-      meals,
-      mealNames,
-    ),
-    (_Failed(:final error, :final stackTrace), _) ||
-    (_, _Failed(:final error, :final stackTrace)) => Error.throwWithStackTrace(
-      error,
-      stackTrace,
-    ),
-  };
+  }) async {
+    final diary = Fetch.of(fetchDiary(date));
+    final meals = Fetch.of(fetchEkkloMeals(date));
+    return switch ((await diary, await meals)) {
+      (Fetched(value: final diary), Fetched(value: final meals)) => _settled(
+        date,
+        diary,
+        meals,
+        mealNames,
+      ),
+      (FetchFailed(:final error, :final stackTrace), _) ||
+      (
+        _,
+        FetchFailed(:final error, :final stackTrace),
+      ) => Error.throwWithStackTrace(error, stackTrace),
+    };
+  }
 
-  Future<JournalRead> readJournal(
+  Future<Fetched<MfpDiaryDay>> fetchDiary(DateTime date) async =>
+      Fetched(await _mfp.diary.forDate(date), readAt: _clock());
+
+  Future<Fetched<List<EkkloDailyMeal>>> fetchEkkloMeals(DateTime date) async =>
+      Fetched(await _ekklo.meals.forDate(date), readAt: _clock());
+
+  JournalRead journalOf(
     DateTime date, {
+    required Fetch<MfpDiaryDay> diary,
+    required Fetch<List<EkkloDailyMeal>> meals,
     List<String> mealNames = const [],
-  }) async => switch (await _sides(date)) {
-    (_Read(value: final diary), _Read(value: final meals)) => BothSides(
-      day: _compare(date, diary, meals, mealNames),
-      readAt: _clock(),
-    ),
-    (_Read(value: final diary), _Failed(:final error)) => MfpOnly(
-      diary: diary,
-      mealNames: mealNames,
-      ekkloProblem: ReadProblem.of(error),
-      readAt: _clock(),
-    ),
-    (_Failed(:final error), _Read(value: final meals))
+  }) => switch ((diary, meals)) {
+    (
+      Fetched(value: final diary, readAt: final mfpAt),
+      Fetched(value: final meals, readAt: final ekkloAt),
+    ) =>
+      BothSides(
+        day: _compare(date, diary, meals, mealNames),
+        readAt: switch (mfpAt.isBefore(ekkloAt)) {
+          true => mfpAt,
+          false => ekkloAt,
+        },
+      ),
+    (Fetched(value: final diary, :final readAt), FetchFailed(:final error)) =>
+      MfpOnly(
+        diary: diary,
+        mealNames: mealNames,
+        ekkloProblem: ReadProblem.of(error),
+        readAt: readAt,
+      ),
+    (FetchFailed(:final error), Fetched(value: final meals, :final readAt))
         when ReadProblem.of(error) != ReadProblem.offline =>
       EkkloOnly(
         ekkloMeals: meals,
         mfpProblem: ReadProblem.of(error),
-        readAt: _clock(),
+        readAt: readAt,
       ),
-    (_Failed(:final error, :final stackTrace), _) => Error.throwWithStackTrace(
-      error,
-      stackTrace,
-    ),
-  };
-
-  Future<Map<DateTime, double?>> loggedKilocalories(
-    Iterable<DateTime> days,
-  ) async => {
-    for (final diary in await Future.wait([
-      for (final day in days) _mfp.diary.forDate(day),
-    ]))
-      diary.date: switch (diary.entries) {
-        [] => null,
-        final entries => DayNutrients.ofEntries(
-          entries,
-        ).amount(Nutrient.kilocalories),
-      },
+    (FetchFailed(:final error, :final stackTrace), _) =>
+      Error.throwWithStackTrace(error, stackTrace),
   };
 
   Future<List<String>> mealNames() => _mfp.diary.mealNames();
+
+  void settleLinks(
+    DateTime date, {
+    required MfpDiaryDay diary,
+    required List<EkkloDailyMeal> meals,
+  }) => _settle(date, diary, _comparison(date, diary, meals));
 
   JournalDay _compare(
     DateTime date,
     MfpDiaryDay diary,
     List<EkkloDailyMeal> ekkloMeals,
     List<String> mealNames,
-  ) {
-    final comparison = compareDay(
-      entries: diary.entries,
-      meals: ekkloMeals,
-      links: _links.forDate(date),
-      unattended: _unattended.forDate(date),
-      memory: _memory.load(),
-      now: _clock(),
-    );
-    _database.transaction(() {
-      _links.replace(
-        dropped: comparison.linksToDrop,
-        adopted: comparison.linksToAdopt,
-      );
-      _unattended
-        ..record(comparison.unattendedToAdopt)
-        ..prune(date, {for (final entry in diary.entries) ?entry.id});
-    });
-    return JournalDay(
-      diary: diary,
-      mealNames: mealNames,
-      ekkloMeals: ekkloMeals,
-      comparison: comparison,
-    );
-  }
+  ) => JournalDay(
+    diary: diary,
+    mealNames: mealNames,
+    ekkloMeals: ekkloMeals,
+    comparison: _comparison(date, diary, ekkloMeals),
+  );
 
-  Future<(_Settled<MfpDiaryDay>, _Settled<List<EkkloDailyMeal>>)> _sides(
+  JournalDay _settled(
     DateTime date,
-  ) async {
-    final diary = _Settled.of(_mfp.diary.forDate(date));
-    final ekkloMeals = _Settled.of(_ekklo.meals.forDate(date));
-    return (await diary, await ekkloMeals);
+    MfpDiaryDay diary,
+    List<EkkloDailyMeal> ekkloMeals,
+    List<String> mealNames,
+  ) {
+    final day = _compare(date, diary, ekkloMeals, mealNames);
+    _settle(date, diary, day.comparison);
+    return day;
   }
-}
 
-sealed class _Settled<T> {
-  const _Settled();
+  DayComparison _comparison(
+    DateTime date,
+    MfpDiaryDay diary,
+    List<EkkloDailyMeal> ekkloMeals,
+  ) => compareDay(
+    entries: diary.entries,
+    meals: ekkloMeals,
+    links: _links.forDate(date),
+    unattended: _unattended.forDate(date),
+    memory: _memory.load(),
+    now: _clock(),
+  );
 
-  static Future<_Settled<T>> of<T>(Future<T> read) =>
-      read.then<_Settled<T>>(_Read.new, onError: _Failed<T>.new);
-}
-
-final class _Read<T> extends _Settled<T> {
-  const _Read(this.value);
-
-  final T value;
-}
-
-final class _Failed<T> extends _Settled<T> {
-  const _Failed(this.error, this.stackTrace);
-
-  final Object error;
-  final StackTrace stackTrace;
+  void _settle(DateTime date, MfpDiaryDay diary, DayComparison comparison) =>
+      _database.transaction(() {
+        _links.replace(
+          dropped: comparison.linksToDrop,
+          adopted: comparison.linksToAdopt,
+        );
+        _unattended
+          ..record(comparison.unattendedToAdopt)
+          ..prune(date, {for (final entry in diary.entries) ?entry.id});
+      });
 }

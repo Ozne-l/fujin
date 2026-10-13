@@ -307,6 +307,7 @@ class UndoAddDoneMapper extends SubClassMapperBase<UndoAddDone> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = UndoAddDoneMapper._());
       UndoAddStateMapper.ensureInitialized().addSubMapper(_instance!);
+      AddedFoodMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -314,8 +315,11 @@ class UndoAddDoneMapper extends SubClassMapperBase<UndoAddDone> {
   @override
   final String id = 'UndoAddDone';
 
+  static AddedFood _$added(UndoAddDone v) => v.added;
+  static const Field<UndoAddDone, AddedFood> _f$added = Field('added', _$added);
+
   @override
-  final MappableFields<UndoAddDone> fields = const {};
+  final MappableFields<UndoAddDone> fields = const {#added: _f$added};
   @override
   final bool ignoreNull = true;
 
@@ -328,7 +332,7 @@ class UndoAddDoneMapper extends SubClassMapperBase<UndoAddDone> {
       UndoAddStateMapper.ensureInitialized();
 
   static UndoAddDone _instantiate(DecodingData data) {
-    return UndoAddDone();
+    return UndoAddDone(data.dec(_f$added));
   }
 
   @override
@@ -391,8 +395,9 @@ extension UndoAddDoneValueCopy<$R, $Out>
 
 abstract class UndoAddDoneCopyWith<$R, $In extends UndoAddDone, $Out>
     implements UndoAddStateCopyWith<$R, $In, $Out> {
+  AddedFoodCopyWith<$R, AddedFood, AddedFood> get added;
   @override
-  $R call();
+  $R call({AddedFood? added});
   UndoAddDoneCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -405,9 +410,14 @@ class _UndoAddDoneCopyWithImpl<$R, $Out>
   late final ClassMapperBase<UndoAddDone> $mapper =
       UndoAddDoneMapper.ensureInitialized();
   @override
-  $R call() => $apply(FieldCopyWithData({}));
+  AddedFoodCopyWith<$R, AddedFood, AddedFood> get added =>
+      $value.added.copyWith.$chain((v) => call(added: v));
   @override
-  UndoAddDone $make(CopyWithData data) => UndoAddDone();
+  $R call({AddedFood? added}) =>
+      $apply(FieldCopyWithData({if (added != null) #added: added}));
+  @override
+  UndoAddDone $make(CopyWithData data) =>
+      UndoAddDone(data.get(#added, or: $value.added));
 
   @override
   UndoAddDoneCopyWith<$R2, UndoAddDone, $Out2> $chain<$R2, $Out2>(

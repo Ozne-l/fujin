@@ -7,8 +7,10 @@ import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/unattended/unattended_item_repository.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
+import 'package:fujin/domain/journal/fetch.dart';
 import 'package:fujin/domain/journal/journal_read.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
+import 'package:fujin/domain/journal/logged_kilocalories.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -30,6 +32,20 @@ void main() {
     database: database,
     clock: () => now,
   );
+
+  Future<JournalRead> readJournal(
+    JournalService journal, {
+    List<String> mealNames = const [],
+  }) async {
+    final diary = Fetch.of(journal.fetchDiary(day));
+    final meals = Fetch.of(journal.fetchEkkloMeals(day));
+    return journal.journalOf(
+      day,
+      diary: await diary,
+      meals: await meals,
+      mealNames: mealNames,
+    );
+  }
 
   setUp(() {
     database = FujinDatabase.inMemory();
@@ -138,7 +154,7 @@ void main() {
         await store.write(FakeBackends.staleEkkloTokens);
         final journal = await service(ekklo: backends.ekkloWith(store));
 
-        final read = await journal.readJournal(day, mealNames: [breakfast]);
+        final read = await readJournal(journal, mealNames: [breakfast]);
 
         check(read)
             .isA<MfpOnly>()
@@ -148,16 +164,56 @@ void main() {
       },
     );
 
+    test('leaves the links alone when composed from reads made before a '
+        'send', () async {
+      backends = FakeBackends(entries: [entry('E-1')]);
+      final journal = await service();
+      final diary = await journal.fetchDiary(day);
+      final meals = await journal.fetchEkkloMeals(day);
+      links.add(link('E-1', 'I-1'));
+
+      final read = journal.journalOf(day, diary: diary, meals: meals);
+
+      check(read).isA<BothSides>();
+      check(
+        links.forDate(day).map((link) => (link.mfpEntryId, link.ekkloItemId)),
+      ).deepEquals([('E-1', 'I-1')]);
+    });
+
+    test('stores the links only once settled from a fresh read', () async {
+      backends = FakeBackends(
+        entries: [entry('E-1')],
+        ekkloMeals: [
+          meal('meal-1', [item('I-1')]),
+        ],
+      );
+      final journal = await service();
+      final diary = await journal.fetchDiary(day);
+      final meals = await journal.fetchEkkloMeals(day);
+
+      final read = journal.journalOf(day, diary: diary, meals: meals);
+      check(read)
+          .isA<BothSides>()
+          .has((read) => read.day.counts.inEkklo, 'in Ekklo')
+          .equals(1);
+      check(links.forDate(day)).isEmpty();
+
+      journal.settleLinks(day, diary: diary.value, meals: meals.value);
+      check(
+        links.forDate(day).map((link) => (link.mfpEntryId, link.ekkloItemId)),
+      ).deepEquals([('E-1', 'I-1')]);
+    });
+
     test('fails as offline when MyFitnessPal cannot be reached', () async {
       backends = FakeBackends(entries: [entry('E-1')]);
       final journal = await service();
       backends.mfpReachable = false;
 
-      await check(journal.readJournal(day)).throws<MfpNetworkException>();
+      await check(readJournal(journal)).throws<MfpNetworkException>();
     });
   });
 
-  test('sums the kilocalories logged on each day, null when nothing is '
+  test('sums the kilocalories logged on a day, null when nothing is '
       'logged', () async {
     final yesterday = DateTime.utc(2026, 10, 6);
     backends = FakeBackends(
@@ -166,14 +222,12 @@ void main() {
         entry('E-2', nutrients: nutrients(kcal: 250)),
       ],
     );
+    final journal = await service();
 
-    final logged = await (await service()).loggedKilocalories([
-      yesterday,
-      day,
-    ]);
+    final before = await journal.fetchDiary(yesterday);
+    final logged = await journal.fetchDiary(day);
 
-    check(logged.keys).unorderedEquals([yesterday, day]);
-    check(logged[yesterday]).isNull();
-    check(logged[day]).equals(750);
+    check(loggedKilocalories(before.value)).isNull();
+    check(loggedKilocalories(logged.value)).equals(750);
   });
 }

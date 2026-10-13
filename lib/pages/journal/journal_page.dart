@@ -72,6 +72,11 @@ class JournalPage extends HookConsumerWidget {
     });
 
     useEffect(() {
+      scheduleMicrotask(() => unawaited(notifier.revalidate()));
+      return null;
+    }, [day]);
+
+    useEffect(() {
       final retrying = switch ((offline, lifecycle)) {
         (true, AppLifecycleState.resumed || null) => Timer.periodic(
           _offlineRetry,
@@ -99,17 +104,28 @@ class JournalPage extends HookConsumerWidget {
       await notifier.reload();
     }
 
+    void rereadDayOf(AddedFood added) {
+      switch (SelectedDay.calendarDay(added.entry.date)) {
+        case final addedDay when addedDay == day:
+          unawaited(notifier.reload());
+        case final addedDay:
+          ref
+            ..invalidate(mfpDiaryProvider(addedDay))
+            ..invalidate(ekkloMealsProvider(addedDay));
+      }
+    }
+
     ref.listen(undoAddProvider, (previous, next) {
       switch (next) {
-        case UndoAddDone():
-          unawaited(notifier.reload());
+        case UndoAddDone(:final added):
+          rereadDayOf(added);
           _showUndone(context);
         case UndoAddFailed(
           :final added,
           :final problem,
           :final removedFromEkklo,
         ):
-          unawaited(notifier.reload());
+          rereadDayOf(added);
           _showUndoFailed(
             context,
             added,
@@ -140,7 +156,12 @@ class JournalPage extends HookConsumerWidget {
 
     Future<void> signIn(FujinRoute route) async {
       final signedIn = await context.push<bool>(route.path);
-      if (signedIn case true) await notifier.reload();
+      if (signedIn case true) {
+        ref
+          ..invalidate(mfpDiaryProvider)
+          ..invalidate(ekkloMealsProvider);
+        await notifier.reload();
+      }
     }
 
     final select = ref.read(selectedDayProvider.notifier).select;

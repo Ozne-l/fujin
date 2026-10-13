@@ -21,7 +21,9 @@ final class UndoAddRunning extends UndoAddState with UndoAddRunningMappable {
 
 @MappableClass(discriminatorValue: 'done')
 final class UndoAddDone extends UndoAddState with UndoAddDoneMappable {
-  const UndoAddDone();
+  const UndoAddDone(this.added);
+
+  final AddedFood added;
 }
 
 @MappableClass(discriminatorValue: 'failed')

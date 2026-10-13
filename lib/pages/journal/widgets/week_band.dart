@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -10,12 +11,15 @@ import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/hints/hint.dart';
 import 'package:fujin/domain/goals/day_goal_state.dart';
 import 'package:fujin/domain/journal/calendar_week.dart';
+import 'package:fujin/domain/journal/fetch.dart';
+import 'package:fujin/domain/journal/logged_kilocalories.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
 import 'package:fujin/pages/journal/widgets/day_ring.dart';
 import 'package:fujin/pages/journal/widgets/week_band_hint.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:motor/motor.dart';
+import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 class WeekBand extends HookConsumerWidget {
   const WeekBand({
@@ -48,7 +52,6 @@ class WeekBand extends HookConsumerWidget {
       viewportFraction: (_visibleDays - 1) / _visibleDays,
     );
     final shown = useState(selectedPage);
-    final turning = useRef(false);
     final hints = ref.watch(hintRepositoryProvider);
     final hinting = useMemoized(() => !hints.wasShown(Hint.weekBandSwipe));
     final bubble = useOverlayPortalController();
@@ -62,20 +65,18 @@ class WeekBand extends HookConsumerWidget {
       return timer.cancel;
     }, const []);
 
-    Future<void> turnTo(int page) async {
-      turning.value = true;
-      await controller.animateToPage(
+    void turnTo(int page) => unawaited(
+      controller.animateToPage(
         page,
         duration: FujinMotion.pageTurn.duration,
         curve: FujinMotion.pageTurn.curve,
-      );
-      turning.value = false;
-    }
+      ),
+    );
 
     useEffect(() {
       if (controller.hasClients && shown.value != selectedPage) {
         shown.value = selectedPage;
-        unawaited(turnTo(selectedPage));
+        turnTo(selectedPage);
       }
       return null;
     }, [selectedPage]);
@@ -84,15 +85,34 @@ class WeekBand extends HookConsumerWidget {
       CalendarWeek.sameWeekday(selected, weeksBack: weeksBack, today: today),
     );
 
-    void showPage(int page) {
-      shown.value = page;
-      if (turning.value) return;
-      selectWeek(page);
+    bool settle(ScrollEndNotification end) {
+      if (end.depth == 0) {
+        switch (controller.page) {
+          case final position?
+              when (position - position.round()).abs() <
+                      precisionErrorTolerance &&
+                  position.round() != shown.value:
+            shown.value = position.round();
+            selectWeek(position.round());
+          case _:
+            break;
+        }
+      }
+      return false;
     }
 
-    final kilocalories = ref.watch(
-      weekKilocaloriesProvider(CalendarWeek.weeksBefore(thisWeek, shown.value)),
+    final shownWeek = ref.watch(
+      weekReadProvider(CalendarWeek.weeksBefore(thisWeek, shown.value)),
     );
+    if (shownWeek.hasValue) {
+      for (final neighbour in [shown.value + 1, shown.value - 1]) {
+        if (neighbour >= 0) {
+          ref.watch(
+            weekReadProvider(CalendarWeek.weeksBefore(thisWeek, neighbour)),
+          );
+        }
+      }
+    }
 
     return Semantics(
       customSemanticsActions: {
@@ -129,30 +149,29 @@ class WeekBand extends HookConsumerWidget {
                     if (notification.dragDetails != null) bubble.hide();
                     return false;
                   },
-                  child: SequenceMotionBuilder<int, double>(
-                    sequence: _nudge,
-                    converter: const SingleMotionConverter(),
-                    playing: hinting,
-                    builder: (context, nudge, phase, child) => PageView.builder(
-                      controller: controller,
-                      reverse: true,
-                      onPageChanged: showPage,
-                      itemBuilder: (context, page) => Transform.translate(
-                        offset: Offset(nudge, 0),
-                        child: _Week(
-                          days: CalendarWeek.daysOf(
-                            CalendarWeek.weeksBefore(thisWeek, page),
+                  child: NotificationListener<ScrollEndNotification>(
+                    onNotification: settle,
+                    child: SequenceMotionBuilder<int, double>(
+                      sequence: _nudge,
+                      converter: const SingleMotionConverter(),
+                      playing: hinting,
+                      builder: (context, nudge, phase, child) =>
+                          PageView.builder(
+                            controller: controller,
+                            reverse: true,
+                            itemBuilder: (context, page) => Transform.translate(
+                              offset: Offset(nudge, 0),
+                              child: _Week(
+                                days: CalendarWeek.daysOf(
+                                  CalendarWeek.weeksBefore(thisWeek, page),
+                                ),
+                                selected: selected,
+                                today: today,
+                                goals: goals,
+                                onSelect: onSelect,
+                              ),
+                            ),
                           ),
-                          selected: selected,
-                          today: today,
-                          goals: goals,
-                          kilocalories: switch (page == shown.value) {
-                            true => kilocalories,
-                            false => const AsyncLoading(),
-                          },
-                          onSelect: onSelect,
-                        ),
-                      ),
                     ),
                   ),
                 ),
@@ -168,13 +187,12 @@ class WeekBand extends HookConsumerWidget {
   }
 }
 
-class _Week extends StatelessWidget {
+class _Week extends ConsumerWidget {
   const _Week({
     required this.days,
     required this.selected,
     required this.today,
     required this.goals,
-    required this.kilocalories,
     required this.onSelect,
   });
 
@@ -182,38 +200,52 @@ class _Week extends StatelessWidget {
   final DateTime selected;
   final DateTime today;
   final Goals? goals;
-  final AsyncValue<Map<DateTime, double?>> kilocalories;
   final ValueChanged<DateTime> onSelect;
 
   @override
-  Widget build(BuildContext context) => Row(
+  Widget build(BuildContext context, WidgetRef ref) => Row(
     children: [
       for (final day in days)
         Expanded(
-          child: _Day(
-            day: day,
-            selected: day == selected,
-            state: _state(day),
-            progress: switch ((goals, kilocalories.value?[day])) {
-              (final goals?, final eaten?) => eaten / goals.kilocalories,
-              _ => 0,
-            },
-            onTap: switch (day.isAfter(today)) {
-              true => null,
-              false => () => onSelect(day),
-            },
-          ),
+          child: switch (ref.exists(mfpDiaryProvider(day))) {
+            true => _ring(day, ref.watch(mfpDiaryProvider(day))),
+            false => _ring(day, null),
+          },
         ),
     ],
   );
 
-  DayGoalState _state(DateTime day) => switch (kilocalories) {
+  Widget _ring(DateTime day, AsyncValue<Fetched<MfpDiaryDay>>? diary) {
+    final eaten = switch (diary?.value) {
+      Fetched(value: final diary) => loggedKilocalories(diary),
+      null => null,
+    };
+    return _Day(
+      day: day,
+      selected: day == selected,
+      state: _state(day, diary, eaten),
+      progress: switch ((goals, eaten)) {
+        (final goals?, final eaten?) => eaten / goals.kilocalories,
+        _ => 0,
+      },
+      onTap: switch (day.isAfter(today)) {
+        true => null,
+        false => () => onSelect(day),
+      },
+    );
+  }
+
+  DayGoalState _state(
+    DateTime day,
+    AsyncValue<Fetched<MfpDiaryDay>>? diary,
+    double? eaten,
+  ) => switch (diary) {
     _ when day.isAfter(today) => DayGoalState.upcoming,
-    AsyncValue(value: final eaten?) => DayGoalState.of(
+    AsyncValue(hasValue: true) => DayGoalState.of(
       day: day,
       today: today,
       goals: goals,
-      kilocalories: eaten[day],
+      kilocalories: eaten,
     ),
     AsyncError() => DayGoalState.noGoal,
     _ => switch (goals) {

@@ -20,7 +20,7 @@ final class UndoAddNotifier extends Notifier<UndoAddState> {
     final outcome = await ref.read(addFoodServiceProvider).undo(added);
     if (!ref.mounted) return;
     state = switch (outcome) {
-      Undone() => const UndoAddDone(),
+      Undone() => UndoAddDone(added),
       StillInMfp(:final error) => UndoAddFailed(
         added,
         ReadProblem.of(error),

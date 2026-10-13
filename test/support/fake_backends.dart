@@ -52,6 +52,7 @@ final class FakeBackends {
   int? mfpSearchStatus;
   int? mfpSyncStatus;
   Completer<void>? diaryGate;
+  Completer<void>? mealsGate;
   final requests = <http.Request>[];
 
   static const ekkloEmail = 'owner@example.com';
@@ -69,6 +70,10 @@ final class FakeBackends {
   late final httpClient = MockClient((request) async {
     requests.add(request);
     if (diaryGate case final gate? when request.url.path == _diaryPath) {
+      await gate.future;
+    }
+    if (mealsGate case final gate?
+        when request.method == 'GET' && request.url.path == dailyMealsPath) {
       await gate.future;
     }
     return switch ((request.method, request.url.host, request.url.path)) {

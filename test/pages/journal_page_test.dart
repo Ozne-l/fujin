@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:io' show HttpStatus;
 
 import 'package:checks/checks.dart';
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:fujin/app/providers.dart';
 import 'package:fujin/data/goals/goals.dart';
+import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/preferences/fujin_preferences.dart';
 import 'package:fujin/domain/goals/day_goal_state.dart';
 import 'package:fujin/pages/adding/add_search_notifier.dart';
@@ -14,6 +17,7 @@ import 'package:fujin/pages/journal/widgets/day_ring.dart';
 import 'package:fujin/pages/journal/widgets/journal_header.dart';
 import 'package:fujin/pages/journal/widgets/nutrient_ring.dart';
 import 'package:fujin/pages/journal/widgets/week_band.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../support/fake_backends.dart';
@@ -61,6 +65,23 @@ Future<void> _pull(WidgetTester tester) =>
 
 Future<void> _pullToRefresh(WidgetTester tester) async {
   await _pull(tester);
+  await tester.pumpAndSettle();
+}
+
+const _mondayDate = '2026-10-05';
+const _pastHalfPage = 0.6;
+const _mfpNotResponding = 'MyFitnessPal ne répond pas.';
+
+int _diaryReads(FakeBackends backends, String date) => backends.requests
+    .where(
+      (request) =>
+          request.url.path == '/v2/diary' &&
+          request.url.queryParameters['entry_date'] == date,
+    )
+    .length;
+
+Future<void> _swipeWeekBack(WidgetTester tester) async {
+  await tester.fling(find.byType(PageView), const Offset(300, 0), 1000);
   await tester.pumpAndSettle();
 }
 
@@ -206,6 +227,38 @@ void main() {
     await tester.pumpAndSettle();
   });
 
+  testWidgets('keeps a food sent since the last read in Ekklo through the '
+      'pull that reads it again', (tester) async {
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [entry('E-1', food: skyr)],
+    );
+    await pumpFujin(tester, backends, goals: _goals);
+    final links = SentLinkRepository(
+      ProviderScope.containerOf(
+        tester.element(find.byType(JournalHeader)),
+      ).read(databaseProvider),
+    )..add(link('E-1', 'I-1', food: skyr));
+    final diaryGate = Completer<void>();
+    final mealsGate = Completer<void>();
+    backends
+      ..ekkloMeals = [
+        meal('meal-1', [item('I-1')]),
+      ]
+      ..diaryGate = diaryGate
+      ..mealsGate = mealsGate;
+    await _pull(tester);
+    await tester.pump(_souffleStep);
+    await tester.pump(_souffleStep);
+    check(links.forDate(day)).length.equals(1);
+
+    diaryGate.complete();
+    mealsGate.complete();
+    await tester.pumpAndSettle();
+    check(links.forDate(day)).length.equals(1);
+    check(find.byType(FilledButton).evaluate()).isEmpty();
+  });
+
   testWidgets(
     'brings the Souffle disc down with an Android pull and rests it above '
     'the week band',
@@ -342,6 +395,173 @@ void main() {
       await tester.tap(find.text("Aujourd'hui ›"));
       await tester.pumpAndSettle();
       check(find.text("Aujourd'hui").evaluate()).length.equals(1);
+    });
+
+    testWidgets('shows a day of the shown week at once, then its new read', (
+      tester,
+    ) async {
+      final backends = FakeBackends(
+        mealNames: [breakfast],
+        entries: [
+          entry('E-1', date: _yesterday, nutrients: nutrients(kcal: 3120)),
+        ],
+      );
+      await pumpFujin(tester, backends, goals: _goals);
+      final gate = Completer<void>();
+      backends
+        ..diaryGate = gate
+        ..entries = [
+          ...backends.entries,
+          entry('E-2', date: _yesterday, nutrients: nutrients(kcal: 100)),
+        ];
+
+      await tester.tap(find.text('6'));
+      await tester.pump();
+      check(
+        _rich('3${_space}120 / 3${_space}000 kcal').evaluate(),
+      ).length.equals(1);
+
+      gate.complete();
+      await tester.pumpAndSettle();
+      check(
+        _rich('3${_space}220 / 3${_space}000 kcal').evaluate(),
+      ).length.equals(1);
+    });
+
+    testWidgets('rings the days of the previous week before it is swiped to', (
+      tester,
+    ) async {
+      await pumpFujin(
+        tester,
+        FakeBackends(
+          mealNames: [breakfast],
+          entries: [
+            entry(
+              'E-1',
+              date: DateTime.utc(2026, 10, 4),
+              nutrients: nutrients(kcal: 3120),
+            ),
+          ],
+        ),
+        goals: _goals,
+      );
+
+      check(_ring(tester, '4').state).equals(DayGoalState.exceeded);
+    });
+
+    testWidgets('never reads a week a slow swipe only crosses', (
+      tester,
+    ) async {
+      final backends = FakeBackends(mealNames: [breakfast]);
+      await pumpFujin(tester, backends);
+      final page = tester.getSize(find.byType(PageView)).width * 7 / 8;
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.byType(PageView)),
+      );
+      for (var moved = 0.0; moved < page * 4.2; moved += 20) {
+        await gesture.moveBy(const Offset(20, 0));
+        await tester.pump(_dragFrame);
+      }
+      await gesture.up();
+      await tester.pumpAndSettle();
+
+      final readDates = {
+        for (final request in backends.requests)
+          if (request.url.path == '/v2/diary')
+            ?request.url.queryParameters['entry_date'],
+      };
+      check(_ring(tester, '9').selected).isTrue();
+      check(readDates).contains('2026-09-09');
+      check(
+        readDates.where(
+          (date) =>
+              date.compareTo('2026-09-21') >= 0 &&
+              date.compareTo('2026-09-28') < 0,
+        ),
+      ).isEmpty();
+    });
+
+    testWidgets('keeps a week left behind for five minutes, then reads it '
+        'again', (tester) async {
+      final backends = FakeBackends(mealNames: [breakfast]);
+      await pumpFujin(tester, backends, goals: _goals);
+      final mondayReads = _diaryReads(backends, _mondayDate);
+
+      await _swipeWeekBack(tester);
+      await _swipeWeekBack(tester);
+      await tester.pump(const Duration(minutes: 4));
+      await _tap(tester, find.text("Aujourd'hui ›"));
+      check(_diaryReads(backends, _mondayDate)).equals(mondayReads);
+
+      await _swipeWeekBack(tester);
+      await _swipeWeekBack(tester);
+      await tester.pump(const Duration(minutes: 6));
+      await _tap(tester, find.text("Aujourd'hui ›"));
+      check(_diaryReads(backends, _mondayDate)).equals(mondayReads + 1);
+    });
+
+    testWidgets('keeps the week held after five minutes on another tab', (
+      tester,
+    ) async {
+      final backends = FakeBackends(mealNames: [breakfast]);
+      await pumpFujin(tester, backends, goals: _goals);
+      final mondayReads = _diaryReads(backends, _mondayDate);
+
+      await _tap(tester, find.text('Mémoire'));
+      await tester.pump(const Duration(minutes: 6));
+      await _tap(tester, find.text('Journal'));
+      await _swipeWeekBack(tester);
+      await _swipeWeekBack(tester);
+      await _tap(tester, find.text("Aujourd'hui ›"));
+      check(_diaryReads(backends, _mondayDate)).equals(mondayReads);
+    });
+
+    testWidgets('shows a day whose last read failed at once with its '
+        'problem, then its new read', (tester) async {
+      final backends = FakeBackends(
+        mealNames: [breakfast],
+        entries: [
+          entry('E-1', date: _yesterday, nutrients: nutrients(kcal: 3120)),
+        ],
+      )..mfpDiaryStatus = HttpStatus.serviceUnavailable;
+      await pumpFujin(tester, backends, goals: _goals);
+      final gate = Completer<void>();
+      backends
+        ..mfpDiaryStatus = null
+        ..diaryGate = gate;
+
+      await tester.tap(find.text('6'));
+      await tester.pump();
+      check(find.text(_mfpNotResponding).evaluate()).length.equals(1);
+      check(
+        find.text("Lecture de MyFitnessPal\net d'Ekklo…").evaluate(),
+      ).isEmpty();
+
+      gate.complete();
+      await tester.pumpAndSettle();
+      check(find.text(_mfpNotResponding).evaluate()).isEmpty();
+      check(
+        _rich('3${_space}120 / 3${_space}000 kcal').evaluate(),
+      ).length.equals(1);
+    });
+
+    testWidgets('selects no week while a finger holds a band caught '
+        'mid-fling', (tester) async {
+      await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+      final band = find.byType(PageView);
+      final controller = tester.widget<PageView>(band).controller;
+      await tester.fling(band, const Offset(300, 0), 1000);
+      while ((controller?.page ?? 0) < _pastHalfPage) {
+        await tester.pump(_dragFrame);
+      }
+
+      final finger = await tester.startGesture(tester.getCenter(band));
+      await tester.pump();
+      check(_ring(tester, '7').selected).isTrue();
+
+      await finger.up();
+      await tester.pumpAndSettle();
+      check(_ring(tester, '30').selected).isTrue();
     });
 
     testWidgets('changes week when the band is swiped', (tester) async {
@@ -681,6 +901,25 @@ void main() {
       check(find.text('Hors ligne').evaluate()).isEmpty();
     });
 
+    testWidgets('rings the whole week again at the first pull back online', (
+      tester,
+    ) async {
+      final backends = FakeBackends(
+        mealNames: [breakfast],
+        entries: [
+          entry('E-1', date: _monday, nutrients: nutrients(kcal: 3120)),
+        ],
+      );
+      final mfp = await backends.mfp();
+      backends.mfpReachable = false;
+      await pumpFujin(tester, backends, mfp: mfp, goals: _goals);
+      check(_ring(tester, '5').state).equals(DayGoalState.noGoal);
+
+      backends.mfpReachable = true;
+      await _pullToRefresh(tester);
+      check(_ring(tester, '5').state).equals(DayGoalState.exceeded);
+    });
+
     testWidgets('says there is no connection on a first read offline', (
       tester,
     ) async {
@@ -734,6 +973,22 @@ void main() {
         find.text('Supprimé de MyFitnessPal et d’Ekklo').evaluate(),
       ).length.equals(1);
       check(find.text('Rien pour l’instant').evaluate()).length.equals(2);
+    });
+
+    testWidgets('rings the day of an undone food without it after moving to '
+        'another week', (tester) async {
+      _tallView(tester);
+      final backends = _basmatiBackends();
+      await pumpFujin(tester, backends, goals: _goals);
+      await _tap(tester, find.text('4'));
+      await _addBasmatiToLunch(tester);
+      await _tap(tester, find.text("Aujourd'hui ›"));
+      check(_ring(tester, '4').state).equals(DayGoalState.missed);
+
+      await _tap(tester, find.text('Annuler'));
+
+      check(backends.entries).isEmpty();
+      check(_ring(tester, '4').state).equals(DayGoalState.nothingLogged);
     });
 
     testWidgets('says the food is still in MyFitnessPal when only Ekklo '

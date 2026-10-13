@@ -45,27 +45,27 @@ Riverpod 3 does both injection and state. Providers are written by hand; a notif
 
 4. **`ref.watch` inside `build`, `ref.read` inside methods and callbacks.**
    Why: `watch` subscribes and rebuilds; in a method or event handler it would add listeners the build does not own (riverpod.dev, "Reading a provider").
-   Example: `JournalNotifier.build` watches `journalServiceProvider` and `mealNamesProvider.future`; `JournalNotifier._reread` reads them (`lib/pages/journal/journal_notifier.dart`). `JournalPage.build` takes the notifier with `ref.read(journalProvider(day).notifier)` (`lib/pages/journal/journal_page.dart`).
+   Example: `JournalNotifier.build` watches `journalServiceProvider`, `mfpDiaryProvider(date)`, `ekkloMealsProvider(date)` and `mealNamesProvider`; `JournalNotifier._reread` invalidates the two sides (and the MyFitnessPal diaries of the rest of the day's week) and reads their futures (`lib/pages/journal/journal_notifier.dart`). `JournalPage.build` takes the notifier with `ref.read(journalProvider(day).notifier)` (`lib/pages/journal/journal_page.dart`).
 
 5. **Treat a notifier as the presenter: it owns state and logic and never touches `BuildContext`, navigation or localized strings.**
    Why: the presenter stays testable without widgets, and copy is chosen in one layer, in the device language.
-   Example: `JournalNotifier` exposes a `JournalRead` and the methods `refresh()` and `reload()` (`lib/pages/journal/journal_notifier.dart`); the page turns `JournalDay.counts` into the localized button label and pills (`lib/pages/journal/widgets/meal_card.dart`, `lib/pages/journal/widgets/day_summary_card.dart`).
+   Example: `JournalNotifier` exposes a `JournalRead` and the methods `refresh()`, `reload()` and `revalidate()` (`lib/pages/journal/journal_notifier.dart`); the page turns `JournalDay.counts` into the localized button label and pills (`lib/pages/journal/widgets/meal_card.dart`, `lib/pages/journal/widgets/day_summary_card.dart`).
 
 6. **Key per-day state with an auto-disposed family and pass the argument through the notifier constructor.**
    Why: each day gets its own cache, released when no widget shows it any more (riverpod.dev, "Family" and "Auto dispose").
    Example: `lib/pages/journal/journal_notifier.dart`:
    ```dart
    journalProvider = AsyncNotifierProvider.autoDispose
-       .family<JournalNotifier, JournalDay, DateTime>(
+       .family<JournalNotifier, JournalRead, DateTime>(
          JournalNotifier.new,
          retry: _noRetry,
        );
    ```
-   Family keys are normalized to UTC calendar days with `SelectedDay.calendarDay` (`lib/pages/journal/selected_day.dart`) so two moments of the same day share one notifier.
+   Family keys are normalized to UTC calendar days with `SelectedDay.calendarDay` (`lib/pages/journal/selected_day.dart`) so two moments of the same day share one notifier. The two reads under a day, `mfpDiaryProvider` and `ekkloMealsProvider`, stay 5 minutes after their last listener (`ref.keepAlive` closed by a timer in `_holdAfterLastListener`, taken again when a paused listener resumes after the timer fired) so the week band and a return to a day show them at once; only display reads go through them, never a write. Composing from them writes nothing either: `JournalService.journalOf` is pure, and the notifier stores link adoptions and drops (`JournalService.settleLinks`) only from reads it just made or waited for (`_firstRead`, `_reread`, `revalidate`), since a held read can predate a send ([ADR 0029](../../../docs/adr/0029-journal-reads-held-for-display.md)).
 
 7. **Turn off automatic retry on providers that call MyFitnessPal or Ekklo.**
    Why: Riverpod 3 retries a failing provider by default (riverpod.dev, "Automatic retry"); a dead session or a server error must show the problem card once, not hammer the APIs in the background.
-   Example: `_noRetry` passed as `retry:` to `journalProvider` and `mealNamesProvider` (`lib/pages/journal/journal_notifier.dart`):
+   Example: `_noRetry` passed as `retry:` to `mfpDiaryProvider`, `ekkloMealsProvider`, `weekReadProvider`, `journalProvider` and `mealNamesProvider` (`lib/pages/journal/journal_notifier.dart`):
    ```dart
    Duration? _noRetry(int retryCount, Object error) => null;
    ```
@@ -76,11 +76,11 @@ Riverpod 3 does both injection and state. Providers are written by hand; a notif
 
 9. **Check `ref.mounted` after an `await` before writing `state`; check `context.mounted` in widgets.**
    Why: an auto-disposed notifier can be gone when the future completes (`Ref.mounted` is new in Riverpod 3, riverpod.dev).
-   Example: `if (ref.mounted) state = next;` in `JournalNotifier._reread`; `if (!context.mounted) return;` in the refresh callback of `JournalPage.build`.
+   Example: `if (ref.mounted) state = next;` in `EkkloSignInNotifier` (`lib/pages/ekklo_sign_in/ekklo_sign_in_notifier.dart`); `if (!context.mounted) return;` in the refresh callback of `JournalPage.build`.
 
 10. **Wrap reads in `AsyncValue.guard` and render `AsyncValue` with a `switch` on its patterns, data first.**
     Why: errors become state instead of escaping, and matching `AsyncValue(value: ...)` first keeps the previous day on screen while a refresh runs; an error set on a notifier that had a value keeps that value (Riverpod copies the previous state), which is how the offline Journal shows its last figures.
-    Example: `JournalNotifier._reread` (`AsyncValue.guard`), and in `JournalPage.build`:
+    Example: `EkkloFoodSearchNotifier` (`AsyncValue.guard`, `lib/pages/memory/ekklo_food_search_notifier.dart`). The Journal is built the same way from held reads: `JournalNotifier.build` throws when MyFitnessPal is offline, so Riverpod keeps the previous read under the error ([ADR 0029](../../../docs/adr/0029-journal-reads-held-for-display.md)). In `JournalPage.build`:
     ```dart
     ...switch (journal) {
       AsyncValue(value: final read?, error: final error?) => [

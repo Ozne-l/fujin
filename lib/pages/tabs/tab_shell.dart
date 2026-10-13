@@ -6,7 +6,6 @@ import 'package:fujin/app/providers.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/adding/adding_possible.dart';
 import 'package:fujin/domain/adding/meal_of_the_hour.dart';
-import 'package:fujin/domain/journal/calendar_week.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
@@ -34,8 +33,8 @@ class TabShell extends ConsumerWidget {
       ref.read(selectedDayProvider.notifier).select(day);
       ref
         ..invalidate(memoryProvider)
-        ..invalidate(journalProvider(day))
-        ..invalidate(weekKilocaloriesProvider(CalendarWeek.mondayOf(day)));
+        ..invalidate(mfpDiaryProvider(day))
+        ..invalidate(ekkloMealsProvider(day));
       JournalSnackBar.added(
         context,
         added,
