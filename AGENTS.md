@@ -83,7 +83,7 @@ The other skills in `.agents/skills/` are vendored from a third party under MIT;
 
 ### Issue tracker
 
-Issues and specs are GitHub issues on `Ozne-l/fujin`, handled with `gh`. See `docs/agents/issue-tracker.md`.
+No issue tracker: specs are ADRs in `docs/adr/`, and no GitHub issue is opened. See `docs/agents/issue-tracker.md`.
 
 ### Domain docs
 
