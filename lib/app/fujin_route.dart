@@ -1,5 +1,6 @@
 import 'package:fujin/data/database/calendar_date_hook.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
+import 'package:fujin/pages/scanner/scanner_exit.dart';
 
 enum FujinRoute {
   splash('/splash'),
@@ -12,12 +13,16 @@ enum FujinRoute {
   mfpSignIn('/mfp-sign-in'),
   ekkloSignIn('/ekklo-sign-in'),
   send('/send/:${FujinRoute.dateParameter}'),
-  addFood('/add/:${FujinRoute.dateParameter}');
+  addFood('/add/:${FujinRoute.dateParameter}'),
+  scanner('/scan/:${FujinRoute.dateParameter}');
 
   const FujinRoute(this.path);
 
   static const dateParameter = 'date';
   static const mealParameter = 'meal';
+  static const queryParameter = 'query';
+  static const barcodeParameter = 'barcode';
+  static const unresolvedParameter = 'unresolved';
   static const foodParameter = 'food';
   static const unitParameter = 'unit';
   static const goalsSegment = 'goals';
@@ -31,6 +36,27 @@ enum FujinRoute {
     path: forDate(date),
     queryParameters: {mealParameter: meal},
   ).toString();
+
+  String forScanSearch(DateTime date, String meal, ScannerSearch search) => Uri(
+    path: forDate(date),
+    queryParameters: {
+      mealParameter: meal,
+      queryParameter: search.query,
+      barcodeParameter: ?search.barcode,
+      unresolvedParameter: '${search.unresolved}',
+    },
+  ).toString();
+
+  static ScannerSearch? scanSearchOf(Map<String, String> parameters) =>
+      switch (parameters[queryParameter]) {
+        final query? => ScannerSearch(
+          query: query,
+          barcode: parameters[barcodeParameter],
+          unresolved:
+              bool.tryParse(parameters[unresolvedParameter] ?? '') ?? false,
+        ),
+        null => null,
+      };
 
   String forFood(RememberedFood food) => Uri(
     path: path.replaceFirst(':$foodParameter', food.mfpFoodId),

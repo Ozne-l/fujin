@@ -1,5 +1,6 @@
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
+import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/recents/recent_food.dart';
 import 'package:fujin/data/recents/recent_food_repository.dart';
@@ -8,6 +9,7 @@ import 'package:fujin/domain/adding/add_outcome.dart';
 import 'package:fujin/domain/adding/add_stage.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/adding/rescale_planned.dart';
+import 'package:fujin/domain/adding/scan_outcome.dart';
 import 'package:fujin/domain/adding/undo_outcome.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/journal/journal_day.dart';
@@ -54,8 +56,40 @@ final class AddFoodService {
       if (food.servingSizes.isNotEmpty) food,
   ];
 
-  Future<MfpBarcodeResult> byBarcode(String barcode) =>
-      _mfp.foods.byBarcode(barcode);
+  Future<MfpBarcodeResult> byBarcode(String barcode) async =>
+      switch (await _mfp.foods.byBarcode(barcode)) {
+        MfpBarcodeFound(:final food) when food.servingSizes.isEmpty =>
+          MfpBarcodeUnresolved(
+            barcode,
+            foodId: food.id,
+            description: food.description,
+            brandName: food.brandName,
+          ),
+        final result => result,
+      };
+
+  Future<ScanOutcome> scan(String barcode) async {
+    if (_memory.barcodeFood(barcode) case final foodId?) {
+      if (await _mfp.foods.byId(foodId) case final food?
+          when food.servingSizes.isNotEmpty) {
+        return ScanFound(barcode, food, remembered: true);
+      }
+    }
+    return switch (await byBarcode(barcode)) {
+      MfpBarcodeFound(:final food) => ScanFound(
+        barcode,
+        food,
+        remembered: false,
+      ),
+      MfpBarcodeUnresolved(:final description, :final brandName) =>
+        ScanUnresolved(
+          barcode,
+          description: description,
+          brandName: brandName,
+        ),
+      MfpBarcodeUnknown() => ScanUnknown(barcode),
+    };
+  }
 
   List<RecentFood> recents() => _recents.latest();
 
@@ -89,10 +123,12 @@ final class AddFoodService {
     AddDraft draft,
     PlannedEntry planned, {
     void Function(AddStage stage)? onStage,
+    String? barcodeToLink,
   }) => _writing ??= _add(
     draft,
     planned,
     onStage,
+    barcodeToLink,
   ).whenComplete(() => _writing = null);
 
   Future<AddOutcome> retryEkklo(AddedFood added) =>
@@ -105,6 +141,7 @@ final class AddFoodService {
     AddDraft draft,
     PlannedEntry planned,
     void Function(AddStage stage)? onStage,
+    String? barcodeToLink,
   ) async {
     final String entryId;
     try {
@@ -129,6 +166,11 @@ final class AddFoodService {
     }
     final entry = draft.entry.copyWith(id: entryId);
     _recents.record(RecentFood.forEntry(entry, addedAt: _clock()));
+    if (barcodeToLink case final barcode?) {
+      _memory.saveBarcodeLink(
+        BarcodeLink(barcode: barcode, mfpFoodId: draft.food.id),
+      );
+    }
     final added = AddedFood(
       planned: rescalePlanned(
         planned,

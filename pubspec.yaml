@@ -26,6 +26,7 @@ dependencies:
   hooks_riverpod: ^3.4.3
   http: ^1.6.0
   intl: any
+  mobile_scanner: ^7.4.2
   motor: ^1.1.0
   myfitnesspal_client:
     git:

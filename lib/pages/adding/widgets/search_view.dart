@@ -20,13 +20,16 @@ import 'package:fujin/pages/adding/widgets/barcode_card.dart';
 import 'package:fujin/pages/adding/widgets/food_list.dart';
 import 'package:fujin/pages/adding/widgets/offline_card.dart';
 import 'package:fujin/pages/adding/widgets/open_draft.dart';
+import 'package:fujin/pages/adding/widgets/scanned_banner.dart';
 import 'package:fujin/pages/adding/widgets/suggestion_row.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/flow_header.dart';
+import 'package:fujin/pages/common/scan_button.dart';
 import 'package:fujin/pages/common/scan_icon.dart';
 import 'package:fujin/pages/common/title_text.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
+import 'package:fujin/pages/scanner/scanner_exit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
@@ -36,6 +39,8 @@ class SearchView extends HookConsumerWidget {
     required this.date,
     required this.mfpMealName,
     required this.onOpen,
+    required this.onScan,
+    this.scan,
     super.key,
   });
 
@@ -44,12 +49,14 @@ class SearchView extends HookConsumerWidget {
   final DateTime date;
   final String mfpMealName;
   final OpenDraft onOpen;
+  final VoidCallback onScan;
+  final ScannerSearch? scan;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final search = ref.watch(addSearchProvider);
-    final notifier = ref.read(addSearchProvider.notifier);
+    final search = ref.watch(addSearchProvider(scan));
+    final notifier = ref.read(addSearchProvider(scan).notifier);
     final recents = search.recents;
     final today = ref.watch(todayProvider);
     final query = useTextEditingController(text: search.query);
@@ -124,7 +131,7 @@ class SearchView extends HookConsumerWidget {
     final body = switch (search) {
       AddSearchIdle() || AddSearchRunning() when barcode != null => [
         BarcodeCard(
-          format: _formatName(barcode.format),
+          format: AddText.barcodeFormat(barcode.format),
           running: search is AddSearchRunning,
           onTap: () => unawaited(lookUp(barcode.barcode)),
         ),
@@ -254,7 +261,9 @@ class SearchView extends HookConsumerWidget {
             alignment: AlignmentDirectional.centerStart,
             child: switch (barcode) {
               final barcode? => AddChip(
-                label: l10n.addBarcodeChip(_formatName(barcode.format)),
+                label: l10n.addBarcodeChip(
+                  AddText.barcodeFormat(barcode.format),
+                ),
                 selected: true,
                 icon: SvgPicture.asset(
                   ScanIcon.asset,
@@ -278,15 +287,36 @@ class SearchView extends HookConsumerWidget {
           ),
         ),
         Expanded(
-          child: ListView(
-            padding: EdgeInsets.only(
-              bottom: FujinSpace.s8 + MediaQuery.paddingOf(context).bottom,
-            ),
+          child: Stack(
             children: [
-              for (final (index, child) in body.indexed) ...[
-                if (index > 0) const SizedBox(height: FujinSpace.s3),
-                child,
-              ],
+              ListView(
+                padding: EdgeInsets.only(
+                  bottom:
+                      FujinSpace.s3 +
+                      FujinSize.tabBar +
+                      FujinSpace.s6 +
+                      MediaQuery.paddingOf(context).bottom,
+                ),
+                children: [
+                  for (final (index, child) in [
+                    if (scan case ScannerSearch(unresolved: true))
+                      const ScannedBanner(),
+                    ...body,
+                  ].indexed) ...[
+                    if (index > 0) const SizedBox(height: FujinSpace.s3),
+                    child,
+                  ],
+                ],
+              ),
+              PositionedDirectional(
+                end: FujinSpace.s5,
+                bottom: 0,
+                child: SafeArea(
+                  top: false,
+                  minimum: const EdgeInsets.only(bottom: FujinSpace.s6),
+                  child: ScanButton(onTap: onScan),
+                ),
+              ),
             ],
           ),
         ),
@@ -349,11 +379,4 @@ class SearchView extends HookConsumerWidget {
       ...rows,
     ];
   }
-
-  static String _formatName(MfpBarcodeFormat format) => switch (format) {
-    MfpBarcodeFormat.ean8 => 'EAN-8',
-    MfpBarcodeFormat.upcA => 'UPC-A',
-    MfpBarcodeFormat.ean13 => 'EAN-13',
-    MfpBarcodeFormat.gtin14 => 'GTIN-14',
-  };
 }

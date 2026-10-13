@@ -26,12 +26,16 @@ final class AddWriteNotifier extends Notifier<AddWriteState> {
     AddWriteEkkloFailed() => false,
   };
 
-  Future<AddOutcome?> add(AddDraft draft, PlannedEntry planned) async {
+  Future<AddOutcome?> add(
+    AddDraft draft,
+    PlannedEntry planned, {
+    String? barcodeToLink,
+  }) async {
     if (_busy) return null;
     state = const AddWriteRunning(AddStage.mfp);
     final outcome = await ref
         .read(addFoodServiceProvider)
-        .add(draft, planned, onStage: _stage);
+        .add(draft, planned, onStage: _stage, barcodeToLink: barcodeToLink);
     _settle(outcome);
     return outcome;
   }

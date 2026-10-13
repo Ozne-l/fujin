@@ -450,6 +450,22 @@
       },
       "$description": "The Fūjin logo on the splash screen.",
       "$type": "dimension"
+    },
+    "aim-frame": {
+      "$value": {
+        "value": 12,
+        "unit": "px"
+      },
+      "$description": "Aiming frame on the scanner camera.",
+      "$type": "dimension"
+    },
+    "key": {
+      "$value": {
+        "value": 8,
+        "unit": "px"
+      },
+      "$description": "Keys of the numeric keypad.",
+      "$type": "dimension"
     }
   },
   "stroke": {
@@ -526,6 +542,22 @@
         "unit": "px"
       },
       "$description": "Short gold rule under the splash tagline.",
+      "$type": "dimension"
+    },
+    "aim-corner": {
+      "$value": {
+        "value": 4,
+        "unit": "px"
+      },
+      "$description": "Corners of the aiming frame on the scanner camera.",
+      "$type": "dimension"
+    },
+    "read-line": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      },
+      "$description": "Gold reading line across the aiming frame.",
       "$type": "dimension"
     }
   },
@@ -911,6 +943,46 @@
         "unit": "px"
       },
       "$description": "Scan icon in the Scanner button.",
+      "$type": "dimension"
+    },
+    "aim-frame-width": {
+      "$value": {
+        "value": 300,
+        "unit": "px"
+      },
+      "$description": "Width of the aiming frame on the scanner camera.",
+      "$type": "dimension"
+    },
+    "aim-frame-height": {
+      "$value": {
+        "value": 190,
+        "unit": "px"
+      },
+      "$description": "Height of the aiming frame on the scanner camera.",
+      "$type": "dimension"
+    },
+    "aim-frame-top": {
+      "$value": {
+        "value": 186,
+        "unit": "px"
+      },
+      "$description": "Distance from the top safe edge to the aiming frame on the scanner camera.",
+      "$type": "dimension"
+    },
+    "camera-action-gap": {
+      "$value": {
+        "value": 68,
+        "unit": "px"
+      },
+      "$description": "Gap between the Saisir le code button and the bottom safe edge of the scanner camera.",
+      "$type": "dimension"
+    },
+    "aim-corner": {
+      "$value": {
+        "value": 30,
+        "unit": "px"
+      },
+      "$description": "Length of each arm of an aiming frame corner.",
       "$type": "dimension"
     },
     "glass-blur": {

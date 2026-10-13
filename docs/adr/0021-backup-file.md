@@ -4,7 +4,7 @@ Date: 2026-10-10
 
 ## Status
 
-Accepted. Implements part C of [0005](0005-backup.md), with the format changes below.
+Accepted. Implements part C of [0005](0005-backup.md), with the format changes below. [0027](0027-barcode-scanner.md) adds version 2 with the barcode links; version 1 still imports.
 
 ## Context
 

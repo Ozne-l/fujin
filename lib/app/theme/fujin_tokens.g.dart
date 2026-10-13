@@ -87,11 +87,13 @@ abstract final class FujinSpace {
 }
 
 abstract final class FujinRadius {
+  static const double aimFrame = 12;
   static const double bar = 2;
   static const double button = 28;
   static const double card = 20;
   static const double field = 16;
   static const double hint = 12;
+  static const double key = 8;
   static const double logo = 36;
   static const double menu = 12;
   static const double pill = 999;
@@ -102,6 +104,7 @@ abstract final class FujinRadius {
 }
 
 abstract final class FujinStroke {
+  static const double aimCorner = 4;
   static const double card = 1;
   static const double dayRing = 1.5;
   static const double fieldError = 1.5;
@@ -110,11 +113,16 @@ abstract final class FujinStroke {
   static const double icon = 1.75;
   static const double macroRing = 2;
   static const double radio = 1.5;
+  static const double readLine = 2;
   static const double spinner = 2.5;
   static const double streak = 2;
 }
 
 abstract final class FujinSize {
+  static const double aimCorner = 30;
+  static const double aimFrameHeight = 190;
+  static const double aimFrameTop = 186;
+  static const double aimFrameWidth = 300;
   static const double bandFade = 28;
   static const double bandNudge = 44;
   static const double breezeGap = 3;
@@ -123,6 +131,7 @@ abstract final class FujinSize {
   static const double breezeInsetTop = 3;
   static const double buttonHeight = 56;
   static const double buttonMedium = 48;
+  static const double cameraActionGap = 68;
   static const double controlHeight = 40;
   static const double dayPill = 26;
   static const double dayRing = 38;

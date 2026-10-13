@@ -15,10 +15,17 @@ abstract final class AddText {
   static const _percent = 100;
   static const _afternoon = 12;
   static const _evening = 18;
-  static const _baseMultiplier = 1.0;
+  static const baseMultiplier = 1.0;
 
   static String serving(AppLocalizations l10n, MfpServingSize serving) =>
       l10n.addServing(serving.value, serving.unit);
+
+  static String barcodeFormat(MfpBarcodeFormat format) => switch (format) {
+    MfpBarcodeFormat.ean8 => 'EAN-8',
+    MfpBarcodeFormat.upcA => 'UPC-A',
+    MfpBarcodeFormat.ean13 => 'EAN-13',
+    MfpBarcodeFormat.gtin14 => 'GTIN-14',
+  };
 
   static String result(AppLocalizations l10n, MfpFood food) =>
       switch (food.servingSizes.firstOrNull) {
@@ -33,7 +40,7 @@ abstract final class AddText {
   static double? kilocalories(MfpFood food) =>
       switch ((food.nutrients?.energy?.kilocalories, food.servingSizes)) {
         (final energy?, [final first, ...]) =>
-          energy * (first.nutritionMultiplier ?? _baseMultiplier),
+          energy * (first.nutritionMultiplier ?? baseMultiplier),
         (final energy?, []) => energy,
         (null, _) => null,
       };

@@ -11,6 +11,10 @@ import 'package:fujin/pages/adding/widgets/side_state.dart';
 import 'package:fujin/pages/adding/widgets/write_actions.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/fujin_spinner.dart';
+import 'package:fujin/pages/common/in_page_sheet.dart';
+import 'package:fujin/pages/common/pill_tone.dart';
+import 'package:fujin/pages/common/sheet_card.dart';
+import 'package:fujin/pages/common/sheet_pictogram.dart';
 import 'package:fujin/pages/common/source_dot.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
 
@@ -59,7 +63,10 @@ class WritePanel extends StatelessWidget {
         :final undoing,
       ) =>
         [
-          const _Glyph(icon: Icons.lock_outline),
+          const SheetPictogram(
+            icon: Icon(Icons.lock_outline),
+            tone: PillTone.error,
+          ),
           _source(l10n.sourceEkklo, FujinColorRole.sourceEkklo),
           _title(l10n.addEkkloSessionTitle),
           _Sides(mfp: SideState.written, ekklo: SideState.failed, meal: meal),
@@ -80,7 +87,10 @@ class WritePanel extends StatelessWidget {
           ),
         ],
       AddWriteEkkloFailed(:final problem, :final undoing) => [
-        const _Glyph(icon: Icons.warning_amber_rounded),
+        const SheetPictogram(
+          icon: Icon(Icons.warning_amber_rounded),
+          tone: PillTone.error,
+        ),
         _title(switch (problem) {
           ReadProblem.ekkloUnavailable ||
           ReadProblem.unknown => l10n.addEkkloNoReply,
@@ -111,7 +121,10 @@ class WritePanel extends StatelessWidget {
         ),
       ],
       AddWriteFailed(problem: ReadProblem.mfpSessionExpired) => [
-        const _Glyph(icon: Icons.lock_outline),
+        const SheetPictogram(
+          icon: Icon(Icons.lock_outline),
+          tone: PillTone.error,
+        ),
         _source(l10n.sourceMyFitnessPal, FujinColorRole.sourceMfp),
         _title(l10n.addMfpSessionTitle),
         _note(
@@ -129,7 +142,10 @@ class WritePanel extends StatelessWidget {
         TextButton(onPressed: actions.dismiss, child: Text(l10n.later)),
       ],
       AddWriteFailed(problem: ReadProblem.ekkloSessionExpired) => [
-        const _Glyph(icon: Icons.lock_outline),
+        const SheetPictogram(
+          icon: Icon(Icons.lock_outline),
+          tone: PillTone.error,
+        ),
         _source(l10n.sourceEkklo, FujinColorRole.sourceEkklo),
         _title(l10n.addEkkloSessionTitle),
         _note(l10n.addEkkloSessionDetail),
@@ -140,7 +156,10 @@ class WritePanel extends StatelessWidget {
         TextButton(onPressed: actions.dismiss, child: Text(l10n.later)),
       ],
       AddWriteFailed(:final problem) => [
-        const _Glyph(icon: Icons.warning_amber_rounded),
+        const SheetPictogram(
+          icon: Icon(Icons.warning_amber_rounded),
+          tone: PillTone.error,
+        ),
         _title(switch (problem) {
           ReadProblem.mfpUnavailable ||
           ReadProblem.unknown => l10n.addMfpNoReply,
@@ -182,39 +201,7 @@ class WritePanel extends StatelessWidget {
       AddWriteIdle() || AddWriteDone() => const <Widget>[],
     };
     if (children.isEmpty) return const SizedBox.shrink();
-    return Stack(
-      children: [
-        const Positioned.fill(
-          child: ColoredBox(color: FujinColorRole.backgroundScrim),
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Material(
-            color: FujinColorRole.backgroundCard,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(FujinRadius.sheet),
-            ),
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  FujinSize.textInset,
-                  FujinSpace.s6,
-                  FujinSize.textInset,
-                  FujinSpace.s4,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  spacing: FujinSpace.s4,
-                  children: children,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+    return InPageSheet(child: SheetCard(children: children));
   }
 
   static Widget _title(String text) => Text(
@@ -244,26 +231,6 @@ class WritePanel extends StatelessWidget {
         ),
       ),
     ],
-  );
-}
-
-class _Glyph extends StatelessWidget {
-  const _Glyph({required this.icon});
-
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) => Align(
-    alignment: AlignmentDirectional.centerStart,
-    child: CircleAvatar(
-      radius: FujinSize.pictogram / 2,
-      backgroundColor: FujinColorRole.backgroundAlert,
-      child: Icon(
-        icon,
-        size: FujinSize.pictogramIcon,
-        color: FujinColorRole.textAlert,
-      ),
-    ),
   );
 }
 

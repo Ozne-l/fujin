@@ -1021,6 +1021,80 @@
   "addMfpSessionSearchDetail": "Reconnecte-toi pour chercher. Ta recherche est gardée.",
   "addEkkloSessionTitle": "Session Ekklo expirée",
   "addEkkloSessionDetail": "MyFitnessPal reste connecté. Reconnecte Ekklo pour écrire des deux côtés ; ta saisie est gardée.",
+  "addScannedUnresolved": "MyFitnessPal connaît ce code-barres mais n'a pas de fiche pour cet aliment. Choisis-le dans la recherche.",
+  "scannerTitle": "Scanner un code-barres",
+  "scannerContext": "{meal} · {date}",
+  "@scannerContext": {
+    "placeholders": {
+      "meal": {"type": "String"},
+      "date": {"type": "DateTime", "format": "MMMEd"}
+    }
+  },
+  "scannerAim": "Place le code-barres dans le cadre",
+  "scannerCodeRead": "Code lu : {code}",
+  "@scannerCodeRead": {
+    "placeholders": {"code": {"type": "String"}}
+  },
+  "scannerTypeCode": "Saisir le code",
+  "scannerTorch": "Lampe",
+  "scannerTypeTitle": "Saisir le code-barres",
+  "scannerCodeValid": "{format}, chiffre de contrôle correct",
+  "@scannerCodeValid": {
+    "placeholders": {"format": {"type": "String"}}
+  },
+  "scannerSearchCode": "Chercher ce code",
+  "scannerErase": "Effacer",
+  "scannerFoundByBarcode": "· trouvé par code-barres",
+  "scannerFromMemory": "Mémoire · retenu pour ce code-barres",
+  "scannerPer100Grams": "{energy} kcal / 100 g",
+  "@scannerPer100Grams": {
+    "placeholders": {
+      "energy": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}}
+    }
+  },
+  "scannerServingEnergy": "{serving} · {energy}",
+  "@scannerServingEnergy": {
+    "placeholders": {
+      "serving": {"type": "String"},
+      "energy": {"type": "String"}
+    }
+  },
+  "scannerUnverifiedDetail": "Saisi par un membre de MyFitnessPal. Vérifie que c’est bien ton paquet avant de continuer.",
+  "scannerStoreCode": "Code magasin",
+  "scannerStoreCodeDetail": "Les codes qui commencent par 02 ou 20 à 29 sont attribués par chaque enseigne : ce produit n’est peut-être pas le tien.",
+  "scannerThisProduct": "C'est bien ce produit",
+  "scannerWrongProduct": "Pas le bon produit : chercher par texte",
+  "scannerNameAndBrand": "{name}, {brand}",
+  "@scannerNameAndBrand": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "brand": {"type": "String"}
+    }
+  },
+  "scannerSearchText": "Chercher par texte",
+  "scannerRescan": "Rescanner",
+  "scannerCheckDigit": "Chiffre de contrôle {actual}, {expected} attendu",
+  "@scannerCheckDigit": {
+    "placeholders": {
+      "actual": {"type": "int"},
+      "expected": {"type": "int"}
+    }
+  },
+  "scannerCheckedOnPhone": "Vérifié sur le téléphone, rien n’a été envoyé. Corrige le dernier chiffre.",
+  "scannerUnavailableTitle": "Codes-barres indisponibles",
+  "scannerUnavailableDetail": "Le service code-barres de MyFitnessPal ne répond pas. La recherche par texte, elle, fonctionne.",
+  "scannerRetryScan": "Réessayer le scan",
+  "scannerOfflineTitle": "Pas de connexion",
+  "scannerFailedDetail": "Le code {code} n'a pas pu être cherché.",
+  "@scannerFailedDetail": {
+    "placeholders": {"code": {"type": "String"}}
+  },
+  "scannerMfpSessionDetail": "Reconnecte-toi pour chercher le code {code}. Il est gardé.",
+  "@scannerMfpSessionDetail": {
+    "placeholders": {"code": {"type": "String"}}
+  },
+  "scannerCameraRefusedTitle": "Pas d'accès à l'appareil photo",
+  "scannerCameraRefusedDetail": "Autorise l'appareil photo pour Fūjin dans les réglages du téléphone, ou saisis le code à la main.",
   "dayPickerTitle": "Choisir le jour",
   "dayPickerMonth": "{date}",
   "@dayPickerMonth": {

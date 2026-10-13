@@ -2539,6 +2539,204 @@ abstract class AppLocalizations {
   /// **'MyFitnessPal reste connecté. Reconnecte Ekklo pour écrire des deux côtés ; ta saisie est gardée.'**
   String get addEkkloSessionDetail;
 
+  /// No description provided for @addScannedUnresolved.
+  ///
+  /// In fr, this message translates to:
+  /// **'MyFitnessPal connaît ce code-barres mais n\'a pas de fiche pour cet aliment. Choisis-le dans la recherche.'**
+  String get addScannedUnresolved;
+
+  /// No description provided for @scannerTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Scanner un code-barres'**
+  String get scannerTitle;
+
+  /// No description provided for @scannerContext.
+  ///
+  /// In fr, this message translates to:
+  /// **'{meal} · {date}'**
+  String scannerContext(String meal, DateTime date);
+
+  /// No description provided for @scannerAim.
+  ///
+  /// In fr, this message translates to:
+  /// **'Place le code-barres dans le cadre'**
+  String get scannerAim;
+
+  /// No description provided for @scannerCodeRead.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code lu : {code}'**
+  String scannerCodeRead(String code);
+
+  /// No description provided for @scannerTypeCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Saisir le code'**
+  String get scannerTypeCode;
+
+  /// No description provided for @scannerTorch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lampe'**
+  String get scannerTorch;
+
+  /// No description provided for @scannerTypeTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Saisir le code-barres'**
+  String get scannerTypeTitle;
+
+  /// No description provided for @scannerCodeValid.
+  ///
+  /// In fr, this message translates to:
+  /// **'{format}, chiffre de contrôle correct'**
+  String scannerCodeValid(String format);
+
+  /// No description provided for @scannerSearchCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chercher ce code'**
+  String get scannerSearchCode;
+
+  /// No description provided for @scannerErase.
+  ///
+  /// In fr, this message translates to:
+  /// **'Effacer'**
+  String get scannerErase;
+
+  /// No description provided for @scannerFoundByBarcode.
+  ///
+  /// In fr, this message translates to:
+  /// **'· trouvé par code-barres'**
+  String get scannerFoundByBarcode;
+
+  /// No description provided for @scannerFromMemory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mémoire · retenu pour ce code-barres'**
+  String get scannerFromMemory;
+
+  /// No description provided for @scannerPer100Grams.
+  ///
+  /// In fr, this message translates to:
+  /// **'{energy} kcal / 100 g'**
+  String scannerPer100Grams(double energy);
+
+  /// No description provided for @scannerServingEnergy.
+  ///
+  /// In fr, this message translates to:
+  /// **'{serving} · {energy}'**
+  String scannerServingEnergy(String serving, String energy);
+
+  /// No description provided for @scannerUnverifiedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Saisi par un membre de MyFitnessPal. Vérifie que c’est bien ton paquet avant de continuer.'**
+  String get scannerUnverifiedDetail;
+
+  /// No description provided for @scannerStoreCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code magasin'**
+  String get scannerStoreCode;
+
+  /// No description provided for @scannerStoreCodeDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les codes qui commencent par 02 ou 20 à 29 sont attribués par chaque enseigne : ce produit n’est peut-être pas le tien.'**
+  String get scannerStoreCodeDetail;
+
+  /// No description provided for @scannerThisProduct.
+  ///
+  /// In fr, this message translates to:
+  /// **'C\'est bien ce produit'**
+  String get scannerThisProduct;
+
+  /// No description provided for @scannerWrongProduct.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas le bon produit : chercher par texte'**
+  String get scannerWrongProduct;
+
+  /// No description provided for @scannerNameAndBrand.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name}, {brand}'**
+  String scannerNameAndBrand(String name, String brand);
+
+  /// No description provided for @scannerSearchText.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chercher par texte'**
+  String get scannerSearchText;
+
+  /// No description provided for @scannerRescan.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rescanner'**
+  String get scannerRescan;
+
+  /// No description provided for @scannerCheckDigit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chiffre de contrôle {actual}, {expected} attendu'**
+  String scannerCheckDigit(int actual, int expected);
+
+  /// No description provided for @scannerCheckedOnPhone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifié sur le téléphone, rien n’a été envoyé. Corrige le dernier chiffre.'**
+  String get scannerCheckedOnPhone;
+
+  /// No description provided for @scannerUnavailableTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Codes-barres indisponibles'**
+  String get scannerUnavailableTitle;
+
+  /// No description provided for @scannerUnavailableDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le service code-barres de MyFitnessPal ne répond pas. La recherche par texte, elle, fonctionne.'**
+  String get scannerUnavailableDetail;
+
+  /// No description provided for @scannerRetryScan.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer le scan'**
+  String get scannerRetryScan;
+
+  /// No description provided for @scannerOfflineTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas de connexion'**
+  String get scannerOfflineTitle;
+
+  /// No description provided for @scannerFailedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le code {code} n\'a pas pu être cherché.'**
+  String scannerFailedDetail(String code);
+
+  /// No description provided for @scannerMfpSessionDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Reconnecte-toi pour chercher le code {code}. Il est gardé.'**
+  String scannerMfpSessionDetail(String code);
+
+  /// No description provided for @scannerCameraRefusedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas d\'accès à l\'appareil photo'**
+  String get scannerCameraRefusedTitle;
+
+  /// No description provided for @scannerCameraRefusedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autorise l\'appareil photo pour Fūjin dans les réglages du téléphone, ou saisis le code à la main.'**
+  String get scannerCameraRefusedDetail;
+
   /// No description provided for @dayPickerTitle.
   ///
   /// In fr, this message translates to:

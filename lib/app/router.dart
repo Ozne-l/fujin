@@ -9,6 +9,7 @@ import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:fujin/pages/memory/memory_food_page.dart';
 import 'package:fujin/pages/memory/memory_page.dart';
 import 'package:fujin/pages/mfp_sign_in/mfp_sign_in_page.dart';
+import 'package:fujin/pages/scanner/scanner_page.dart';
 import 'package:fujin/pages/sending/send_page.dart';
 import 'package:fujin/pages/settings/goals_page.dart';
 import 'package:fujin/pages/settings/settings_page.dart';
@@ -118,9 +119,26 @@ final routerProvider = Provider<GoRouter>((ref) {
           (final date?, final meal?) => AddFoodPage(
             date: SelectedDay.calendarDay(DateTime.parse(date)),
             mfpMealName: meal,
+            scan: FujinRoute.scanSearchOf(state.uri.queryParameters),
           ),
           _ => throw StateError(
             '${FujinRoute.addFood.path} needs ${FujinRoute.dateParameter} '
+            'and ${FujinRoute.mealParameter}',
+          ),
+        },
+      ),
+      GoRoute(
+        path: FujinRoute.scanner.path,
+        builder: (context, state) => switch ((
+          state.pathParameters[FujinRoute.dateParameter],
+          state.uri.queryParameters[FujinRoute.mealParameter],
+        )) {
+          (final date?, final meal?) => ScannerPage(
+            date: SelectedDay.calendarDay(DateTime.parse(date)),
+            mfpMealName: meal,
+          ),
+          _ => throw StateError(
+            '${FujinRoute.scanner.path} needs ${FujinRoute.dateParameter} '
             'and ${FujinRoute.mealParameter}',
           ),
         },

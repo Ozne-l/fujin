@@ -4,7 +4,7 @@ Date: 2026-10-08
 
 ## Status
 
-Accepted
+Accepted. [0027](0027-barcode-scanner.md) lets the MyFitnessPal barcode lookup (`POST /iphone_api/synchronize` on the sync origin) through the guard.
 
 ## Context
 

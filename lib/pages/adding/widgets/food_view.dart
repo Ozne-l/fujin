@@ -36,7 +36,6 @@ import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
 import 'package:fujin/pages/common/title_text.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
-import 'package:fujin/pages/journal/journal_text.dart';
 import 'package:fujin/pages/sending/entry_choices.dart';
 import 'package:fujin/pages/sending/send_text.dart';
 import 'package:fujin/pages/sending/sheets/match_sheet.dart';
@@ -51,6 +50,7 @@ class FoodView extends HookConsumerWidget {
     required this.onBack,
     required this.onLeave,
     this.barcode,
+    this.barcodeToLink,
     super.key,
   });
 
@@ -58,6 +58,7 @@ class FoodView extends HookConsumerWidget {
 
   final AddDraft initial;
   final String? barcode;
+  final String? barcodeToLink;
   final VoidCallback onBack;
   final ValueChanged<AddedFood> onLeave;
 
@@ -130,7 +131,11 @@ class FoodView extends HookConsumerWidget {
     Future<void> add() async {
       final current = ref.read(formProvider);
       if (current.planned case final planned?) {
-        final outcome = await writer.add(current.draft, planned);
+        final outcome = await writer.add(
+          current.draft,
+          planned,
+          barcodeToLink: barcodeToLink,
+        );
         if (outcome case FoodChanged(:final after)) notifier.reload(after);
       }
     }
@@ -138,7 +143,11 @@ class FoodView extends HookConsumerWidget {
     Future<void> undo() async {
       switch (await writer.undo()) {
         case StillInMfp(:final error) || NotUndone(:final error):
-          if (context.mounted) _showUndoFailed(context, ReadProblem.of(error));
+          if (context.mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showProblem(l10n, ReadProblem.of(error));
+          }
         case Undone() || null:
           break;
       }
@@ -351,12 +360,5 @@ class FoodView extends HookConsumerWidget {
             now.amount(nutrient).toStringAsFixed(_decimals))
           nutrient,
     };
-  }
-
-  static void _showUndoFailed(BuildContext context, ReadProblem problem) {
-    final l10n = AppLocalizations.of(context);
-    ScaffoldMessenger.of(context).showFujinSnackBar(
-      SnackBar(content: Text(JournalText.problemHeadline(l10n, problem))),
-    );
   }
 }

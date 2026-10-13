@@ -16,18 +16,19 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0010](0010-go-router-navigation.md) | go_router navigation | Accepted (tab plans superseded by 0019) |
 | [0011](0011-sessions-in-secure-storage.md) | Sessions in secure storage | Accepted |
 | [0012](0012-test-doubles-at-process-edges.md) | Test doubles at process edges only | Accepted |
-| [0013](0013-layers.md) | Layers | Accepted (planned memory and settings pages superseded by 0019; `lib/data/backup/` built by 0021, settings pages by 0020 and 0021, sending by 0018, adding by 0026; scanner not built) |
+| [0013](0013-layers.md) | Layers | Accepted (planned memory and settings pages superseded by 0019; `lib/data/backup/` built by 0021, settings pages by 0020 and 0021, sending by 0018, adding by 0026, scanner by 0027) |
 | [0014](0014-lints-and-code-style.md) | Lints and code style | Accepted |
 | [0015](0015-french-and-english-copy.md) | French and English copy | Accepted |
 | [0016](0016-english-in-code-and-tokens.md) | English in code, design tokens and docs | Accepted |
-| [0017](0017-read-only-dev-environment.md) | Read-only dev environment | Accepted |
+| [0017](0017-read-only-dev-environment.md) | Read-only dev environment | Accepted (barcode lookup let through by 0027) |
 | [0018](0018-send-flow.md) | Send flow: matching, review and execution | Accepted (automatic sends amended by 0025) |
-| [0019](0019-tab-shell.md) | Tab shell: Journal and Mémoire tabs, Scanner disabled | Accepted |
+| [0019](0019-tab-shell.md) | Tab shell: Journal and Mémoire tabs, Scanner disabled | Accepted (Scanner enabled by 0027) |
 | [0020](0020-goals.md) | Goals: one row in Fūjin's SQLite | Accepted |
-| [0021](0021-backup-file.md) | Backup file: fujin-backup v1 behind the BackupFiles seam | Accepted |
+| [0021](0021-backup-file.md) | Backup file: fujin-backup v1 behind the BackupFiles seam | Accepted (version 2 by 0027) |
 | [0022](0022-journal-states-and-goal-rings.md) | Journal states and goal rings | Accepted |
 | [0023](0023-ui-flags-in-shared-preferences.md) | UI flags in shared preferences | Accepted (settings and `FujinPreferences.open` added by 0025) |
 | [0024](0024-splash-from-the-first-frame.md) | Splash from the first frame | Accepted |
 | [0025](0025-automatic-mode.md) | Automatic mode: unattended items instead of Memory, a setting in shared preferences | Accepted |
-| [0026](0026-adding-a-food.md) | Adding a food: one draft, the send flow's Ekklo half, undo | Accepted |
+| [0026](0026-adding-a-food.md) | Adding a food: one draft, the send flow's Ekklo half, undo | Accepted (scanner and 02d built by 0027) |
+| [0027](0027-barcode-scanner.md) | Barcode scanner: full-screen camera, barcode links in Memory, backup v2 | Accepted (built) |
 | [0028](0028-fujin-drawn-controls.md) | Fūjin-drawn controls instead of stock Material | Accepted |

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/router.dart';
+import 'package:fujin/app/theme/fujin_system_bars.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
@@ -11,15 +13,19 @@ class FujinApp extends ConsumerWidget {
   const FujinApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => MaterialApp.router(
-    onGenerateTitle: (context) => AppLocalizations.of(context).appName,
-    theme: FujinTheme.light(),
-    routerConfig: ref.watch(routerProvider),
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
-    supportedLocales: AppLocalizations.supportedLocales,
-    debugShowCheckedModeBanner: false,
-    builder: bannerFor(ref.watch(appEnvironmentProvider)),
-  );
+  Widget build(BuildContext context, WidgetRef ref) =>
+      AnnotatedRegion<SystemUiOverlayStyle>(
+        value: FujinSystemBars.onLight,
+        child: MaterialApp.router(
+          onGenerateTitle: (context) => AppLocalizations.of(context).appName,
+          theme: FujinTheme.light(),
+          routerConfig: ref.watch(routerProvider),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          debugShowCheckedModeBanner: false,
+          builder: bannerFor(ref.watch(appEnvironmentProvider)),
+        ),
+      );
 
   static TransitionBuilder? bannerFor(AppEnvironment environment) =>
       switch (environment) {

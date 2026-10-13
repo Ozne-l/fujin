@@ -4,7 +4,7 @@ Date: 2026-10-10
 
 ## Status
 
-Accepted. Supersedes the "Planned" and "No tab bar" bullets of [0010](0010-go-router-navigation.md) and the `lib/pages/` memory and settings items in the planned folders of [0013](0013-layers.md).
+Accepted. Supersedes the "Planned" and "No tab bar" bullets of [0010](0010-go-router-navigation.md) and the `lib/pages/` memory and settings items in the planned folders of [0013](0013-layers.md). [0027](0027-barcode-scanner.md) enables the Scanner button.
 
 ## Context
 

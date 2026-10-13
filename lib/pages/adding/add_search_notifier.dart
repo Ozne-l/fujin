@@ -6,26 +6,38 @@ import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_food_service.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/pages/adding/add_search_state.dart';
+import 'package:fujin/pages/scanner/scanner_exit.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hooks_riverpod/misc.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
-final NotifierProvider<AddSearchNotifier, AddSearchState> addSearchProvider =
-    NotifierProvider.autoDispose<AddSearchNotifier, AddSearchState>(
+final NotifierProviderFamily<AddSearchNotifier, AddSearchState, ScannerSearch?>
+addSearchProvider = NotifierProvider.autoDispose
+    .family<AddSearchNotifier, AddSearchState, ScannerSearch?>(
       AddSearchNotifier.new,
     );
 
 final class AddSearchNotifier extends Notifier<AddSearchState> {
+  AddSearchNotifier(this.scan);
+
   static const typingPause = Duration(milliseconds: 400);
 
+  final ScannerSearch? scan;
   Timer? _typing;
 
   @override
   AddSearchState build() {
     ref.onDispose(() => _typing?.cancel());
-    return AddSearchIdle(
-      query: '',
+    final recents = ref.read(addFoodServiceProvider).recents();
+    final query = scan?.query.trim() ?? '';
+    if (query.isEmpty) {
+      return AddSearchIdle(query: query, verifiedOnly: false, recents: recents);
+    }
+    _typing = Timer(Duration.zero, () => unawaited(search(query)));
+    return AddSearchRunning(
+      query: query,
       verifiedOnly: false,
-      recents: ref.read(addFoodServiceProvider).recents(),
+      recents: recents,
     );
   }
 
@@ -80,20 +92,6 @@ final class AddSearchNotifier extends Notifier<AddSearchState> {
   Future<MfpFood?> lookUp() => _fetch(
     (service, query) => service.byBarcode(query),
     (idle, result) => switch (result) {
-      MfpBarcodeFound(:final barcode, :final food)
-          when food.servingSizes.isEmpty =>
-        (
-          _missing(
-            idle,
-            MfpBarcodeUnresolved(
-              barcode,
-              foodId: food.id,
-              description: food.description,
-              brandName: food.brandName,
-            ),
-          ),
-          null,
-        ),
       MfpBarcodeFound(:final food) => (idle, food),
       MfpBarcodeUnknown() || MfpBarcodeUnresolved() => (
         _missing(idle, result),

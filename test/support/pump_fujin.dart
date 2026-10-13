@@ -14,12 +14,14 @@ import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
+import 'package:fujin/pages/scanner/scan_camera.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'fake_backends.dart';
 import 'fake_backup_files.dart';
+import 'fake_scan_camera.dart';
 import 'fixtures.dart';
 import 'in_memory_preferences.dart';
 
@@ -37,6 +39,7 @@ Future<void> pumpFujin(
   BackupFiles? backupFiles,
   Future<void> Function()? clearWebCookies,
   SharedPreferencesWithCache? preferences,
+  FakeScanCamera? camera,
   List<BarcodeLink> barcodeLinks = const [],
 }) async {
   tester.platformDispatcher.localesTestValue = const [Locale('fr')];
@@ -70,6 +73,9 @@ Future<void> pumpFujin(
           clearWebCookies ?? () async {},
         ),
         preferencesProvider.overrideWithValue(storedPreferences),
+        scanCameraProvider.overrideWithValue(
+          (camera ?? FakeScanCamera()).build,
+        ),
       ],
       child: const FujinApp(),
     ),

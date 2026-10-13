@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart'
     show group, setUp, tearDown, test;
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
+import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/recents/recent_food_repository.dart';
@@ -13,6 +14,7 @@ import 'package:fujin/domain/adding/add_food_service.dart';
 import 'package:fujin/domain/adding/add_outcome.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/adding/ekklo_side.dart';
+import 'package:fujin/domain/adding/scan_outcome.dart';
 import 'package:fujin/domain/adding/undo_outcome.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
@@ -26,6 +28,7 @@ import '../../support/fake_backends.dart';
 import '../../support/fixtures.dart';
 
 const _gratin = 'mfp-gratin';
+const _barcode = '3275760750398';
 const _portion = 'portion';
 const _hundredGrams = MfpServingSize(
   value: 100,
@@ -499,6 +502,110 @@ void main() {
       check(
         await adding.search('riz basmati', verifiedOnly: false),
       ).deepEquals([_basmati, unverified]);
+    });
+  });
+
+  group('scanning a barcode', () {
+    List<String> syncs() => [
+      for (final request in backends.requests)
+        if (request.url.host == mfpSyncUri.host) request.url.path,
+    ];
+
+    test('offers the MyFitnessPal food of the code', () async {
+      backends.mfpBarcodes = {_barcode: _basmati};
+      final (_, adding) = await services();
+
+      check(await adding.scan(_barcode)).isA<ScanFound>()
+        ..has((it) => it.food, 'food').equals(_basmati)
+        ..has((it) => it.remembered, 'remembered').isFalse();
+    });
+
+    test(
+      'offers the food linked to the code before asking MyFitnessPal',
+      () async {
+        backends.mfpBarcodes = {_barcode: _basmati};
+        memoryRepository.saveBarcodeLink(
+          const BarcodeLink(barcode: _barcode, mfpFoodId: skyr),
+        );
+        final (_, adding) = await services();
+
+        check(await adding.scan(_barcode)).isA<ScanFound>()
+          ..has((it) => it.food, 'food').equals(_skyr)
+          ..has((it) => it.remembered, 'remembered').isTrue();
+        check(syncs()).isEmpty();
+      },
+    );
+
+    test('asks MyFitnessPal when the linked food is gone', () async {
+      backends.mfpBarcodes = {_barcode: _basmati};
+      memoryRepository.saveBarcodeLink(
+        const BarcodeLink(barcode: _barcode, mfpFoodId: 'mfp-gone'),
+      );
+      final (_, adding) = await services();
+
+      check(await adding.scan(_barcode)).isA<ScanFound>()
+        ..has((it) => it.food, 'food').equals(_basmati)
+        ..has((it) => it.remembered, 'remembered').isFalse();
+    });
+
+    test('names a code MyFitnessPal knows without a food card', () async {
+      backends.mfpBarcodes = {
+        _barcode: mfpFood(
+          'mfp-unlisted',
+          description: 'Riz basmati',
+          brand: 'Taureau Ailé',
+        ),
+      };
+      final (_, adding) = await services();
+
+      check(await adding.scan(_barcode)).isA<ScanUnresolved>()
+        ..has((it) => it.description, 'description').equals('Riz basmati')
+        ..has((it) => it.brandName, 'brand').equals('Taureau Ailé');
+    });
+
+    test('treats a food card without serving size as no card', () async {
+      final bare = mfpFood(rice, servingSizes: const []);
+      backends
+        ..mfpFoods = [bare]
+        ..mfpBarcodes = {_barcode: bare};
+      final (_, adding) = await services();
+
+      check(await adding.scan(_barcode)).isA<ScanUnresolved>();
+    });
+
+    test('says when MyFitnessPal does not know the code', () async {
+      final (_, adding) = await services();
+
+      check(
+        await adding.scan(_barcode),
+      ).isA<ScanUnknown>().has((it) => it.barcode, 'barcode').equals(_barcode);
+    });
+
+    test('links the code to the food once it is in MyFitnessPal', () async {
+      final (_, adding) = await services();
+      final draft = _draft(_basmati);
+
+      await adding.add(
+        draft,
+        await adding.plan(draft),
+        barcodeToLink: _barcode,
+      );
+
+      check(memoryRepository.barcodeFood(_barcode)).equals(rice);
+    });
+
+    test('links nothing when MyFitnessPal refuses the add', () async {
+      backends.mfpWritesFail = true;
+      final (_, adding) = await services();
+      final draft = _draft(_basmati);
+
+      await adding.add(
+        draft,
+        await adding.plan(draft),
+        barcodeToLink: _barcode,
+      );
+
+      check(memoryRepository.barcodeFood(_barcode)).isNull();
     });
   });
 

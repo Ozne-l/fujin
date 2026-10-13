@@ -48,7 +48,9 @@ final class FakeBackends {
   var _nextId = 0;
   bool ekkloReachable = true;
   bool mfpReachable = true;
+  int? mfpDiaryStatus;
   int? mfpSearchStatus;
+  int? mfpSyncStatus;
   Completer<void>? diaryGate;
   final requests = <http.Request>[];
 
@@ -98,14 +100,18 @@ final class FakeBackends {
           'expires_in': 3600,
           'user_id': 'mfp-user',
         }),
-      ('GET', final host, _diaryPath) when host == mfpApiUri.host => _json({
-        'items': [
-          for (final entry in entries)
-            if (CalendarDateHook.format(entry.date) ==
-                request.url.queryParameters[_entryDate])
-              entry.toMap(),
-        ],
-      }),
+      ('GET', final host, _diaryPath) when host == mfpApiUri.host =>
+        switch (mfpDiaryStatus) {
+          final status? => http.Response('', status),
+          null => _json({
+            'items': [
+              for (final entry in entries)
+                if (CalendarDateHook.format(entry.date) ==
+                    request.url.queryParameters[_entryDate])
+                  entry.toMap(),
+            ],
+          }),
+        },
       ('POST', final host, _diaryPath) when host == mfpApiUri.host => _addEntry(
         request,
       ),
@@ -132,9 +138,11 @@ final class FakeBackends {
             if (food.id == request.url.queryParameters['ids']) food.toMap(),
         ],
       }),
-      ('POST', final host, _syncPath) when host == mfpSyncUri.host => _barcode(
-        request,
-      ),
+      ('POST', final host, _syncPath) when host == mfpSyncUri.host =>
+        switch (mfpSyncStatus) {
+          final status? => http.Response('', status),
+          null => _barcode(request),
+        },
       ('GET', final host, '/v2/users/mfp-user') when host == mfpApiUri.host =>
         _json({
           'item': {

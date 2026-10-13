@@ -1889,6 +1889,139 @@ class AppLocalizationsFr extends AppLocalizations {
       'MyFitnessPal reste connecté. Reconnecte Ekklo pour écrire des deux côtés ; ta saisie est gardée.';
 
   @override
+  String get addScannedUnresolved =>
+      'MyFitnessPal connaît ce code-barres mais n\'a pas de fiche pour cet aliment. Choisis-le dans la recherche.';
+
+  @override
+  String get scannerTitle => 'Scanner un code-barres';
+
+  @override
+  String scannerContext(String meal, DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMEd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$meal · $dateString';
+  }
+
+  @override
+  String get scannerAim => 'Place le code-barres dans le cadre';
+
+  @override
+  String scannerCodeRead(String code) {
+    return 'Code lu : $code';
+  }
+
+  @override
+  String get scannerTypeCode => 'Saisir le code';
+
+  @override
+  String get scannerTorch => 'Lampe';
+
+  @override
+  String get scannerTypeTitle => 'Saisir le code-barres';
+
+  @override
+  String scannerCodeValid(String format) {
+    return '$format, chiffre de contrôle correct';
+  }
+
+  @override
+  String get scannerSearchCode => 'Chercher ce code';
+
+  @override
+  String get scannerErase => 'Effacer';
+
+  @override
+  String get scannerFoundByBarcode => '· trouvé par code-barres';
+
+  @override
+  String get scannerFromMemory => 'Mémoire · retenu pour ce code-barres';
+
+  @override
+  String scannerPer100Grams(double energy) {
+    final intl.NumberFormat energyNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 0,
+        );
+    final String energyString = energyNumberFormat.format(energy);
+
+    return '$energyString kcal / 100 g';
+  }
+
+  @override
+  String scannerServingEnergy(String serving, String energy) {
+    return '$serving · $energy';
+  }
+
+  @override
+  String get scannerUnverifiedDetail =>
+      'Saisi par un membre de MyFitnessPal. Vérifie que c’est bien ton paquet avant de continuer.';
+
+  @override
+  String get scannerStoreCode => 'Code magasin';
+
+  @override
+  String get scannerStoreCodeDetail =>
+      'Les codes qui commencent par 02 ou 20 à 29 sont attribués par chaque enseigne : ce produit n’est peut-être pas le tien.';
+
+  @override
+  String get scannerThisProduct => 'C\'est bien ce produit';
+
+  @override
+  String get scannerWrongProduct => 'Pas le bon produit : chercher par texte';
+
+  @override
+  String scannerNameAndBrand(String name, String brand) {
+    return '$name, $brand';
+  }
+
+  @override
+  String get scannerSearchText => 'Chercher par texte';
+
+  @override
+  String get scannerRescan => 'Rescanner';
+
+  @override
+  String scannerCheckDigit(int actual, int expected) {
+    return 'Chiffre de contrôle $actual, $expected attendu';
+  }
+
+  @override
+  String get scannerCheckedOnPhone =>
+      'Vérifié sur le téléphone, rien n’a été envoyé. Corrige le dernier chiffre.';
+
+  @override
+  String get scannerUnavailableTitle => 'Codes-barres indisponibles';
+
+  @override
+  String get scannerUnavailableDetail =>
+      'Le service code-barres de MyFitnessPal ne répond pas. La recherche par texte, elle, fonctionne.';
+
+  @override
+  String get scannerRetryScan => 'Réessayer le scan';
+
+  @override
+  String get scannerOfflineTitle => 'Pas de connexion';
+
+  @override
+  String scannerFailedDetail(String code) {
+    return 'Le code $code n\'a pas pu être cherché.';
+  }
+
+  @override
+  String scannerMfpSessionDetail(String code) {
+    return 'Reconnecte-toi pour chercher le code $code. Il est gardé.';
+  }
+
+  @override
+  String get scannerCameraRefusedTitle => 'Pas d\'accès à l\'appareil photo';
+
+  @override
+  String get scannerCameraRefusedDetail =>
+      'Autorise l\'appareil photo pour Fūjin dans les réglages du téléphone, ou saisis le code à la main.';
+
+  @override
   String get dayPickerTitle => 'Choisir le jour';
 
   @override

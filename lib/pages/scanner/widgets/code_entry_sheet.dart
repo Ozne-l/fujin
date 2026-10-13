@@ -1,0 +1,124 @@
+import 'package:flutter/material.dart';
+import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/adding/add_text.dart';
+import 'package:fujin/pages/common/sheet_card.dart';
+import 'package:fujin/pages/scanner/widgets/code_keypad.dart';
+import 'package:myfitnesspal_client/myfitnesspal_client.dart';
+
+class CodeEntrySheet extends StatelessWidget {
+  const CodeEntrySheet({
+    required this.code,
+    required this.onDigit,
+    required this.onErase,
+    required this.onSubmit,
+    super.key,
+  });
+
+  final String code;
+  final ValueChanged<int> onDigit;
+  final VoidCallback onErase;
+  final VoidCallback onSubmit;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final check = checkBarcode(code);
+    final value = FujinText.inter18Medium.copyWith(
+      color: FujinColorRole.textPrimary,
+    );
+    final (border, borderWidth) = switch (check) {
+      MfpBarcodeWrongCheckDigit() => (
+        FujinColorRole.textAlert,
+        FujinStroke.fieldError,
+      ),
+      MfpValidBarcode() || MfpBarcodeNotDigits() || MfpBarcodeWrongLength() => (
+        FujinColorRole.textLink,
+        FujinStroke.fieldFocus,
+      ),
+    };
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SheetCard(
+          handle: true,
+          spacing: FujinSpace.s3,
+          bottomSafe: false,
+          children: [
+            Text(
+              l10n.scannerTypeTitle,
+              style: FujinText.hina24.copyWith(
+                color: FujinColorRole.textPrimary,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(FujinSpace.s4),
+              decoration: BoxDecoration(
+                color: FujinColorRole.backgroundCard,
+                borderRadius: BorderRadius.circular(FujinRadius.field),
+                border: Border.all(color: border, width: borderWidth),
+              ),
+              child: Row(
+                children: [
+                  Text(code, style: value),
+                  Container(
+                    width: FujinStroke.fieldFocus,
+                    height: value.fontSize,
+                    color: FujinColorRole.textLink,
+                  ),
+                ],
+              ),
+            ),
+            ...switch (check) {
+              MfpValidBarcode(:final format) => [
+                _helper(
+                  Icons.check_circle,
+                  l10n.scannerCodeValid(AddText.barcodeFormat(format)),
+                  FujinColorRole.textLink,
+                ),
+              ],
+              MfpBarcodeWrongCheckDigit(:final actual, :final expected) => [
+                _helper(
+                  Icons.warning_amber_rounded,
+                  l10n.scannerCheckDigit(actual, expected),
+                  FujinColorRole.textAlert,
+                ),
+                Text(
+                  l10n.scannerCheckedOnPhone,
+                  style: FujinText.inter12Regular.copyWith(
+                    color: FujinColorRole.textSecondary,
+                  ),
+                ),
+              ],
+              MfpBarcodeNotDigits() || MfpBarcodeWrongLength() => const [],
+            },
+            FilledButton(
+              onPressed: switch (check) {
+                MfpValidBarcode() => onSubmit,
+                MfpBarcodeNotDigits() ||
+                MfpBarcodeWrongLength() ||
+                MfpBarcodeWrongCheckDigit() => null,
+              },
+              child: Text(l10n.scannerSearchCode),
+            ),
+          ],
+        ),
+        CodeKeypad(onDigit: onDigit, onErase: onErase),
+      ],
+    );
+  }
+
+  static Widget _helper(IconData icon, String text, Color color) => Row(
+    spacing: FujinSpace.s2,
+    children: [
+      Icon(icon, size: FujinSize.tileIcon, color: color),
+      Flexible(
+        child: Text(
+          text,
+          style: FujinText.inter13Medium.copyWith(color: color),
+        ),
+      ),
+    ],
+  );
+}
