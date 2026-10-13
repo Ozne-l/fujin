@@ -5,6 +5,8 @@ import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/adding/add_text.dart';
+import 'package:fujin/pages/common/breeze_indicator.dart';
+import 'package:fujin/pages/common/breeze_streaks.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
 
 class EkkloSummaryCard extends StatelessWidget {
@@ -49,6 +51,19 @@ class EkkloSummaryCard extends StatelessWidget {
         Icons.bookmark_border,
         FujinColorRole.sourceEkkloText,
         FujinColorRole.sourceEkkloBackground,
+      ),
+    };
+    final (tileColor, tile) = switch (planned ?? problem) {
+      null => (
+        FujinColorRole.backgroundInfo,
+        const BreezeIndicator(
+          streaks: BreezeStreaks.searching,
+          drifting: true,
+        ),
+      ),
+      _ => (
+        iconBackground,
+        Icon(icon, size: FujinSize.searchIcon, color: iconColor),
       ),
     };
     final (title, detail) = switch ((planned, problem)) {
@@ -106,20 +121,8 @@ class EkkloSummaryCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: FujinSize.tile / 2,
-                  backgroundColor: iconBackground,
-                  child: switch (planned ?? problem) {
-                    null => const SizedBox.square(
-                      dimension: FujinSize.searchIcon,
-                      child: CircularProgressIndicator(
-                        strokeWidth: FujinStroke.icon,
-                      ),
-                    ),
-                    _ => Icon(
-                      icon,
-                      size: FujinSize.searchIcon,
-                      color: iconColor,
-                    ),
-                  },
+                  backgroundColor: tileColor,
+                  child: tile,
                 ),
                 Expanded(
                   child: Column(

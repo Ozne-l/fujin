@@ -405,5 +405,11 @@
   "addMfpSessionDetail": "Sign in again to add. Your entry is kept: {food}, {serving}, {meal} on {date}.",
   "addMfpSessionSearchDetail": "Sign in again to search. Your search is kept.",
   "addEkkloSessionTitle": "Ekklo session expired",
-  "addEkkloSessionDetail": "MyFitnessPal stays connected. Reconnect Ekklo to write to both sides; your entry is kept."
+  "addEkkloSessionDetail": "MyFitnessPal stays connected. Reconnect Ekklo to write to both sides; your entry is kept.",
+  "dayPickerTitle": "Choose the day",
+  "dayPickerMonth": "{date}",
+  "dayPickerDay": "{date}",
+  "previousMonth": "Previous month",
+  "nextMonth": "Next month",
+  "memoryMealMenu": "Ekklo meal for {meal}"
 }

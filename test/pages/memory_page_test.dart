@@ -1,11 +1,14 @@
 import 'package:checks/checks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
 import '../support/pump_fujin.dart';
+
+const _snack = 'Collation';
 
 Future<void> _tap(WidgetTester tester, String text) async {
   final target = find.text(text).last;
@@ -25,6 +28,20 @@ Future<void> _back(WidgetTester tester) async {
 Future<void> _openMemory(WidgetTester tester, FakeBackends backends) async {
   await pumpFujin(tester, backends, units: memory.units);
   await _tap(tester, 'Mémoire');
+}
+
+Future<void> _openMealMenu(WidgetTester tester) async {
+  await _openMemory(
+    tester,
+    FakeBackends(
+      mealNames: [breakfast],
+      ekkloMeals: [
+        meal('meal-1', [item('I-1')], name: _snack),
+      ],
+    ),
+  );
+  await _tap(tester, 'Repas (2)');
+  await _tap(tester, petitDejeuner);
 }
 
 void main() {
@@ -127,24 +144,62 @@ void main() {
     check(_count('→ $riceInEkklo')).equals(0);
   });
 
+  testWidgets('swipes between foods and meals and keeps the search', (
+    tester,
+  ) async {
+    await _openMemory(tester, FakeBackends(mealNames: [breakfast]));
+    await tester.enterText(find.byType(TextField), 'rice');
+    await tester.pumpAndSettle();
+
+    await tester.fling(find.byType(PageView), const Offset(-500, 0), 1000);
+    await tester.pumpAndSettle();
+    check(_count(petitDejeuner)).equals(1);
+    check(_count('→ $riceInEkklo')).equals(0);
+
+    await tester.fling(find.byType(PageView), const Offset(500, 0), 1000);
+    await tester.pumpAndSettle();
+    check(_count('→ $riceInEkklo')).equals(1);
+    check(_count(oats)).equals(0);
+    check(_count(petitDejeuner)).equals(0);
+  });
+
   testWidgets('maps a MyFitnessPal meal to a meal seen in Ekklo', (
     tester,
   ) async {
-    await _openMemory(
-      tester,
-      FakeBackends(
-        mealNames: [breakfast],
-        ekkloMeals: [
-          meal('meal-1', [item('I-1')], name: 'Collation'),
-        ],
-      ),
-    );
+    await _openMealMenu(tester);
+    await _tap(tester, _snack);
 
-    await _tap(tester, 'Repas (2)');
-    await _tap(tester, petitDejeuner);
-    await _tap(tester, 'Collation');
-
-    check(_count('Collation')).equals(1);
+    check(_count(_snack)).equals(1);
     check(_count(petitDejeuner)).equals(0);
+  });
+
+  testWidgets('marks the current Ekklo meal in the open menu and closes it '
+      'without change when tapped outside', (tester) async {
+    await _openMealMenu(tester);
+
+    check(_count(_snack)).equals(1);
+    check(
+      tester.widget<Text>(find.text(petitDejeuner).last).style?.color,
+    ).equals(FujinColorRole.textLink);
+
+    await tester.tapAt(Offset.zero);
+    await tester.pumpAndSettle();
+
+    check(_count(_snack)).equals(0);
+    check(_count(petitDejeuner)).equals(1);
+  });
+
+  testWidgets('closes the open meal menu on back and stays on Mémoire', (
+    tester,
+  ) async {
+    await _openMealMenu(tester);
+    check(_count(_snack)).equals(1);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+
+    check(_count(_snack)).equals(0);
+    check(_count(petitDejeuner)).equals(1);
+    check(_count('Repas (2)')).equals(1);
   });
 }

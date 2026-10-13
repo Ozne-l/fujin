@@ -8,8 +8,12 @@ import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/preferences/fujin_preferences.dart';
 import 'package:fujin/domain/goals/day_goal_state.dart';
 import 'package:fujin/pages/adding/add_search_notifier.dart';
+import 'package:fujin/pages/common/gold_volute.dart';
+import 'package:fujin/pages/common/souffle_refresh.dart';
 import 'package:fujin/pages/journal/widgets/day_ring.dart';
+import 'package:fujin/pages/journal/widgets/journal_header.dart';
 import 'package:fujin/pages/journal/widgets/nutrient_ring.dart';
+import 'package:fujin/pages/journal/widgets/week_band.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../support/fake_backends.dart';
@@ -18,6 +22,29 @@ import '../support/in_memory_preferences.dart';
 import '../support/pump_fujin.dart';
 
 const _space = '\u202f';
+const _souffleStep = Duration(milliseconds: 500);
+const _dragFrame = Duration(milliseconds: 16);
+
+final Finder _souffleDisc = find.descendant(
+  of: find.descendant(
+    of: find.byType(SouffleRefresh),
+    matching: find.byType(Positioned),
+  ),
+  matching: find.byType(GoldVolute),
+);
+
+double _souffleOpacity(WidgetTester tester) => tester
+    .widgetList<Opacity>(
+      find.ancestor(of: _souffleDisc, matching: find.byType(Opacity)),
+    )
+    .fold(1, (opacity, layer) => opacity * layer.opacity);
+
+Matrix4 _souffleTurn(WidgetTester tester) => tester
+    .widget<Transform>(
+      find.ancestor(of: _souffleDisc, matching: find.byType(Transform)).first,
+    )
+    .transform;
+
 const _bandHint = 'Glisse pour voir les semaines passées';
 const _goals = Goals(
   kilocalories: 3000,
@@ -29,12 +56,11 @@ const _goals = Goals(
 final _monday = DateTime.utc(2026, 10, 5);
 final _yesterday = DateTime.utc(2026, 10, 6);
 
+Future<void> _pull(WidgetTester tester) =>
+    tester.fling(find.byType(CustomScrollView), const Offset(0, 400), 1000);
+
 Future<void> _pullToRefresh(WidgetTester tester) async {
-  await tester.fling(
-    find.byType(CustomScrollView),
-    const Offset(0, 400),
-    1000,
-  );
+  await _pull(tester);
   await tester.pumpAndSettle();
 }
 
@@ -49,11 +75,15 @@ double? _goalOf(WidgetTester tester, String label) => tester
 
 Finder _rich(String text) => find.text(text, findRichText: true);
 
-void _tallView(WidgetTester tester) {
+void _tallView(
+  WidgetTester tester, {
+  Size size = const Size(800, 1800),
+  double pixelRatio = 1,
+}) {
   addTearDown(tester.view.reset);
   tester.view
-    ..physicalSize = const Size(800, 1800)
-    ..devicePixelRatio = 1;
+    ..physicalSize = size
+    ..devicePixelRatio = pixelRatio;
 }
 
 Future<void> _tap(WidgetTester tester, Finder target) async {
@@ -134,6 +164,97 @@ void main() {
     await _pullToRefresh(tester);
     check(find.text('Rien de nouveau').evaluate()).length.equals(1);
   });
+
+  testWidgets('shows the Souffle disc while a pull refreshes', (tester) async {
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [entry('E-1')],
+    );
+    await pumpFujin(tester, backends);
+    check(_souffleDisc.evaluate()).isEmpty();
+
+    final gate = Completer<void>();
+    backends.diaryGate = gate;
+    await _pull(tester);
+    await tester.pump(_souffleStep);
+    await tester.pump(_souffleStep);
+    check(_souffleDisc.evaluate()).length.equals(1);
+    check(find.byType(CircularProgressIndicator).evaluate()).isEmpty();
+
+    gate.complete();
+    await tester.pumpAndSettle();
+    check(_souffleDisc.evaluate()).isEmpty();
+  });
+
+  testWidgets('spins the Souffle disc until the refresh ends', (tester) async {
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [entry('E-1')],
+    );
+    await pumpFujin(tester, backends);
+
+    final gate = Completer<void>();
+    backends.diaryGate = gate;
+    await _pull(tester);
+    await tester.pump(_souffleStep);
+    await tester.pump(_souffleStep);
+    final turn = _souffleTurn(tester);
+    await tester.pump(_souffleStep);
+    check(_souffleTurn(tester)).not((later) => later.equals(turn));
+
+    gate.complete();
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets(
+    'brings the Souffle disc down with an Android pull and rests it above '
+    'the week band',
+    (tester) async {
+      _tallView(tester, size: const Size(1080, 2400), pixelRatio: 2);
+      final backends = FakeBackends(
+        mealNames: [breakfast],
+        entries: [entry('E-1')],
+      );
+      await pumpFujin(tester, backends);
+      final gate = Completer<void>();
+      backends.diaryGate = gate;
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.byType(JournalHeader)),
+      );
+      final tops = <double>[];
+      for (var step = 0; step < 4; step++) {
+        for (var frame = 0; frame < 4; frame++) {
+          await gesture.moveBy(const Offset(0, 10));
+          await tester.pump(_dragFrame);
+        }
+        tops.add(tester.getRect(_souffleDisc).top);
+        check(_souffleOpacity(tester)).isGreaterThan(0);
+      }
+      for (final (index, top) in tops.indexed.skip(1)) {
+        check(top).isGreaterThan(tops[index - 1]);
+      }
+
+      for (var frame = 0; frame < 20; frame++) {
+        await gesture.moveBy(const Offset(0, 15));
+        await tester.pump(_dragFrame);
+      }
+      await gesture.up();
+      await tester.pump(_souffleStep);
+      await tester.pump(_souffleStep);
+
+      final rest = tester.getRect(_souffleDisc);
+      check(_souffleOpacity(tester)).equals(1);
+      check(rest.bottom).isLessOrEqual(
+        tester.getRect(find.byType(WeekBand)).top,
+      );
+
+      gate.complete();
+      await tester.pump(_souffleStep);
+      await tester.pump(_souffleStep);
+      await tester.pump(_souffleStep);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.android),
+  );
 
   testWidgets('does not say nothing is new when Ekklo stops answering', (
     tester,

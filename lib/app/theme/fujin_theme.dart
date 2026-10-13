@@ -20,6 +20,16 @@ abstract final class FujinTheme {
     borderSide: BorderSide(color: FujinColorRole.borderCard),
   );
 
+  static const searchFieldFocusedBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(FujinRadius.pill)),
+    borderSide: BorderSide(
+      color: FujinColorRole.textLink,
+      width: FujinStroke.fieldFocus,
+    ),
+  );
+
+  static const double cursorWidth = FujinStroke.fieldFocus;
+
   static const fieldFocusedBorder = OutlineInputBorder(
     borderRadius: BorderRadius.all(Radius.circular(FujinRadius.field)),
     borderSide: BorderSide(
@@ -34,7 +44,7 @@ abstract final class FujinTheme {
     foregroundColor: FujinColorRole.buttonAlertText,
     textStyle: FujinText.inter15Medium,
     shape: const StadiumBorder(),
-  );
+  ).copyWith(overlayColor: pressedOverlay);
 
   static final ButtonStyle largeOutlinedButtonStyle = OutlinedButton.styleFrom(
     minimumSize: const Size.fromHeight(FujinSize.buttonHeight),
@@ -72,12 +82,30 @@ abstract final class FujinTheme {
       errorBorder: fieldErrorBorder,
       focusedErrorBorder: fieldErrorBorder,
     ),
+    splashFactory: InkRipple.splashFactory,
+    splashColor: FujinColorRole.backgroundPressed,
+    highlightColor: FujinColorRole.backgroundPressed,
+    hoverColor: FujinColorRole.backgroundPressed,
+    focusColor: FujinColorRole.backgroundPressed,
     textSelectionTheme: const TextSelectionThemeData(
-      cursorColor: FujinColorRole.textPrimary,
+      cursorColor: FujinColorRole.textLink,
+      selectionColor: FujinColor.matcha,
+      selectionHandleColor: FujinColor.fujin,
     ),
-    progressIndicatorTheme: const ProgressIndicatorThemeData(
-      color: FujinColorRole.textLink,
-      refreshBackgroundColor: FujinColorRole.backgroundCard,
+    tooltipTheme: TooltipThemeData(
+      decoration: const BoxDecoration(
+        color: FujinColorRole.backgroundDark,
+        borderRadius: BorderRadius.all(Radius.circular(FujinRadius.hint)),
+      ),
+      padding: const EdgeInsetsDirectional.fromSTEB(
+        FujinSpace.s3,
+        FujinSize.hintPaddingVertical,
+        FujinSize.hintPaddingEnd,
+        FujinSize.hintPaddingVertical,
+      ),
+      textStyle: FujinText.inter13Medium.copyWith(
+        color: FujinColorRole.textOnDark,
+      ),
     ),
     snackBarTheme: SnackBarThemeData(
       backgroundColor: FujinColorRole.backgroundDark,
@@ -114,7 +142,7 @@ abstract final class FujinTheme {
         disabledForegroundColor: FujinColorRole.buttonDisabledText,
         textStyle: FujinText.inter15Semibold,
         shape: const StadiumBorder(),
-      ),
+      ).copyWith(overlayColor: pressedOverlay),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
@@ -125,8 +153,28 @@ abstract final class FujinTheme {
         side: const BorderSide(color: FujinColorRole.borderCard),
         textStyle: FujinText.inter15Medium,
         shape: const StadiumBorder(),
-      ),
+      ).copyWith(overlayColor: pressedOverlay),
     ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        minimumSize: const Size(FujinSize.touchTarget, FujinSize.buttonMedium),
+        padding: const EdgeInsets.symmetric(horizontal: FujinSpace.s5),
+        foregroundColor: FujinColorRole.textLink,
+        disabledForegroundColor: FujinColorRole.buttonDisabledText,
+        textStyle: FujinText.inter15Medium,
+        shape: const StadiumBorder(),
+      ).copyWith(overlayColor: pressedOverlay),
+    ),
+  );
+
+  static const pressedOverlay = WidgetStatePropertyAll<Color?>(
+    FujinColorRole.backgroundPressed,
+  );
+
+  static const floatingShadow = BoxShadow(
+    color: FujinColorRole.shadowFloating,
+    blurRadius: FujinSize.floatingShadowBlur,
+    offset: Offset(0, FujinSize.floatingShadowOffset),
   );
 
   static const _colorScheme = ColorScheme(

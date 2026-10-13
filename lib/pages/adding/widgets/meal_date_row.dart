@@ -1,10 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/common/day_picker_sheet.dart';
+import 'package:fujin/pages/common/fujin_menu.dart';
+import 'package:fujin/pages/common/fujin_menu_button.dart';
 import 'package:fujin/pages/common/title_text.dart';
-import 'package:fujin/pages/journal/selected_day.dart';
+import 'package:fujin/pages/sending/sheets/sheet_frame.dart';
 
 class MealDateRow extends StatelessWidget {
   const MealDateRow({
@@ -17,6 +21,10 @@ class MealDateRow extends StatelessWidget {
   });
 
   static const _pickerSpan = Duration(days: 365);
+  static const _bookIcon = 'assets/icons/book.svg';
+  static const _padding = EdgeInsetsDirectional.symmetric(
+    horizontal: FujinSpace.s4,
+  );
 
   final String meal;
   final List<String> meals;
@@ -27,39 +35,55 @@ class MealDateRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    Future<void> pickDate() async {
-      final picked = await showDatePicker(
-        context: context,
-        initialDate: date,
-        firstDate: date.subtract(_pickerSpan),
-        lastDate: date.add(_pickerSpan),
-      );
-      if (picked case final picked?) onDate(SelectedDay.calendarDay(picked));
-    }
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
       child: Row(
         spacing: FujinSpace.s2,
         children: [
           Expanded(
-            child: PopupMenuButton<String>(
-              initialValue: meal,
-              onSelected: onMeal,
-              itemBuilder: (context) => [
-                for (final name in {meal, ...meals})
-                  PopupMenuItem(value: name, child: Text(name)),
+            child: FujinMenu<String>(
+              items: [
+                ...{meal, ...meals},
               ],
-              child: _Pill(icon: Icons.description_outlined, label: meal),
+              selected: meal,
+              labelOf: (name) => name,
+              onSelected: onMeal,
+              itemPadding: _padding,
+              builder: (context, {required expanded, required toggle}) => _pill(
+                label: meal,
+                expanded: expanded,
+                onTap: toggle,
+                leading: SvgPicture.asset(
+                  _bookIcon,
+                  width: FujinSize.mealArrow,
+                  height: FujinSize.mealArrow,
+                  theme: const SvgTheme(
+                    currentColor: FujinColorRole.textPrimary,
+                  ),
+                  excludeFromSemantics: true,
+                ),
+              ),
             ),
           ),
           Expanded(
-            child: InkWell(
-              onTap: () => unawaited(pickDate()),
-              customBorder: const StadiumBorder(),
-              child: _Pill(
-                icon: Icons.calendar_today_outlined,
-                label: TitleText.capitalized(l10n.addMealDate(date)),
+            child: _pill(
+              label: TitleText.capitalized(l10n.addMealDate(date)),
+              expanded: false,
+              onTap: () => unawaited(
+                SheetFrame.show(
+                  context,
+                  builder: (context) => DayPickerSheet(
+                    selected: date,
+                    first: date.subtract(_pickerSpan),
+                    last: date.add(_pickerSpan),
+                    onPicked: onDate,
+                  ),
+                ),
+              ),
+              leading: const Icon(
+                Icons.calendar_today_outlined,
+                size: FujinSize.mealArrow,
+                color: FujinColorRole.textPrimary,
               ),
             ),
           ),
@@ -67,43 +91,20 @@ class MealDateRow extends StatelessWidget {
       ),
     );
   }
-}
 
-class _Pill extends StatelessWidget {
-  const _Pill({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) => Container(
+  static Widget _pill({
+    required String label,
+    required bool expanded,
+    required VoidCallback onTap,
+    required Widget leading,
+  }) => FujinMenuButton(
+    label: label,
+    expanded: expanded,
+    onTap: onTap,
     height: FujinSize.buttonMedium,
-    padding: const EdgeInsets.symmetric(horizontal: FujinSpace.s4),
-    decoration: const ShapeDecoration(
-      color: FujinColorRole.backgroundCard,
-      shape: StadiumBorder(
-        side: BorderSide(color: FujinColorRole.borderCard),
-      ),
-    ),
-    child: Row(
-      spacing: FujinSpace.s2,
-      children: [
-        Icon(
-          icon,
-          size: FujinSize.searchIcon,
-          color: FujinColorRole.textPrimary,
-        ),
-        Expanded(
-          child: Text(
-            label,
-            overflow: TextOverflow.ellipsis,
-            style: FujinText.inter15Medium.copyWith(
-              color: FujinColorRole.textPrimary,
-            ),
-          ),
-        ),
-        const Icon(Icons.expand_more, color: FujinColorRole.textPrimary),
-      ],
-    ),
+    radius: FujinRadius.pill,
+    padding: _padding,
+    chevronSize: FujinSize.mealArrow,
+    leading: leading,
   );
 }

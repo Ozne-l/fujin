@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 
 class GoalField extends StatelessWidget {
@@ -19,6 +20,7 @@ class GoalField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => TextField(
+    cursorWidth: FujinTheme.cursorWidth,
     controller: controller,
     onChanged: onChanged,
     keyboardType: const TextInputType.numberWithOptions(decimal: true),

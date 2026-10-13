@@ -6,9 +6,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/fujin_app.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/router.dart';
+import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/pages/adding/add_search_notifier.dart';
+import 'package:fujin/pages/common/day_picker_sheet.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -590,4 +592,107 @@ void main() {
 
     _sees('Produit reconnu, sans fiche');
   });
+
+  testWidgets('drafts the serving and the meal chosen in their menus', (
+    tester,
+  ) async {
+    final twoServings = mfpFood(
+      oats,
+      description: _oatsName,
+      servingSizes: const [
+        MfpServingSize(value: 100, unit: grams, nutritionMultiplier: 1),
+        MfpServingSize(value: 40, unit: grams, nutritionMultiplier: 0.4),
+      ],
+    );
+    final backends = _backends(stored: [twoServings])
+      ..mfpSearches = {
+        _query: [twoServings],
+      };
+    await pumpFujin(tester, backends);
+    await _openAdd(tester);
+    await _openOats(tester);
+
+    await _tap(tester, '100 g');
+    await _tap(tester, '40 g');
+    await _tap(tester, breakfast);
+    await _tap(tester, lunch);
+    await _tap(tester, _addToBoth);
+
+    check(backends.entries).length.equals(1);
+    check(backends.entries.single)
+      ..has((entry) => entry.mealName, 'meal').equals(lunch)
+      ..has((entry) => entry.servingSize.value, 'serving').equals(40);
+  });
+
+  testWidgets('closes the open meal menu on back and stays on the fiche', (
+    tester,
+  ) async {
+    await pumpFujin(tester, _backends());
+    await _openAdd(tester);
+    await _openOats(tester);
+    await _tap(tester, breakfast);
+    _sees(lunch);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+
+    check(find.text(lunch).evaluate()).isEmpty();
+    _sees('Ajouter à $breakfast');
+    _sees(_addToBoth);
+  });
+
+  testWidgets('adds to the day tapped in the day picker', (tester) async {
+    final backends = _backends();
+    await pumpFujin(tester, backends);
+    await _openAdd(tester);
+    await _openOats(tester);
+
+    await _openDayPicker(tester);
+    await tester.tap(_dayInPicker('6'));
+    await tester.pumpAndSettle();
+    check(find.byType(DayPickerSheet).evaluate()).isEmpty();
+    await _tap(tester, _addToBoth);
+
+    check(
+      backends.entries.single,
+    ).has((entry) => entry.date, 'date').equals(DateTime.utc(2026, 10, 6));
+  });
+
+  testWidgets('greys out the days more than a year away and ignores them', (
+    tester,
+  ) async {
+    await pumpFujin(tester, _backends());
+    await _openAdd(tester);
+    await _openOats(tester);
+    await _openDayPicker(tester);
+
+    for (var month = 0; month < 12; month++) {
+      await tester.tap(find.byTooltip('Mois précédent'));
+      await tester.pumpAndSettle();
+    }
+    _sees('Octobre 2025');
+    check(
+      _dayColor(tester, '6'),
+    ).equals(FujinColorRole.textDisabled);
+    check(_dayColor(tester, '7')).equals(FujinColorRole.textPrimary);
+
+    await tester.tap(_dayInPicker('6'));
+    await tester.pumpAndSettle();
+
+    check(find.byType(DayPickerSheet).evaluate()).length.equals(1);
+  });
 }
+
+Future<void> _openDayPicker(WidgetTester tester) async {
+  final pill = find.byIcon(Icons.calendar_today_outlined);
+  await tester.ensureVisible(pill);
+  await tester.pumpAndSettle();
+  await tester.tap(pill);
+  await tester.pumpAndSettle();
+}
+
+Finder _dayInPicker(String date) =>
+    find.descendant(of: find.byType(DayPickerSheet), matching: find.text(date));
+
+Color? _dayColor(WidgetTester tester, String date) =>
+    tester.widget<Text>(_dayInPicker(date)).style?.color;

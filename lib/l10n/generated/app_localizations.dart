@@ -2538,6 +2538,42 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'MyFitnessPal reste connecté. Reconnecte Ekklo pour écrire des deux côtés ; ta saisie est gardée.'**
   String get addEkkloSessionDetail;
+
+  /// No description provided for @dayPickerTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir le jour'**
+  String get dayPickerTitle;
+
+  /// No description provided for @dayPickerMonth.
+  ///
+  /// In fr, this message translates to:
+  /// **'{date}'**
+  String dayPickerMonth(DateTime date);
+
+  /// No description provided for @dayPickerDay.
+  ///
+  /// In fr, this message translates to:
+  /// **'{date}'**
+  String dayPickerDay(DateTime date);
+
+  /// No description provided for @previousMonth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mois précédent'**
+  String get previousMonth;
+
+  /// No description provided for @nextMonth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mois suivant'**
+  String get nextMonth;
+
+  /// No description provided for @memoryMealMenu.
+  ///
+  /// In fr, this message translates to:
+  /// **'Repas Ekklo pour {meal}'**
+  String memoryMealMenu(String meal);
 }
 
 class _AppLocalizationsDelegate

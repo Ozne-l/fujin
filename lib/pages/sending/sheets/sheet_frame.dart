@@ -155,7 +155,6 @@ class SheetFrame extends HookWidget {
                           Expanded(
                             child: TextButton(
                               onPressed: onSkip,
-                              style: _skipStyle,
                               child: Text(skipLabel ?? l10n.skip),
                             ),
                           ),
@@ -169,13 +168,6 @@ class SheetFrame extends HookWidget {
       ),
     );
   }
-
-  static final ButtonStyle _skipStyle = TextButton.styleFrom(
-    minimumSize: const Size(0, FujinSize.buttonMedium),
-    foregroundColor: FujinColorRole.textLink,
-    textStyle: FujinText.inter15Medium,
-    shape: const StadiumBorder(),
-  );
 }
 
 class _SearchField extends StatelessWidget {
@@ -186,6 +178,7 @@ class _SearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => TextField(
+    cursorWidth: FujinTheme.cursorWidth,
     controller: controller,
     textInputAction: TextInputAction.search,
     style: FujinText.inter16Regular.copyWith(

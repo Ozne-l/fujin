@@ -21,20 +21,40 @@ class SuggestionRow extends StatelessWidget {
       shape: const StadiumBorder(
         side: BorderSide(color: FujinColorRole.borderCard),
       ),
-      child: ListTile(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
         onTap: onTap,
-        shape: const StadiumBorder(),
-        leading: Icon(icon, color: FujinColorRole.textLink),
-        title: Text(
-          label,
-          style: FujinText.inter15Medium.copyWith(
-            color: FujinColorRole.textPrimary,
+        customBorder: const StadiumBorder(),
+        child: SizedBox(
+          height: FujinSize.field,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: FujinSpace.s4),
+            child: Row(
+              spacing: FujinSpace.s3,
+              children: [
+                Icon(
+                  icon,
+                  size: FujinSize.searchIcon,
+                  color: FujinColorRole.textLink,
+                ),
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: FujinText.inter15Medium.copyWith(
+                      color: FujinColorRole.textPrimary,
+                    ),
+                  ),
+                ),
+                const Icon(
+                  Icons.chevron_right,
+                  size: FujinSize.mealArrow,
+                  color: FujinColorRole.textSecondary,
+                ),
+              ],
+            ),
           ),
-        ),
-        trailing: const Icon(
-          Icons.chevron_right,
-          size: FujinSize.rowChevron,
-          color: FujinColorRole.textSecondary,
         ),
       ),
     ),

@@ -55,9 +55,7 @@ class _DayDetail extends StatelessWidget {
               child: TextButton(
                 onPressed: navigator.pop,
                 style: TextButton.styleFrom(
-                  foregroundColor: FujinColorRole.textLink,
                   textStyle: FujinText.inter13Medium,
-                  minimumSize: const Size.square(FujinSize.touchTarget),
                 ),
                 child: Text(l10n.close),
               ),

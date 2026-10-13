@@ -1,21 +1,42 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/pages/memory/memory_segment.dart';
 
 class MemorySegments extends StatelessWidget {
   const MemorySegments({
-    required this.selected,
+    required this.pages,
     required this.labelOf,
-    required this.onSelect,
     super.key,
   });
 
-  final MemorySegment selected;
+  final PageController pages;
   final String Function(MemorySegment segment) labelOf;
-  final ValueChanged<MemorySegment> onSelect;
 
   static const double _segmentRadius =
       FujinSize.controlHeight / 2 - FujinSpace.s1;
+  static final int _lastIndex = MemorySegment.values.length - 1;
+
+  double get _page => switch (pages.hasClients) {
+    true when pages.position.hasContentDimensions =>
+      pages.page ?? pages.initialPage.toDouble(),
+    _ => pages.initialPage.toDouble(),
+  };
+
+  void _select(MemorySegment segment) {
+    if (_page == segment.index) return;
+    unawaited(HapticFeedback.selectionClick());
+    unawaited(
+      pages.animateToPage(
+        segment.index,
+        duration: FujinMotion.pageTurn.duration,
+        curve: FujinMotion.pageTurn.curve,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) => Container(
@@ -25,17 +46,40 @@ class MemorySegments extends StatelessWidget {
       color: FujinColorRole.borderCard,
       borderRadius: BorderRadius.circular(FujinSize.controlHeight / 2),
     ),
-    child: Row(
-      children: [
-        for (final segment in MemorySegment.values)
-          Expanded(
-            child: _Segment(
-              label: labelOf(segment),
-              active: segment == selected,
-              onTap: () => onSelect(segment),
+    child: ListenableBuilder(
+      listenable: pages,
+      builder: (context, _) {
+        final page = _page.clamp(0, _lastIndex).toDouble();
+        return Stack(
+          children: [
+            Align(
+              alignment: Alignment(page / _lastIndex * 2 - 1, 0),
+              child: FractionallySizedBox(
+                widthFactor: 1 / MemorySegment.values.length,
+                heightFactor: 1,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: FujinColorRole.backgroundCard,
+                    borderRadius: BorderRadius.circular(_segmentRadius),
+                  ),
+                ),
+              ),
             ),
-          ),
-      ],
+            Row(
+              children: [
+                for (final segment in MemorySegment.values)
+                  Expanded(
+                    child: _Segment(
+                      label: labelOf(segment),
+                      active: (1 - (page - segment.index).abs()).clamp(0, 1),
+                      onTap: () => _select(segment),
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        );
+      },
     ),
   );
 }
@@ -48,26 +92,25 @@ class _Segment extends StatelessWidget {
   });
 
   final String label;
-  final bool active;
+  final double active;
   final VoidCallback onTap;
+
+  static const double _selectedFrom = 0.5;
 
   @override
   Widget build(BuildContext context) => Semantics(
     button: true,
-    selected: active,
-    child: Material(
-      color: active ? FujinColorRole.backgroundCard : Colors.transparent,
-      borderRadius: BorderRadius.circular(MemorySegments._segmentRadius),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(MemorySegments._segmentRadius),
-        onTap: onTap,
-        child: Center(
-          child: Text(
-            label,
-            style: FujinText.inter14Medium.copyWith(
-              color: active
-                  ? FujinColorRole.textPrimary
-                  : FujinColorRole.textSecondary,
+    selected: active >= _selectedFrom,
+    child: GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Center(
+        child: Text(
+          label,
+          style: FujinText.inter14Medium.copyWith(
+            color: Color.alphaBlend(
+              FujinColorRole.textPrimary.withValues(alpha: active),
+              FujinColorRole.textSecondary,
             ),
           ),
         ),

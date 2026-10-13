@@ -3,7 +3,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/goals/goal_status.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
-import 'package:fujin/pages/journal/widgets/progress_ring.dart';
+import 'package:fujin/pages/common/progress_ring.dart';
 
 class NutrientRing extends StatelessWidget {
   const NutrientRing({

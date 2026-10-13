@@ -160,9 +160,7 @@ class _EkkloCard extends ConsumerWidget {
       action: TextButton(
         onPressed: onChange,
         style: TextButton.styleFrom(
-          foregroundColor: FujinColorRole.textLink,
           textStyle: FujinText.inter14Medium,
-          minimumSize: const Size.square(FujinSize.touchTarget),
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           visualDensity: VisualDensity.compact,
         ),
@@ -335,6 +333,7 @@ class _UnitWeightRow extends HookWidget {
         SizedBox(
           width: FujinSize.weightField,
           child: TextField(
+            cursorWidth: FujinTheme.cursorWidth,
             controller: weight,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             textInputAction: TextInputAction.done,

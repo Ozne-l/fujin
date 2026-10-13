@@ -10,6 +10,7 @@ import 'package:fujin/pages/adding/widgets/side_row.dart';
 import 'package:fujin/pages/adding/widgets/side_state.dart';
 import 'package:fujin/pages/adding/widgets/write_actions.dart';
 import 'package:fujin/pages/common/entry_text.dart';
+import 'package:fujin/pages/common/fujin_spinner.dart';
 import 'package:fujin/pages/common/source_dot.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
 
@@ -45,10 +46,10 @@ class WritePanel extends StatelessWidget {
         ),
         FilledButton.icon(
           onPressed: null,
-          icon: const SizedBox.square(
-            dimension: FujinSize.searchIcon,
-            child: CircularProgressIndicator(strokeWidth: FujinStroke.icon),
+          style: FilledButton.styleFrom(
+            disabledForegroundColor: FujinColorRole.textSecondary,
           ),
+          icon: const FujinSpinner.button(),
           label: Text(l10n.addAdding),
         ),
         _note(l10n.addAddingNote, center: true),

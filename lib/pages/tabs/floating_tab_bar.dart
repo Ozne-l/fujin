@@ -1,9 +1,8 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/common/glass_surface.dart';
 import 'package:fujin/pages/common/scan_icon.dart';
 import 'package:fujin/pages/tabs/fujin_tab.dart';
 
@@ -55,7 +54,7 @@ class FloatingTabBar extends StatelessWidget {
               spacing: FujinSpace.s2,
               children: [
                 Expanded(
-                  child: _Glass(
+                  child: GlassSurface(
                     child: Padding(
                       padding: const EdgeInsets.all(FujinSize.tabPlateInset),
                       child: Row(
@@ -79,7 +78,7 @@ class FloatingTabBar extends StatelessWidget {
                   button: true,
                   enabled: false,
                   label: l10n.tabScanner,
-                  child: _Glass(
+                  child: GlassSurface(
                     child: SizedBox.square(
                       dimension: FujinSize.tabBar,
                       child: Center(
@@ -103,67 +102,6 @@ class FloatingTabBar extends StatelessWidget {
       ],
     );
   }
-}
-
-class _Glass extends StatelessWidget {
-  const _Glass({required this.child});
-
-  final Widget child;
-
-  static const _radius = BorderRadius.all(
-    Radius.circular(FujinSize.tabBar / 2),
-  );
-
-  @override
-  Widget build(BuildContext context) => CustomPaint(
-    painter: const _OuterShadowPainter(_radius),
-    child: ClipRRect(
-      borderRadius: _radius,
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: FujinSize.glassBlur,
-          sigmaY: FujinSize.glassBlur,
-        ),
-        child: ColoredBox(
-          color: FujinColorRole.backgroundGlass,
-          child: SizedBox(height: FujinSize.tabBar, child: child),
-        ),
-      ),
-    ),
-  );
-}
-
-class _OuterShadowPainter extends CustomPainter {
-  const _OuterShadowPainter(this.radius);
-
-  final BorderRadius radius;
-
-  static const _shadow = BoxShadow(
-    color: FujinColorRole.shadowFloating,
-    blurRadius: FujinSize.floatingShadowBlur,
-    offset: Offset(0, FujinSize.floatingShadowOffset),
-  );
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final shape = radius.toRRect(Offset.zero & size);
-    final reach = _shadow.blurRadius + _shadow.offset.distance;
-    canvas
-      ..save()
-      ..clipPath(
-        Path.combine(
-          PathOperation.difference,
-          Path()..addRect(shape.outerRect.inflate(reach)),
-          Path()..addRRect(shape),
-        ),
-      )
-      ..drawRRect(shape.shift(_shadow.offset), _shadow.toPaint())
-      ..restore();
-  }
-
-  @override
-  bool shouldRepaint(_OuterShadowPainter oldDelegate) =>
-      radius != oldDelegate.radius;
 }
 
 class _TabButton extends StatelessWidget {

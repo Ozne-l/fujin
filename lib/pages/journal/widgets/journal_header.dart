@@ -51,9 +51,7 @@ class JournalHeader extends StatelessWidget {
                 TextButton(
                   onPressed: onTap,
                   style: TextButton.styleFrom(
-                    foregroundColor: FujinColorRole.textLink,
                     textStyle: FujinText.inter13Medium,
-                    minimumSize: const Size.square(FujinSize.touchTarget),
                     padding: EdgeInsets.zero,
                   ),
                   child: Text(label),

@@ -1020,5 +1020,24 @@
   },
   "addMfpSessionSearchDetail": "Reconnecte-toi pour chercher. Ta recherche est gardée.",
   "addEkkloSessionTitle": "Session Ekklo expirée",
-  "addEkkloSessionDetail": "MyFitnessPal reste connecté. Reconnecte Ekklo pour écrire des deux côtés ; ta saisie est gardée."
+  "addEkkloSessionDetail": "MyFitnessPal reste connecté. Reconnecte Ekklo pour écrire des deux côtés ; ta saisie est gardée.",
+  "dayPickerTitle": "Choisir le jour",
+  "dayPickerMonth": "{date}",
+  "@dayPickerMonth": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "yMMMM"}
+    }
+  },
+  "dayPickerDay": "{date}",
+  "@dayPickerDay": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "yMMMMEEEEd"}
+    }
+  },
+  "previousMonth": "Mois précédent",
+  "nextMonth": "Mois suivant",
+  "memoryMealMenu": "Repas Ekklo pour {meal}",
+  "@memoryMealMenu": {
+    "placeholders": {"meal": {"type": "String"}}
+  }
 }

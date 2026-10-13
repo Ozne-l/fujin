@@ -6,6 +6,7 @@ import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/alert_banner.dart';
+import 'package:fujin/pages/common/fujin_spinner.dart';
 import 'package:fujin/pages/common/sign_in_failure.dart';
 import 'package:fujin/pages/common/top_bar.dart';
 import 'package:fujin/pages/ekklo_sign_in/ekklo_sign_in_notifier.dart';
@@ -94,6 +95,7 @@ class EkkloSignInPage extends HookConsumerWidget {
                       textInputAction: TextInputAction.next,
                       autocorrect: false,
                       autofillHints: const [AutofillHints.email],
+                      cursorWidth: FujinTheme.cursorWidth,
                       style: _fieldStyle,
                     ),
                     const SizedBox(height: FujinSpace.s4),
@@ -119,13 +121,7 @@ class EkkloSignInPage extends HookConsumerWidget {
               child: FilledButton(
                 onPressed: submit,
                 child: switch (running) {
-                  true => const SizedBox.square(
-                    dimension: FujinSize.icon,
-                    child: CircularProgressIndicator(
-                      strokeWidth: FujinStroke.icon,
-                      color: FujinColorRole.buttonDisabledText,
-                    ),
-                  ),
+                  true => const FujinSpinner.button(),
                   false => Text(l10n.signIn),
                 },
               ),
@@ -225,6 +221,7 @@ class _PasswordField extends HookWidget {
       autocorrect: false,
       enableSuggestions: false,
       autofillHints: const [AutofillHints.password],
+      cursorWidth: FujinTheme.cursorWidth,
       style: EkkloSignInPage._fieldStyle,
       onChanged: onChanged,
       onSubmitted: (_) => onSubmitted?.call(),
@@ -234,7 +231,6 @@ class _PasswordField extends HookWidget {
         suffixIcon: TextButton(
           onPressed: () => shown.value = !shown.value,
           style: TextButton.styleFrom(
-            foregroundColor: FujinColorRole.textLink,
             textStyle: FujinText.inter14Medium,
           ),
           child: Text(

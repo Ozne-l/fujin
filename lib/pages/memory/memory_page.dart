@@ -28,115 +28,132 @@ class MemoryPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final memory = ref.watch(memoryProvider);
-    final segment = useState(MemorySegment.foods);
+    final pages = usePageController();
     final search = useTextEditingController();
     useListenable(search);
     final remembered = memory.matches.length + memory.ownCopies.length;
     final bottom = MediaQuery.paddingOf(context).bottom;
 
+    Widget page(MemorySegment segment) => CustomScrollView(
+      key: PageStorageKey(segment),
+      slivers: [
+        const SliverToBoxAdapter(child: SizedBox(height: _segmentsSpan)),
+        ...switch ((segment, remembered)) {
+          (MemorySegment.foods, 0) => [
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Column(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(
+                      top: FujinSpace.s8 + FujinSpace.s4,
+                      bottom: FujinSpace.s8,
+                    ),
+                    child: MemoryEmptyView(),
+                  ),
+                  const Spacer(),
+                  const SeigaihaBand(),
+                  SizedBox(height: FujinSpace.s8 + bottom),
+                ],
+              ),
+            ),
+          ],
+          (MemorySegment.foods, _) => [
+            SliverList.list(
+              children: _foods(
+                context,
+                memory,
+                search,
+                (food) => unawaited(
+                  context.push<void>(FujinRoute.memoryFood.forFood(food)),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: SizedBox(height: FujinSpace.s8 + bottom),
+            ),
+          ],
+          (MemorySegment.meals, _) => [
+            SliverToBoxAdapter(
+              child: _MealsSection(
+                memory: memory,
+                onChange: ref.read(memoryProvider.notifier).saveMeal,
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: SizedBox(height: FujinSpace.s8 + bottom),
+            ),
+          ],
+        },
+      ],
+    );
+
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: CustomScrollView(
-          slivers: [
-            SliverList.list(
-              children: [
-                const SizedBox(height: FujinSpace.s3),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: FujinSize.textInset,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: FujinSpace.s3,
-                    children: [
-                      Text(
-                        l10n.tabMemory,
-                        style: FujinText.hina30.copyWith(
-                          color: FujinColorRole.textPrimary,
-                        ),
-                      ),
-                      Text(
-                        l10n.memorySubtitle,
-                        style: FujinText.inter15Regular.copyWith(
-                          color: FujinColorRole.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    FujinSize.screenMargin,
-                    FujinSpace.s3,
-                    FujinSize.screenMargin,
-                    FujinSpace.s4,
-                  ),
-                  child: MemorySegments(
-                    selected: segment.value,
-                    labelOf: (value) => switch (value) {
-                      MemorySegment.foods => l10n.memoryFoods(remembered),
-                      MemorySegment.meals => l10n.memoryMeals(
-                        memory.meals.length,
-                      ),
-                    },
-                    onSelect: (value) => segment.value = value,
-                  ),
-                ),
-              ],
-            ),
-            ...switch ((segment.value, remembered)) {
-              (MemorySegment.foods, 0) => [
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Column(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(
-                          top: FujinSpace.s8 + FujinSpace.s4,
-                          bottom: FujinSpace.s8,
-                        ),
-                        child: MemoryEmptyView(),
-                      ),
-                      const Spacer(),
-                      const SeigaihaBand(),
-                      SizedBox(height: FujinSpace.s8 + bottom),
-                    ],
-                  ),
-                ),
-              ],
-              (MemorySegment.foods, _) => [
-                SliverList.list(
-                  children: _foods(
-                    context,
-                    memory,
-                    search,
-                    (food) => unawaited(
-                      context.push<void>(FujinRoute.memoryFood.forFood(food)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                FujinSize.textInset,
+                FujinSpace.s3,
+                FujinSize.textInset,
+                0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: FujinSpace.s3,
+                children: [
+                  Text(
+                    l10n.tabMemory,
+                    style: FujinText.hina30.copyWith(
+                      color: FujinColorRole.textPrimary,
                     ),
                   ),
-                ),
-                SliverToBoxAdapter(
-                  child: SizedBox(height: FujinSpace.s8 + bottom),
-                ),
-              ],
-              (MemorySegment.meals, _) => [
-                SliverToBoxAdapter(
-                  child: _MealsSection(
-                    memory: memory,
-                    onChange: ref.read(memoryProvider.notifier).saveMeal,
+                  Text(
+                    l10n.memorySubtitle,
+                    style: FujinText.inter15Regular.copyWith(
+                      color: FujinColorRole.textSecondary,
+                    ),
                   ),
-                ),
-                SliverToBoxAdapter(
-                  child: SizedBox(height: FujinSpace.s8 + bottom),
-                ),
-              ],
-            },
+                ],
+              ),
+            ),
+            Expanded(
+              child: Stack(
+                children: [
+                  PageView(
+                    controller: pages,
+                    children: [
+                      for (final segment in MemorySegment.values) page(segment),
+                    ],
+                  ),
+                  Positioned(
+                    top: FujinSpace.s3,
+                    left: FujinSize.screenMargin,
+                    right: FujinSize.screenMargin,
+                    child: MemorySegments(
+                      pages: pages,
+                      labelOf: (value) => switch (value) {
+                        MemorySegment.foods => l10n.memoryFoods(remembered),
+                        MemorySegment.meals => l10n.memoryMeals(
+                          memory.meals.length,
+                        ),
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
+
+  static const double _segmentsSpan =
+      FujinSpace.s3 + FujinSize.controlHeight + FujinSpace.s4;
 
   static List<Widget> _foods(
     BuildContext context,

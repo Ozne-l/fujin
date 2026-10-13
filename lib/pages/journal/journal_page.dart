@@ -14,6 +14,7 @@ import 'package:fujin/pages/common/goals_notifier.dart';
 import 'package:fujin/pages/common/gold_separator.dart';
 import 'package:fujin/pages/common/snack_bar_content.dart';
 import 'package:fujin/pages/common/snack_bar_glyph.dart';
+import 'package:fujin/pages/common/souffle_refresh.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
 import 'package:fujin/pages/journal/journal_snack_bar.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
@@ -180,85 +181,81 @@ class JournalPage extends HookConsumerWidget {
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: RefreshIndicator(
+        child: SouffleRefresh(
           onRefresh: refresh,
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: [
-              SliverToBoxAdapter(
-                child: JournalHeader(
-                  day: day,
-                  today: today,
-                  link: switch ((day == today, goals)) {
-                    (false, _) => (l10n.backToToday, () => select(today)),
-                    (true, null) => (
-                      l10n.setGoals,
-                      () =>
-                          unawaited(context.push<void>(FujinRoute.goals.path)),
-                    ),
-                    (true, Goals()) => null,
-                  },
-                ),
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(vertical: FujinSpace.s3),
-                sliver: SliverToBoxAdapter(
-                  child: WeekBand(
-                    selected: day,
-                    today: today,
-                    goals: goals,
-                    onSelect: select,
+          slivers: [
+            SliverToBoxAdapter(
+              child: JournalHeader(
+                day: day,
+                today: today,
+                link: switch ((day == today, goals)) {
+                  (false, _) => (l10n.backToToday, () => select(today)),
+                  (true, null) => (
+                    l10n.setGoals,
+                    () => unawaited(context.push<void>(FujinRoute.goals.path)),
                   ),
+                  (true, Goals()) => null,
+                },
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(vertical: FujinSpace.s3),
+              sliver: SliverToBoxAdapter(
+                child: WeekBand(
+                  selected: day,
+                  today: today,
+                  goals: goals,
+                  onSelect: select,
                 ),
               ),
-              ...switch (journal) {
-                AsyncValue(value: final read?, error: final error?) => [
-                  ...problem(ReadProblem.of(error), readAt: read.readAt),
-                  summary(read, stale: true),
-                ],
-                AsyncValue(value: BothSides(:final day) && final read) => [
-                  summary(read, stale: false),
-                  ..._meals(context, [
-                    for (final meal in day.meals)
-                      MealCard(
-                        key: ValueKey((day.date, meal.name)),
-                        meal: meal,
-                        onAdd: () => unawaited(add(meal.name)),
-                      ),
-                  ]),
-                ],
-                AsyncValue(value: MfpOnly() && final read) => [
-                  ...problem(read.ekkloProblem),
-                  summary(read, stale: false),
-                  ..._meals(context, [
-                    for (final MapEntry(key: name, value: kilocalories)
-                        in read.mealKilocalories.entries)
-                      UnavailableMealCard(
-                        name: name,
-                        kilocalories: kilocalories,
-                      ),
-                  ]),
-                ],
-                AsyncValue(value: EkkloOnly() && final read) => [
-                  ...problem(read.mfpProblem),
-                  summary(read, stale: false),
-                ],
-                AsyncError(:final error) => problem(ReadProblem.of(error)),
-                AsyncLoading() => [
-                  const SliverToBoxAdapter(child: LoadingSummaryCard()),
-                  ..._meals(context, [
-                    for (var index = 0; index < _loadingMeals; index++)
-                      const LoadingMealCard(),
-                  ]),
-                ],
-              },
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: FujinSpace.s8 + MediaQuery.paddingOf(context).bottom,
-                ),
+            ),
+            ...switch (journal) {
+              AsyncValue(value: final read?, error: final error?) => [
+                ...problem(ReadProblem.of(error), readAt: read.readAt),
+                summary(read, stale: true),
+              ],
+              AsyncValue(value: BothSides(:final day) && final read) => [
+                summary(read, stale: false),
+                ..._meals(context, [
+                  for (final meal in day.meals)
+                    MealCard(
+                      key: ValueKey((day.date, meal.name)),
+                      meal: meal,
+                      onAdd: () => unawaited(add(meal.name)),
+                    ),
+                ]),
+              ],
+              AsyncValue(value: MfpOnly() && final read) => [
+                ...problem(read.ekkloProblem),
+                summary(read, stale: false),
+                ..._meals(context, [
+                  for (final MapEntry(key: name, value: kilocalories)
+                      in read.mealKilocalories.entries)
+                    UnavailableMealCard(
+                      name: name,
+                      kilocalories: kilocalories,
+                    ),
+                ]),
+              ],
+              AsyncValue(value: EkkloOnly() && final read) => [
+                ...problem(read.mfpProblem),
+                summary(read, stale: false),
+              ],
+              AsyncError(:final error) => problem(ReadProblem.of(error)),
+              AsyncLoading() => [
+                const SliverToBoxAdapter(child: LoadingSummaryCard()),
+                ..._meals(context, [
+                  for (var index = 0; index < _loadingMeals; index++)
+                    const LoadingMealCard(),
+                ]),
+              ],
+            },
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: FujinSpace.s8 + MediaQuery.paddingOf(context).bottom,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

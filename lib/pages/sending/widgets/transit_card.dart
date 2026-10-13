@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
@@ -13,12 +11,6 @@ import 'package:motor/motor.dart';
 
 class TransitCard extends StatelessWidget {
   const TransitCard({required this.names, super.key});
-
-  static const _drift = StepSequence<double>(
-    [0, 1],
-    motion: FujinMotion.drift,
-    loop: LoopMode.seamless,
-  );
 
   final List<String> names;
 
@@ -67,14 +59,18 @@ class TransitCard extends StatelessWidget {
           SizedBox(
             height: FujinSize.transitLane,
             child: SequenceMotionBuilder<int, double>(
-              sequence: _drift,
+              sequence: FujinMotion.driftCycle,
               converter: MotionConverter.single,
               builder: (context, value, _, _) => Stack(
                 children: [
                   for (final (index, name) in names.indexed)
                     _Drifting(
                       name: name,
-                      progress: (value + index / names.length) % 1,
+                      progress: FujinMotion.driftPhase(
+                        value,
+                        index,
+                        names.length,
+                      ),
                       upper: index.isEven,
                     ),
                 ],
@@ -108,7 +104,7 @@ class _Drifting extends StatelessWidget {
       },
     ),
     child: Opacity(
-      opacity: math.sin(progress * math.pi).clamp(0, 1),
+      opacity: FujinMotion.driftFade(progress),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         spacing: FujinSpace.s1,

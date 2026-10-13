@@ -1881,4 +1881,36 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get addEkkloSessionDetail =>
       'MyFitnessPal stays connected. Reconnect Ekklo to write to both sides; your entry is kept.';
+
+  @override
+  String get dayPickerTitle => 'Choose the day';
+
+  @override
+  String dayPickerMonth(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMM(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString';
+  }
+
+  @override
+  String dayPickerDay(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMMEEEEd(
+      localeName,
+    );
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString';
+  }
+
+  @override
+  String get previousMonth => 'Previous month';
+
+  @override
+  String get nextMonth => 'Next month';
+
+  @override
+  String memoryMealMenu(String meal) {
+    return 'Ekklo meal for $meal';
+  }
 }

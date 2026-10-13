@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/adding/widgets/side_state.dart';
+import 'package:fujin/pages/common/fujin_spinner.dart';
+import 'package:fujin/pages/common/progress_ring.dart';
 import 'package:fujin/pages/common/source_dot.dart';
 
 class SideRow extends StatelessWidget {
@@ -44,25 +46,22 @@ class SideRow extends StatelessWidget {
           ),
           Text(status, style: FujinText.inter13Medium.copyWith(color: color)),
           SizedBox.square(
-            dimension: FujinSize.icon,
+            dimension: FujinSize.spinner,
             child: switch (state) {
-              SideState.waiting || SideState.notSent => const Icon(
-                Icons.radio_button_unchecked,
-                color: FujinColorRole.textDisabled,
+              SideState.waiting || SideState.notSent => const ProgressRing(
+                size: FujinSize.spinner,
+                stroke: FujinStroke.radio,
+                track: FujinColorRole.textDisabled,
+                child: SizedBox.shrink(),
               ),
-              SideState.writing => const Padding(
-                padding: EdgeInsets.all(FujinSpace.s1),
-                child: CircularProgressIndicator(
-                  strokeWidth: FujinStroke.icon,
-                ),
-              ),
-              SideState.written => const Icon(
-                Icons.check_circle,
+              SideState.writing => const FujinSpinner.card(),
+              SideState.written => const _Disc(
                 color: FujinColorRole.textLink,
+                icon: Icons.check,
               ),
-              SideState.failed => const Icon(
-                Icons.error,
+              SideState.failed => const _Disc(
                 color: FujinColorRole.textAlert,
+                icon: Icons.priority_high,
               ),
             },
           ),
@@ -70,4 +69,21 @@ class SideRow extends StatelessWidget {
       ),
     );
   }
+}
+
+class _Disc extends StatelessWidget {
+  const _Disc({required this.color, required this.icon});
+
+  final Color color;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    child: Icon(
+      icon,
+      size: FujinSize.stepIcon,
+      color: FujinColorRole.textOnDark,
+    ),
+  );
 }

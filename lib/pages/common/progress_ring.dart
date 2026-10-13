@@ -15,6 +15,7 @@ class ProgressRing extends StatelessWidget {
     this.arc,
     this.progress = 0,
     this.dashed = false,
+    this.cap = StrokeCap.round,
     super.key,
   });
 
@@ -26,6 +27,7 @@ class ProgressRing extends StatelessWidget {
   final Color? arc;
   final double progress;
   final bool dashed;
+  final StrokeCap cap;
 
   @override
   Widget build(BuildContext context) => SizedBox.square(
@@ -41,6 +43,7 @@ class ProgressRing extends StatelessWidget {
           arc: arc,
           progress: value,
           dashed: dashed,
+          cap: cap,
         ),
         child: child,
       ),
@@ -57,6 +60,7 @@ class _RingPainter extends CustomPainter {
     required this.arc,
     required this.progress,
     required this.dashed,
+    required this.cap,
   });
 
   static const double _start = -pi / 2;
@@ -68,6 +72,7 @@ class _RingPainter extends CustomPainter {
   final Color? arc;
   final double progress;
   final bool dashed;
+  final StrokeCap cap;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -96,7 +101,7 @@ class _RingPainter extends CustomPainter {
         false,
         line
           ..color = arc
-          ..strokeCap = StrokeCap.round,
+          ..strokeCap = cap,
       );
     }
   }
@@ -119,5 +124,6 @@ class _RingPainter extends CustomPainter {
       old.track != track ||
       old.arc != arc ||
       old.progress != progress ||
-      old.dashed != dashed;
+      old.dashed != dashed ||
+      old.cap != cap;
 }

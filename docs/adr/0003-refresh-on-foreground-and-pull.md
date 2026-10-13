@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Accepted
+Accepted. The stock `RefreshIndicator` spinner is replaced by `SouffleRefresh` ([0028](0028-fujin-drawn-controls.md)); the gesture and `JournalNotifier.refresh()` are unchanged.
 
 ## Context
 

@@ -157,9 +157,7 @@ class MealCard extends HookWidget {
             child: TextButton.icon(
               onPressed: onAdd,
               style: TextButton.styleFrom(
-                foregroundColor: FujinColorRole.textLink,
                 textStyle: FujinText.inter14Medium,
-                minimumSize: const Size.square(FujinSize.touchTarget),
                 padding: EdgeInsets.zero,
               ),
               icon: SvgPicture.asset(

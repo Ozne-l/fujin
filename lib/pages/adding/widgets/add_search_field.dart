@@ -25,6 +25,7 @@ class AddSearchField extends StatelessWidget {
       textInputAction: TextInputAction.search,
       onChanged: onChanged,
       onSubmitted: onSubmitted,
+      cursorWidth: FujinTheme.cursorWidth,
       style: FujinText.inter16Medium.copyWith(
         color: FujinColorRole.textPrimary,
       ),
@@ -40,20 +41,38 @@ class AddSearchField extends StatelessWidget {
         ),
         suffixIcon: switch (controller.text) {
           '' => null,
-          _ => IconButton(
-            onPressed: onClear,
-            tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
-            icon: const Icon(
-              Icons.cancel,
-              size: FujinSize.searchIcon,
-              color: FujinColorRole.textTertiary,
+          _ => Semantics(
+            button: true,
+            label: MaterialLocalizations.of(context).deleteButtonTooltip,
+            child: InkResponse(
+              onTap: onClear,
+              radius: FujinSize.touchTarget / 2,
+              child: const SizedBox.square(
+                dimension: FujinSize.touchTarget,
+                child: Center(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: FujinColor.kinari,
+                      shape: BoxShape.circle,
+                    ),
+                    child: SizedBox.square(
+                      dimension: FujinSize.searchIcon,
+                      child: Icon(
+                        Icons.close,
+                        size: FujinSize.menuChevron,
+                        color: FujinColorRole.textSecondary,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         },
         contentPadding: const EdgeInsets.symmetric(vertical: FujinSpace.s4),
         border: FujinTheme.searchFieldBorder,
         enabledBorder: FujinTheme.searchFieldBorder,
-        focusedBorder: FujinTheme.searchFieldBorder,
+        focusedBorder: FujinTheme.searchFieldFocusedBorder,
       ),
     ),
   );

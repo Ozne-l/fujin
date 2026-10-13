@@ -66,8 +66,8 @@ class WeekBand extends HookConsumerWidget {
       turning.value = true;
       await controller.animateToPage(
         page,
-        duration: FujinMotion.weekTurn.duration,
-        curve: FujinMotion.weekTurn.curve,
+        duration: FujinMotion.pageTurn.duration,
+        curve: FujinMotion.pageTurn.curve,
       );
       turning.value = false;
     }

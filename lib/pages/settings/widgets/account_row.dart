@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/common/source_dot.dart';
@@ -66,9 +67,8 @@ class AccountRow extends StatelessWidget {
               foregroundColor: FujinColorRole.textAlert,
               textStyle: FujinText.inter14Medium,
               padding: const EdgeInsets.symmetric(horizontal: FujinSpace.s3),
-              minimumSize: const Size.square(FujinSize.touchTarget),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
+            ).copyWith(overlayColor: FujinTheme.pressedOverlay),
             child: Text(l10n.signOut),
           ),
         ],

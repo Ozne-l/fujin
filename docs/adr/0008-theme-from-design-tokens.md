@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Accepted. All the planned motion users are built: the goal rings (`ProgressRing`, [0022](0022-journal-states-and-goal-rings.md)), the send progress of screen 14 (`ProgressCard`, [0018](0018-send-flow.md)), status pill changes (`StatusPill` in `lib/pages/common/status_pill.dart`: colours with `FujinMotion.pill`, a new label cross-fades and settles with `FujinMotion.pillSettle`), sheet motion (`SheetFrame.show` passes `FujinMotion.sheet`, built from the springs `sheetIn` and `sheetOut` through `MotionCurve`) and snackbar motion (every snackbar goes through `showFujinSnackBar` in `lib/pages/common/fujin_snack_bar.dart` with `FujinMotion.snackBar`; Flutter only lets a snackbar's durations change, not its curves).
+Accepted. All the planned motion users are built: the goal rings (`ProgressRing`, [0022](0022-journal-states-and-goal-rings.md)), the send progress of screen 14 (`ProgressCard`, [0018](0018-send-flow.md)), status pill changes (`StatusPill` in `lib/pages/common/status_pill.dart`: colours with `FujinMotion.pill`, a new label cross-fades and settles with `FujinMotion.pillSettle`), sheet motion (`SheetFrame.show` passes `FujinMotion.sheet`, built from the springs `sheetIn` and `sheetOut` through `MotionCurve`) and snackbar motion (every snackbar goes through `showFujinSnackBar` in `lib/pages/common/fujin_snack_bar.dart` with `FujinMotion.snackBar`; Flutter only lets a snackbar's durations change, not its curves). The Android pull-to-refresh indicator is no longer stock: [0028](0028-fujin-drawn-controls.md) draws it and adds `FujinMotion.spin` for endless rotations.
 
 ## Context
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
@@ -74,6 +75,7 @@ class _WeightSheet extends HookWidget {
                   ),
                 ),
                 TextField(
+                  cursorWidth: FujinTheme.cursorWidth,
                   controller: weight,
                   autofocus: true,
                   keyboardType: const TextInputType.numberWithOptions(

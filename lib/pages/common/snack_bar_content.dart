@@ -56,7 +56,6 @@ class SnackBarContent extends StatelessWidget {
           style: TextButton.styleFrom(
             foregroundColor: FujinColor.kin,
             textStyle: FujinText.inter14Semibold,
-            minimumSize: const Size.square(FujinSize.touchTarget),
             padding: const EdgeInsets.symmetric(horizontal: FujinSpace.s4),
           ),
           child: Text(label),

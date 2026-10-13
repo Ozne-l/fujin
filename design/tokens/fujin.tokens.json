@@ -512,6 +512,14 @@
       "$description": "Focused input field.",
       "$type": "dimension"
     },
+    "spinner": {
+      "$value": {
+        "value": 2.5,
+        "unit": "px"
+      },
+      "$description": "Arc of the loading spinner.",
+      "$type": "dimension"
+    },
     "gold-rule": {
       "$value": {
         "value": 2,
@@ -527,6 +535,30 @@
         "value": 16,
         "unit": "px"
       },
+      "$type": "dimension"
+    },
+    "spinner": {
+      "$value": {
+        "value": 22,
+        "unit": "px"
+      },
+      "$description": "Loading spinner.",
+      "$type": "dimension"
+    },
+    "spinner-small": {
+      "$value": {
+        "value": 18,
+        "unit": "px"
+      },
+      "$description": "Loading spinner inside a button or a row.",
+      "$type": "dimension"
+    },
+    "field": {
+      "$value": {
+        "value": 52,
+        "unit": "px"
+      },
+      "$description": "Height of the serving field and the suggestion rows.",
       "$type": "dimension"
     },
     "text-inset": {
@@ -1269,6 +1301,20 @@
           "hex": "#F7F1E0"
         },
         "$description": "Washi at 55%, the end of the fade content scrolls into under the tab bar.",
+        "$type": "color"
+      },
+      "pressed": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1059,
+            0.102,
+            0.0902
+          ],
+          "alpha": 0.06,
+          "hex": "#1B1A17"
+        },
+        "$description": "Sumi at 6%, the ink wash under a pressed, hovered or focused surface.",
         "$type": "color"
       }
     },

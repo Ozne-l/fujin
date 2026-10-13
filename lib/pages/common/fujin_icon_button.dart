@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 
 class FujinIconButton extends StatelessWidget {
@@ -23,6 +24,6 @@ class FujinIconButton extends StatelessWidget {
       backgroundColor: FujinColorRole.backgroundCard,
       foregroundColor: FujinColorRole.textPrimary,
       side: const BorderSide(color: FujinColorRole.borderCard),
-    ),
+    ).copyWith(overlayColor: FujinTheme.pressedOverlay),
   );
 }

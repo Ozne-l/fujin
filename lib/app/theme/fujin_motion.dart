@@ -1,10 +1,30 @@
+import 'dart:math' as math;
+
 import 'package:flutter/animation.dart';
 import 'package:motor/motor.dart';
 
 abstract final class FujinMotion {
   static const Motion progress = MaterialSpringMotion.standardSpatialDefault();
+  static const Motion spin = LinearMotion(Duration(milliseconds: 1200));
+  static const spinTurns = StepSequence<double>(
+    [0, 1],
+    motion: spin,
+    loop: LoopMode.seamless,
+  );
   static const Motion drift = LinearMotion(Duration(milliseconds: 2800));
-  static const CurvedMotion weekTurn = CurvedMotion(
+  static const driftCycle = StepSequence<double>(
+    [0, 1],
+    motion: drift,
+    loop: LoopMode.seamless,
+  );
+
+  static double driftPhase(double cycle, int index, int count) =>
+      (cycle + index / count) % 1;
+
+  static double driftFade(double phase) =>
+      math.sin(phase * math.pi).clamp(0, 1);
+
+  static const CurvedMotion pageTurn = CurvedMotion(
     Duration(milliseconds: 350),
     Curves.easeOutCubic,
   );

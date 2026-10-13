@@ -68,6 +68,7 @@ abstract final class FujinColorRole {
   static const Color textSecondary = FujinColor.hai;
   static const Color textTertiary = FujinColor.haiLight;
   static const backgroundGlass = Color(0x66FFFCF4);
+  static const backgroundPressed = Color(0x0F1B1A17);
   static const backgroundScrim = Color(0x801B1A17);
   static const backgroundScrollFade = Color(0x8CF7F1E0);
   static const backgroundTabActive = Color(0xCCDCE8D5);
@@ -109,6 +110,7 @@ abstract final class FujinStroke {
   static const double icon = 1.75;
   static const double macroRing = 2;
   static const double radio = 1.5;
+  static const double spinner = 2.5;
   static const double streak = 2;
 }
 
@@ -126,6 +128,7 @@ abstract final class FujinSize {
   static const double dayRing = 38;
   static const double dragHandleHeight = 4;
   static const double dragHandleWidth = 36;
+  static const double field = 52;
   static const double floatingShadowBlur = 20;
   static const double floatingShadowOffset = 6;
   static const double glassBlur = 12;
@@ -176,6 +179,8 @@ abstract final class FujinSize {
   static const double skeletonTitle = 12;
   static const double skeletonWide = 200;
   static const double sourceDot = 8;
+  static const double spinner = 22;
+  static const double spinnerSmall = 18;
   static const double splashRuleGap = 58;
   static const double splashTitleGap = 36;
   static const double stepIcon = 14;

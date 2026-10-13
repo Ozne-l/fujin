@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/common/fujin_spinner.dart';
 import 'package:fujin/pages/common/scan_icon.dart';
 
 class BarcodeCard extends StatelessWidget {
@@ -75,12 +76,7 @@ class BarcodeCard extends StatelessWidget {
                   ),
                 ),
                 switch (running) {
-                  true => const SizedBox.square(
-                    dimension: FujinSize.searchIcon,
-                    child: CircularProgressIndicator(
-                      strokeWidth: FujinStroke.icon,
-                    ),
-                  ),
+                  true => const FujinSpinner.card(),
                   false => const Icon(
                     Icons.chevron_right,
                     size: FujinSize.rowChevron,

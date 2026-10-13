@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/sending/nutrient_deltas.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
@@ -114,7 +115,7 @@ class ReviewCard extends ConsumerWidget {
                             backgroundColor: FujinColor.fujin,
                             foregroundColor: FujinColorRole.textOnDark,
                             textStyle: FujinText.inter16Medium,
-                          ),
+                          ).copyWith(overlayColor: FujinTheme.pressedOverlay),
                           child: Text(l10n.confirm),
                         ),
                     ],

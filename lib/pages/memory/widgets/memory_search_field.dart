@@ -14,6 +14,7 @@ class MemorySearchField extends StatelessWidget {
     child: TextField(
       controller: controller,
       textInputAction: TextInputAction.search,
+      cursorWidth: FujinTheme.cursorWidth,
       style: FujinText.inter15Regular.copyWith(
         color: FujinColorRole.textPrimary,
       ),
@@ -30,7 +31,7 @@ class MemorySearchField extends StatelessWidget {
         contentPadding: EdgeInsets.zero,
         border: FujinTheme.searchFieldBorder,
         enabledBorder: FujinTheme.searchFieldBorder,
-        focusedBorder: FujinTheme.searchFieldBorder,
+        focusedBorder: FujinTheme.searchFieldFocusedBorder,
       ),
     ),
   );

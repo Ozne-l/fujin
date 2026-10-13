@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/memory/meal_mapping.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/common/fujin_menu.dart';
+import 'package:fujin/pages/common/fujin_menu_button.dart';
 
 class MealMappingsCard extends StatelessWidget {
   const MealMappingsCard({
@@ -89,63 +91,39 @@ class _MealRow extends StatelessWidget {
         const Icon(
           Icons.arrow_forward,
           size: FujinSize.mealArrow,
-          color: FujinColorRole.textTertiary,
+          color: FujinColorRole.textGold,
         ),
-        PopupMenuButton<String>(
-          initialValue: meal.ekkloMealName,
-          onSelected: onSelect,
-          tooltip: meal.mfpMealName,
-          useRootNavigator: true,
-          itemBuilder: (context) => [
-            for (final choice in {meal.ekkloMealName, ...choices})
-              PopupMenuItem(
-                value: choice,
-                child: Text(
-                  choice,
-                  style: FujinText.inter14Medium.copyWith(
-                    color: FujinColorRole.textPrimary,
-                  ),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: (FujinSize.touchTarget - FujinSize.controlHeight) / 2,
+          ),
+          child: FujinMenu<String>(
+            items: [
+              ...{meal.ekkloMealName, ...choices},
+            ],
+            selected: meal.ekkloMealName,
+            labelOf: (choice) => choice,
+            onSelected: onSelect,
+            itemPadding: _padding,
+            builder: (context, {required expanded, required toggle}) =>
+                FujinMenuButton(
+                  label: meal.ekkloMealName,
+                  expanded: expanded,
+                  onTap: toggle,
+                  width: FujinSize.menuWidth,
+                  height: FujinSize.controlHeight,
+                  radius: FujinRadius.menu,
+                  padding: _padding,
+                  spacing: FujinSize.textGap,
+                  semanticsLabel: l10n.memoryMealMenu(meal.mfpMealName),
                 ),
-              ),
-          ],
-          child: Container(
-            margin: const EdgeInsets.symmetric(
-              vertical: (FujinSize.touchTarget - FujinSize.controlHeight) / 2,
-            ),
-            width: FujinSize.menuWidth,
-            height: FujinSize.controlHeight,
-            padding: const EdgeInsetsDirectional.only(
-              start: FujinSpace.s3,
-              end: FujinSpace.s3,
-            ),
-            decoration: BoxDecoration(
-              color: FujinColorRole.backgroundCard,
-              borderRadius: BorderRadius.circular(FujinRadius.menu),
-              border: Border.all(color: FujinColorRole.borderCard),
-            ),
-            child: Row(
-              spacing: FujinSize.textGap,
-              children: [
-                Expanded(
-                  child: Text(
-                    meal.ekkloMealName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: FujinText.inter14Medium.copyWith(
-                      color: FujinColorRole.textPrimary,
-                    ),
-                  ),
-                ),
-                const Icon(
-                  Icons.expand_more,
-                  size: FujinSize.menuChevron,
-                  color: FujinColorRole.textPrimary,
-                ),
-              ],
-            ),
           ),
         ),
       ],
     );
   }
+
+  static const _padding = EdgeInsetsDirectional.symmetric(
+    horizontal: FujinSpace.s3,
+  );
 }
