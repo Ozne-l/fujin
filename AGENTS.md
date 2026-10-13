@@ -30,7 +30,7 @@ flutter run --flavor production \
   --dart-define=EKKLO_BASE_URI=http://10.0.2.2:<port>
 ```
 
-Every build and run names a flavor, `production` or `dev`; a build without one throws at startup. The dev flavor is a second app (`dev.oznel.fujin.dev`, "Fūjin DEV") that the owner runs on his real accounts in read-only mode ([ADR 0017](docs/adr/0017-read-only-dev-environment.md)): reads and sign-in go through, every other write is stopped in `ReadOnlyHttpClient` (`lib/data/http/read_only_http_client.dart`). That app is for the owner; agents still use fake servers, and may run `--flavor dev` against them to check the guard.
+Every build and run names a flavor, `production` or `dev`; a build without one throws at startup. The dev flavor is a second app (`dev.oznel.fujin.dev`, "Fūjin DEV") that the owner runs on his real accounts in read-only mode ([ADR 0017](docs/adr/0017-read-only-dev-environment.md)): reads, sign-in and the barcode lookup go through, every other write is stopped in `ReadOnlyHttpClient` (`lib/data/http/read_only_http_client.dart`). That app is for the owner; agents still use fake servers, and may run `--flavor dev` against them to check the guard.
 
 `10.0.2.2` is the host machine as seen from the Android emulator; on the iOS simulator use `127.0.0.1`. Debug builds allow cleartext HTTP (`android/app/src/debug/AndroidManifest.xml`); release builds do not. Tests never need a server: they use `FakeBackends` (`test/support/fake_backends.dart`).
 

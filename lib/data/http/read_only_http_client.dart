@@ -1,19 +1,24 @@
 import 'package:http/http.dart' as http;
 
 final class ReadOnlyHttpClient extends http.BaseClient {
-  ReadOnlyHttpClient(this._inner, {required Uri ekkloBaseUri})
-    : _sessionWrites = {
-        ekkloBaseUri.resolve(_ekkloLoginPath),
-        ekkloBaseUri.resolve(_ekkloRefreshPath),
-      };
+  ReadOnlyHttpClient(
+    this._inner, {
+    required Uri ekkloBaseUri,
+    required Uri mfpSyncUri,
+  }) : _allowedWrites = {
+         ekkloBaseUri.resolve(_ekkloLoginPath),
+         ekkloBaseUri.resolve(_ekkloRefreshPath),
+         mfpSyncUri.resolve(_mfpSyncPath),
+       };
 
   static const _readMethods = {'GET', 'HEAD'};
   static const _ekkloLoginPath = '/api/v1/auth/login';
   static const _ekkloRefreshPath = '/api/v1/auth/login/refresh_token';
+  static const _mfpSyncPath = '/iphone_api/synchronize';
   static const _blocked = 'Blocked by the read-only dev environment';
 
   final http.Client _inner;
-  final Set<Uri> _sessionWrites;
+  final Set<Uri> _allowedWrites;
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
@@ -34,7 +39,7 @@ final class ReadOnlyHttpClient extends http.BaseClient {
 
   bool _allows(http.BaseRequest request) =>
       reads(request.method) ||
-      _sessionWrites.any(
+      _allowedWrites.any(
         (uri) =>
             uri.origin == request.url.origin && uri.path == request.url.path,
       );

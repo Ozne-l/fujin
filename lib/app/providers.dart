@@ -63,6 +63,7 @@ final httpClientProvider = Provider<http.Client>((ref) {
     AppEnvironment.dev => ReadOnlyHttpClient(
       http.Client(),
       ekkloBaseUri: Config.ekkloBaseUri,
+      mfpSyncUri: Config.mfpSyncUri,
     ),
   };
   ref.onDispose(client.close);

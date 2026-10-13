@@ -8,9 +8,16 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
 
+const _syncPath = '/iphone_api/synchronize';
+const _unknownBarcode = '4006381333931';
+
 final class _Guarded {
   _Guarded(this.backends)
-    : client = ReadOnlyHttpClient(backends.httpClient, ekkloBaseUri: ekkloUri);
+    : client = ReadOnlyHttpClient(
+        backends.httpClient,
+        ekkloBaseUri: ekkloUri,
+        mfpSyncUri: mfpSyncUri,
+      );
 
   final FakeBackends backends;
   final ReadOnlyHttpClient client;
@@ -22,6 +29,7 @@ final class _Guarded {
     httpClient: client,
     webUri: mfpWebUri,
     apiUri: mfpApiUri,
+    syncUri: mfpSyncUri,
     sessionStore: InMemoryMfpSessionStore(),
   );
 
@@ -74,6 +82,17 @@ void main() {
     ).deepEquals(['POST /api/v1/auth/login/refresh_token']);
   });
 
+  test('lets the MyFitnessPal barcode lookup through', () async {
+    final guarded = _Guarded(FakeBackends());
+    final mfp = await guarded.signedInMfp();
+
+    await check(
+      mfp.foods.byBarcode(_unknownBarcode),
+    ).completes((result) => result.isA<MfpBarcodeUnknown>());
+
+    check(guarded.writesSent).deepEquals(['POST $_syncPath']);
+  });
+
   test('stops every other write before it reaches the server', () async {
     final guarded = _Guarded(FakeBackends());
     final ekklo = await guarded.signedInEkklo();
@@ -92,6 +111,16 @@ void main() {
     ).throws<http.ClientException>();
     await check(
       guarded.client.post(mfpApiUri.resolve('/api/v1/auth/login')),
+    ).throws<http.ClientException>();
+
+    await check(
+      guarded.client.post(mfpApiUri.resolve(_syncPath)),
+    ).throws<http.ClientException>();
+    await check(
+      guarded.client.post(mfpSyncUri.resolve('/v2/diary')),
+    ).throws<http.ClientException>();
+    await check(
+      guarded.client.post(mfpApiUri.resolve('/v2/diary')),
     ).throws<http.ClientException>();
 
     check(guarded.writesSent).deepEquals(['POST /api/v1/auth/login']);
