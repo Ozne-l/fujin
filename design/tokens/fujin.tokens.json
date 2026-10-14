@@ -1017,6 +1017,14 @@
       "$description": "Height of the fade at the bottom of a tab screen, behind the tab bar.",
       "$type": "dimension"
     },
+    "scroll-edge-fade": {
+      "$value": {
+        "value": 24,
+        "unit": "px"
+      },
+      "$description": "Fade at the top of a list scrolling under a fixed header, such as the Mémoire segments or the send filters.",
+      "$type": "dimension"
+    },
     "button-medium": {
       "$value": {
         "value": 48,

@@ -11,6 +11,7 @@ import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/fade_through.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
+import 'package:fujin/pages/common/scroll_edge_fade.dart';
 import 'package:fujin/pages/common/send_label.dart';
 import 'package:fujin/pages/sending/send_notifier.dart';
 import 'package:fujin/pages/sending/widgets/plan_row.dart';
@@ -97,6 +98,7 @@ class _Review extends HookWidget {
     };
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: FujinSpace.s3,
       children: [
         if (available.isNotEmpty)
           ReviewFilters(
@@ -112,65 +114,67 @@ class _Review extends HookWidget {
             ],
           ),
         Expanded(
-          child: ListView(
-            padding: const EdgeInsets.only(
-              top: FujinSpace.s4,
-              bottom: FujinSpace.s6,
-            ),
-            children: [
-              if (section case final section?) ...[
-                Padding(
-                  padding: const EdgeInsetsDirectional.only(
-                    start: FujinSize.textInset,
-                    end: FujinSize.textInset,
-                    bottom: FujinSpace.s3,
-                  ),
-                  child: Text(
-                    section.heading(context.intl),
-                    style: FujinText.inter12Medium.copyWith(
-                      color: FujinColorRole.textSecondary,
+          child: ScrollEdgeFade(
+            child: ListView(
+              padding: const EdgeInsets.only(
+                top: FujinSpace.s3,
+                bottom: FujinSpace.s6,
+              ),
+              children: [
+                if (section case final section?) ...[
+                  Padding(
+                    padding: const EdgeInsetsDirectional.only(
+                      start: FujinSize.textInset,
+                      end: FujinSize.textInset,
+                      bottom: FujinSpace.s3,
+                    ),
+                    child: Text(
+                      section.heading(context.intl),
+                      style: FujinText.inter12Medium.copyWith(
+                        color: FujinColorRole.textSecondary,
+                      ),
                     ),
                   ),
-                ),
-                ...switch (section) {
-                  _Section.toReview => [
-                    for (final planned in plan.toReview)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: FujinSpace.s3),
-                        child: ReviewCard(
-                          key: ValueKey(planned.entryId),
-                          planned: planned,
-                        ),
-                      ),
-                    if (plan.toReview.any(_showsDeltas))
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: FujinSize.textInset,
-                        ),
-                        child: Text(
-                          context.intl.toleranceNote,
-                          style: FujinText.inter12Regular.copyWith(
-                            color: FujinColorRole.textTertiary,
+                  ...switch (section) {
+                    _Section.toReview => [
+                      for (final planned in plan.toReview)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: FujinSpace.s3),
+                          child: ReviewCard(
+                            key: ValueKey(planned.entryId),
+                            planned: planned,
                           ),
                         ),
-                      ),
-                  ],
-                  _Section.automatic => [
-                    PlanRow.card([
-                      for (final planned in plan.automatic)
-                        PlanRow.planned(planned),
-                    ]),
-                  ],
-                  _Section.inEkklo => [
-                    PlanRow.card([
-                      for (final compared in plan.inEkklo)
-                        if (compared.status case InEkklo(:final link))
-                          PlanRow.inEkklo(compared.entry, link),
-                    ]),
-                  ],
-                },
+                      if (plan.toReview.any(_showsDeltas))
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: FujinSize.textInset,
+                          ),
+                          child: Text(
+                            context.intl.toleranceNote,
+                            style: FujinText.inter12Regular.copyWith(
+                              color: FujinColorRole.textTertiary,
+                            ),
+                          ),
+                        ),
+                    ],
+                    _Section.automatic => [
+                      PlanRow.card([
+                        for (final planned in plan.automatic)
+                          PlanRow.planned(planned),
+                      ]),
+                    ],
+                    _Section.inEkklo => [
+                      PlanRow.card([
+                        for (final compared in plan.inEkklo)
+                          if (compared.status case InEkklo(:final link))
+                            PlanRow.inEkklo(compared.entry, link),
+                      ]),
+                    ],
+                  },
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ],

@@ -9,6 +9,7 @@ import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/memory/memory_rules.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/scroll_edge_fade.dart';
 import 'package:fujin/pages/common/seigaiha_band.dart';
 import 'package:fujin/pages/common/text_inset.dart';
 import 'package:fujin/pages/memory/memory_notifier.dart';
@@ -36,7 +37,7 @@ class MemoryPage extends HookConsumerWidget {
     Widget page(MemorySegment segment) => CustomScrollView(
       key: PageStorageKey(segment),
       slivers: [
-        const SliverToBoxAdapter(child: SizedBox(height: _segmentsSpan)),
+        const SliverToBoxAdapter(child: SizedBox(height: FujinSpace.s3)),
         ...switch ((segment, remembered)) {
           (MemorySegment.foods, 0) => [
             SliverFillRemaining(
@@ -119,31 +120,29 @@ class MemoryPage extends HookConsumerWidget {
                 ],
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                FujinSize.screenMargin,
+                FujinSpace.s3,
+                FujinSize.screenMargin,
+                FujinSpace.s3,
+              ),
+              child: MemorySegments(
+                pages: pages,
+                labelOf: (value) => switch (value) {
+                  MemorySegment.foods => context.intl.memoryFoods(remembered),
+                  MemorySegment.meals => context.intl.memoryMeals(
+                    memory.meals.length,
+                  ),
+                },
+              ),
+            ),
             Expanded(
-              child: Stack(
+              child: PageView(
+                controller: pages,
                 children: [
-                  PageView(
-                    controller: pages,
-                    children: [
-                      for (final segment in MemorySegment.values) page(segment),
-                    ],
-                  ),
-                  Positioned(
-                    top: FujinSpace.s3,
-                    left: FujinSize.screenMargin,
-                    right: FujinSize.screenMargin,
-                    child: MemorySegments(
-                      pages: pages,
-                      labelOf: (value) => switch (value) {
-                        MemorySegment.foods => context.intl.memoryFoods(
-                          remembered,
-                        ),
-                        MemorySegment.meals => context.intl.memoryMeals(
-                          memory.meals.length,
-                        ),
-                      },
-                    ),
-                  ),
+                  for (final segment in MemorySegment.values)
+                    ScrollEdgeFade(child: page(segment)),
                 ],
               ),
             ),
@@ -152,9 +151,6 @@ class MemoryPage extends HookConsumerWidget {
       ),
     );
   }
-
-  static const double _segmentsSpan =
-      FujinSpace.s3 + FujinSize.controlHeight + FujinSpace.s4;
 
   static List<Widget> _foods(
     BuildContext context,

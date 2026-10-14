@@ -175,6 +175,7 @@ abstract final class FujinSize {
   static const double rowChevron = 20;
   static const double scanIcon = 26;
   static const double screenMargin = 16;
+  static const double scrollEdgeFade = 24;
   static const double scrollFade = 110;
   static const double searchField = 44;
   static const double searchIcon = 20;
