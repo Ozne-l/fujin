@@ -35,15 +35,15 @@ class JournalHeader extends StatelessWidget {
             context.intl.appName,
             style: FujinText.hina22.copyWith(color: FujinColorRole.textLink),
           ),
-          Row(
+          OverflowBar(
+            alignment: MainAxisAlignment.spaceBetween,
+            overflowAlignment: OverflowBarAlignment.end,
             spacing: FujinSpace.s3,
             children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: FujinText.hina30.copyWith(
-                    color: FujinColorRole.textPrimary,
-                  ),
+              Text(
+                title,
+                style: FujinText.hina30.copyWith(
+                  color: FujinColorRole.textPrimary,
                 ),
               ),
               if (link case (final label, final onTap))

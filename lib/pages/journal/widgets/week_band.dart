@@ -15,6 +15,7 @@ import 'package:fujin/domain/journal/fetch.dart';
 import 'package:fujin/domain/journal/logged_kilocalories.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/compact_text_scaling.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
 import 'package:fujin/pages/journal/widgets/day_ring.dart';
 import 'package:fujin/pages/journal/widgets/week_band_hint.dart';
@@ -137,43 +138,49 @@ class WeekBand extends HookConsumerWidget {
           link: anchor,
           child: SizedBox(
             height: FujinSize.weekBand,
-            child: Stack(
-              children: [
-                NotificationListener<ScrollStartNotification>(
-                  onNotification: (notification) {
-                    if (notification.dragDetails != null) bubble.hide();
-                    return false;
-                  },
-                  child: NotificationListener<ScrollEndNotification>(
-                    onNotification: settle,
-                    child: SequenceMotionBuilder<int, double>(
-                      sequence: _nudge,
-                      converter: const SingleMotionConverter(),
-                      playing: hinting && !FujinMotion.reduced(context),
-                      builder: (context, nudge, phase, child) =>
-                          PageView.builder(
-                            controller: controller,
-                            reverse: true,
-                            itemBuilder: (context, page) => Transform.translate(
-                              offset: Offset(nudge, 0),
-                              child: _Week(
-                                days: CalendarWeek.daysOf(
-                                  CalendarWeek.weeksBefore(thisWeek, page),
-                                ),
-                                selected: selected,
-                                today: today,
-                                goals: goals,
-                                onSelect: onSelect,
-                              ),
+            child: CompactTextScaling(
+              child: Stack(
+                children: [
+                  NotificationListener<ScrollStartNotification>(
+                    onNotification: (notification) {
+                      if (notification.dragDetails != null) bubble.hide();
+                      return false;
+                    },
+                    child: NotificationListener<ScrollEndNotification>(
+                      onNotification: settle,
+                      child: SequenceMotionBuilder<int, double>(
+                        sequence: _nudge,
+                        converter: const SingleMotionConverter(),
+                        playing: hinting && !FujinMotion.reduced(context),
+                        builder: (context, nudge, phase, child) =>
+                            PageView.builder(
+                              controller: controller,
+                              reverse: true,
+                              itemBuilder: (context, page) =>
+                                  Transform.translate(
+                                    offset: Offset(nudge, 0),
+                                    child: _Week(
+                                      days: CalendarWeek.daysOf(
+                                        CalendarWeek.weeksBefore(
+                                          thisWeek,
+                                          page,
+                                        ),
+                                      ),
+                                      selected: selected,
+                                      today: today,
+                                      goals: goals,
+                                      onSelect: onSelect,
+                                    ),
+                                  ),
                             ),
-                          ),
+                      ),
                     ),
                   ),
-                ),
-                const _Fade(alignment: AlignmentDirectional.centerStart),
-                if (shown.value > 0)
-                  const _Fade(alignment: AlignmentDirectional.centerEnd),
-              ],
+                  const _Fade(alignment: AlignmentDirectional.centerStart),
+                  if (shown.value > 0)
+                    const _Fade(alignment: AlignmentDirectional.centerEnd),
+                ],
+              ),
             ),
           ),
         ),
@@ -287,6 +294,7 @@ class _Day extends StatelessWidget {
             children: [
               Text(
                 context.intl.weekdayShort(day),
+                maxLines: 1,
                 style: switch (selected) {
                   true => FujinText.inter11Semibold.copyWith(
                     color: FujinColorRole.textPrimary,

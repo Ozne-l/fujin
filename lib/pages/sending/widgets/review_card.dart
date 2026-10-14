@@ -100,24 +100,26 @@ class ReviewCard extends ConsumerWidget {
                   constraints: const BoxConstraints(
                     minHeight: FujinSize.buttonMedium,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    runAlignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     spacing: FujinSpace.s3,
+                    runSpacing: FujinSpace.s2,
                     children: [
-                      Flexible(
-                        child: StatusPill(label: reasonLabel, tone: reasonTone),
-                      ),
+                      StatusPill(label: reasonLabel, tone: reasonTone),
                       if (_confirmable(planned.reason))
                         FilledButton(
                           onPressed: () => _confirm(context, ref),
                           style: FilledButton.styleFrom(
-                            minimumSize: const Size(0, FujinSize.buttonMedium),
+                            minimumSize: const Size(0, FujinSize.buttonCompact),
+                            tapTargetSize: MaterialTapTargetSize.padded,
                             padding: const EdgeInsets.symmetric(
-                              horizontal: FujinSpace.s3,
+                              horizontal: FujinSpace.s4,
                             ),
                             backgroundColor: FujinColor.fujin,
-                            foregroundColor: FujinColorRole.textOnDark,
-                            textStyle: FujinText.inter16Medium,
+                            foregroundColor: FujinColor.washi,
+                            textStyle: FujinText.inter14Medium,
                           ).copyWith(overlayColor: FujinTheme.pressedOverlay),
                           child: Text(context.intl.confirm),
                         ),

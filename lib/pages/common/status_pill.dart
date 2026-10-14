@@ -56,7 +56,14 @@ class StatusPill extends HookWidget {
       children: [
         if (content.icon case final icon?)
           Icon(icon, size: style.fontSize, color: style.color),
-        Text(content.label, style: style),
+        Flexible(
+          child: Text(
+            content.label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: style,
+          ),
+        ),
       ],
     );
 

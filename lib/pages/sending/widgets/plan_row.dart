@@ -69,7 +69,7 @@ class PlanRow extends StatelessWidget {
             children: [
               Text(
                 name,
-                maxLines: 1,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: FujinText.inter15Medium.copyWith(
                   color: FujinColorRole.textPrimary,
@@ -77,7 +77,7 @@ class PlanRow extends StatelessWidget {
               ),
               Text(
                 detail,
-                maxLines: 1,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: FujinText.inter13Regular.copyWith(color: detailColor),
               ),

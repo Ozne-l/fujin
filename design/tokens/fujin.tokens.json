@@ -1024,6 +1024,14 @@
       },
       "$type": "dimension"
     },
+    "button-compact": {
+      "$value": {
+        "value": 32,
+        "unit": "px"
+      },
+      "$description": "Visible height of a compact button, inside a 48 px touch zone.",
+      "$type": "dimension"
+    },
     "pill": {
       "$value": {
         "value": 26,

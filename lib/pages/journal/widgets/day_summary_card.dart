@@ -332,18 +332,19 @@ class _SourceLine extends StatelessWidget {
     spacing: FujinSpace.s2,
     children: [
       SourceDot(color: dot),
-      Expanded(
-        child: Text(
-          label,
-          style: FujinText.inter13Medium.copyWith(
-            color: FujinColorRole.textPrimary,
-          ),
+      Text(
+        label,
+        style: FujinText.inter13Medium.copyWith(
+          color: FujinColorRole.textPrimary,
         ),
       ),
-      Text.rich(
-        TextSpan(
-          style: const TextStyle(color: FujinColorRole.textPrimary),
-          children: trailing,
+      Expanded(
+        child: Text.rich(
+          TextSpan(
+            style: const TextStyle(color: FujinColorRole.textPrimary),
+            children: trailing,
+          ),
+          textAlign: TextAlign.end,
         ),
       ),
     ],

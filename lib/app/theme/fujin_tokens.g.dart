@@ -129,6 +129,7 @@ abstract final class FujinSize {
   static const double breezeIndicator = 24;
   static const double breezeInsetBottom = 1;
   static const double breezeInsetTop = 3;
+  static const double buttonCompact = 32;
   static const double buttonHeight = 56;
   static const double buttonMedium = 48;
   static const double cameraActionGap = 68;

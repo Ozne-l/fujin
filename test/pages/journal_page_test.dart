@@ -169,6 +169,27 @@ void main() {
     check(find.text('1/2 dans Ekklo').evaluate()).length.equals(1);
   });
 
+  testWidgets('fits a phone screen with the text at twice its size', (
+    tester,
+  ) async {
+    _tallView(tester, size: const Size(1080, 2400), pixelRatio: 2.625);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await pumpFujin(
+      tester,
+      FakeBackends(
+        mealNames: [breakfast, lunch],
+        entries: [
+          entry('E-1'),
+          entry('E-2', meal: lunch),
+        ],
+      ),
+    );
+
+    check(tester.takeException()).isNull();
+  });
+
   testWidgets('says nothing is new only after a pull that changed nothing', (
     tester,
   ) async {

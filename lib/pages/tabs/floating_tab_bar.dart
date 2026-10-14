@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/compact_text_scaling.dart';
 import 'package:fujin/pages/common/glass_surface.dart';
 import 'package:fujin/pages/common/scan_button.dart';
 import 'package:fujin/pages/tabs/fujin_tab.dart';
@@ -58,19 +59,21 @@ class FloatingTabBar extends StatelessWidget {
                   child: GlassSurface(
                     child: Padding(
                       padding: const EdgeInsets.all(FujinSize.tabPlateInset),
-                      child: Row(
-                        spacing: FujinSize.tabGap,
-                        children: [
-                          for (final tab in FujinTab.values)
-                            Expanded(
-                              child: _TabButton(
-                                tab: tab,
-                                label: tab.label(context.intl),
-                                active: tab == selected,
-                                onTap: () => onSelect(tab),
+                      child: CompactTextScaling(
+                        child: Row(
+                          spacing: FujinSize.tabGap,
+                          children: [
+                            for (final tab in FujinTab.values)
+                              Expanded(
+                                child: _TabButton(
+                                  tab: tab,
+                                  label: tab.label(context.intl),
+                                  active: tab == selected,
+                                  onTap: () => onSelect(tab),
+                                ),
                               ),
-                            ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

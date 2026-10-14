@@ -34,6 +34,27 @@ void main() {
       ..devicePixelRatio = 1;
   });
 
+  testWidgets('fits the review on a phone screen with the text at twice its '
+      'size', (tester) async {
+    tester.view
+      ..physicalSize = const Size(1080, 2400)
+      ..devicePixelRatio = 2.625;
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await pumpFujin(
+      tester,
+      FakeBackends(
+        mealNames: [breakfast],
+        entries: [entry('E-1', food: skyr, description: 'Skyr nature')],
+      ),
+    );
+
+    await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
+
+    _sees('Aucun aliment proche');
+    check(tester.takeException()).isNull();
+  });
+
   testWidgets('sends a day reviewed on screen 10 and comes back to a '
       'Journal all in Ekklo', (tester) async {
     final backends = FakeBackends(
