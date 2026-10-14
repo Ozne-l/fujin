@@ -7,8 +7,8 @@ import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/day_picker_sheet.dart';
 import 'package:fujin/pages/common/fujin_menu.dart';
 import 'package:fujin/pages/common/fujin_menu_button.dart';
+import 'package:fujin/pages/common/sheet_frame.dart';
 import 'package:fujin/pages/common/title_text.dart';
-import 'package:fujin/pages/sending/sheets/sheet_frame.dart';
 
 class MealDateRow extends StatelessWidget {
   const MealDateRow({

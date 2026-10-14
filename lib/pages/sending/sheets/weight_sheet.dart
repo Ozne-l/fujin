@@ -7,9 +7,9 @@ import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/grams_input.dart';
+import 'package:fujin/pages/common/sheet_frame.dart';
 import 'package:fujin/pages/sending/entry_choices.dart';
 import 'package:fujin/pages/sending/send_text.dart';
-import 'package:fujin/pages/sending/sheets/sheet_frame.dart';
 
 Future<void> showWeightSheet(
   BuildContext context, {

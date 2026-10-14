@@ -5,8 +5,8 @@ import 'package:fujin/domain/goals/goal_amounts.dart';
 import 'package:fujin/domain/journal/day_nutrients.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/sheet_frame.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
-import 'package:fujin/pages/sending/sheets/sheet_frame.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 Future<void> showMyDaySheet(

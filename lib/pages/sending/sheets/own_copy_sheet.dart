@@ -9,12 +9,12 @@ import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/pill_size.dart';
+import 'package:fujin/pages/common/sheet_frame.dart';
 import 'package:fujin/pages/common/status_pill.dart';
 import 'package:fujin/pages/sending/entry_choices.dart';
 import 'package:fujin/pages/sending/send_text.dart';
 import 'package:fujin/pages/sending/sheets/candidate_card.dart';
 import 'package:fujin/pages/sending/sheets/match_sheet.dart';
-import 'package:fujin/pages/sending/sheets/sheet_frame.dart';
 
 Future<void> showOwnCopySheet(
   BuildContext context, {

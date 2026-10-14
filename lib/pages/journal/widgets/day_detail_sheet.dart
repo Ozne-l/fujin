@@ -5,10 +5,10 @@ import 'package:fujin/domain/journal/journal_day.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/send_label.dart';
+import 'package:fujin/pages/common/sheet_frame.dart';
 import 'package:fujin/pages/common/source_dot.dart';
 import 'package:fujin/pages/common/title_text.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
-import 'package:fujin/pages/sending/sheets/sheet_frame.dart';
 
 Future<void> showDayDetailSheet(
   BuildContext context, {
