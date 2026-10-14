@@ -4,7 +4,7 @@ Date: 2026-10-10
 
 ## Status
 
-Accepted. Amends the "No polling" bullet of [0003](0003-refresh-on-foreground-and-pull.md) for the offline state only. The band's reads and `JournalService.readJournal` are replaced by held reads and `JournalService.journalOf`, and the neighbour weeks' rings are drawn before they are swiped to ([0029](0029-journal-reads-held-for-display.md)); the states are unchanged.
+Accepted. Amends the "No polling" bullet of [0003](0003-refresh-on-foreground-and-pull.md) for the offline state only. The band's reads and `JournalService.readJournal` are replaced by held reads and `JournalService.journalOf`, and the neighbour weeks' rings are drawn before they are swiped to ([0029](0029-journal-reads-held-for-display.md)); the states are unchanged. With Ekklo missing and offline, the meals show their MyFitnessPal foods ([0030](0030-mfp-foods-shown-when-a-side-is-missing.md)).
 
 ## Context
 

@@ -830,7 +830,8 @@ void main() {
     check(find.text('Flocons d’avoine').evaluate()).isEmpty();
   });
 
-  testWidgets('keeps MyFitnessPal readable when the Ekklo session expired', (
+  testWidgets('keeps the MyFitnessPal foods readable, without statuses, when '
+      'the Ekklo session expired', (
     tester,
   ) async {
     final backends = FakeBackends(
@@ -856,6 +857,8 @@ void main() {
     await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
     await tester.pumpAndSettle();
     check(find.text('Ekklo indisponible').evaluate()).length.equals(1);
+    check(find.text(oats).evaluate()).length.equals(1);
+    check(find.text('À envoyer').evaluate()).isEmpty();
   });
 
   testWidgets('keeps Ekklo readable when the MyFitnessPal session expired', (
@@ -886,7 +889,8 @@ void main() {
   });
 
   group('offline', () {
-    testWidgets('keeps the last figures with their time and retries alone', (
+    testWidgets('keeps the last figures and foods with their time and '
+        'retries alone', (
       tester,
     ) async {
       final backends = FakeBackends(
@@ -910,6 +914,10 @@ void main() {
             .evaluate(),
       ).length.equals(1);
       check(find.text('496 kcal à 20:00').evaluate()).length.equals(1);
+      await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
+      await tester.pumpAndSettle();
+      check(find.text(oats).evaluate()).length.equals(1);
+      check(find.text('À envoyer').evaluate()).isEmpty();
 
       backends
         ..mfpReachable = true

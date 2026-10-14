@@ -12,6 +12,8 @@ import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
+import 'package:fujin/pages/journal/widgets/entry_row.dart';
+import 'package:fujin/pages/journal/widgets/split_line.dart';
 
 class MealCard extends HookWidget {
   const MealCard({required this.meal, required this.onAdd, super.key});
@@ -58,7 +60,7 @@ class MealCard extends HookWidget {
         spacing: FujinSpace.s3,
         children: [
           _title(context.intl),
-          _Line(
+          SplitLine(
             leading: Text(
               context.intl.mealProgress(counts.inEkklo, total),
               style: FujinText.inter13Regular.copyWith(
@@ -190,7 +192,7 @@ class MealCard extends HookWidget {
   );
 
   Widget _title(AppLocalizations intl) =>
-      _Line(leading: _name(), trailing: _kilocalories(intl));
+      SplitLine(leading: _name(), trailing: _kilocalories(intl));
 
   static List<(String, PillTone)> _mealPills(
     AppLocalizations intl,
@@ -223,62 +225,10 @@ class _EntryRow extends StatelessWidget {
       ToSend() => (context.intl.statusToSend, PillTone.attention, null),
       ToUpdate() => (context.intl.statusToUpdate, PillTone.info, Icons.refresh),
     };
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: FujinSpace.s1,
-      children: [
-        _Line(
-          leading: Text(
-            entry.food.description,
-            style: FujinText.inter15Medium.copyWith(
-              color: FujinColorRole.textPrimary,
-            ),
-          ),
-          trailing: Text(
-            EntryText.energy(context.intl, entry),
-            style: FujinText.inter15Semibold.copyWith(
-              color: FujinColorRole.textPrimary,
-            ),
-          ),
-        ),
-        _Line(
-          leading: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: FujinSpace.s1,
-            children: [
-              Text(
-                EntryText.brandedServing(context.intl, entry),
-                style: FujinText.inter13Regular.copyWith(
-                  color: FujinColorRole.textSecondary,
-                ),
-              ),
-              Text(
-                detail,
-                style: FujinText.inter12Medium.copyWith(
-                  color: FujinColorRole.textTertiary,
-                ),
-              ),
-            ],
-          ),
-          trailing: StatusPill(label: label, tone: tone, icon: icon),
-        ),
-      ],
+    return EntryRow(
+      entry: entry,
+      detail: detail,
+      pill: StatusPill(label: label, tone: tone, icon: icon),
     );
   }
-}
-
-class _Line extends StatelessWidget {
-  const _Line({required this.leading, required this.trailing});
-
-  final Widget leading;
-  final Widget trailing;
-
-  @override
-  Widget build(BuildContext context) => Row(
-    spacing: FujinSpace.s3,
-    children: [
-      Expanded(child: leading),
-      trailing,
-    ],
-  );
 }

@@ -1,10 +1,9 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/domain/journal/day_nutrients.dart';
+import 'package:fujin/domain/journal/diary_meal.dart';
 import 'package:fujin/domain/journal/journal_day.dart';
-import 'package:fujin/domain/journal/journal_meal.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
-import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 part 'journal_read.mapper.dart';
@@ -16,6 +15,8 @@ sealed class JournalRead with JournalReadMappable {
   final DateTime readAt;
 
   MfpDiaryDay? get diary;
+
+  List<DiaryMeal> get diaryMeals;
 }
 
 @MappableClass(discriminatorValue: 'both')
@@ -26,6 +27,15 @@ final class BothSides extends JournalRead with BothSidesMappable {
 
   @override
   MfpDiaryDay get diary => day.diary;
+
+  @override
+  List<DiaryMeal> get diaryMeals => [
+    for (final meal in day.meals)
+      DiaryMeal(
+        name: meal.name,
+        entries: [for (final compared in meal.entries) compared.entry],
+      ),
+  ];
 }
 
 @MappableClass(discriminatorValue: 'mfp_only')
@@ -45,12 +55,8 @@ final class MfpOnly extends JournalRead with MfpOnlyMappable {
 
   DayNutrients get nutrients => DayNutrients.ofEntries(diary.entries);
 
-  Map<String, double> get mealKilocalories => {
-    for (final name in JournalMeal.namesOf(mealNames, diary.entries))
-      name: DayNutrients.ofEntries(
-        diary.entries.where((entry) => entry.mealName == name),
-      ).amount(Nutrient.kilocalories),
-  };
+  @override
+  List<DiaryMeal> get diaryMeals => DiaryMeal.of(mealNames, diary.entries);
 }
 
 @MappableClass(discriminatorValue: 'ekklo_only')
@@ -66,6 +72,9 @@ final class EkkloOnly extends JournalRead with EkkloOnlyMappable {
 
   @override
   MfpDiaryDay? get diary => null;
+
+  @override
+  List<DiaryMeal> get diaryMeals => const [];
 
   DayNutrients get ekkloNutrients => DayNutrients.ofEkklo(ekkloMeals);
 }

@@ -25,7 +25,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0019](0019-tab-shell.md) | Tab shell: Journal and Mémoire tabs, Scanner disabled | Accepted (Scanner enabled by 0027) |
 | [0020](0020-goals.md) | Goals: one row in Fūjin's SQLite | Accepted |
 | [0021](0021-backup-file.md) | Backup file: fujin-backup v1 behind the BackupFiles seam | Accepted (version 2 by 0027) |
-| [0022](0022-journal-states-and-goal-rings.md) | Journal states and goal rings | Accepted (band reads held and neighbour weeks prefetched by 0029) |
+| [0022](0022-journal-states-and-goal-rings.md) | Journal states and goal rings | Accepted (band reads held and neighbour weeks prefetched by 0029; MyFitnessPal foods shown with Ekklo missing and offline by 0030) |
 | [0023](0023-ui-flags-in-shared-preferences.md) | UI flags in shared preferences | Accepted (settings and `FujinPreferences.open` added by 0025) |
 | [0024](0024-splash-from-the-first-frame.md) | Splash from the first frame | Accepted |
 | [0025](0025-automatic-mode.md) | Automatic mode: unattended items instead of Memory, a setting in shared preferences | Accepted |
@@ -33,5 +33,6 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0027](0027-barcode-scanner.md) | Barcode scanner: full-screen camera, barcode links in Memory, backup v2 | Accepted (built) |
 | [0028](0028-fujin-drawn-controls.md) | Fūjin-drawn controls instead of stock Material | Accepted |
 | [0029](0029-journal-reads-held-for-display.md) | Journal reads held in memory for display, writes read live | Accepted |
+| [0030](0030-mfp-foods-shown-when-a-side-is-missing.md) | MyFitnessPal foods shown when Ekklo or the network is missing | Accepted |
 | [0031](0031-reduced-motion.md) | Reduced motion follows the phone setting | Accepted |
 | [0032](0032-text-contrast.md) | Text roles meet 4.5:1 on page and card | Accepted |

@@ -120,8 +120,8 @@ Codes from the Figma file "Fūjin · Maquettes", as used in the docs.
 | K9 | Everything already in Ekklo: no send button, every meal folded and "Dans Ekklo". Code: `MealCard` (`lib/pages/journal/widgets/meal_card.dart`) |
 | K10 | Empty MyFitnessPal day: today's ring without arc, counters at 0, each meal "Rien pour l’instant", no send button |
 | K11 | Partial goals: a nutrient without goal shows its value alone in a dashed circle. Code: `NutrientRing` |
-| K12 | Journal with the Ekklo session expired: storm card "Déconnecté" with "Se reconnecter à Ekklo", MyFitnessPal stays readable, meals "Ekklo indisponible", send disabled. Code: `JournalProblemCard`, `MfpOnly`, `UnavailableMealCard` (`lib/pages/journal/widgets/unavailable_meal_card.dart`) |
-| K13 | Offline: storm card "Hors ligne", the last figures with their time, retried every 15 s while the app is open. ADR 0022 |
+| K12 | Journal with the Ekklo session expired: storm card "Déconnecté" with "Se reconnecter à Ekklo", MyFitnessPal stays readable, meals "Ekklo indisponible" with their MyFitnessPal foods and no status, send disabled. Code: `JournalProblemCard`, `MfpOnly`, `DiaryMealCard` (`lib/pages/journal/widgets/diary_meal_card.dart`). ADR 0030 |
+| K13 | Offline: storm card "Hors ligne", the last figures and MyFitnessPal foods with their time, no status, retried every 15 s while the app is open. ADR 0022, ADR 0030 |
 | K14 | Access blocked by MyFitnessPal's anti-bot check (out of v1) |
 | K15 | MyFitnessPal (or Ekklo) not responding: storm card "Indisponible" with "Réessayer". Code: `JournalProblemCard` |
 | K16 | Back from adding a food: snackbar "Riz basmati ajouté", "MyFitnessPal et Ekklo · Déjeuner" ("MyFitnessPal seulement" when Ekklo failed and the entry stays "À envoyer"), with "Annuler" for 8 s. Code: `JournalPage`, `SnackBarContent` (`lib/pages/common/snack_bar_content.dart`) |

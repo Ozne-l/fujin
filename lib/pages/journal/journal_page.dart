@@ -24,12 +24,12 @@ import 'package:fujin/pages/journal/undo_add_notifier.dart';
 import 'package:fujin/pages/journal/undo_add_state.dart';
 import 'package:fujin/pages/journal/widgets/day_detail_sheet.dart';
 import 'package:fujin/pages/journal/widgets/day_summary_card.dart';
+import 'package:fujin/pages/journal/widgets/diary_meal_card.dart';
 import 'package:fujin/pages/journal/widgets/journal_header.dart';
 import 'package:fujin/pages/journal/widgets/journal_problem_card.dart';
 import 'package:fujin/pages/journal/widgets/loading_meal_card.dart';
 import 'package:fujin/pages/journal/widgets/loading_summary_card.dart';
 import 'package:fujin/pages/journal/widgets/meal_card.dart';
-import 'package:fujin/pages/journal/widgets/unavailable_meal_card.dart';
 import 'package:fujin/pages/journal/widgets/week_band.dart';
 import 'package:fujin/pages/memory/memory_notifier.dart';
 import 'package:go_router/go_router.dart';
@@ -233,6 +233,13 @@ class JournalPage extends HookConsumerWidget {
               AsyncValue(value: final read?, error: final error?) => [
                 ...problem(ReadProblem.of(error), readAt: read.readAt),
                 summary(read, stale: true),
+                ...switch (read.diaryMeals) {
+                  [] => const <Widget>[],
+                  final meals => _meals(context, [
+                    for (final meal in meals)
+                      DiaryMealCard(key: ValueKey(meal.name), meal: meal),
+                  ]),
+                },
               ],
               AsyncValue(value: BothSides(:final day) && final read) => [
                 summary(read, stale: false),
@@ -249,11 +256,11 @@ class JournalPage extends HookConsumerWidget {
                 ...problem(read.ekkloProblem),
                 summary(read, stale: false),
                 ..._meals(context, [
-                  for (final MapEntry(key: name, value: kilocalories)
-                      in read.mealKilocalories.entries)
-                    UnavailableMealCard(
-                      name: name,
-                      kilocalories: kilocalories,
+                  for (final meal in read.diaryMeals)
+                    DiaryMealCard(
+                      key: ValueKey(meal.name),
+                      meal: meal,
+                      note: context.intl.ekkloUnavailable,
                     ),
                 ]),
               ],
