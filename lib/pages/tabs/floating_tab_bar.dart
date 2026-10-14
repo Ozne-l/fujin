@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/compact_text_scaling.dart';
+import 'package:fujin/pages/common/glass_layer.dart';
 import 'package:fujin/pages/common/glass_surface.dart';
 import 'package:fujin/pages/common/scan_button.dart';
 import 'package:fujin/pages/tabs/fujin_tab.dart';
+import 'package:motor/motor.dart';
 
 class FloatingTabBar extends StatelessWidget {
   const FloatingTabBar({
@@ -52,34 +55,43 @@ class FloatingTabBar extends StatelessWidget {
           child: SafeArea(
             top: false,
             minimum: const EdgeInsets.only(bottom: FujinSpace.s6),
-            child: Row(
-              spacing: FujinSpace.s2,
-              children: [
-                Expanded(
-                  child: GlassSurface(
-                    child: Padding(
-                      padding: const EdgeInsets.all(FujinSize.tabPlateInset),
-                      child: CompactTextScaling(
-                        child: Row(
-                          spacing: FujinSize.tabGap,
-                          children: [
-                            for (final tab in FujinTab.values)
-                              Expanded(
-                                child: _TabButton(
-                                  tab: tab,
-                                  label: tab.label(context.intl),
-                                  active: tab == selected,
-                                  onTap: () => onSelect(tab),
-                                ),
+            child: GlassLayer(
+              child: Row(
+                spacing: FujinSpace.s2,
+                children: [
+                  Expanded(
+                    child: GlassSurface(
+                      child: Padding(
+                        padding: const EdgeInsets.all(FujinSize.tabPlateInset),
+                        child: CompactTextScaling(
+                          child: Stack(
+                            children: [
+                              Positioned.fill(
+                                child: _ActiveTab(index: selected.index),
                               ),
-                          ],
+                              Row(
+                                spacing: FujinSize.tabGap,
+                                children: [
+                                  for (final tab in FujinTab.values)
+                                    Expanded(
+                                      child: _TabButton(
+                                        tab: tab,
+                                        label: tab.label(context.intl),
+                                        active: tab == selected,
+                                        onTap: () => onSelect(tab),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                ScanButton(onTap: onScan),
-              ],
+                  ScanButton(onTap: onScan),
+                ],
+              ),
             ),
           ),
         ),
@@ -109,12 +121,8 @@ class _TabButton extends StatelessWidget {
       selected: active,
       child: Material(
         type: MaterialType.transparency,
-        child: Ink(
+        child: SizedBox(
           height: FujinSize.tab,
-          decoration: ShapeDecoration(
-            shape: const StadiumBorder(),
-            color: active ? FujinColorRole.backgroundTabActive : null,
-          ),
           child: InkWell(
             customBorder: const StadiumBorder(),
             onTap: onTap,
@@ -141,4 +149,51 @@ class _TabButton extends StatelessWidget {
       ),
     );
   }
+}
+
+class _ActiveTab extends StatelessWidget {
+  const _ActiveTab({required this.index});
+
+  final int index;
+
+  @override
+  Widget build(BuildContext context) => IgnorePointer(
+    child: LayoutBuilder(
+      builder: (context, constraints) {
+        final count = FujinTab.values.length;
+        final width =
+            (constraints.maxWidth - FujinSize.tabGap * (count - 1)) / count;
+        return VelocityMotionBuilder<double>(
+          converter: const SingleMotionConverter(),
+          motion: FujinMotion.of(context, FujinMotion.tabSlide),
+          value: index.toDouble(),
+          builder: (context, position, velocity, child) => Align(
+            alignment: Alignment.centerLeft,
+            child: Transform.translate(
+              offset: Offset(position * (width + FujinSize.tabGap), 0),
+              child: Transform.scale(
+                scaleX:
+                    1 +
+                    (velocity.abs() * FujinMotion.tabSquash).clamp(
+                      0,
+                      FujinMotion.tabSquashLimit,
+                    ),
+                child: child,
+              ),
+            ),
+          ),
+          child: SizedBox(
+            width: width,
+            height: FujinSize.tab,
+            child: const DecoratedBox(
+              decoration: ShapeDecoration(
+                shape: StadiumBorder(),
+                color: FujinColorRole.backgroundTabActive,
+              ),
+            ),
+          ),
+        );
+      },
+    ),
+  );
 }

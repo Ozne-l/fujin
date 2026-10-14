@@ -25,6 +25,7 @@ import 'package:fujin/pages/adding/widgets/scanned_banner.dart';
 import 'package:fujin/pages/adding/widgets/suggestion_row.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/flow_header.dart';
+import 'package:fujin/pages/common/glass_layer.dart';
 import 'package:fujin/pages/common/scan_button.dart';
 import 'package:fujin/pages/common/scan_icon.dart';
 import 'package:fujin/pages/common/title_text.dart';
@@ -319,7 +320,7 @@ class SearchView extends HookConsumerWidget {
                 child: SafeArea(
                   top: false,
                   minimum: const EdgeInsets.only(bottom: FujinSpace.s6),
-                  child: ScanButton(onTap: onScan),
+                  child: GlassLayer(child: ScanButton(onTap: onScan)),
                 ),
               ),
             ],

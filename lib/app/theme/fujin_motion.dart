@@ -41,6 +41,13 @@ abstract final class FujinMotion {
   static const Motion pillSettle = MaterialSpringMotion.expressiveSpatialFast(
     snapToEnd: true,
   );
+  static const Motion tabSlide = MaterialSpringMotion.expressiveSpatialDefault(
+    snapToEnd: true,
+  );
+  static const double tabSquash = 0.04;
+  static const double tabSquashLimit = 0.25;
+  static const double glassPress = 1.04;
+  static const double glassStretch = 0.3;
   static const Motion sheetIn = Motion.customSpring(
     SpringDescription(mass: 1, stiffness: 110, damping: 21),
   );
