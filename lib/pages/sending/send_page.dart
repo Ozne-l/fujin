@@ -14,7 +14,6 @@ import 'package:fujin/pages/sending/widgets/automatic_sent_view.dart';
 import 'package:fujin/pages/sending/widgets/interrupted_view.dart';
 import 'package:fujin/pages/sending/widgets/plan_failed_view.dart';
 import 'package:fujin/pages/sending/widgets/review_view.dart';
-import 'package:fujin/pages/sending/widgets/searching_view.dart';
 import 'package:fujin/pages/sending/widgets/sending_view.dart';
 import 'package:fujin/pages/sending/widgets/sent_view.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -68,7 +67,10 @@ class SendPage extends HookConsumerWidget {
                   progress: progress,
                   failure: failure,
                 ),
-              (_, SendPlanSearching(:final plan)) => SearchingView(plan: plan),
+              (_, SendPlanSearching(:final plan)) => ReviewView(
+                plan: plan,
+                searching: true,
+              ),
               (_, SendPlanReady(:final plan)) => ReviewView(plan: plan),
               (_, SendPlanFailed(:final plan, :final failure)) =>
                 PlanFailedView(

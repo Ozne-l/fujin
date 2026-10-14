@@ -129,7 +129,7 @@ Codes from the Figma file "Fūjin · Maquettes", as used in the docs.
 | K18 | Undo stopped halfway: the Ekklo item is gone but the MyFitnessPal entry stayed; snackbar "Encore dans MyFitnessPal" with "Réessayer", which runs the undo again. When nothing could be removed, "Ajout non annulé" with the reason. Code: `UndoAddNotifier`, `UndoAddFailed` (`lib/pages/journal/undo_add_state.dart`) |
 | K19 | Journal with entries "À mettre à jour" |
 | K20 | "Rien de nouveau" snackbar after a pull that changed nothing |
-| 09 | "Recherche en cours": Fūjin plans the send, one Ekklo search per unknown food. Code: `SearchingView` (`lib/pages/sending/widgets/searching_view.dart`) |
+| 09 | "Recherche en cours": Fūjin plans the send, one Ekklo search per unknown food. Code: `ReviewView` with `searching: true` (`lib/pages/sending/widgets/review_view.dart`), so the header and the send button stay in place when the plan is ready |
 | 10 | "À vérifier": the plan, filtered by "à vérifier", "automatiques" and "déjà dans Ekklo", and the send button. Code: `ReviewView` (`lib/pages/sending/widgets/review_view.dart`) |
 | 11 | Sheet "Choisir l'aliment Ekklo": candidates, Ekklo search, own copy or skip. Code: `showMatchSheet` (`lib/pages/sending/sheets/match_sheet.dart`) |
 | 12 | Sheet "Poids d'une unité". Code: `showWeightSheet` (`lib/pages/sending/sheets/weight_sheet.dart`) |

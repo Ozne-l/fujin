@@ -2,9 +2,14 @@ import 'package:flutter/widgets.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 
 class FadeThrough extends StatelessWidget {
-  const FadeThrough({required this.child, super.key});
+  const FadeThrough({
+    required this.child,
+    this.scale = FujinMotion.fadeThroughScale,
+    super.key,
+  });
 
   final Widget child;
+  final double scale;
 
   @override
   Widget build(BuildContext context) => AnimatedSwitcher(
@@ -18,7 +23,7 @@ class FadeThrough extends StatelessWidget {
       opacity: animation,
       child: ScaleTransition(
         scale: Tween<double>(
-          begin: FujinMotion.fadeThroughScale,
+          begin: scale,
           end: 1,
         ).animate(animation),
         child: child,

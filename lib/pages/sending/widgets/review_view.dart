@@ -9,24 +9,83 @@ import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/domain/sending/send_plan.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/fade_through.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/send_label.dart';
 import 'package:fujin/pages/sending/send_notifier.dart';
 import 'package:fujin/pages/sending/widgets/plan_row.dart';
+import 'package:fujin/pages/sending/widgets/progress_card.dart';
 import 'package:fujin/pages/sending/widgets/review_card.dart';
 import 'package:fujin/pages/sending/widgets/review_filters.dart';
 import 'package:fujin/pages/sending/widgets/send_footer.dart';
 import 'package:fujin/pages/sending/widgets/send_header.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ReviewView extends HookConsumerWidget {
-  const ReviewView({required this.plan, super.key});
+class ReviewView extends StatelessWidget {
+  const ReviewView({required this.plan, this.searching = false, super.key});
+
+  final SendPlan plan;
+  final bool searching;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      SendHeader(plan: plan),
+      Expanded(
+        child: FadeThrough(
+          scale: _unscaled,
+          child: switch (searching) {
+            true => _Searching(key: const ValueKey(true), plan: plan),
+            false => _Review(key: const ValueKey(false), plan: plan),
+          },
+        ),
+      ),
+      _Footer(plan: plan, searching: searching),
+    ],
+  );
+
+  static const double _unscaled = 1;
+}
+
+class _Searching extends StatelessWidget {
+  const _Searching({required this.plan, super.key});
 
   final SendPlan plan;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final intl = context.intl;
+  Widget build(BuildContext context) {
+    final rows = [
+      for (final planned in plan.entries) PlanRow.planned(planned),
+      for (final (index, entry) in plan.pending.indexed)
+        PlanRow.pending(entry, searching: index == 0),
+    ];
+    return ListView(
+      padding: const EdgeInsets.only(bottom: FujinSpace.s6),
+      children: [
+        ProgressCard(
+          title: context.intl.searchingTitle,
+          detail: context.intl.searchingDetail,
+          note: context.intl.searchingNote,
+          done: plan.entries.length,
+          total: plan.total,
+        ),
+        if (rows.isNotEmpty) ...[
+          const SizedBox(height: FujinSpace.s4),
+          PlanRow.card(rows),
+        ],
+      ],
+    );
+  }
+}
+
+class _Review extends HookWidget {
+  const _Review({required this.plan, super.key});
+
+  final SendPlan plan;
+
+  @override
+  Widget build(BuildContext context) {
     final chosen = useState<_Section?>(null);
     final available = [
       for (final section in _Section.values)
@@ -39,7 +98,6 @@ class ReviewView extends HookConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SendHeader(plan: plan),
         if (available.isNotEmpty)
           ReviewFilters(
             chips: [
@@ -68,7 +126,7 @@ class ReviewView extends HookConsumerWidget {
                     bottom: FujinSpace.s3,
                   ),
                   child: Text(
-                    section.heading(intl),
+                    section.heading(context.intl),
                     style: FujinText.inter12Medium.copyWith(
                       color: FujinColorRole.textSecondary,
                     ),
@@ -115,7 +173,6 @@ class ReviewView extends HookConsumerWidget {
             ],
           ),
         ),
-        _Footer(plan: plan),
       ],
     );
   }
@@ -155,16 +212,20 @@ enum _Section {
 }
 
 class _Footer extends ConsumerWidget {
-  const _Footer({required this.plan});
+  const _Footer({required this.plan, required this.searching});
 
   final SendPlan plan;
+  final bool searching;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final updates = plan.entries
         .where((planned) => planned.sends && planned.replacing != null)
         .length;
-    final label = SendLabel.of(context.intl, plan.sendCount - updates, updates);
+    final label = switch (searching) {
+      true => null,
+      false => SendLabel.of(context.intl, plan.sendCount - updates, updates),
+    };
     return SendFooter(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
