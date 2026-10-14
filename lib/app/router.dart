@@ -16,6 +16,7 @@ import 'package:fujin/pages/settings/settings_page.dart';
 import 'package:fujin/pages/splash/splash_page.dart';
 import 'package:fujin/pages/tabs/fujin_tab.dart';
 import 'package:fujin/pages/tabs/tab_shell.dart';
+import 'package:fujin/pages/tabs/tab_switcher.dart';
 import 'package:fujin/pages/welcome/welcome_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -30,7 +31,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: FujinRoute.splash.path,
         builder: (context, state) => const SplashPage(),
       ),
-      StatefulShellRoute.indexedStack(
+      StatefulShellRoute(
         redirect: (context, state) async =>
             switch (await ref.read(accountsServiceProvider).read()) {
               ConnectedAccounts(both: true) => null,
@@ -38,6 +39,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             },
         builder: (context, state, navigationShell) =>
             TabShell(navigationShell: navigationShell),
+        navigatorContainerBuilder: (context, navigationShell, children) =>
+            TabSwitcher(
+              index: navigationShell.currentIndex,
+              children: children,
+            ),
         branches: [
           for (final tab in FujinTab.values)
             StatefulShellBranch(

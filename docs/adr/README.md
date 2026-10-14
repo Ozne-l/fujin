@@ -36,4 +36,4 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0030](0030-mfp-foods-shown-when-a-side-is-missing.md) | MyFitnessPal foods shown when Ekklo or the network is missing | Accepted |
 | [0031](0031-reduced-motion.md) | Reduced motion follows the phone setting | Accepted |
 | [0032](0032-text-contrast.md) | Text roles meet 4.5:1 on page and card | Accepted |
-| [0033](0033-liquid-glass-and-fade-through.md) | Liquid glass tab bar | Proposed |
+| [0033](0033-liquid-glass-and-fade-through.md) | Liquid glass tab bar and fade-through navigation | Proposed |

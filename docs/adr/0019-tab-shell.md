@@ -4,7 +4,7 @@ Date: 2026-10-10
 
 ## Status
 
-Accepted. Supersedes the "Planned" and "No tab bar" bullets of [0010](0010-go-router-navigation.md) and the `lib/pages/` memory and settings items in the planned folders of [0013](0013-layers.md). [0027](0027-barcode-scanner.md) enables the Scanner button. [0033](0033-liquid-glass-and-fade-through.md) replaces the frosted plate.
+Accepted. Supersedes the "Planned" and "No tab bar" bullets of [0010](0010-go-router-navigation.md) and the `lib/pages/` memory and settings items in the planned folders of [0013](0013-layers.md). [0027](0027-barcode-scanner.md) enables the Scanner button. [0033](0033-liquid-glass-and-fade-through.md) replaces the indexed stack and the frosted plate.
 
 ## Context
 
@@ -12,7 +12,7 @@ The Mémoire screens (18 to 21 in the Figma file "Fūjin · Maquettes") are the 
 
 ## Decision
 
-- The tabs are a `StatefulShellRoute.indexedStack` in `routerProvider` (`lib/app/router.dart`), one `StatefulShellBranch` per `FujinTab` value (`lib/pages/tabs/fujin_tab.dart`), built with an exhaustive `switch` so a new tab cannot miss its branch. Each branch keeps its own navigator and stack.
+- The tabs are a `StatefulShellRoute` in `routerProvider` (`lib/app/router.dart`), whose branch navigators sit in `TabSwitcher` (`lib/pages/tabs/tab_switcher.dart`, a fade-through, [0033](0033-liquid-glass-and-fade-through.md)), one `StatefulShellBranch` per `FujinTab` value (`lib/pages/tabs/fujin_tab.dart`), built with an exhaustive `switch` so a new tab cannot miss its branch. Each branch keeps its own navigator and stack.
 - The accounts redirect of [0010](0010-go-router-navigation.md) moves from the Journal route to the shell route, so every tab needs both sessions.
 - The welcome screen, both sign-ins and the send flow stay top-level routes above the shell: they cover the tab bar, and back from them returns to the tab that opened them.
 - `TabShell` (`lib/pages/tabs/tab_shell.dart`) is a `Scaffold` with `extendBody: true` and `FloatingTabBar` (`lib/pages/tabs/floating_tab_bar.dart`) as its bottom bar, so pages scroll under the glass. Each tab page keeps `SafeArea(bottom: false)` and ends its scroll with the bottom padding the bar reports. Tapping the current tab returns its branch to its first screen (`goBranch(index, initialLocation: true)`).
@@ -25,5 +25,5 @@ Source: go_router docs (pub.dev/packages/go_router, `StatefulShellRoute.indexedS
 ## Consequences
 
 - Adding a tab is one `FujinTab` value, its icon and label, and one branch case; the compiler points at the missing case.
-- The Memory page is built once and kept alive by the indexed stack, so the Journal invalidates `memoryProvider` after a send to show what the send remembered.
+- The Memory page is built once and kept alive by `TabSwitcher`, so the Journal invalidates `memoryProvider` after a send to show what the send remembered.
 - Every navigation into the shell costs the two secure storage reads of the accounts check, as the Journal did before.

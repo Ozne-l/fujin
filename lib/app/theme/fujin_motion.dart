@@ -48,6 +48,11 @@ abstract final class FujinMotion {
   static const double tabSquashLimit = 0.25;
   static const double glassPress = 1.04;
   static const double glassStretch = 0.3;
+  static const CurvedMotion fadeThrough = CurvedMotion(
+    Duration(milliseconds: 280),
+    Curves.easeOutCubic,
+  );
+  static const double fadeThroughScale = 0.98;
   static const Motion sheetIn = Motion.customSpring(
     SpringDescription(mass: 1, stiffness: 110, damping: 21),
   );

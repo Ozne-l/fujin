@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 
@@ -61,6 +62,14 @@ abstract final class FujinTheme {
     colorScheme: _colorScheme,
     scaffoldBackgroundColor: FujinColorRole.backgroundPage,
     canvasColor: FujinColorRole.backgroundPage,
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: PredictiveBackPageTransitionsBuilder(
+          fallbackColor: FujinColorRole.backgroundPage,
+        ),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+      },
+    ),
     dividerColor: FujinColorRole.borderHairline,
     fontFamily: FujinFont.inter,
     textTheme: _textTheme,

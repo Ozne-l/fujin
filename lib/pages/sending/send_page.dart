@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fujin/domain/sending/send_mode.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/automatic_mode_notifier.dart';
+import 'package:fujin/pages/common/fade_through.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/sending/send_notifier.dart';
 import 'package:fujin/pages/sending/send_plan_notifier.dart';
@@ -50,25 +51,32 @@ class SendPage extends HookConsumerWidget {
       },
       child: Scaffold(
         body: SafeArea(
-          child: switch ((sendState, planState)) {
-            (SendDone(:final report), _) => switch (report.mode) {
-              SendMode.reviewed => SentView(report: report),
-              SendMode.automatic => AutomaticSentView(report: report),
+          child: FadeThrough(
+            child: switch ((sendState, planState)) {
+              (SendDone(:final report), _) => switch (report.mode) {
+                SendMode.reviewed => SentView(report: report),
+                SendMode.automatic => AutomaticSentView(report: report),
+              },
+              (SendRunning(:final progress), SendPlanReady(:final plan)) =>
+                SendingView(plan: plan, progress: progress),
+              (
+                SendFailed(:final progress, :final failure),
+                SendPlanReady(:final plan),
+              ) =>
+                InterruptedView(
+                  plan: plan,
+                  progress: progress,
+                  failure: failure,
+                ),
+              (_, SendPlanSearching(:final plan)) => SearchingView(plan: plan),
+              (_, SendPlanReady(:final plan)) => ReviewView(plan: plan),
+              (_, SendPlanFailed(:final plan, :final failure)) =>
+                PlanFailedView(
+                  plan: plan,
+                  failure: failure,
+                ),
             },
-            (SendRunning(:final progress), SendPlanReady(:final plan)) =>
-              SendingView(plan: plan, progress: progress),
-            (
-              SendFailed(:final progress, :final failure),
-              SendPlanReady(:final plan),
-            ) =>
-              InterruptedView(plan: plan, progress: progress, failure: failure),
-            (_, SendPlanSearching(:final plan)) => SearchingView(plan: plan),
-            (_, SendPlanReady(:final plan)) => ReviewView(plan: plan),
-            (_, SendPlanFailed(:final plan, :final failure)) => PlanFailedView(
-              plan: plan,
-              failure: failure,
-            ),
-          },
+          ),
         ),
       ),
     );
