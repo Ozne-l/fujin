@@ -682,6 +682,22 @@
   },
   "backToToday": "Aujourd'hui ›",
   "setGoals": "Définir mes objectifs ›",
+  "weekBandDay": "{date}",
+  "@weekBandDay": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "MMMMEEEEd"}
+    }
+  },
+  "weekBandDayGoal": "{date}, {goal}",
+  "@weekBandDayGoal": {
+    "placeholders": {"date": {"type": "String"}, "goal": {"type": "String"}}
+  },
+  "dayGoalUpcoming": "à venir",
+  "dayGoalNothingLogged": "rien de noté",
+  "dayGoalInProgress": "en cours",
+  "dayGoalMissed": "sous l’objectif",
+  "dayGoalReached": "objectif atteint",
+  "dayGoalExceeded": "objectif dépassé",
   "previousWeek": "Semaine précédente",
   "nextWeek": "Semaine suivante",
   "weekBandHint": "Glisse pour voir les semaines passées",

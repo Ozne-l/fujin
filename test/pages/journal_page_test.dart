@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io' show HttpStatus;
+import 'dart:ui' show Tristate;
 
 import 'package:checks/checks.dart';
 import 'package:ekklo_client/ekklo_client.dart';
@@ -369,6 +370,37 @@ void main() {
       check(
         _rich('1${_space}898 / 3${_space}000 kcal').evaluate(),
       ).length.equals(1);
+    });
+
+    testWidgets('names each day of the band with its goal for a screen '
+        'reader, the selected one included', (tester) async {
+      final semantics = tester.ensureSemantics();
+      await pumpFujin(
+        tester,
+        FakeBackends(
+          mealNames: [breakfast],
+          entries: [
+            entry('E-1', date: _yesterday, nutrients: nutrients(kcal: 3120)),
+          ],
+        ),
+        goals: _goals,
+      );
+
+      Tristate selected(String label) => tester
+          .getSemantics(find.bySemanticsLabel(label))
+          .flagsCollection
+          .isSelected;
+
+      check(
+        selected('mardi 6 octobre, objectif dépassé'),
+      ).equals(Tristate.isFalse);
+      check(
+        selected('mercredi 7 octobre, en cours'),
+      ).equals(Tristate.isTrue);
+      check(
+        find.bySemanticsLabel('jeudi 8 octobre, à venir').evaluate(),
+      ).length.equals(1);
+      semantics.dispose();
     });
 
     testWidgets('shows a past day under the month with a way back to today', (

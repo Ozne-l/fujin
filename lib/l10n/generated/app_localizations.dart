@@ -1742,6 +1742,54 @@ abstract class AppLocalizations {
   /// **'Définir mes objectifs ›'**
   String get setGoals;
 
+  /// No description provided for @weekBandDay.
+  ///
+  /// In fr, this message translates to:
+  /// **'{date}'**
+  String weekBandDay(DateTime date);
+
+  /// No description provided for @weekBandDayGoal.
+  ///
+  /// In fr, this message translates to:
+  /// **'{date}, {goal}'**
+  String weekBandDayGoal(String date, String goal);
+
+  /// No description provided for @dayGoalUpcoming.
+  ///
+  /// In fr, this message translates to:
+  /// **'à venir'**
+  String get dayGoalUpcoming;
+
+  /// No description provided for @dayGoalNothingLogged.
+  ///
+  /// In fr, this message translates to:
+  /// **'rien de noté'**
+  String get dayGoalNothingLogged;
+
+  /// No description provided for @dayGoalInProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'en cours'**
+  String get dayGoalInProgress;
+
+  /// No description provided for @dayGoalMissed.
+  ///
+  /// In fr, this message translates to:
+  /// **'sous l’objectif'**
+  String get dayGoalMissed;
+
+  /// No description provided for @dayGoalReached.
+  ///
+  /// In fr, this message translates to:
+  /// **'objectif atteint'**
+  String get dayGoalReached;
+
+  /// No description provided for @dayGoalExceeded.
+  ///
+  /// In fr, this message translates to:
+  /// **'objectif dépassé'**
+  String get dayGoalExceeded;
+
   /// No description provided for @previousWeek.
   ///
   /// In fr, this message translates to:

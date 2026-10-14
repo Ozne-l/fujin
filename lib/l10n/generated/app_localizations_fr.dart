@@ -1257,6 +1257,39 @@ class AppLocalizationsFr extends AppLocalizations {
   String get setGoals => 'Définir mes objectifs ›';
 
   @override
+  String weekBandDay(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMEEEEd(
+      localeName,
+    );
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString';
+  }
+
+  @override
+  String weekBandDayGoal(String date, String goal) {
+    return '$date, $goal';
+  }
+
+  @override
+  String get dayGoalUpcoming => 'à venir';
+
+  @override
+  String get dayGoalNothingLogged => 'rien de noté';
+
+  @override
+  String get dayGoalInProgress => 'en cours';
+
+  @override
+  String get dayGoalMissed => 'sous l’objectif';
+
+  @override
+  String get dayGoalReached => 'objectif atteint';
+
+  @override
+  String get dayGoalExceeded => 'objectif dépassé';
+
+  @override
   String get previousWeek => 'Semaine précédente';
 
   @override

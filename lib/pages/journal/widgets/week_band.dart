@@ -13,6 +13,7 @@ import 'package:fujin/domain/goals/day_goal_state.dart';
 import 'package:fujin/domain/journal/calendar_week.dart';
 import 'package:fujin/domain/journal/fetch.dart';
 import 'package:fujin/domain/journal/logged_kilocalories.dart';
+import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
 import 'package:fujin/pages/journal/widgets/day_ring.dart';
@@ -266,35 +267,58 @@ class _Day extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final intl = context.intl;
-    return InkResponse(
-      onTap: onTap,
-      radius: FujinSize.touchTarget / 2,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        spacing: FujinSpace.s2,
-        children: [
-          Text(
-            intl.weekdayShort(day),
-            style: switch (selected) {
-              true => FujinText.inter11Semibold.copyWith(
-                color: FujinColorRole.textPrimary,
+    final date = context.intl.weekBandDay(day);
+    return MergeSemantics(
+      child: InkResponse(
+        onTap: onTap,
+        radius: FujinSize.touchTarget / 2,
+        child: Semantics(
+          label: switch (_goalText(context.intl, state)) {
+            null => date,
+            final goal => context.intl.weekBandDayGoal(date, goal),
+          },
+          selected: selected,
+          button: true,
+          enabled: onTap != null,
+          excludeSemantics: true,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: FujinSpace.s2,
+            children: [
+              Text(
+                context.intl.weekdayShort(day),
+                style: switch (selected) {
+                  true => FujinText.inter11Semibold.copyWith(
+                    color: FujinColorRole.textPrimary,
+                  ),
+                  false => FujinText.inter11Regular.copyWith(
+                    color: FujinColorRole.textSecondary,
+                  ),
+                },
               ),
-              false => FujinText.inter11Regular.copyWith(
-                color: FujinColorRole.textSecondary,
+              DayRing(
+                date: context.intl.dayOfMonth(day),
+                state: state,
+                progress: progress,
+                selected: selected,
               ),
-            },
+            ],
           ),
-          DayRing(
-            date: intl.dayOfMonth(day),
-            state: state,
-            progress: progress,
-            selected: selected,
-          ),
-        ],
+        ),
       ),
     );
   }
+
+  static String? _goalText(AppLocalizations intl, DayGoalState state) =>
+      switch (state) {
+        DayGoalState.upcoming => intl.dayGoalUpcoming,
+        DayGoalState.noGoal => null,
+        DayGoalState.nothingLogged => intl.dayGoalNothingLogged,
+        DayGoalState.inProgress => intl.dayGoalInProgress,
+        DayGoalState.missed => intl.dayGoalMissed,
+        DayGoalState.reached => intl.dayGoalReached,
+        DayGoalState.exceeded => intl.dayGoalExceeded,
+      };
 }
 
 class _Fade extends StatelessWidget {
