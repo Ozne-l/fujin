@@ -11,7 +11,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0005](0005-backup.md) | Backup: Auto Backup whitelist, manual JSON file | Accepted (B implemented, C implemented by 0021) |
 | [0006](0006-riverpod-notifiers-as-presenters.md) | Riverpod notifiers as presenters | Accepted (undo notifier built by 0026, import and export by 0021) |
 | [0007](0007-dart-mappable-models.md) | dart_mappable models | Accepted |
-| [0008](0008-theme-from-design-tokens.md) | Theme from design tokens, motion with motor | Accepted (goal rings built by 0022, send progress by 0018; pill, sheet and snackbar motion built; reduced motion added by 0031) |
+| [0008](0008-theme-from-design-tokens.md) | Theme from design tokens, motion with motor | Accepted (goal rings built by 0022, send progress by 0018; pill, sheet and snackbar motion built; reduced motion added by 0031; `hai-light` darkened by 0032) |
 | [0009](0009-french-only-copy.md) | French-only copy | Superseded by 0015 |
 | [0010](0010-go-router-navigation.md) | go_router navigation | Accepted (tab plans superseded by 0019) |
 | [0011](0011-sessions-in-secure-storage.md) | Sessions in secure storage | Accepted |
@@ -34,3 +34,4 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0028](0028-fujin-drawn-controls.md) | Fūjin-drawn controls instead of stock Material | Accepted |
 | [0029](0029-journal-reads-held-for-display.md) | Journal reads held in memory for display, writes read live | Accepted |
 | [0031](0031-reduced-motion.md) | Reduced motion follows the phone setting | Accepted |
+| [0032](0032-text-contrast.md) | Text roles meet 4.5:1 on page and card | Accepted |

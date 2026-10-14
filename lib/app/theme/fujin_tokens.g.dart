@@ -8,7 +8,7 @@ abstract final class FujinColor {
   static const ekkloLight = Color(0xFFECE5F7);
   static const fujin = Color(0xFF2F5E34);
   static const hai = Color(0xFF6F6857);
-  static const haiLight = Color(0xFF8A826C);
+  static const haiLight = Color(0xFF736C5A);
   static const kin = Color(0xFFD4A548);
   static const kinDark = Color(0xFF8C6418);
   static const kinLight = Color(0xFFF3E6C4);
