@@ -8,7 +8,7 @@ import 'package:fujin/data/memory/meal_mapping.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/memory/memory_rules.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/seigaiha_band.dart';
 import 'package:fujin/pages/common/text_inset.dart';
 import 'package:fujin/pages/memory/memory_notifier.dart';
@@ -26,7 +26,6 @@ class MemoryPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final memory = ref.watch(memoryProvider);
     final pages = usePageController();
     final search = useTextEditingController();
@@ -106,13 +105,13 @@ class MemoryPage extends HookConsumerWidget {
                 spacing: FujinSpace.s3,
                 children: [
                   Text(
-                    l10n.tabMemory,
+                    context.intl.tabMemory,
                     style: FujinText.hina30.copyWith(
                       color: FujinColorRole.textPrimary,
                     ),
                   ),
                   Text(
-                    l10n.memorySubtitle,
+                    context.intl.memorySubtitle,
                     style: FujinText.inter15Regular.copyWith(
                       color: FujinColorRole.textSecondary,
                     ),
@@ -136,8 +135,10 @@ class MemoryPage extends HookConsumerWidget {
                     child: MemorySegments(
                       pages: pages,
                       labelOf: (value) => switch (value) {
-                        MemorySegment.foods => l10n.memoryFoods(remembered),
-                        MemorySegment.meals => l10n.memoryMeals(
+                        MemorySegment.foods => context.intl.memoryFoods(
+                          remembered,
+                        ),
+                        MemorySegment.meals => context.intl.memoryMeals(
                           memory.meals.length,
                         ),
                       },
@@ -177,7 +178,7 @@ class MemoryPage extends HookConsumerWidget {
         child: switch (foods) {
           [] => TextInset(
             child: Text(
-              AppLocalizations.of(context).memorySearchEmpty,
+              context.intl.memorySearchEmpty,
               style: FujinText.inter13Regular.copyWith(
                 color: FujinColorRole.textSecondary,
               ),
@@ -219,7 +220,7 @@ class _MealsSection extends ConsumerWidget {
           ),
           TextInset(
             child: Text(
-              AppLocalizations.of(context).memoryMealsNote,
+              context.intl.memoryMealsNote,
               style: FujinText.inter13Regular.copyWith(
                 color: FujinColorRole.textSecondary,
               ),

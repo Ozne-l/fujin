@@ -4,7 +4,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_stage.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/adding/add_write_state.dart';
 import 'package:fujin/pages/adding/widgets/side_row.dart';
 import 'package:fujin/pages/adding/widgets/side_state.dart';
@@ -32,11 +32,10 @@ class WritePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final meal = draft.mfpMealName;
     final children = switch (state) {
       AddWriteRunning(:final stage) => [
-        _title(l10n.addingTitle),
+        _title(context.intl.addingTitle),
         _Sides(
           mfp: switch (stage) {
             AddStage.mfp => SideState.writing,
@@ -54,9 +53,9 @@ class WritePanel extends StatelessWidget {
             disabledForegroundColor: FujinColorRole.textSecondary,
           ),
           icon: const FujinSpinner.button(),
-          label: Text(l10n.addAdding),
+          label: Text(context.intl.addAdding),
         ),
-        _note(l10n.addAddingNote, center: true),
+        _note(context.intl.addAddingNote, center: true),
       ],
       AddWriteEkkloFailed(
         problem: ReadProblem.ekkloSessionExpired,
@@ -67,23 +66,23 @@ class WritePanel extends StatelessWidget {
             icon: Icon(Icons.lock_outline),
             tone: PillTone.error,
           ),
-          _source(l10n.sourceEkklo, FujinColorRole.sourceEkklo),
-          _title(l10n.addEkkloSessionTitle),
+          _source(context.intl.sourceEkklo, FujinColorRole.sourceEkklo),
+          _title(context.intl.addEkkloSessionTitle),
           _Sides(mfp: SideState.written, ekklo: SideState.failed, meal: meal),
-          _note(l10n.addEkkloFailedDetail),
+          _note(context.intl.addEkkloFailedDetail),
           FilledButton(
             onPressed: switch (undoing) {
               true => null,
               false => () => actions.signIn(FujinRoute.ekkloSignIn),
             },
-            child: Text(l10n.ekkloReconnect),
+            child: Text(context.intl.ekkloReconnect),
           ),
           OutlinedButton(
             onPressed: switch (undoing) {
               true => null,
               false => actions.undo,
             },
-            child: Text(l10n.addCancelMfpEntry),
+            child: Text(context.intl.addCancelMfpEntry),
           ),
         ],
       AddWriteEkkloFailed(:final problem, :final undoing) => [
@@ -93,31 +92,31 @@ class WritePanel extends StatelessWidget {
         ),
         _title(switch (problem) {
           ReadProblem.ekkloUnavailable ||
-          ReadProblem.unknown => l10n.addEkkloNoReply,
+          ReadProblem.unknown => context.intl.addEkkloNoReply,
           ReadProblem.offline ||
           ReadProblem.mfpSessionExpired ||
           ReadProblem.mfpUnavailable ||
           ReadProblem.ekkloSessionExpired => JournalText.problemHeadline(
-            l10n,
+            context.intl,
             problem,
           ),
         }),
         _Sides(mfp: SideState.written, ekklo: SideState.failed, meal: meal),
-        _note(l10n.addEkkloFailedDetail),
+        _note(context.intl.addEkkloFailedDetail),
         FilledButton.icon(
           onPressed: switch (undoing) {
             true => null,
             false => actions.retryEkklo,
           },
           icon: const Icon(Icons.refresh),
-          label: Text(l10n.addRetryEkklo),
+          label: Text(context.intl.addRetryEkklo),
         ),
         OutlinedButton(
           onPressed: switch (undoing) {
             true => null,
             false => actions.undo,
           },
-          child: Text(l10n.addCancelMfpEntry),
+          child: Text(context.intl.addCancelMfpEntry),
         ),
       ],
       AddWriteFailed(problem: ReadProblem.mfpSessionExpired) => [
@@ -125,35 +124,35 @@ class WritePanel extends StatelessWidget {
           icon: Icon(Icons.lock_outline),
           tone: PillTone.error,
         ),
-        _source(l10n.sourceMyFitnessPal, FujinColorRole.sourceMfp),
-        _title(l10n.addMfpSessionTitle),
+        _source(context.intl.sourceMyFitnessPal, FujinColorRole.sourceMfp),
+        _title(context.intl.addMfpSessionTitle),
         _note(
-          l10n.addMfpSessionDetail(
+          context.intl.addMfpSessionDetail(
             draft.food.description,
-            EntryText.serving(l10n, draft.entry),
+            EntryText.serving(context.intl, draft.entry),
             meal.toLowerCase(),
             draft.date,
           ),
         ),
         FilledButton(
           onPressed: () => actions.signIn(FujinRoute.mfpSignIn),
-          child: Text(l10n.mfpReconnect),
+          child: Text(context.intl.mfpReconnect),
         ),
-        TextButton(onPressed: actions.dismiss, child: Text(l10n.later)),
+        TextButton(onPressed: actions.dismiss, child: Text(context.intl.later)),
       ],
       AddWriteFailed(problem: ReadProblem.ekkloSessionExpired) => [
         const SheetPictogram(
           icon: Icon(Icons.lock_outline),
           tone: PillTone.error,
         ),
-        _source(l10n.sourceEkklo, FujinColorRole.sourceEkklo),
-        _title(l10n.addEkkloSessionTitle),
-        _note(l10n.addEkkloSessionDetail),
+        _source(context.intl.sourceEkklo, FujinColorRole.sourceEkklo),
+        _title(context.intl.addEkkloSessionTitle),
+        _note(context.intl.addEkkloSessionDetail),
         FilledButton(
           onPressed: () => actions.signIn(FujinRoute.ekkloSignIn),
-          child: Text(l10n.ekkloReconnect),
+          child: Text(context.intl.ekkloReconnect),
         ),
-        TextButton(onPressed: actions.dismiss, child: Text(l10n.later)),
+        TextButton(onPressed: actions.dismiss, child: Text(context.intl.later)),
       ],
       AddWriteFailed(:final problem) => [
         const SheetPictogram(
@@ -162,12 +161,12 @@ class WritePanel extends StatelessWidget {
         ),
         _title(switch (problem) {
           ReadProblem.mfpUnavailable ||
-          ReadProblem.unknown => l10n.addMfpNoReply,
+          ReadProblem.unknown => context.intl.addMfpNoReply,
           ReadProblem.offline ||
           ReadProblem.ekkloUnavailable ||
           ReadProblem.mfpSessionExpired ||
           ReadProblem.ekkloSessionExpired => JournalText.problemHeadline(
-            l10n,
+            context.intl,
             problem,
           ),
         }),
@@ -187,15 +186,15 @@ class WritePanel extends StatelessWidget {
             meal: meal,
           ),
         },
-        _note(l10n.addMfpFailedDetail),
+        _note(context.intl.addMfpFailedDetail),
         FilledButton.icon(
           onPressed: actions.retry,
           icon: const Icon(Icons.refresh),
-          label: Text(l10n.tryAgain),
+          label: Text(context.intl.tryAgain),
         ),
         OutlinedButton(
           onPressed: actions.dismiss,
-          child: Text(l10n.addEditEntry),
+          child: Text(context.intl.addEditEntry),
         ),
       ],
       AddWriteIdle() || AddWriteDone() => const <Widget>[],
@@ -243,7 +242,6 @@ class _Sides extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: FujinSpace.s4),
       decoration: BoxDecoration(
@@ -253,14 +251,14 @@ class _Sides extends StatelessWidget {
       child: Column(
         children: [
           SideRow(
-            label: l10n.sourceMyFitnessPal,
+            label: context.intl.sourceMyFitnessPal,
             dot: FujinColorRole.sourceMfp,
             state: mfp,
             meal: meal,
           ),
           const Divider(height: FujinStroke.card, thickness: FujinStroke.card),
           SideRow(
-            label: l10n.sourceEkklo,
+            label: context.intl.sourceEkklo,
             dot: FujinColorRole.sourceEkklo,
             state: ekklo,
             meal: meal,

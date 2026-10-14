@@ -5,7 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fujin/app/config.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/fujin_icon_button.dart';
 import 'package:fujin/pages/common/sign_in_failure.dart';
 import 'package:fujin/pages/mfp_sign_in/mfp_sign_in_notifier.dart';
@@ -19,7 +19,6 @@ class MfpSignInPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final state = ref.watch(mfpSignInProvider);
     final notifier = ref.read(mfpSignInProvider.notifier);
     final webView = useState<InAppWebViewController?>(null);
@@ -49,15 +48,15 @@ class MfpSignInPage extends HookConsumerWidget {
     final (dot, message) = switch (state) {
       MfpSignInFailed(failure: SignInFailure.refused) => (
         FujinColorRole.textAlert,
-        l10n.mfpSignInRefused,
+        context.intl.mfpSignInRefused,
       ),
       MfpSignInFailed(failure: SignInFailure.unreachable) => (
         FujinColorRole.textAlert,
-        l10n.mfpSignInUnreachable,
+        context.intl.mfpSignInUnreachable,
       ),
       MfpSignInIdle() || MfpSignInRunning() || MfpSignInDone() => (
         FujinColor.kin,
-        l10n.mfpSignInHint,
+        context.intl.mfpSignInHint,
       ),
     };
 
@@ -90,7 +89,7 @@ class MfpSignInPage extends HookConsumerWidget {
                         spacing: FujinSpace.s1,
                         children: [
                           Text(
-                            l10n.sourceMyFitnessPal,
+                            context.intl.sourceMyFitnessPal,
                             style: FujinText.inter15Medium.copyWith(
                               color: FujinColorRole.textPrimary,
                             ),
@@ -106,7 +105,7 @@ class MfpSignInPage extends HookConsumerWidget {
                     ),
                     FujinIconButton(
                       icon: Icons.refresh,
-                      tooltip: l10n.reload,
+                      tooltip: context.intl.reload,
                       onPressed: () => unawaited(webView.value?.reload()),
                     ),
                   ],

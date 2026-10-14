@@ -15,7 +15,7 @@ Accepted. Supersedes [0009](0009-french-only-copy.md).
 - User-facing text lives in two ARB files: `lib/l10n/app_fr.arb`, the template, which matches the Figma texts word for word and carries every placeholder definition, and `lib/l10n/app_en.arb`, its English translation with the same keys.
 - The app follows the device language. `preferred-supported-locales: [fr]` in `l10n.yaml` makes French the fallback for any other language.
 - A new string is added to both files in the same change; both files keep the same keys.
-- Everything else from [0009](0009-french-only-copy.md) still holds: gen-l10n output in `lib/l10n/generated/`, ICU plurals and formats, `AppLocalizations` called from widgets only.
+- Everything else from [0009](0009-french-only-copy.md) still holds: gen-l10n output in `lib/l10n/generated/`, ICU plurals and formats, `AppLocalizations` called from widgets only. Widgets reach it through `context.intl` (`IntlContext` in `lib/l10n/intl_context.dart`); a text helper that has no `BuildContext` takes it as an `AppLocalizations intl` parameter.
 - Widget tests pin the French locale (`localesTestValue` in `test/pages/journal_page_test.dart`) and assert on French text, the language the owner uses.
 
 Source: Flutter docs (docs.flutter.dev), "Internationalizing Flutter apps".

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 
 class MemorySearchField extends StatelessWidget {
   const MemorySearchField({required this.controller, super.key});
@@ -19,7 +19,7 @@ class MemorySearchField extends StatelessWidget {
         color: FujinColorRole.textPrimary,
       ),
       decoration: InputDecoration(
-        hintText: AppLocalizations.of(context).memorySearchHint,
+        hintText: context.intl.memorySearchHint,
         hintStyle: FujinText.inter15Regular.copyWith(
           color: FujinColorRole.textTertiary,
         ),

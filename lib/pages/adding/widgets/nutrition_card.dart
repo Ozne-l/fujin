@@ -5,7 +5,7 @@ import 'package:fujin/domain/goals/goal_amounts.dart';
 import 'package:fujin/domain/goals/goal_status.dart';
 import 'package:fujin/domain/journal/day_nutrients.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/adding/widgets/day_share_bar.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
 
@@ -29,7 +29,6 @@ class NutritionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final kilocalories = food.amount(Nutrient.kilocalories);
     final left = switch (_goal(Nutrient.kilocalories)) {
       (final goal, final day)? =>
@@ -64,7 +63,7 @@ class NutritionCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      l10n.addMyDay,
+                      context.intl.addMyDay,
                       style: FujinText.inter13Medium.copyWith(
                         color: FujinColorRole.textLink,
                       ),
@@ -87,14 +86,14 @@ class NutritionCard extends StatelessWidget {
               _Highlight(
                 on: changed.contains(Nutrient.kilocalories),
                 child: Text(
-                  l10n.kilocaloriesValue(kilocalories),
+                  context.intl.kilocaloriesValue(kilocalories),
                   style: FujinText.inter28Semibold.copyWith(
                     color: FujinColorRole.textPrimary,
                   ),
                 ),
               ),
               Text(
-                l10n.nutrientKilocalories,
+                context.intl.nutrientKilocalories,
                 style: FujinText.inter14Regular.copyWith(
                   color: FujinColorRole.textSecondary,
                 ),
@@ -103,8 +102,8 @@ class NutritionCard extends StatelessWidget {
               if (left case final left?)
                 Text(
                   switch (left) {
-                    < 0 => l10n.addExceeds(-left),
-                    _ => l10n.addRemaining(left),
+                    < 0 => context.intl.addExceeds(-left),
+                    _ => context.intl.addRemaining(left),
                   },
                   style: FujinText.inter14Medium.copyWith(
                     color: switch (left) {
@@ -126,7 +125,7 @@ class NutritionCard extends StatelessWidget {
                     spacing: FujinSpace.s1,
                     children: [
                       Text(
-                        JournalText.name(l10n, nutrient),
+                        JournalText.name(context.intl, nutrient),
                         style: FujinText.inter11Regular.copyWith(
                           color: FujinColorRole.textSecondary,
                         ),
@@ -135,8 +134,10 @@ class NutritionCard extends StatelessWidget {
                         on: changed.contains(nutrient),
                         child: Text(
                           switch (food.isPartial(nutrient)) {
-                            true => l10n.macroUnknown,
-                            false => l10n.addMacroGrams(food.amount(nutrient)),
+                            true => context.intl.macroUnknown,
+                            false => context.intl.addMacroGrams(
+                              food.amount(nutrient),
+                            ),
                           },
                           style: FujinText.inter15Medium.copyWith(
                             color: FujinColorRole.textPrimary,

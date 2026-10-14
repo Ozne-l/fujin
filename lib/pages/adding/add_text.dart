@@ -17,8 +17,8 @@ abstract final class AddText {
   static const _evening = 18;
   static const baseMultiplier = 1.0;
 
-  static String serving(AppLocalizations l10n, MfpServingSize serving) =>
-      l10n.addServing(serving.value, serving.unit);
+  static String serving(AppLocalizations intl, MfpServingSize serving) =>
+      intl.addServing(serving.value, serving.unit);
 
   static String barcodeFormat(MfpBarcodeFormat format) => switch (format) {
     MfpBarcodeFormat.ean8 => 'EAN-8',
@@ -27,12 +27,12 @@ abstract final class AddText {
     MfpBarcodeFormat.gtin14 => 'GTIN-14',
   };
 
-  static String result(AppLocalizations l10n, MfpFood food) =>
+  static String result(AppLocalizations intl, MfpFood food) =>
       switch (food.servingSizes.firstOrNull) {
         final first? => EntryText.branded(
-          l10n,
+          intl,
           food.brandName,
-          serving(l10n, first),
+          serving(intl, first),
         ),
         null => food.brandName ?? '',
       };
@@ -46,24 +46,24 @@ abstract final class AddText {
       };
 
   static String recent(
-    AppLocalizations l10n,
+    AppLocalizations intl,
     RecentFood recent, {
     required DateTime today,
-  }) => l10n.addRecentLine(
+  }) => intl.addRecentLine(
     EntryText.branded(
-      l10n,
+      intl,
       recent.brandName,
-      l10n.servingLine(
+      intl.servingLine(
         recent.servings,
         recent.servingValue,
         recent.servingUnit,
       ),
     ),
-    when(l10n, recent.addedAt, today: today),
+    when(intl, recent.addedAt, today: today),
   );
 
   static String when(
-    AppLocalizations l10n,
+    AppLocalizations intl,
     DateTime moment, {
     required DateTime today,
   }) {
@@ -71,78 +71,78 @@ abstract final class AddText {
     final reference = DateTime.utc(today.year, today.month, today.day);
     return switch (reference.difference(day).inDays) {
       0 => switch (moment.hour) {
-        < _afternoon => l10n.addThisMorning,
-        < _evening => l10n.addThisAfternoon,
-        _ => l10n.addThisEvening,
+        < _afternoon => intl.addThisMorning,
+        < _evening => intl.addThisAfternoon,
+        _ => intl.addThisEvening,
       },
-      1 => l10n.addYesterday,
+      1 => intl.addYesterday,
       final days when days > 0 && days < CalendarWeek.daysPerWeek =>
-        l10n.addWeekday(
+        intl.addWeekday(
           moment,
         ),
-      _ => l10n.addShortDate(moment),
+      _ => intl.addShortDate(moment),
     };
   }
 
-  static String forServing(AppLocalizations l10n, AddDraft draft) {
+  static String forServing(AppLocalizations intl, AddDraft draft) {
     final entry = draft.entry;
-    final serving = EntryText.serving(l10n, entry);
+    final serving = EntryText.serving(intl, entry);
     return switch (entryGrams(entry)) {
       final grams? when draft.servings != AddDraft.oneServing =>
-        l10n.addForGrams(
+        intl.addForGrams(
           serving,
-          SendText.grams(l10n, grams),
+          SendText.grams(intl, grams),
         ),
-      _ => l10n.addFor(serving),
+      _ => intl.addFor(serving),
     };
   }
 
   static (String, String) ekkloSummary(
-    AppLocalizations l10n,
+    AppLocalizations intl,
     PlannedEntry planned,
   ) {
     final entry = planned.entry;
     final unit = entry.servingSize.unit;
     final gramUnit = isGramUnit(unit);
     final ownAmount = switch (entryGrams(entry)) {
-      final grams? => SendText.grams(l10n, grams),
-      null => EntryText.serving(l10n, entry),
+      final grams? => SendText.grams(intl, grams),
+      null => EntryText.serving(intl, entry),
     };
     final food = switch (planned.choice) {
-      SendToEkkloFood(:final ekkloFoodName, :final grams) => l10n.addEkkloFood(
+      SendToEkkloFood(:final ekkloFoodName, :final grams) => intl.addEkkloFood(
         ekkloFoodName,
-        SendText.grams(l10n, grams),
+        SendText.grams(intl, grams),
       ),
-      SendAsOwnCopy(:final reuse?) => l10n.addEkkloFood(
+      SendAsOwnCopy(:final reuse?) => intl.addEkkloFood(
         reuse.ekkloFoodName,
         ownAmount,
       ),
-      SendAsOwnCopy() => l10n.addWillBeCreated,
-      SkipEntry() => l10n.addToChoose,
+      SendAsOwnCopy() => intl.addWillBeCreated,
+      SkipEntry() => intl.addToChoose,
     };
     return switch (EkkloSide.of(planned)) {
-      EkkloSide.remembered => (food, l10n.addRemembered),
+      EkkloSide.remembered => (food, intl.addRemembered),
       EkkloSide.foundAutomatically => (
         food,
-        l10n.addFoundAutomatically(_gap(planned)),
+        intl.addFoundAutomatically(_gap(planned)),
       ),
       EkkloSide.willBeCreated => (
-        l10n.addWillBeCreated,
-        l10n.addWillBeCreatedDetail(ownAmount),
+        intl.addWillBeCreated,
+        intl.addWillBeCreatedDetail(ownAmount),
       ),
       EkkloSide.toChoose => (
-        l10n.addToChoose,
+        intl.addToChoose,
         switch (gramUnit) {
-          true => l10n.addToChooseDetail,
-          false => l10n.addToChooseWeightDetail(unit),
+          true => intl.addToChooseDetail,
+          false => intl.addToChooseWeightDetail(unit),
         },
       ),
       EkkloSide.chosen => (
         food,
         switch ((planned.choice, gramUnit)) {
           (SendToEkkloFood(:final gramsPerUnit?), false) =>
-            l10n.addChosenWeight(unit, SendText.grams(l10n, gramsPerUnit)),
-          _ => l10n.addChosen,
+            intl.addChosenWeight(unit, SendText.grams(intl, gramsPerUnit)),
+          _ => intl.addChosen,
         },
       ),
     };

@@ -3,26 +3,26 @@ import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 
 abstract final class MemoryText {
-  static String target(AppLocalizations l10n, RememberedFood food) =>
+  static String target(AppLocalizations intl, RememberedFood food) =>
       switch (food) {
-        MatchedFood(:final ekkloFoodName) => l10n.memoryTarget(ekkloFoodName),
-        OwnCopy() => l10n.memoryOwnCopyTarget,
+        MatchedFood(:final ekkloFoodName) => intl.memoryTarget(ekkloFoodName),
+        OwnCopy() => intl.memoryOwnCopyTarget,
       };
 
-  static String quotedUnits(AppLocalizations l10n, Iterable<String> units) =>
-      units.map(l10n.memoryUnitQuoted).join(l10n.listSeparator);
+  static String quotedUnits(AppLocalizations intl, Iterable<String> units) =>
+      units.map(intl.memoryUnitQuoted).join(intl.listSeparator);
 
-  static String macros(AppLocalizations l10n, EkkloFood food) => l10n.macros(
-    l10n.macroValue(food.proteins),
-    l10n.macroValue(food.carbs),
-    l10n.macroValue(food.fats),
-    l10n.macroValue(food.fiber),
+  static String macros(AppLocalizations intl, EkkloFood food) => intl.macros(
+    intl.macroValue(food.proteins),
+    intl.macroValue(food.carbs),
+    intl.macroValue(food.fats),
+    intl.macroValue(food.fiber),
   );
 
-  static String portion(AppLocalizations l10n, EkkloFood food) =>
+  static String portion(AppLocalizations intl, EkkloFood food) =>
       switch (food.quantityType) {
-        EkkloQuantityType.grams => l10n.memoryPerGrams(food.portion),
-        EkkloQuantityType.ml => l10n.memoryPerMilliliters(food.portion),
+        EkkloQuantityType.grams => intl.memoryPerGrams(food.portion),
+        EkkloQuantityType.ml => intl.memoryPerMilliliters(food.portion),
         EkkloQuantityType.cup ||
         EkkloQuantityType.halfCup ||
         EkkloQuantityType.thirdCup ||
@@ -38,6 +38,6 @@ abstract final class MemoryText {
         EkkloQuantityType.portion ||
         EkkloQuantityType.can ||
         EkkloQuantityType.glass ||
-        EkkloQuantityType.unknown => l10n.memoryPerPortion,
+        EkkloQuantityType.unknown => intl.memoryPerPortion,
       };
 }

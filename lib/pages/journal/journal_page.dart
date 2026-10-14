@@ -9,7 +9,7 @@ import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/journal/journal_read.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/domain/sending/food_words.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
 import 'package:fujin/pages/common/gold_separator.dart';
 import 'package:fujin/pages/common/snack_bar_content.dart';
@@ -45,7 +45,6 @@ class JournalPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final day = ref.watch(selectedDayProvider);
     final today = ref.watch(todayProvider);
     final goals = ref.watch(goalsProvider);
@@ -210,9 +209,9 @@ class JournalPage extends HookConsumerWidget {
                 day: day,
                 today: today,
                 link: switch ((day == today, goals)) {
-                  (false, _) => (l10n.backToToday, () => select(today)),
+                  (false, _) => (context.intl.backToToday, () => select(today)),
                   (true, null) => (
-                    l10n.setGoals,
+                    context.intl.setGoals,
                     () => unawaited(context.push<void>(FujinRoute.goals.path)),
                   ),
                   (true, Goals()) => null,
@@ -299,7 +298,7 @@ class JournalPage extends HookConsumerWidget {
       ),
       sliver: SliverToBoxAdapter(
         child: Text(
-          AppLocalizations.of(context).mealsOfTheDay,
+          context.intl.mealsOfTheDay,
           style: FujinText.inter12Medium.copyWith(
             color: FujinColorRole.textSecondary,
           ),
@@ -315,27 +314,25 @@ class JournalPage extends HookConsumerWidget {
   ];
 
   static void _showNothingNew(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     JournalSnackBar.show(
       context,
       duration: _nothingNewDuration,
       content: SnackBarContent(
         glyph: SnackBarGlyph.refresh,
-        title: l10n.nothingNewTitle,
-        detail: l10n.nothingNewDetail,
+        title: context.intl.nothingNewTitle,
+        detail: context.intl.nothingNewDetail,
       ),
     );
   }
 
   static void _showUndone(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     JournalSnackBar.show(
       context,
       duration: _undoneDuration,
       content: SnackBarContent(
         glyph: SnackBarGlyph.undone,
-        title: l10n.addUndone,
-        detail: l10n.addUndoneDetail,
+        title: context.intl.addUndone,
+        detail: context.intl.addUndoneDetail,
       ),
     );
   }
@@ -347,13 +344,15 @@ class JournalPage extends HookConsumerWidget {
     required bool removedFromEkklo,
     required VoidCallback onRetry,
   }) {
-    final l10n = AppLocalizations.of(context);
     final (title, detail) = switch (removedFromEkklo) {
       true => (
-        l10n.addStillInMfp,
-        l10n.addStillInMfpDetail(productName(added.entry.food)),
+        context.intl.addStillInMfp,
+        context.intl.addStillInMfpDetail(productName(added.entry.food)),
       ),
-      false => (l10n.addNotUndone, JournalText.problemHeadline(l10n, problem)),
+      false => (
+        context.intl.addNotUndone,
+        JournalText.problemHeadline(context.intl, problem),
+      ),
     };
     JournalSnackBar.show(
       context,
@@ -362,7 +361,7 @@ class JournalPage extends HookConsumerWidget {
         glyph: SnackBarGlyph.alert,
         title: title,
         detail: detail,
-        action: (l10n.tryAgain, onRetry),
+        action: (context.intl.tryAgain, onRetry),
       ),
     );
   }

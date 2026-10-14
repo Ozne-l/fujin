@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 
 class OfflineCard extends StatelessWidget {
   const OfflineCard({required this.onRetry, super.key});
@@ -9,7 +9,6 @@ class OfflineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
       padding: const EdgeInsets.all(FujinSpace.s4),
@@ -36,13 +35,13 @@ class OfflineCard extends StatelessWidget {
               spacing: FujinSpace.s1,
               children: [
                 Text(
-                  l10n.addOfflineTitle,
+                  context.intl.addOfflineTitle,
                   style: FujinText.inter15Medium.copyWith(
                     color: FujinColorRole.textPrimary,
                   ),
                 ),
                 Text(
-                  l10n.addOfflineDetail,
+                  context.intl.addOfflineDetail,
                   style: FujinText.inter13Regular.copyWith(
                     color: FujinColorRole.textSecondary,
                   ),
@@ -51,7 +50,7 @@ class OfflineCard extends StatelessWidget {
                 OutlinedButton.icon(
                   onPressed: onRetry,
                   icon: const Icon(Icons.refresh),
-                  label: Text(l10n.tryAgain),
+                  label: Text(context.intl.tryAgain),
                 ),
               ],
             ),

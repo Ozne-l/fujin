@@ -11,30 +11,30 @@ abstract final class SendText {
   static const _percent = 100;
   static const _gramDecimals = 1;
 
-  static String grams(AppLocalizations l10n, double grams) =>
-      l10n.gramsValue(double.parse(grams.toStringAsFixed(_gramDecimals)));
+  static String grams(AppLocalizations intl, double grams) =>
+      intl.gramsValue(double.parse(grams.toStringAsFixed(_gramDecimals)));
 
-  static String nutrient(AppLocalizations l10n, Nutrient nutrient) =>
+  static String nutrient(AppLocalizations intl, Nutrient nutrient) =>
       switch (nutrient) {
-        Nutrient.kilocalories => l10n.nutrientKilocalories,
-        Nutrient.protein => l10n.nutrientProtein,
-        Nutrient.carbohydrates => l10n.nutrientCarbohydrates,
-        Nutrient.fat => l10n.nutrientFat,
-        Nutrient.fiber => l10n.nutrientFiber,
+        Nutrient.kilocalories => intl.nutrientKilocalories,
+        Nutrient.protein => intl.nutrientProtein,
+        Nutrient.carbohydrates => intl.nutrientCarbohydrates,
+        Nutrient.fat => intl.nutrientFat,
+        Nutrient.fiber => intl.nutrientFiber,
       };
 
   static String delta(
-    AppLocalizations l10n,
+    AppLocalizations intl,
     NutrientDeltas deltas,
     Nutrient nutrient,
   ) {
-    final label = SendText.nutrient(l10n, nutrient);
+    final label = SendText.nutrient(intl, nutrient);
     return switch (deltas.of(nutrient)) {
-      null => l10n.deltaUnknown(label),
+      null => intl.deltaUnknown(label),
       final delta => switch ((delta * _percent).round()) {
-        0 => l10n.deltaNone(label),
-        final percent when percent > 0 => l10n.deltaUp(label, percent),
-        final percent => l10n.deltaDown(label, -percent),
+        0 => intl.deltaNone(label),
+        final percent when percent > 0 => intl.deltaUp(label, percent),
+        final percent => intl.deltaDown(label, -percent),
       },
     };
   }
@@ -46,52 +46,52 @@ abstract final class SendText {
         (_, false) => PillTone.error,
       };
 
-  static String nameMatch(AppLocalizations l10n, NameMatch match) =>
+  static String nameMatch(AppLocalizations intl, NameMatch match) =>
       switch (match) {
-        NameMatch.product => l10n.nameMatchProduct,
-        NameMatch.brand => l10n.nameMatchBrand,
-        NameMatch.none => l10n.nameMatchNone,
+        NameMatch.product => intl.nameMatchProduct,
+        NameMatch.brand => intl.nameMatchBrand,
+        NameMatch.none => intl.nameMatchNone,
       };
 
   static (String, PillTone) reason(
-    AppLocalizations l10n,
+    AppLocalizations intl,
     ReviewReason reason,
   ) => switch (reason) {
-    ReviewReason.weightToConfirm => (l10n.pillWeightToConfirm, PillTone.error),
+    ReviewReason.weightToConfirm => (intl.pillWeightToConfirm, PillTone.error),
     ReviewReason.newAssociation => (
-      l10n.pillNewAssociation,
+      intl.pillNewAssociation,
       PillTone.attention,
     ),
-    ReviewReason.noCloseFood => (l10n.pillNoCloseFood, PillTone.muted),
-    ReviewReason.skipped => (l10n.pillSkipped, PillTone.muted),
-    ReviewReason.confirmed => (l10n.pillConfirmed, PillTone.validated),
+    ReviewReason.noCloseFood => (intl.pillNoCloseFood, PillTone.muted),
+    ReviewReason.skipped => (intl.pillSkipped, PillTone.muted),
+    ReviewReason.confirmed => (intl.pillConfirmed, PillTone.validated),
   };
 
-  static String unattended(AppLocalizations l10n, PlannedEntry planned) =>
+  static String unattended(AppLocalizations intl, PlannedEntry planned) =>
       switch ((planned.reason, planned.choice)) {
         (ReviewReason.weightToConfirm, SendToEkkloFood(:final grams)) =>
-          l10n.unattendedWeight(SendText.grams(l10n, grams)),
+          intl.unattendedWeight(SendText.grams(intl, grams)),
         (_, SendToEkkloFood(:final ekkloFoodName, :final food)) =>
-          l10n.unattendedClosest(switch (food?.brands) {
-            final brands? => l10n.weightFoodBrand(ekkloFoodName, brands),
+          intl.unattendedClosest(switch (food?.brands) {
+            final brands? => intl.weightFoodBrand(ekkloFoodName, brands),
             null => ekkloFoodName,
           }),
-        (_, SendAsOwnCopy()) => l10n.unattendedOwnCopy,
-        (_, SkipEntry()) => l10n.skippedDetail,
+        (_, SendAsOwnCopy()) => intl.unattendedOwnCopy,
+        (_, SkipEntry()) => intl.skippedDetail,
       };
 
-  static String kept(AppLocalizations l10n, PlannedEntry planned) =>
+  static String kept(AppLocalizations intl, PlannedEntry planned) =>
       switch (planned.choice) {
-        SendAsOwnCopy() => l10n.towards(l10n.ownCopy),
-        SendToEkkloFood() || SkipEntry() => target(l10n, planned),
+        SendAsOwnCopy() => intl.towards(intl.ownCopy),
+        SendToEkkloFood() || SkipEntry() => target(intl, planned),
       };
 
-  static String target(AppLocalizations l10n, PlannedEntry planned) =>
+  static String target(AppLocalizations intl, PlannedEntry planned) =>
       switch (planned.choice) {
         SendToEkkloFood(:final ekkloFoodName, :final grams) =>
-          l10n.towardsAmount(ekkloFoodName, SendText.grams(l10n, grams)),
-        SendAsOwnCopy(reuse: null) => l10n.towards(l10n.ownCopyToCreate),
-        SendAsOwnCopy() => l10n.towards(l10n.ownCopy),
-        SkipEntry() => l10n.skippedDetail,
+          intl.towardsAmount(ekkloFoodName, SendText.grams(intl, grams)),
+        SendAsOwnCopy(reuse: null) => intl.towards(intl.ownCopyToCreate),
+        SendAsOwnCopy() => intl.towards(intl.ownCopy),
+        SkipEntry() => intl.skippedDetail,
       };
 }

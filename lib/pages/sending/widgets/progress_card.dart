@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/fujin_weather.dart';
 import 'package:fujin/pages/common/progress_bar.dart';
 import 'package:fujin/pages/sending/widgets/glyph_card.dart';
@@ -23,7 +23,6 @@ class ProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return GlyphCard(
       weather: FujinWeather.breeze,
       title: title,
@@ -59,7 +58,7 @@ class ProgressCard extends StatelessWidget {
                 ),
               ),
               Text(
-                l10n.progressCount(done, total),
+                context.intl.progressCount(done, total),
                 style: FujinText.inter13Medium.copyWith(
                   color: FujinColorRole.textSecondary,
                 ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/adding/store_code.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/pill_size.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/sheet_card.dart';
@@ -28,12 +28,11 @@ class ScannedFoodSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final storeCode = isStoreCode(code);
     final verified = food.verified ?? false;
     final details = [
-      if (!verified) l10n.scannerUnverifiedDetail,
-      if (storeCode) l10n.scannerStoreCodeDetail,
+      if (!verified) context.intl.scannerUnverifiedDetail,
+      if (storeCode) context.intl.scannerStoreCodeDetail,
     ];
     return SheetCard(
       handle: true,
@@ -46,7 +45,7 @@ class ScannedFoodSheet extends StatelessWidget {
               const SourceDot(color: FujinColorRole.textLink),
               Flexible(
                 child: Text(
-                  l10n.scannerFromMemory,
+                  context.intl.scannerFromMemory,
                   style: FujinText.inter12Medium.copyWith(
                     color: FujinColorRole.textSecondary,
                   ),
@@ -56,14 +55,14 @@ class ScannedFoodSheet extends StatelessWidget {
             false => [
               const SourceDot(color: FujinColorRole.sourceMfp),
               Text(
-                l10n.sourceMyFitnessPal,
+                context.intl.sourceMyFitnessPal,
                 style: FujinText.inter12Medium.copyWith(
                   color: FujinColorRole.textSecondary,
                 ),
               ),
               Flexible(
                 child: Text(
-                  l10n.scannerFoundByBarcode,
+                  context.intl.scannerFoundByBarcode,
                   style: FujinText.inter12Regular.copyWith(
                     color: FujinColorRole.textSecondary,
                   ),
@@ -77,7 +76,7 @@ class ScannedFoodSheet extends StatelessWidget {
           style: FujinText.hina24.copyWith(color: FujinColorRole.textPrimary),
         ),
         Text(
-          ScannerText.foodLine(l10n, food),
+          ScannerText.foodLine(context.intl, food),
           style: FujinText.inter15Regular.copyWith(
             color: FujinColorRole.textPrimary,
           ),
@@ -88,26 +87,26 @@ class ScannedFoodSheet extends StatelessWidget {
           children: [
             switch (verified) {
               true => StatusPill(
-                label: l10n.addVerified,
+                label: context.intl.addVerified,
                 tone: PillTone.validated,
                 icon: Icons.check,
                 size: PillSize.small,
               ),
               false => StatusPill(
-                label: l10n.addUnverified,
+                label: context.intl.addUnverified,
                 tone: PillTone.attention,
                 size: PillSize.small,
               ),
             },
             switch (storeCode) {
               true => StatusPill(
-                label: l10n.scannerStoreCode,
+                label: context.intl.scannerStoreCode,
                 tone: PillTone.error,
                 icon: Icons.warning_amber_rounded,
                 size: PillSize.small,
               ),
               false => StatusPill(
-                label: l10n.addEan(code),
+                label: context.intl.addEan(code),
                 tone: PillTone.muted,
                 size: PillSize.small,
               ),
@@ -124,11 +123,11 @@ class ScannedFoodSheet extends StatelessWidget {
         const SizedBox(height: FujinSpace.s1),
         FilledButton(
           onPressed: onConfirm,
-          child: Text(l10n.scannerThisProduct),
+          child: Text(context.intl.scannerThisProduct),
         ),
         TextButton(
           onPressed: onSearch,
-          child: Text(l10n.scannerWrongProduct),
+          child: Text(context.intl.scannerWrongProduct),
         ),
       ],
     );

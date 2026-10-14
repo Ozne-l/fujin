@@ -6,6 +6,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/sending/send_plan.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/send_label.dart';
 import 'package:fujin/pages/sending/send_notifier.dart';
@@ -23,7 +24,7 @@ class ReviewView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
+    final intl = context.intl;
     final chosen = useState<_Section?>(null);
     final available = [
       for (final section in _Section.values)
@@ -43,7 +44,7 @@ class ReviewView extends HookConsumerWidget {
               for (final filter in available)
                 (
                   key: ValueKey(filter),
-                  label: filter.label(l10n, filter.count(plan)),
+                  label: filter.label(context.intl, filter.count(plan)),
                   tone: filter.tone,
                   selected: filter == section,
                   onSelected: () => chosen.value = filter,
@@ -65,7 +66,7 @@ class ReviewView extends HookConsumerWidget {
                     bottom: FujinSpace.s3,
                   ),
                   child: Text(
-                    section.heading(l10n),
+                    section.heading(intl),
                     style: FujinText.inter12Medium.copyWith(
                       color: FujinColorRole.textSecondary,
                     ),
@@ -121,16 +122,16 @@ enum _Section {
     _Section.inEkklo => plan.inEkklo.length,
   };
 
-  String label(AppLocalizations l10n, int count) => switch (this) {
-    _Section.toReview => l10n.filterToReview(count),
-    _Section.automatic => l10n.filterAutomatic(count),
-    _Section.inEkklo => l10n.filterInEkklo(count),
+  String label(AppLocalizations intl, int count) => switch (this) {
+    _Section.toReview => intl.filterToReview(count),
+    _Section.automatic => intl.filterAutomatic(count),
+    _Section.inEkklo => intl.filterInEkklo(count),
   };
 
-  String heading(AppLocalizations l10n) => switch (this) {
-    _Section.toReview => l10n.sectionToReview,
-    _Section.automatic => l10n.sectionAutomatic,
-    _Section.inEkklo => l10n.sectionInEkklo,
+  String heading(AppLocalizations intl) => switch (this) {
+    _Section.toReview => intl.sectionToReview,
+    _Section.automatic => intl.sectionAutomatic,
+    _Section.inEkklo => intl.sectionInEkklo,
   };
 }
 
@@ -141,18 +142,17 @@ class _Footer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final updates = plan.entries
         .where((planned) => planned.sends && planned.replacing != null)
         .length;
-    final label = SendLabel.of(l10n, plan.sendCount - updates, updates);
+    final label = SendLabel.of(context.intl, plan.sendCount - updates, updates);
     return SendFooter(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: FujinSpace.s3,
         children: [
           Text(
-            l10n.proposalsUsed,
+            context.intl.proposalsUsed,
             textAlign: TextAlign.center,
             style: FujinText.inter12Regular.copyWith(
               color: FujinColorRole.textSecondary,
@@ -165,7 +165,7 @@ class _Footer extends ConsumerWidget {
                 ref.read(sendProvider(plan.date).notifier).send(plan),
               ),
             },
-            child: Text(label ?? l10n.sendToEkklo),
+            child: Text(label ?? context.intl.sendToEkklo),
           ),
         ],
       ),

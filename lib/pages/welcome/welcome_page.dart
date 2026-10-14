@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/accounts/connected_accounts.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/gold_volute.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/seigaiha_band.dart';
@@ -19,7 +19,6 @@ class WelcomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final accounts = switch (ref.watch(connectedAccountsProvider)) {
       AsyncData(:final value) => value,
       AsyncLoading() || AsyncError() => null,
@@ -68,21 +67,21 @@ class WelcomePage extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              l10n.appName,
+                              context.intl.appName,
                               style: FujinText.hina22.copyWith(
                                 color: FujinColorRole.textLink,
                               ),
                             ),
                             const SizedBox(height: FujinSpace.s5),
                             Text(
-                              l10n.welcomeHeading,
+                              context.intl.welcomeHeading,
                               style: FujinText.hina30.copyWith(
                                 color: FujinColorRole.textPrimary,
                               ),
                             ),
                             const SizedBox(height: FujinSpace.s6),
                             Text(
-                              l10n.welcomeIntro,
+                              context.intl.welcomeIntro,
                               style: FujinText.inter15Regular.copyWith(
                                 color: FujinColorRole.textSecondary,
                               ),
@@ -92,8 +91,8 @@ class WelcomePage extends ConsumerWidget {
                       ),
                       const SizedBox(height: FujinSpace.s8),
                       _AccountCard(
-                        name: l10n.sourceMyFitnessPal,
-                        role: l10n.mfpAccountRole,
+                        name: context.intl.sourceMyFitnessPal,
+                        role: context.intl.mfpAccountRole,
                         dot: FujinColorRole.sourceMfp,
                         connected: accounts?.mfp,
                         onSignIn: () => unawaited(signIn(FujinRoute.mfpSignIn)),
@@ -103,8 +102,8 @@ class WelcomePage extends ConsumerWidget {
                         child: Center(child: GoldVolute()),
                       ),
                       _AccountCard(
-                        name: l10n.sourceEkklo,
-                        role: l10n.ekkloAccountRole,
+                        name: context.intl.sourceEkklo,
+                        role: context.intl.ekkloAccountRole,
                         dot: FujinColorRole.sourceEkklo,
                         connected: accounts?.ekklo,
                         onSignIn: () =>
@@ -112,7 +111,7 @@ class WelcomePage extends ConsumerWidget {
                       ),
                       const SizedBox(height: FujinSpace.s5),
                       Text(
-                        l10n.credentialsStayOnPhone,
+                        context.intl.credentialsStayOnPhone,
                         textAlign: TextAlign.center,
                         style: FujinText.inter13Regular.copyWith(
                           color: FujinColorRole.textTertiary,
@@ -130,7 +129,7 @@ class WelcomePage extends ConsumerWidget {
                   ),
                   child: FilledButton(
                     onPressed: proceed,
-                    child: Text(l10n.continueAction),
+                    child: Text(context.intl.continueAction),
                   ),
                 ),
               ],
@@ -159,7 +158,6 @@ class _AccountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: FujinSpace.s5,
@@ -190,7 +188,7 @@ class _AccountCard extends StatelessWidget {
                   ),
                   Text(
                     switch (connected) {
-                      true => l10n.accountSessionActive,
+                      true => context.intl.accountSessionActive,
                       false || null => role,
                     },
                     style: FujinText.inter13Regular.copyWith(
@@ -202,13 +200,13 @@ class _AccountCard extends StatelessWidget {
             ),
             switch (connected) {
               true => StatusPill(
-                label: l10n.accountConnected,
+                label: context.intl.accountConnected,
                 tone: PillTone.validated,
                 icon: Icons.check,
               ),
               false => OutlinedButton(
                 onPressed: onSignIn,
-                child: Text(l10n.signIn),
+                child: Text(context.intl.signIn),
               ),
               null => const SizedBox.shrink(),
             },

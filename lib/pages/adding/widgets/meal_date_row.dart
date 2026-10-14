@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/day_picker_sheet.dart';
 import 'package:fujin/pages/common/fujin_menu.dart';
 import 'package:fujin/pages/common/fujin_menu_button.dart';
@@ -34,7 +34,6 @@ class MealDateRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
       child: Row(
@@ -67,7 +66,7 @@ class MealDateRow extends StatelessWidget {
           ),
           Expanded(
             child: _pill(
-              label: TitleText.capitalized(l10n.addMealDate(date)),
+              label: TitleText.capitalized(context.intl.addMealDate(date)),
               expanded: false,
               onTap: () => unawaited(
                 SheetFrame.show(

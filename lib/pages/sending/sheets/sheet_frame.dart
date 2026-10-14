@@ -3,7 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 
 class SheetFrame extends HookWidget {
   const SheetFrame({
@@ -65,7 +65,6 @@ class SheetFrame extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final query = useTextEditingController(text: initialQuery);
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
@@ -155,7 +154,7 @@ class SheetFrame extends HookWidget {
                           Expanded(
                             child: TextButton(
                               onPressed: onSkip,
-                              child: Text(skipLabel ?? l10n.skip),
+                              child: Text(skipLabel ?? context.intl.skip),
                             ),
                           ),
                       ],
@@ -185,7 +184,7 @@ class _SearchField extends StatelessWidget {
       color: FujinColorRole.textPrimary,
     ),
     decoration: InputDecoration(
-      hintText: AppLocalizations.of(context).searchEkklo,
+      hintText: context.intl.searchEkklo,
       hintStyle: FujinText.inter16Regular.copyWith(
         color: FujinColorRole.textSecondary,
       ),

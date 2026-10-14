@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/goals/goal_status.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/progress_ring.dart';
 
 class NutrientRing extends StatelessWidget {
@@ -23,10 +23,9 @@ class NutrientRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final value = switch (partial) {
-      true => l10n.atLeast(l10n.ringValue(amount)),
-      false => l10n.ringValue(amount),
+      true => context.intl.atLeast(context.intl.ringValue(amount)),
+      false => context.intl.ringValue(amount),
     };
     final status = switch (goal) {
       final goal? => GoalStatus.of(nutrient, amount: amount, goal: goal),
@@ -85,7 +84,7 @@ class NutrientRing extends StatelessWidget {
               ),
               if (goal case final goal?)
                 Text(
-                  l10n.ringGoal(goal),
+                  context.intl.ringGoal(goal),
                   style: FujinText.inter10Regular.copyWith(
                     color: FujinColorRole.textSecondary,
                   ),

@@ -9,6 +9,7 @@ import 'package:fujin/data/recents/recent_food.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/adding/add_search_notifier.dart';
 import 'package:fujin/pages/adding/add_search_state.dart';
 import 'package:fujin/pages/adding/add_text.dart';
@@ -54,7 +55,6 @@ class SearchView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final search = ref.watch(addSearchProvider(scan));
     final notifier = ref.read(addSearchProvider(scan).notifier);
     final recents = search.recents;
@@ -107,18 +107,18 @@ class SearchView extends HookConsumerWidget {
     }
 
     List<Widget> recentList(String trailing) => [
-      AddSectionLabel(label: l10n.addRecents, trailing: trailing),
+      AddSectionLabel(label: context.intl.addRecents, trailing: trailing),
       switch (recents) {
-        [] => _note(l10n.addRecentsEmpty),
+        [] => _note(context.intl.addRecentsEmpty),
         _ => FoodList(
           rows: [
             for (final recent in recents)
               (
                 title: recent.description,
-                detail: AddText.recent(l10n, recent, today: today),
+                detail: AddText.recent(context.intl, recent, today: today),
                 verified: false,
                 energy: switch (recent.kilocalories) {
-                  final energy? => l10n.kilocalories(energy),
+                  final energy? => context.intl.kilocalories(energy),
                   null => null,
                 },
                 onTap: () => unawaited(reopen(recent)),
@@ -138,35 +138,37 @@ class SearchView extends HookConsumerWidget {
         Center(
           child: TextButton(
             onPressed: () => searchText(barcode.barcode),
-            child: Text(l10n.addSearchAsText(barcode.barcode)),
+            child: Text(context.intl.addSearchAsText(barcode.barcode)),
           ),
         ),
       ],
       AddSearchIdle() => [
-        ...recentList(l10n.addRecentsAddedFromFujin),
-        if (recents.isNotEmpty) _note(l10n.addRecentsNote),
+        ...recentList(context.intl.addRecentsAddedFromFujin),
+        if (recents.isNotEmpty) _note(context.intl.addRecentsNote),
       ],
       AddSearchRunning() => [
         AddSectionLabel(
-          label: l10n.addMfpResults,
-          trailing: l10n.addSearching,
+          label: context.intl.addMfpResults,
+          trailing: context.intl.addSearching,
           dot: FujinColorRole.sourceMfp,
         ),
       ],
       AddSearchResults(foods: []) => [
         AddStatePanel(
           icon: Icons.search,
-          title: l10n.addNoResultTitle,
-          detail: l10n.addNoResultDetail,
+          title: context.intl.addNoResultTitle,
+          detail: context.intl.addNoResultDetail,
         ),
-        ..._suggestions(l10n, search, searchText, notifier),
+        ..._suggestions(context.intl, search, searchText, notifier),
       ],
       AddSearchResults(:final foods) => [
         AddSectionLabel(
-          label: l10n.addMfpResults,
+          label: context.intl.addMfpResults,
           trailing: switch (foods.length) {
-            MfpFoods.defaultMaxResults => l10n.addFirstResults(foods.length),
-            final count => l10n.addResultCount(count),
+            MfpFoods.defaultMaxResults => context.intl.addFirstResults(
+              foods.length,
+            ),
+            final count => context.intl.addResultCount(count),
           },
           dot: FujinColorRole.sourceMfp,
         ),
@@ -175,10 +177,10 @@ class SearchView extends HookConsumerWidget {
             for (final food in foods)
               (
                 title: food.description,
-                detail: AddText.result(l10n, food),
+                detail: AddText.result(context.intl, food),
                 verified: food.verified ?? false,
                 energy: switch (AddText.kilocalories(food)) {
-                  final energy? => l10n.kilocalories(energy),
+                  final energy? => context.intl.kilocalories(energy),
                   null => null,
                 },
                 onTap: () => open(food),
@@ -189,26 +191,26 @@ class SearchView extends HookConsumerWidget {
       AddBarcodeMissing(
         result: MfpBarcodeUnresolved(:final description, :final brandName),
       ) =>
-        [_unresolved(l10n, description, brandName, searchText)],
+        [_unresolved(context.intl, description, brandName, searchText)],
       AddBarcodeMissing(:final result) => [
         AddStatePanel(
           icon: Icons.qr_code_2,
-          title: l10n.addBarcodeUnknownTitle,
-          detail: l10n.addBarcodeUnknownDetail(result.barcode),
+          title: context.intl.addBarcodeUnknownTitle,
+          detail: context.intl.addBarcodeUnknownDetail(result.barcode),
         ),
       ],
       AddSearchFailed(problem: ReadProblem.offline) => [
         OfflineCard(onRetry: retry),
-        ...recentList(l10n.addRecentsOnPhone),
+        ...recentList(context.intl.addRecentsOnPhone),
       ],
       AddSearchFailed(problem: ReadProblem.mfpSessionExpired) => [
         AddStatePanel(
           icon: Icons.lock_outline,
           alert: true,
-          title: l10n.addMfpSessionTitle,
-          detail: l10n.addMfpSessionSearchDetail,
+          title: context.intl.addMfpSessionTitle,
+          detail: context.intl.addMfpSessionSearchDetail,
           actionIcon: Icons.login,
-          action: (l10n.mfpReconnect, () => unawaited(signIn())),
+          action: (context.intl.mfpReconnect, () => unawaited(signIn())),
         ),
       ],
       AddSearchFailed(:final problem, :final statusCode) => [
@@ -216,17 +218,20 @@ class SearchView extends HookConsumerWidget {
           icon: Icons.dns_outlined,
           alert: true,
           title: switch (problem) {
-            ReadProblem.mfpUnavailable => l10n.addServerTitle,
+            ReadProblem.mfpUnavailable => context.intl.addServerTitle,
             ReadProblem.offline ||
             ReadProblem.mfpSessionExpired ||
             ReadProblem.ekkloSessionExpired ||
             ReadProblem.ekkloUnavailable ||
-            ReadProblem.unknown => JournalText.problemHeadline(l10n, problem),
+            ReadProblem.unknown => JournalText.problemHeadline(
+              context.intl,
+              problem,
+            ),
           },
-          detail: l10n.addServerDetail,
-          action: (l10n.tryAgain, retry),
+          detail: context.intl.addServerDetail,
+          action: (context.intl.tryAgain, retry),
           note: switch (statusCode) {
-            final code? => l10n.addServerCode(code),
+            final code? => context.intl.addServerCode(code),
             null => null,
           },
         ),
@@ -238,7 +243,7 @@ class SearchView extends HookConsumerWidget {
       children: [
         FlowHeader(
           title: mfpMealName,
-          subtitle: TitleText.capitalized(l10n.journalDay(date)),
+          subtitle: TitleText.capitalized(context.intl.journalDay(date)),
           onBack: () => context.pop(),
         ),
         AddSearchField(
@@ -261,7 +266,7 @@ class SearchView extends HookConsumerWidget {
             alignment: AlignmentDirectional.centerStart,
             child: switch (barcode) {
               final barcode? => AddChip(
-                label: l10n.addBarcodeChip(
+                label: context.intl.addBarcodeChip(
                   AddText.barcodeFormat(barcode.format),
                 ),
                 selected: true,
@@ -273,7 +278,7 @@ class SearchView extends HookConsumerWidget {
                 ),
               ),
               null => AddChip(
-                label: l10n.addVerifiedOnly,
+                label: context.intl.addVerifiedOnly,
                 selected: search.verifiedOnly,
                 icon: switch (search.verifiedOnly) {
                   true => const Icon(Icons.check),
@@ -335,7 +340,7 @@ class SearchView extends HookConsumerWidget {
   );
 
   static Widget _unresolved(
-    AppLocalizations l10n,
+    AppLocalizations intl,
     String description,
     String? brandName,
     ValueChanged<String> searchText,
@@ -343,17 +348,17 @@ class SearchView extends HookConsumerWidget {
     final text = [description, ?brandName].join(_wordSeparator);
     return AddStatePanel(
       icon: Icons.qr_code_2,
-      title: l10n.addBarcodeUnresolvedTitle,
-      detail: l10n.addBarcodeUnresolvedDetail(
-        EntryText.branded(l10n, brandName, description),
+      title: intl.addBarcodeUnresolvedTitle,
+      detail: intl.addBarcodeUnresolvedDetail(
+        EntryText.branded(intl, brandName, description),
       ),
       actionIcon: Icons.search,
-      action: (l10n.addSearchQuoted(text), () => searchText(text)),
+      action: (intl.addSearchQuoted(text), () => searchText(text)),
     );
   }
 
   static List<Widget> _suggestions(
-    AppLocalizations l10n,
+    AppLocalizations intl,
     AddSearchState search,
     ValueChanged<String> searchText,
     AddSearchNotifier notifier,
@@ -364,18 +369,18 @@ class SearchView extends HookConsumerWidget {
       if (shorter.isNotEmpty)
         SuggestionRow(
           icon: Icons.search,
-          label: l10n.addShorten(shorter),
+          label: intl.addShorten(shorter),
           onTap: () => searchText(shorter),
         ),
       if (search.verifiedOnly)
         SuggestionRow(
           icon: Icons.check,
-          label: l10n.addIncludeUnverified,
+          label: intl.addIncludeUnverified,
           onTap: () => unawaited(notifier.verifiedOnly(only: false)),
         ),
     ];
     return [
-      if (rows.isNotEmpty) AddSectionLabel(label: l10n.addTryInstead),
+      if (rows.isNotEmpty) AddSectionLabel(label: intl.addTryInstead),
       ...rows,
     ];
   }

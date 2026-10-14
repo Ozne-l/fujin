@@ -3,6 +3,7 @@ import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/fujin_app.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/splash/splash_view.dart';
 
 class SplashApp extends StatelessWidget {
@@ -12,7 +13,7 @@ class SplashApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-    onGenerateTitle: (context) => AppLocalizations.of(context).appName,
+    onGenerateTitle: (context) => context.intl.appName,
     theme: FujinTheme.light(),
     home: const SplashView(),
     localizationsDelegates: AppLocalizations.localizationsDelegates,

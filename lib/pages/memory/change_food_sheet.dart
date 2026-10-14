@@ -7,7 +7,7 @@ import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/sending/food_words.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/memory/ekklo_food_search_notifier.dart';
 import 'package:fujin/pages/memory/memory_notifier.dart';
 import 'package:fujin/pages/memory/memory_text.dart';
@@ -30,7 +30,6 @@ class _ChangeFoodSheet extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final terms = descriptionTerms(food.mfpDescription);
     final search = ref.watch(ekkloFoodSearchProvider(terms));
     final picked = useState(food.ekkloFoodId);
@@ -45,12 +44,12 @@ class _ChangeFoodSheet extends HookConsumerWidget {
 
     return SheetFrame(
       title: food.mfpDescription,
-      subtitle: l10n.memoryChangeSubtitle,
+      subtitle: context.intl.memoryChangeSubtitle,
       initialQuery: terms,
       onSearch: (text) => unawaited(
         ref.read(ekkloFoodSearchProvider(terms).notifier).search(text),
       ),
-      sectionLabel: l10n.ekkloCandidates,
+      sectionLabel: context.intl.ekkloCandidates,
       body: switch (search) {
         AsyncError(:final error) => [
           SheetMessage(
@@ -58,19 +57,19 @@ class _ChangeFoodSheet extends HookConsumerWidget {
               error,
               ref.read(appEnvironmentProvider),
             )) {
-              SendFailure.network => l10n.searchFailedNetwork,
+              SendFailure.network => context.intl.searchFailedNetwork,
               SendFailure.ekkloSession ||
               SendFailure.mfpSession ||
               SendFailure.refused ||
               SendFailure.blockedInDev ||
-              SendFailure.other => l10n.searchFailedOther,
+              SendFailure.other => context.intl.searchFailedOther,
             },
             color: FujinColorRole.textAlert,
           ),
         ],
         AsyncData(value: []) => [
           SheetMessage(
-            text: l10n.noEkkloResult,
+            text: context.intl.noEkkloResult,
             color: FujinColorRole.textSecondary,
           ),
         ],
@@ -84,7 +83,7 @@ class _ChangeFoodSheet extends HookConsumerWidget {
         ],
         AsyncValue() => [const SheetSearching()],
       },
-      primaryLabel: l10n.associateAndRemember,
+      primaryLabel: context.intl.associateAndRemember,
       onPrimary: switch (selected) {
         final candidate? => () {
           ref.read(memoryProvider.notifier).associate(food, candidate);
@@ -103,7 +102,6 @@ class _Candidate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: FujinSpace.s1,
@@ -122,9 +120,9 @@ class _Candidate extends StatelessWidget {
             ),
           ),
         Text(
-          l10n.memoryEnergyPer(
-            l10n.kilocalories(food.calories),
-            MemoryText.portion(l10n, food),
+          context.intl.memoryEnergyPer(
+            context.intl.kilocalories(food.calories),
+            MemoryText.portion(context.intl, food),
           ),
           style: FujinText.inter12Medium.copyWith(
             color: FujinColorRole.textTertiary,

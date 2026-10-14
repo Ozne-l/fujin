@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/info_banner.dart';
 
 class FoodChangedBanner extends StatelessWidget {
@@ -17,15 +17,14 @@ class FoodChangedBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return InfoBanner(
       icon: const Icon(
         Icons.refresh,
         size: FujinSize.searchIcon,
         color: FujinColorRole.textOnDark,
       ),
-      title: l10n.addFoodChangedTitle,
-      detail: l10n.addFoodChangedDetail(before, after, serving),
+      title: context.intl.addFoodChangedTitle,
+      detail: context.intl.addFoodChangedDetail(before, after, serving),
     );
   }
 }

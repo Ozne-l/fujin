@@ -3,7 +3,7 @@ import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/fujin_weather.dart';
 import 'package:fujin/pages/common/fujin_weather_glyph.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
@@ -24,41 +24,43 @@ class JournalProblemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final headline = JournalText.problemHeadline(l10n, problem);
+    final headline = JournalText.problemHeadline(context.intl, problem);
     final (title, detail) = switch (problem) {
       ReadProblem.mfpSessionExpired => (
-        l10n.disconnected,
-        l10n.mfpSessionExpiredDetail,
+        context.intl.disconnected,
+        context.intl.mfpSessionExpiredDetail,
       ),
       ReadProblem.ekkloSessionExpired => (
-        l10n.disconnected,
-        l10n.ekkloSessionExpiredDetail,
+        context.intl.disconnected,
+        context.intl.ekkloSessionExpiredDetail,
       ),
       ReadProblem.offline => (
-        l10n.offlineTitle,
+        context.intl.offlineTitle,
         switch (readAt) {
-          final readAt? => l10n.offlineSince(readAt),
-          null => l10n.offlineDetail,
+          final readAt? => context.intl.offlineSince(readAt),
+          null => context.intl.offlineDetail,
         },
       ),
       ReadProblem.mfpUnavailable ||
       ReadProblem.ekkloUnavailable ||
-      ReadProblem.unknown => (l10n.unavailableTitle, l10n.readFailedDetail),
+      ReadProblem.unknown => (
+        context.intl.unavailableTitle,
+        context.intl.readFailedDetail,
+      ),
     };
     final (action, onPressed) = switch (problem) {
       ReadProblem.mfpSessionExpired => (
-        l10n.mfpReconnect,
+        context.intl.mfpReconnect,
         () => onSignIn(FujinRoute.mfpSignIn),
       ),
       ReadProblem.ekkloSessionExpired => (
-        l10n.ekkloReconnect,
+        context.intl.ekkloReconnect,
         () => onSignIn(FujinRoute.ekkloSignIn),
       ),
       ReadProblem.offline ||
       ReadProblem.mfpUnavailable ||
       ReadProblem.ekkloUnavailable ||
-      ReadProblem.unknown => (l10n.tryAgain, onRetry),
+      ReadProblem.unknown => (context.intl.tryAgain, onRetry),
     };
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),

@@ -5,6 +5,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/grams_input.dart';
 import 'package:fujin/pages/sending/entry_choices.dart';
 import 'package:fujin/pages/sending/send_text.dart';
@@ -37,7 +38,6 @@ class _WeightSheet extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final entry = planned.entry;
     final unit = entry.servingSize.unit;
     final weight = useTextEditingController(
@@ -51,11 +51,14 @@ class _WeightSheet extends HookWidget {
     final navigator = Navigator.of(context);
 
     return SheetFrame(
-      title: l10n.weightQuestion(unit),
+      title: context.intl.weightQuestion(unit),
       titleStyle: FujinText.hina26,
       subtitle: switch (entry.food.brandName?.trim()) {
         null || '' => entry.food.description,
-        final brand => l10n.weightFoodBrand(entry.food.description, brand),
+        final brand => context.intl.weightFoodBrand(
+          entry.food.description,
+          brand,
+        ),
       },
       body: [
         Column(
@@ -68,7 +71,7 @@ class _WeightSheet extends HookWidget {
               children: [
                 SheetFrame.inset(
                   Text(
-                    l10n.weightLabel(unit),
+                    context.intl.weightLabel(unit),
                     style: FujinText.inter13Medium.copyWith(
                       color: FujinColorRole.textPrimary,
                     ),
@@ -86,13 +89,13 @@ class _WeightSheet extends HookWidget {
                     color: FujinColorRole.textPrimary,
                   ),
                   decoration: InputDecoration(
-                    suffixText: l10n.gramsSuffix,
+                    suffixText: context.intl.gramsSuffix,
                     suffixStyle: FujinText.inter15Regular.copyWith(
                       color: FujinColorRole.textSecondary,
                     ),
                   ),
                 ),
-                if (_estimate(l10n) case final estimate?)
+                if (_estimate(context.intl) case final estimate?)
                   SheetFrame.inset(
                     Text(
                       estimate,
@@ -114,16 +117,16 @@ class _WeightSheet extends HookWidget {
                 spacing: FujinSpace.s1,
                 children: [
                   Text(
-                    l10n.inEkkloTitle,
+                    context.intl.inEkkloTitle,
                     style: FujinText.inter12Medium.copyWith(
                       color: FujinColorRole.textSecondary,
                     ),
                   ),
                   Text(
                     switch (grams) {
-                      final grams? => l10n.weightInEkklo(
+                      final grams? => context.intl.weightInEkklo(
                         choice.ekkloFoodName,
-                        SendText.grams(l10n, planned.units * grams),
+                        SendText.grams(context.intl, planned.units * grams),
                       ),
                       null => choice.ekkloFoodName,
                     },
@@ -144,7 +147,10 @@ class _WeightSheet extends HookWidget {
                     color: FujinColorRole.textGold,
                   ),
                   Expanded(
-                    child: Text(l10n.weightRemembered, style: _rememberedStyle),
+                    child: Text(
+                      context.intl.weightRemembered,
+                      style: _rememberedStyle,
+                    ),
                   ),
                 ],
               ),
@@ -152,7 +158,7 @@ class _WeightSheet extends HookWidget {
           ],
         ),
       ],
-      primaryLabel: l10n.validate,
+      primaryLabel: context.intl.validate,
       onPrimary: switch (grams) {
         final grams? => () {
           choices.weigh(grams);
@@ -167,12 +173,12 @@ class _WeightSheet extends HookWidget {
     color: FujinColorRole.textGold,
   );
 
-  String? _estimate(AppLocalizations l10n) => switch ((
+  String? _estimate(AppLocalizations intl) => switch ((
     planned.entry.nutrients.energy?.kilocalories,
     planned.units,
   )) {
-    (final kilocalories?, final units) when units > 0 => l10n.weightEstimate(
-      l10n.kilocalories(kilocalories / units),
+    (final kilocalories?, final units) when units > 0 => intl.weightEstimate(
+      intl.kilocalories(kilocalories / units),
       planned.entry.servingSize.unit,
     ),
     _ => null,

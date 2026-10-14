@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/sending/send_report.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/fujin_weather.dart';
 import 'package:fujin/pages/common/fujin_weather_glyph.dart';
 import 'package:fujin/pages/common/gold_separator.dart';
@@ -49,7 +49,6 @@ class SentFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Stack(
       children: [
         const PositionedDirectional(
@@ -78,7 +77,7 @@ class SentFrame extends StatelessWidget {
                   ),
                   const SizedBox(height: FujinSpace.s4),
                   Text(
-                    l10n.sentTitle,
+                    context.intl.sentTitle,
                     textAlign: TextAlign.center,
                     style: FujinText.hina44.copyWith(
                       color: FujinColorRole.textLink,
@@ -86,7 +85,7 @@ class SentFrame extends StatelessWidget {
                   ),
                   const SizedBox(height: FujinSpace.s5),
                   Text(
-                    l10n.sentDetail(report.sent),
+                    context.intl.sentDetail(report.sent),
                     textAlign: TextAlign.center,
                     style: FujinText.inter15Medium.copyWith(
                       color: FujinColorRole.textPrimary,
@@ -114,7 +113,7 @@ class SentFrame extends StatelessWidget {
             SendFooter(
               child: FilledButton(
                 onPressed: context.pop,
-                child: Text(l10n.backToJournal),
+                child: Text(context.intl.backToJournal),
               ),
             ),
           ],

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 
 class AddSearchField extends StatelessWidget {
   const AddSearchField({
@@ -30,7 +30,7 @@ class AddSearchField extends StatelessWidget {
         color: FujinColorRole.textPrimary,
       ),
       decoration: InputDecoration(
-        hintText: AppLocalizations.of(context).addSearchHint,
+        hintText: context.intl.addSearchHint,
         hintStyle: FujinText.inter16Regular.copyWith(
           color: FujinColorRole.textSecondary,
         ),

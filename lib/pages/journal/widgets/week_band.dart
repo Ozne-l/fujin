@@ -13,7 +13,7 @@ import 'package:fujin/domain/goals/day_goal_state.dart';
 import 'package:fujin/domain/journal/calendar_week.dart';
 import 'package:fujin/domain/journal/fetch.dart';
 import 'package:fujin/domain/journal/logged_kilocalories.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
 import 'package:fujin/pages/journal/widgets/day_ring.dart';
 import 'package:fujin/pages/journal/widgets/week_band_hint.dart';
@@ -44,7 +44,6 @@ class WeekBand extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final thisWeek = CalendarWeek.mondayOf(today);
     final selectedPage = CalendarWeek.weeksBetween(selected, today);
     final controller = usePageController(
@@ -116,10 +115,10 @@ class WeekBand extends HookConsumerWidget {
 
     return Semantics(
       customSemanticsActions: {
-        CustomSemanticsAction(label: l10n.previousWeek): () =>
+        CustomSemanticsAction(label: context.intl.previousWeek): () =>
             selectWeek(shown.value + 1),
         if (shown.value > 0)
-          CustomSemanticsAction(label: l10n.nextWeek): () =>
+          CustomSemanticsAction(label: context.intl.nextWeek): () =>
               selectWeek(shown.value - 1),
       },
       child: OverlayPortal(
@@ -272,7 +271,7 @@ class _Day extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final intl = context.intl;
     return InkResponse(
       onTap: onTap,
       radius: FujinSize.touchTarget / 2,
@@ -281,7 +280,7 @@ class _Day extends StatelessWidget {
         spacing: FujinSpace.s2,
         children: [
           Text(
-            l10n.weekdayShort(day),
+            intl.weekdayShort(day),
             style: switch (selected) {
               true => FujinText.inter11Semibold.copyWith(
                 color: FujinColorRole.textPrimary,
@@ -292,7 +291,7 @@ class _Day extends StatelessWidget {
             },
           ),
           DayRing(
-            date: l10n.dayOfMonth(day),
+            date: intl.dayOfMonth(day),
             state: state,
             progress: progress,
             selected: selected,

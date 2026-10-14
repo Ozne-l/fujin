@@ -7,6 +7,7 @@ import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/review_reason.dart';
 import 'package:fujin/domain/sending/send_report.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
@@ -29,14 +30,13 @@ class AutomaticSentView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final choices = ref.watch(keptChoicesProvider(report.date));
     final note = FujinText.inter12Regular.copyWith(
       color: FujinColorRole.textSecondary,
     );
     return SentFrame(
       report: report,
-      note: l10n.automaticSentNote,
+      note: context.intl.automaticSentNote,
       children: [
         if (report.unattended case final unattended
             when unattended.isNotEmpty) ...[
@@ -44,7 +44,7 @@ class AutomaticSentView extends ConsumerWidget {
             top: FujinSpace.s4,
             bottom: FujinSpace.s2,
             child: Text(
-              l10n.unattendedChoices(unattended.length),
+              context.intl.unattendedChoices(unattended.length),
               style: FujinText.inter12Medium.copyWith(
                 color: FujinColorRole.textSecondary,
               ),
@@ -61,7 +61,7 @@ class AutomaticSentView extends ConsumerWidget {
           ]),
           TextInset(
             top: FujinSpace.s4,
-            child: Text(l10n.unattendedNote, style: note),
+            child: Text(context.intl.unattendedNote, style: note),
           ),
         ],
       ],
@@ -83,7 +83,6 @@ class _ChoiceRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: FujinSpace.s3),
       child: Row(
@@ -102,8 +101,8 @@ class _ChoiceRow extends ConsumerWidget {
                 ),
                 Text(
                   switch (kept) {
-                    final kept? => SendText.kept(l10n, kept),
-                    null => SendText.unattended(l10n, sent),
+                    final kept? => SendText.kept(context.intl, kept),
+                    null => SendText.unattended(context.intl, sent),
                   },
                   style: FujinText.inter13Regular.copyWith(
                     color: FujinColorRole.textSecondary,
@@ -114,7 +113,7 @@ class _ChoiceRow extends ConsumerWidget {
           ),
           switch (kept) {
             _? => StatusPill(
-              label: l10n.pillRemembered,
+              label: context.intl.pillRemembered,
               tone: PillTone.validated,
             ),
             null => Semantics(
@@ -126,7 +125,7 @@ class _ChoiceRow extends ConsumerWidget {
                   false => () => _review(context, ref),
                 },
                 child: Text(
-                  l10n.review,
+                  context.intl.review,
                   style: FujinText.inter15Medium.copyWith(
                     color: switch (keeping) {
                       true => FujinColorRole.textDisabled,
@@ -146,17 +145,17 @@ class _ChoiceRow extends ConsumerWidget {
     final kept = ref.read(keptChoicesProvider(sent.entry.date).notifier);
     final messenger = ScaffoldMessenger.of(context);
     final router = GoRouter.of(context);
-    final l10n = AppLocalizations.of(context);
+    final intl = context.intl;
 
     void keep(PlannedEntry planned) => unawaited(
       kept.keep(planned).then((failure) {
         if (failure case final failure?) {
           messenger.showFujinSnackBar(
             SnackBar(
-              content: Text(_failed(l10n, failure)),
+              content: Text(_failed(intl, failure)),
               action: switch (failure) {
                 SendFailure.ekkloSession => SnackBarAction(
-                  label: l10n.ekkloReconnect,
+                  label: intl.ekkloReconnect,
                   onPressed: () =>
                       unawaited(router.push<bool>(FujinRoute.ekkloSignIn.path)),
                 ),
@@ -199,14 +198,14 @@ class _ChoiceRow extends ConsumerWidget {
     });
   }
 
-  String _failed(AppLocalizations l10n, SendFailure failure) =>
+  String _failed(AppLocalizations intl, SendFailure failure) =>
       switch (failure) {
-        SendFailure.network => l10n.offlineHeadline,
-        SendFailure.ekkloSession => l10n.ekkloSessionExpired,
-        SendFailure.mfpSession => l10n.mfpSessionExpired,
-        SendFailure.blockedInDev => l10n.interruptedDev(
+        SendFailure.network => intl.offlineHeadline,
+        SendFailure.ekkloSession => intl.ekkloSessionExpired,
+        SendFailure.mfpSession => intl.mfpSessionExpired,
+        SendFailure.blockedInDev => intl.interruptedDev(
           sent.entry.food.description,
         ),
-        SendFailure.refused || SendFailure.other => l10n.keepFailed,
+        SendFailure.refused || SendFailure.other => intl.keepFailed,
       };
 }

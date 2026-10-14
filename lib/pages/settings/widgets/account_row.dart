@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/source_dot.dart';
 
 class AccountRow extends StatelessWidget {
@@ -18,7 +18,6 @@ class AccountRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsetsDirectional.fromSTEB(
         FujinSpace.s5,
@@ -50,7 +49,7 @@ class AccountRow extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        l10n.settingsAccountActive,
+                        context.intl.settingsAccountActive,
                         style: FujinText.inter13Regular.copyWith(
                           color: FujinColorRole.textSecondary,
                         ),
@@ -69,7 +68,7 @@ class AccountRow extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: FujinSpace.s3),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ).copyWith(overlayColor: FujinTheme.pressedOverlay),
-            child: Text(l10n.signOut),
+            child: Text(context.intl.signOut),
           ),
         ],
       ),

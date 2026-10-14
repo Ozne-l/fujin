@@ -5,6 +5,7 @@ import 'package:fujin/domain/sending/own_copy_renewal.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/breeze_indicator.dart';
 import 'package:fujin/pages/common/breeze_streaks.dart';
 import 'package:fujin/pages/common/entry_text.dart';
@@ -32,31 +33,30 @@ class PlanRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final (name, detail, detailColor, trailing) = switch (_row) {
       _Planned(:final planned) => (
         planned.entry.food.description,
-        SendText.target(l10n, planned),
+        SendText.target(context.intl, planned),
         FujinColorRole.textSecondary,
-        _plannedPill(l10n, planned),
+        _plannedPill(context.intl, planned),
       ),
       _Pending(:final entry, searching: true) => (
         entry.food.description,
-        l10n.rowSearching,
+        context.intl.rowSearching,
         FujinColor.sora,
         const BreezeIndicator(streaks: BreezeStreaks.searching),
       ),
       _Pending(:final entry, searching: false) => (
         entry.food.description,
-        l10n.rowWaiting,
+        context.intl.rowWaiting,
         FujinColorRole.textTertiary,
         null,
       ),
       _InEkkloRow(:final entry, :final link) => (
         entry.food.description,
-        EntryText.linkedServing(l10n, link),
+        EntryText.linkedServing(context.intl, link),
         FujinColorRole.textSecondary,
-        StatusPill(label: l10n.statusInEkklo, tone: PillTone.validated),
+        StatusPill(label: context.intl.statusInEkklo, tone: PillTone.validated),
       ),
     };
     return Row(
@@ -89,25 +89,25 @@ class PlanRow extends StatelessWidget {
     );
   }
 
-  static Widget _plannedPill(AppLocalizations l10n, PlannedEntry planned) =>
+  static Widget _plannedPill(AppLocalizations intl, PlannedEntry planned) =>
       switch ((planned.reviewed, planned.replacing)) {
         (false, null) => StatusPill(
           label: switch (planned.choice) {
-            SendAsOwnCopy(renewal: OwnCopyRenewal.newUnit) => l10n.pillNewUnit,
+            SendAsOwnCopy(renewal: OwnCopyRenewal.newUnit) => intl.pillNewUnit,
             SendAsOwnCopy(renewal: OwnCopyRenewal.foodChanged) =>
-              l10n.pillFoodChanged,
+              intl.pillFoodChanged,
             SendAsOwnCopy(renewal: null) ||
             SendToEkkloFood() ||
-            SkipEntry() => l10n.pillRemembered,
+            SkipEntry() => intl.pillRemembered,
           },
           tone: PillTone.attention,
         ),
         (false, _) => StatusPill(
-          label: l10n.statusToUpdate,
+          label: intl.statusToUpdate,
           tone: PillTone.info,
           icon: Icons.refresh,
         ),
-        (true, _) => switch (SendText.reason(l10n, planned.reason)) {
+        (true, _) => switch (SendText.reason(intl, planned.reason)) {
           (final label, final tone) => StatusPill(label: label, tone: tone),
         },
       };

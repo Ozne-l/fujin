@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/sending/sheets/sheet_frame.dart';
 import 'package:fujin/pages/settings/widgets/alert_pictogram.dart';
 
@@ -27,7 +27,7 @@ Future<void> showConfirmSheet(
         onConfirm();
       },
       onSkip: navigator.pop,
-      skipLabel: AppLocalizations.of(context).cancel,
+      skipLabel: context.intl.cancel,
     );
   },
 );

@@ -3,7 +3,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/adding/ekklo_side.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/adding/add_text.dart';
 import 'package:fujin/pages/common/breeze_indicator.dart';
 import 'package:fujin/pages/common/breeze_streaks.dart';
@@ -27,7 +27,6 @@ class EkkloSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final side = switch (planned) {
       final planned? => EkkloSide.of(planned),
       null => null,
@@ -67,19 +66,19 @@ class EkkloSummaryCard extends StatelessWidget {
       ),
     };
     final (title, detail) = switch ((planned, problem)) {
-      (final planned?, _) => AddText.ekkloSummary(l10n, planned),
+      (final planned?, _) => AddText.ekkloSummary(context.intl, planned),
       (null, final problem?) => (
-        JournalText.problemHeadline(l10n, problem),
+        JournalText.problemHeadline(context.intl, problem),
         switch (problem) {
-          ReadProblem.ekkloSessionExpired => l10n.ekkloReconnect,
+          ReadProblem.ekkloSessionExpired => context.intl.ekkloReconnect,
           ReadProblem.offline ||
           ReadProblem.mfpSessionExpired ||
           ReadProblem.mfpUnavailable ||
           ReadProblem.ekkloUnavailable ||
-          ReadProblem.unknown => l10n.tryAgain,
+          ReadProblem.unknown => context.intl.tryAgain,
         },
       ),
-      (null, null) => (l10n.rowSearching, ''),
+      (null, null) => (context.intl.rowSearching, ''),
     };
     final detailColor = switch (side) {
       EkkloSide.remembered ||

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/adding/widgets/side_state.dart';
 import 'package:fujin/pages/common/fujin_spinner.dart';
 import 'package:fujin/pages/common/progress_ring.dart';
@@ -22,13 +22,27 @@ class SideRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final (status, color) = switch (state) {
-      SideState.waiting => (l10n.rowWaiting, FujinColorRole.textSecondary),
-      SideState.writing => (l10n.addWriting, FujinColorRole.textPrimary),
-      SideState.written => (l10n.addWrittenIn(meal), FujinColorRole.textLink),
-      SideState.failed => (l10n.addNotWritten, FujinColorRole.textAlert),
-      SideState.notSent => (l10n.addNotSent, FujinColorRole.textSecondary),
+      SideState.waiting => (
+        context.intl.rowWaiting,
+        FujinColorRole.textSecondary,
+      ),
+      SideState.writing => (
+        context.intl.addWriting,
+        FujinColorRole.textPrimary,
+      ),
+      SideState.written => (
+        context.intl.addWrittenIn(meal),
+        FujinColorRole.textLink,
+      ),
+      SideState.failed => (
+        context.intl.addNotWritten,
+        FujinColorRole.textAlert,
+      ),
+      SideState.notSent => (
+        context.intl.addNotSent,
+        FujinColorRole.textSecondary,
+      ),
     };
     return SizedBox(
       height: FujinSize.touchTarget + FujinSpace.s2,

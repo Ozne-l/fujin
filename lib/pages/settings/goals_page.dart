@@ -4,7 +4,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/goals/goal_amounts.dart';
 import 'package:fujin/domain/goals/macro_energy.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
 import 'package:fujin/pages/common/goals_text.dart';
 import 'package:fujin/pages/common/grams_input.dart';
@@ -19,7 +19,6 @@ class GoalsPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final stored = ref.watch(goalsProvider);
     final fields = {
       for (final nutrient in Nutrient.values)
@@ -55,7 +54,7 @@ class GoalsPage extends HookConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TopBar(title: l10n.goalsTitle),
+            TopBar(title: context.intl.goalsTitle),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(
@@ -68,7 +67,7 @@ class GoalsPage extends HookConsumerWidget {
                   TextInset(
                     bottom: FujinSpace.s2,
                     child: Text(
-                      l10n.goalsHeading,
+                      context.intl.goalsHeading,
                       style: FujinText.hina30.copyWith(
                         color: FujinColorRole.textPrimary,
                       ),
@@ -76,7 +75,7 @@ class GoalsPage extends HookConsumerWidget {
                   ),
                   TextInset(
                     child: Text(
-                      l10n.goalsSubtitle,
+                      context.intl.goalsSubtitle,
                       style: FujinText.inter15Regular.copyWith(
                         color: FujinColorRole.textSecondary,
                       ),
@@ -86,7 +85,7 @@ class GoalsPage extends HookConsumerWidget {
                     top: FujinSpace.s6,
                     bottom: FujinSpace.s2,
                     child: Text(
-                      l10n.goalsSection,
+                      context.intl.goalsSection,
                       style: FujinText.inter12Medium.copyWith(
                         color: FujinColorRole.textSecondary,
                       ),
@@ -99,9 +98,9 @@ class GoalsPage extends HookConsumerWidget {
                       for (final MapEntry(key: nutrient, value: field)
                           in fields.entries)
                         GoalField(
-                          label: GoalsText.label(l10n, nutrient),
-                          unit: GoalsText.unit(l10n, nutrient),
-                          hint: GoalsText.hint(l10n, nutrient),
+                          label: GoalsText.label(context.intl, nutrient),
+                          unit: GoalsText.unit(context.intl, nutrient),
+                          hint: GoalsText.hint(context.intl, nutrient),
                           controller: field,
                           onChanged: (_) => saved.value = false,
                         ),
@@ -111,7 +110,7 @@ class GoalsPage extends HookConsumerWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: FujinSpace.s3),
                       child: switch (GoalsText.energyNote(
-                        l10n,
+                        context.intl,
                         energy,
                         amounts[Nutrient.kilocalories],
                       )) {
@@ -140,8 +139,8 @@ class GoalsPage extends HookConsumerWidget {
                 children: [
                   if (saved.value)
                     NoteCard(
-                      title: l10n.goalsSavedTitle,
-                      detail: l10n.goalsSavedDetail,
+                      title: context.intl.goalsSavedTitle,
+                      detail: context.intl.goalsSavedDetail,
                       background: FujinColorRole.backgroundSuccess,
                       titleColor: FujinColorRole.textLink,
                       detailColor: FujinColorRole.textLink,
@@ -149,8 +148,8 @@ class GoalsPage extends HookConsumerWidget {
                   FilledButton(
                     onPressed: save,
                     child: Text(switch (saved.value) {
-                      true => l10n.saved,
-                      false => l10n.save,
+                      true => context.intl.saved,
+                      false => context.intl.save,
                     }),
                   ),
                 ],

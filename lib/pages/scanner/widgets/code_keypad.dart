@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 
 class CodeKeypad extends StatelessWidget {
   const CodeKeypad({required this.onDigit, required this.onErase, super.key});
@@ -51,7 +51,7 @@ class CodeKeypad extends StatelessWidget {
                   Expanded(
                     child: _Key(
                       onTap: onErase,
-                      label: AppLocalizations.of(context).scannerErase,
+                      label: context.intl.scannerErase,
                       child: const Icon(
                         Icons.backspace_outlined,
                         size: FujinSize.icon,

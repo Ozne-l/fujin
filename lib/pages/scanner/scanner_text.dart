@@ -7,10 +7,10 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 abstract final class ScannerText {
   static const _referenceGrams = 100;
 
-  static String foodLine(AppLocalizations l10n, MfpFood food) =>
-      EntryText.branded(l10n, food.brandName, _energy(l10n, food));
+  static String foodLine(AppLocalizations intl, MfpFood food) =>
+      EntryText.branded(intl, food.brandName, _energy(intl, food));
 
-  static String _energy(AppLocalizations l10n, MfpFood food) => switch ((
+  static String _energy(AppLocalizations intl, MfpFood food) => switch ((
     food.nutrients?.energy?.kilocalories,
     food.servingSizes
         .where((serving) => isGramUnit(serving.unit) && serving.value > 0)
@@ -18,17 +18,17 @@ abstract final class ScannerText {
     food.servingSizes.firstOrNull,
     AddText.kilocalories(food),
   )) {
-    (final energy?, final grams?, _, _) => l10n.scannerPer100Grams(
+    (final energy?, final grams?, _, _) => intl.scannerPer100Grams(
       energy *
           (grams.nutritionMultiplier ?? AddText.baseMultiplier) /
           grams.value *
           _referenceGrams,
     ),
-    (_, null, final first?, final kilocalories?) => l10n.scannerServingEnergy(
-      AddText.serving(l10n, first),
-      l10n.kilocalories(kilocalories),
+    (_, null, final first?, final kilocalories?) => intl.scannerServingEnergy(
+      AddText.serving(intl, first),
+      intl.kilocalories(kilocalories),
     ),
-    (_, _, final first?, _) => AddText.serving(l10n, first),
+    (_, _, final first?, _) => AddText.serving(intl, first),
     (_, _, null, _) => '',
   };
 }

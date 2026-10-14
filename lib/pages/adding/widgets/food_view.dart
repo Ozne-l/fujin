@@ -15,7 +15,7 @@ import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/domain/sending/unit_weight.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/adding/add_form_notifier.dart';
 import 'package:fujin/pages/adding/add_text.dart';
 import 'package:fujin/pages/adding/add_write_notifier.dart';
@@ -64,7 +64,6 @@ class FoodView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final formProvider = addFormProvider(initial);
     final form = ref.watch(formProvider);
     final notifier = ref.read(formProvider.notifier);
@@ -146,7 +145,7 @@ class FoodView extends HookConsumerWidget {
           if (context.mounted) {
             ScaffoldMessenger.of(
               context,
-            ).showProblem(l10n, ReadProblem.of(error));
+            ).showProblem(context.intl, ReadProblem.of(error));
           }
         case Undone() || null:
           break;
@@ -190,17 +189,17 @@ class FoodView extends HookConsumerWidget {
     };
     final (primaryLabel, onPrimary) = switch ((side, before)) {
       (EkkloSide.toChoose, _) => (
-        l10n.addChooseEkkloFood,
+        context.intl.addChooseEkkloFood,
         () => unawaited(chooseEkklo()),
       ),
-      (_, _?) => (l10n.addConfirmAndAdd, () => unawaited(add())),
-      (_, null) => (l10n.addToBoth, () => unawaited(add())),
+      (_, _?) => (context.intl.addConfirmAndAdd, () => unawaited(add())),
+      (_, null) => (context.intl.addToBoth, () => unawaited(add())),
     };
     final grams = switch (entryGrams(entry)) {
-      final grams? => SendText.grams(l10n, grams),
-      null => EntryText.serving(l10n, entry),
+      final grams? => SendText.grams(context.intl, grams),
+      null => EntryText.serving(context.intl, entry),
     };
-    final dayTitle = TitleText.capitalized(l10n.journalDay(draft.date));
+    final dayTitle = TitleText.capitalized(context.intl.journalDay(draft.date));
 
     return PopScope(
       canPop: false,
@@ -213,7 +212,7 @@ class FoodView extends HookConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               FlowHeader(
-                title: l10n.addToMeal(draft.mfpMealName),
+                title: context.intl.addToMeal(draft.mfpMealName),
                 subtitle: dayTitle,
                 onBack: back,
               ),
@@ -225,13 +224,16 @@ class FoodView extends HookConsumerWidget {
                       FoodChangedBanner(
                         before: _perServing(before),
                         after: _perServing(draft),
-                        serving: AddText.serving(l10n, draft.servingSize),
+                        serving: AddText.serving(
+                          context.intl,
+                          draft.servingSize,
+                        ),
                       ),
                       const SizedBox(height: FujinSpace.s3),
                     ],
                     FoodIdentity(food: draft.food, barcode: barcode),
                     const SizedBox(height: FujinSpace.s4),
-                    AddSectionLabel(label: l10n.addServingSize),
+                    AddSectionLabel(label: context.intl.addServingSize),
                     const SizedBox(height: FujinSpace.s2),
                     ServingField(
                       servings: draft.food.servingSizes,
@@ -239,7 +241,7 @@ class FoodView extends HookConsumerWidget {
                       onSelected: notifier.serving,
                     ),
                     const SizedBox(height: FujinSpace.s4),
-                    AddSectionLabel(label: l10n.addServings),
+                    AddSectionLabel(label: context.intl.addServings),
                     const SizedBox(height: FujinSpace.s2),
                     Padding(
                       padding: const EdgeInsets.symmetric(
@@ -260,7 +262,7 @@ class FoodView extends HookConsumerWidget {
                     ),
                     const SizedBox(height: FujinSpace.s3),
                     NutritionCard(
-                      servingLine: AddText.forServing(l10n, draft),
+                      servingLine: AddText.forServing(context.intl, draft),
                       food: food,
                       day: day,
                       goals: goals,
@@ -271,7 +273,7 @@ class FoodView extends HookConsumerWidget {
                       onMyDay: () => unawaited(
                         showMyDaySheet(
                           context,
-                          subtitle: l10n.addDaySubtitle(
+                          subtitle: context.intl.addDaySubtitle(
                             dayTitle,
                             draft.food.description,
                             grams,
@@ -292,7 +294,7 @@ class FoodView extends HookConsumerWidget {
                     ),
                     const SizedBox(height: FujinSpace.s3),
                     Text(
-                      l10n.addWriteOrder,
+                      context.intl.addWriteOrder,
                       textAlign: TextAlign.center,
                       style: FujinText.inter12Regular.copyWith(
                         color: FujinColorRole.textSecondary,

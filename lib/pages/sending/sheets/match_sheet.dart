@@ -7,6 +7,7 @@ import 'package:fujin/domain/sending/ekklo_candidate.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/source_dot.dart';
 import 'package:fujin/pages/sending/ekklo_search_notifier.dart';
@@ -52,7 +53,6 @@ class _MatchSheet extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final entry = planned.entry;
     final search = ref.watch(ekkloSearchProvider(planned));
     final picked = useState<String?>(null);
@@ -74,25 +74,25 @@ class _MatchSheet extends HookConsumerWidget {
 
     return SheetFrame(
       title: entry.food.description,
-      subtitle: EntryText.brandedServing(l10n, entry),
+      subtitle: EntryText.brandedServing(context.intl, entry),
       lead: [_MfpReference(planned: planned)],
       initialQuery: search.query,
       onSearch: (text) => unawaited(
         ref.read(ekkloSearchProvider(planned).notifier).search(text),
       ),
-      sectionLabel: l10n.ekkloCandidates,
+      sectionLabel: context.intl.ekkloCandidates,
       body: [
-        ..._candidates(l10n, search, selected, picked),
+        ..._candidates(context.intl, search, selected, picked),
         SheetFrame.inset(
           Text(
-            l10n.toleranceNote,
+            context.intl.toleranceNote,
             style: FujinText.inter12Regular.copyWith(
               color: FujinColorRole.textTertiary,
             ),
           ),
         ),
       ],
-      primaryLabel: l10n.associateAndRemember,
+      primaryLabel: context.intl.associateAndRemember,
       onPrimary: switch (selected) {
         final candidate? => () {
           choices.choose(candidate);
@@ -100,7 +100,7 @@ class _MatchSheet extends HookConsumerWidget {
         },
         null => null,
       },
-      secondaryLabel: l10n.ownCopy,
+      secondaryLabel: context.intl.ownCopy,
       onSecondary: () {
         navigator.pop();
         unawaited(
@@ -129,7 +129,7 @@ class _MatchSheet extends HookConsumerWidget {
       results.where((candidate) => candidate.food.id == id).firstOrNull;
 
   static List<Widget> _candidates(
-    AppLocalizations l10n,
+    AppLocalizations intl,
     EkkloSearchState search,
     EkkloCandidate? selected,
     ValueNotifier<String?> picked,
@@ -137,12 +137,12 @@ class _MatchSheet extends HookConsumerWidget {
     EkkloSearchFailed(:final failure) => [
       SheetMessage(
         text: switch (failure) {
-          SendFailure.network => l10n.searchFailedNetwork,
+          SendFailure.network => intl.searchFailedNetwork,
           SendFailure.ekkloSession ||
           SendFailure.mfpSession ||
           SendFailure.refused ||
           SendFailure.blockedInDev ||
-          SendFailure.other => l10n.searchFailedOther,
+          SendFailure.other => intl.searchFailedOther,
         },
         color: FujinColorRole.textAlert,
       ),
@@ -150,7 +150,7 @@ class _MatchSheet extends HookConsumerWidget {
     EkkloSearchRunning() => [const SheetSearching()],
     EkkloSearchDone(results: []) => [
       SheetMessage(
-        text: l10n.noEkkloResult,
+        text: intl.noEkkloResult,
         color: FujinColorRole.textSecondary,
       ),
     ],
@@ -173,7 +173,6 @@ class _MfpReference extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(FujinSpace.s3),
       decoration: BoxDecoration(
@@ -190,14 +189,14 @@ class _MfpReference extends StatelessWidget {
               const SourceDot(color: FujinColorRole.sourceMfp),
               Expanded(
                 child: Text(
-                  l10n.sourceMyFitnessPal,
+                  context.intl.sourceMyFitnessPal,
                   style: FujinText.inter12Medium.copyWith(
                     color: FujinColorRole.textSecondary,
                   ),
                 ),
               ),
               Text(
-                EntryText.energy(l10n, planned.entry),
+                EntryText.energy(context.intl, planned.entry),
                 style: FujinText.inter15Semibold.copyWith(
                   color: FujinColorRole.textPrimary,
                 ),
@@ -205,7 +204,7 @@ class _MfpReference extends StatelessWidget {
             ],
           ),
           Text(
-            EntryText.macros(l10n, planned.entry.nutrients),
+            EntryText.macros(context.intl, planned.entry.nutrients),
             style: FujinText.inter12Medium.copyWith(
               color: FujinColorRole.textTertiary,
             ),
@@ -223,7 +222,6 @@ class _CandidateDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: FujinSpace.s1,
@@ -244,7 +242,7 @@ class _CandidateDetail extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  SendText.grams(l10n, candidate.grams),
+                  SendText.grams(context.intl, candidate.grams),
                   style: FujinText.inter13Regular.copyWith(
                     color: FujinColorRole.textSecondary,
                   ),
@@ -252,7 +250,7 @@ class _CandidateDetail extends StatelessWidget {
               ],
             ),
             Text(
-              CandidateCard.origin(l10n, candidate),
+              CandidateCard.origin(context.intl, candidate),
               style: FujinText.inter12Regular.copyWith(
                 color: FujinColorRole.textSecondary,
               ),

@@ -6,7 +6,7 @@ import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/fujin_icon_button.dart';
 import 'package:fujin/pages/common/gold_volute.dart';
 import 'package:fujin/pages/common/grams_input.dart';
@@ -26,7 +26,6 @@ class MemoryFoodPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final memory = ref.watch(memoryProvider);
     final notifier = ref.read(memoryProvider.notifier);
     final food = switch (mfpUnit) {
@@ -72,12 +71,14 @@ class MemoryFoodPage extends HookConsumerWidget {
             ),
             _SourceCard(
               dot: FujinColorRole.sourceMfp,
-              source: l10n.sourceMyFitnessPal,
+              source: context.intl.sourceMyFitnessPal,
               name: food.mfpDescription,
               lines: [
                 if (servedIn.isNotEmpty)
                   _Line(
-                    l10n.memoryServedIn(MemoryText.quotedUnits(l10n, servedIn)),
+                    context.intl.memoryServedIn(
+                      MemoryText.quotedUnits(context.intl, servedIn),
+                    ),
                     FujinText.inter13Regular.copyWith(
                       color: FujinColorRole.textSecondary,
                     ),
@@ -98,7 +99,7 @@ class MemoryFoodPage extends HookConsumerWidget {
                 top: FujinSpace.s5,
                 bottom: FujinSpace.s2,
                 child: Text(
-                  l10n.memoryUnitWeights,
+                  context.intl.memoryUnitWeights,
                   style: FujinText.inter12Medium.copyWith(
                     color: FujinColorRole.textSecondary,
                   ),
@@ -124,11 +125,11 @@ class MemoryFoodPage extends HookConsumerWidget {
                   context.pop();
                   notifier.forget(food);
                 },
-                child: Text(l10n.memoryForget),
+                child: Text(context.intl.memoryForget),
               ),
             ),
             Text(
-              l10n.memoryForgetNote,
+              context.intl.memoryForgetNote,
               textAlign: TextAlign.center,
               style: FujinText.inter12Regular.copyWith(
                 color: FujinColorRole.textSecondary,
@@ -149,14 +150,13 @@ class _EkkloCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final ekkloFood = switch (ref.watch(ekkloFoodProvider(food.ekkloFoodId))) {
       AsyncData(:final value) => value,
       AsyncValue() => null,
     };
     return _SourceCard(
       dot: FujinColorRole.sourceEkklo,
-      source: l10n.sourceEkklo,
+      source: context.intl.sourceEkklo,
       action: TextButton(
         onPressed: onChange,
         style: TextButton.styleFrom(
@@ -164,22 +164,22 @@ class _EkkloCard extends ConsumerWidget {
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           visualDensity: VisualDensity.compact,
         ),
-        child: Text(l10n.memoryChange),
+        child: Text(context.intl.memoryChange),
       ),
       name: food.ekkloFoodName,
       lines: [
         if (ekkloFood case final ekkloFood?) ...[
           _Line(
-            l10n.memoryEnergyPer(
-              l10n.kilocalories(ekkloFood.calories),
-              MemoryText.portion(l10n, ekkloFood),
+            context.intl.memoryEnergyPer(
+              context.intl.kilocalories(ekkloFood.calories),
+              MemoryText.portion(context.intl, ekkloFood),
             ),
             FujinText.inter15Semibold.copyWith(
               color: FujinColorRole.textPrimary,
             ),
           ),
           _Line(
-            MemoryText.macros(l10n, ekkloFood),
+            MemoryText.macros(context.intl, ekkloFood),
             FujinText.inter12Medium.copyWith(
               color: FujinColorRole.textTertiary,
             ),
@@ -264,7 +264,6 @@ class _UnitWeights extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(
         FujinSpace.s5,
@@ -288,8 +287,8 @@ class _UnitWeights extends StatelessWidget {
               onSave: onSave,
             ),
           Text(
-            l10n.memoryUnitWeightNote(
-              MemoryText.quotedUnits(l10n, [
+            context.intl.memoryUnitWeightNote(
+              MemoryText.quotedUnits(context.intl, [
                 for (final unit in units) unit.mfpUnit,
               ]),
             ),
@@ -315,7 +314,6 @@ class _UnitWeightRow extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final weight = useTextEditingController(
       text: GramsInput.format(context, unit.grams),
     );
@@ -324,7 +322,7 @@ class _UnitWeightRow extends HookWidget {
       children: [
         Expanded(
           child: Text(
-            l10n.memoryOneUnit(unit.mfpUnit),
+            context.intl.memoryOneUnit(unit.mfpUnit),
             style: FujinText.inter15Medium.copyWith(
               color: FujinColorRole.textPrimary,
             ),
@@ -342,7 +340,7 @@ class _UnitWeightRow extends HookWidget {
             ),
             decoration: InputDecoration(
               isDense: true,
-              suffixText: l10n.gramsSuffix,
+              suffixText: context.intl.gramsSuffix,
               suffixStyle: FujinText.inter15Regular.copyWith(
                 color: FujinColorRole.textSecondary,
               ),

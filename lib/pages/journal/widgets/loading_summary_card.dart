@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/fujin_weather.dart';
 import 'package:fujin/pages/common/fujin_weather_glyph.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
@@ -11,7 +11,6 @@ class LoadingSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
       padding: const EdgeInsets.all(FujinSpace.s5),
@@ -30,7 +29,7 @@ class LoadingSummaryCard extends StatelessWidget {
               const FujinWeatherGlyph(weather: FujinWeather.breeze),
               Expanded(
                 child: Text(
-                  l10n.journalLoading,
+                  context.intl.journalLoading,
                   style: FujinText.inter15Medium.copyWith(
                     color: FujinColorRole.textPrimary,
                   ),
@@ -78,7 +77,7 @@ class LoadingSummaryCard extends StatelessWidget {
               minimumSize: const Size.fromHeight(FujinSize.buttonMedium),
               textStyle: FujinText.inter15Medium,
             ),
-            child: Text(l10n.sendToEkklo),
+            child: Text(context.intl.sendToEkklo),
           ),
         ],
       ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/fujin_spinner.dart';
 import 'package:fujin/pages/common/scan_icon.dart';
 
@@ -19,7 +19,6 @@ class BarcodeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(FujinRadius.card),
       side: const BorderSide(
@@ -61,13 +60,13 @@ class BarcodeCard extends StatelessWidget {
                     spacing: FujinSpace.s1,
                     children: [
                       Text(
-                        l10n.addSearchBarcode,
+                        context.intl.addSearchBarcode,
                         style: FujinText.inter15Medium.copyWith(
                           color: FujinColorRole.textPrimary,
                         ),
                       ),
                       Text(
-                        l10n.addBarcodeValid(format),
+                        context.intl.addBarcodeValid(format),
                         style: FujinText.inter12Regular.copyWith(
                           color: FujinColorRole.textLink,
                         ),

@@ -6,7 +6,7 @@ import 'package:fujin/domain/sending/ekklo_candidate.dart';
 import 'package:fujin/domain/sending/food_words.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/pill_size.dart';
 import 'package:fujin/pages/common/status_pill.dart';
@@ -39,10 +39,9 @@ class _OwnCopySheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final entry = planned.entry;
     final navigator = Navigator.of(context);
-    final energy = EntryText.energy(l10n, entry);
+    final energy = EntryText.energy(context.intl, entry);
 
     void chooseCandidate() {
       navigator.pop();
@@ -51,7 +50,10 @@ class _OwnCopySheet extends StatelessWidget {
 
     return SheetFrame(
       title: entry.food.description,
-      subtitle: l10n.entryDetail(EntryText.serving(l10n, entry), energy),
+      subtitle: context.intl.entryDetail(
+        EntryText.serving(context.intl, entry),
+        energy,
+      ),
       lead: [
         const _NoCloseFood(),
         CandidateCard(
@@ -62,7 +64,7 @@ class _OwnCopySheet extends StatelessWidget {
             spacing: FujinSpace.s1,
             children: [
               Text(
-                l10n.ownCopyLabel,
+                context.intl.ownCopyLabel,
                 style: FujinText.inter12Medium.copyWith(
                   color: FujinColorRole.textLink,
                 ),
@@ -74,13 +76,16 @@ class _OwnCopySheet extends StatelessWidget {
                 ),
               ),
               Text(
-                l10n.ownCopyServing(EntryText.serving(l10n, entry), energy),
+                context.intl.ownCopyServing(
+                  EntryText.serving(context.intl, entry),
+                  energy,
+                ),
                 style: FujinText.inter12Regular.copyWith(
                   color: FujinColorRole.textSecondary,
                 ),
               ),
               Text(
-                EntryText.macros(l10n, entry.nutrients),
+                EntryText.macros(context.intl, entry.nutrients),
                 style: FujinText.inter12Medium.copyWith(
                   color: FujinColorRole.textTertiary,
                 ),
@@ -100,17 +105,17 @@ class _OwnCopySheet extends StatelessWidget {
           ),
         );
       },
-      sectionLabel: l10n.rejectedCandidates,
+      sectionLabel: context.intl.rejectedCandidates,
       body: [
         if (planned.candidates.isNotEmpty)
           _Rejected(candidates: planned.candidates, onTap: chooseCandidate),
       ],
-      primaryLabel: l10n.createOwnCopy,
+      primaryLabel: context.intl.createOwnCopy,
       onPrimary: () {
         choices.ownCopy();
         navigator.pop();
       },
-      secondaryLabel: l10n.chooseCandidate,
+      secondaryLabel: context.intl.chooseCandidate,
       onSecondary: chooseCandidate,
       onSkip: switch (choices.skip) {
         final skip? => () {
@@ -128,7 +133,6 @@ class _NoCloseFood extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(FujinSpace.s3),
       decoration: BoxDecoration(
@@ -150,13 +154,13 @@ class _NoCloseFood extends StatelessWidget {
               spacing: FujinSpace.s1,
               children: [
                 Text(
-                  l10n.noCloseFoodTitle,
+                  context.intl.noCloseFoodTitle,
                   style: FujinText.inter14Medium.copyWith(
                     color: FujinColorRole.textPrimary,
                   ),
                 ),
                 Text(
-                  l10n.noCloseFoodDetail,
+                  context.intl.noCloseFoodDetail,
                   style: FujinText.inter12Regular.copyWith(
                     color: FujinColorRole.textSecondary,
                   ),
@@ -208,7 +212,6 @@ class _RejectedRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final worst = _worst(candidate);
     return InkWell(
       onTap: onTap,
@@ -232,7 +235,7 @@ class _RejectedRow extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    CandidateCard.origin(l10n, candidate),
+                    CandidateCard.origin(context.intl, candidate),
                     style: FujinText.inter12Regular.copyWith(
                       color: FujinColorRole.textSecondary,
                     ),
@@ -241,7 +244,7 @@ class _RejectedRow extends StatelessWidget {
               ),
             ),
             StatusPill(
-              label: SendText.delta(l10n, candidate.deltas, worst),
+              label: SendText.delta(context.intl, candidate.deltas, worst),
               tone: SendText.deltaTone(candidate.deltas, worst),
               size: PillSize.small,
             ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
 import 'package:fujin/pages/memory/memory_text.dart';
@@ -68,7 +68,6 @@ class _FoodRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return InkWell(
       onTap: onTap,
       child: ConstrainedBox(
@@ -95,7 +94,7 @@ class _FoodRow extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      MemoryText.target(l10n, food),
+                      MemoryText.target(context.intl, food),
                       style: FujinText.inter13Regular.copyWith(
                         color: FujinColorRole.textSecondary,
                       ),
@@ -111,9 +110,9 @@ class _FoodRow extends StatelessWidget {
                     for (final unit in units)
                       StatusPill(
                         key: ValueKey(unit),
-                        label: l10n.unitWeight(
+                        label: context.intl.unitWeight(
                           unit.mfpUnit,
-                          SendText.grams(l10n, unit.grams),
+                          SendText.grams(context.intl, unit.grams),
                         ),
                         tone: PillTone.attention,
                         icon: Icons.check,

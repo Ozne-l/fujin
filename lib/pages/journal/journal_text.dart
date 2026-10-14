@@ -12,39 +12,39 @@ abstract final class JournalText {
     Nutrient.fiber,
   ];
 
-  static String name(AppLocalizations l10n, Nutrient nutrient) =>
+  static String name(AppLocalizations intl, Nutrient nutrient) =>
       switch (nutrient) {
-        Nutrient.kilocalories => l10n.goalKilocalories,
-        Nutrient.protein => TitleText.capitalized(l10n.macroNameProtein),
+        Nutrient.kilocalories => intl.goalKilocalories,
+        Nutrient.protein => TitleText.capitalized(intl.macroNameProtein),
         Nutrient.carbohydrates => TitleText.capitalized(
-          l10n.macroNameCarbohydrates,
+          intl.macroNameCarbohydrates,
         ),
-        Nutrient.fat => TitleText.capitalized(l10n.macroNameFat),
-        Nutrient.fiber => TitleText.capitalized(l10n.macroNameFiber),
+        Nutrient.fat => TitleText.capitalized(intl.macroNameFat),
+        Nutrient.fiber => TitleText.capitalized(intl.macroNameFiber),
       };
 
-  static String problemHeadline(AppLocalizations l10n, ReadProblem problem) =>
+  static String problemHeadline(AppLocalizations intl, ReadProblem problem) =>
       switch (problem) {
-        ReadProblem.mfpSessionExpired => l10n.mfpSessionExpired,
-        ReadProblem.ekkloSessionExpired => l10n.ekkloSessionExpired,
-        ReadProblem.offline => l10n.offlineHeadline,
-        ReadProblem.mfpUnavailable => l10n.serviceNotResponding(
-          l10n.sourceMyFitnessPal,
+        ReadProblem.mfpSessionExpired => intl.mfpSessionExpired,
+        ReadProblem.ekkloSessionExpired => intl.ekkloSessionExpired,
+        ReadProblem.offline => intl.offlineHeadline,
+        ReadProblem.mfpUnavailable => intl.serviceNotResponding(
+          intl.sourceMyFitnessPal,
         ),
-        ReadProblem.ekkloUnavailable => l10n.serviceNotResponding(
-          l10n.sourceEkklo,
+        ReadProblem.ekkloUnavailable => intl.serviceNotResponding(
+          intl.sourceEkklo,
         ),
-        ReadProblem.unknown => l10n.readFailed,
+        ReadProblem.unknown => intl.readFailed,
       };
 
-  static String macroLine(AppLocalizations l10n, DayNutrients nutrients) {
+  static String macroLine(AppLocalizations intl, DayNutrients nutrients) {
     String amount(Nutrient nutrient) => _atLeast(
-      l10n,
+      intl,
       nutrients,
       nutrient,
-      l10n.macroValue(nutrients.amount(nutrient)),
+      intl.macroValue(nutrients.amount(nutrient)),
     );
-    return l10n.macros(
+    return intl.macros(
       amount(Nutrient.protein),
       amount(Nutrient.carbohydrates),
       amount(Nutrient.fat),
@@ -53,24 +53,24 @@ abstract final class JournalText {
   }
 
   static String amount(
-    AppLocalizations l10n,
+    AppLocalizations intl,
     DayNutrients nutrients,
     Nutrient nutrient,
-  ) => _atLeast(l10n, nutrients, nutrient, switch (nutrient) {
-    Nutrient.kilocalories => l10n.kilocalories(nutrients.amount(nutrient)),
+  ) => _atLeast(intl, nutrients, nutrient, switch (nutrient) {
+    Nutrient.kilocalories => intl.kilocalories(nutrients.amount(nutrient)),
     Nutrient.protein ||
     Nutrient.carbohydrates ||
     Nutrient.fat ||
-    Nutrient.fiber => l10n.gramsValue(nutrients.amount(nutrient)),
+    Nutrient.fiber => intl.gramsValue(nutrients.amount(nutrient)),
   });
 
   static String _atLeast(
-    AppLocalizations l10n,
+    AppLocalizations intl,
     DayNutrients nutrients,
     Nutrient nutrient,
     String value,
   ) => switch (nutrients.isPartial(nutrient)) {
-    true => l10n.atLeast(value),
+    true => intl.atLeast(value),
     false => value,
   };
 }

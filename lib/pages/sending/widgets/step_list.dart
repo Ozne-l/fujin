@@ -3,6 +3,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/sending/send_step.dart';
 import 'package:fujin/domain/sending/step_state.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/breeze_indicator.dart';
 import 'package:fujin/pages/common/breeze_streaks.dart';
 
@@ -13,7 +14,6 @@ class StepList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
       padding: const EdgeInsets.fromLTRB(
@@ -40,15 +40,15 @@ class StepList extends StatelessWidget {
                 ),
                 child: Divider(),
               ),
-            _row(l10n, step),
+            _row(context.intl, step),
           ],
         ],
       ),
     );
   }
 
-  Widget _row(AppLocalizations l10n, SendStep step) {
-    final (title, subtitle, subtitleColor) = _texts(l10n, step);
+  Widget _row(AppLocalizations intl, SendStep step) {
+    final (title, subtitle, subtitleColor) = _texts(intl, step);
     return Row(
       spacing: FujinSpace.s4,
       children: [
@@ -76,67 +76,67 @@ class StepList extends StatelessWidget {
   }
 
   (String, String, Color) _texts(
-    AppLocalizations l10n,
+    AppLocalizations intl,
     SendStep step,
   ) => switch ((step, step.state)) {
     (OwnCopyStep(:final name), StepState.done) => (
-      l10n.stepOwnCopyDone,
+      intl.stepOwnCopyDone,
       name,
       FujinColorRole.textSecondary,
     ),
     (OwnCopyStep(:final name), StepState.running) => (
-      l10n.stepOwnCopy,
-      l10n.stepOnTheWay(name),
+      intl.stepOwnCopy,
+      intl.stepOnTheWay(name),
       FujinColor.sora,
     ),
     (OwnCopyStep(:final name), StepState.pending) => (
-      l10n.stepOwnCopy,
-      l10n.stepWaiting(name),
+      intl.stepOwnCopy,
+      intl.stepWaiting(name),
       FujinColorRole.textTertiary,
     ),
     (OwnCopyStep(), StepState.failed) => (
-      l10n.stepOwnCopy,
-      l10n.stepFailed,
+      intl.stepOwnCopy,
+      intl.stepFailed,
       FujinColorRole.textAlert,
     ),
     (MealStep(:final ekkloMealName, :final entryIds), StepState.done) => (
       ekkloMealName,
-      l10n.stepFoodsAdded(entryIds.length),
+      intl.stepFoodsAdded(entryIds.length),
       FujinColorRole.textSecondary,
     ),
     (MealStep(:final ekkloMealName, :final entryIds), StepState.running) => (
       ekkloMealName,
-      l10n.stepOnTheWay(l10n.stepFoods(entryIds.length)),
+      intl.stepOnTheWay(intl.stepFoods(entryIds.length)),
       FujinColor.sora,
     ),
     (MealStep(:final ekkloMealName, :final entryIds), StepState.pending) => (
       ekkloMealName,
-      l10n.stepWaiting(l10n.stepFoods(entryIds.length)),
+      intl.stepWaiting(intl.stepFoods(entryIds.length)),
       FujinColorRole.textTertiary,
     ),
     (MealStep(:final ekkloMealName, :final entryIds), StepState.failed) => (
       ekkloMealName,
-      l10n.stepFoodsNotSent(entryIds.length),
+      intl.stepFoodsNotSent(entryIds.length),
       FujinColorRole.textAlert,
     ),
     (QuantityUpdateStep(:final name), StepState.done) => (
       name,
-      l10n.stepQuantityDone,
+      intl.stepQuantityDone,
       FujinColorRole.textSecondary,
     ),
     (QuantityUpdateStep(:final name), StepState.running) => (
       name,
-      l10n.stepOnTheWay(l10n.stepQuantity),
+      intl.stepOnTheWay(intl.stepQuantity),
       FujinColor.sora,
     ),
     (QuantityUpdateStep(:final name), StepState.pending) => (
       name,
-      l10n.stepWaiting(l10n.stepQuantity),
+      intl.stepWaiting(intl.stepQuantity),
       FujinColorRole.textTertiary,
     ),
     (QuantityUpdateStep(:final name), StepState.failed) => (
       name,
-      l10n.stepQuantityFailed,
+      intl.stepQuantityFailed,
       FujinColorRole.textAlert,
     ),
   };

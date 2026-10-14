@@ -7,6 +7,7 @@ import 'package:fujin/app/theme/fujin_system_bars.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class FujinApp extends ConsumerWidget {
@@ -17,7 +18,7 @@ class FujinApp extends ConsumerWidget {
       AnnotatedRegion<SystemUiOverlayStyle>(
         value: FujinSystemBars.onLight,
         child: MaterialApp.router(
-          onGenerateTitle: (context) => AppLocalizations.of(context).appName,
+          onGenerateTitle: (context) => context.intl.appName,
           theme: FujinTheme.light(),
           routerConfig: ref.watch(routerProvider),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -34,7 +35,7 @@ class FujinApp extends ConsumerWidget {
       };
 
   static Widget _devBanner(BuildContext context, Widget? child) => Banner(
-    message: AppLocalizations.of(context).devEnvironmentBanner,
+    message: context.intl.devEnvironmentBanner,
     location: BannerLocation.topEnd,
     color: FujinColorRole.buttonAlertBackground,
     textStyle: FujinText.inter11Semibold.copyWith(

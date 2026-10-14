@@ -3,7 +3,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/journal/day_nutrients.dart';
 import 'package:fujin/domain/journal/journal_day.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/send_label.dart';
 import 'package:fujin/pages/common/source_dot.dart';
 import 'package:fujin/pages/common/title_text.dart';
@@ -27,15 +27,14 @@ class _DayDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final navigator = Navigator.of(context);
     final counts = day.counts;
     final mfp = day.nutrients;
     final ekklo = day.ekkloNutrients;
     final notes = [
       if (counts.pending > 0)
-        l10n.dayDetailPending(counts.pending, counts.total),
-      if (mfp.isPartial(Nutrient.fiber)) l10n.fiberNote,
+        context.intl.dayDetailPending(counts.pending, counts.total),
+      if (mfp.isPartial(Nutrient.fiber)) context.intl.fiberNote,
     ];
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(
@@ -57,7 +56,7 @@ class _DayDetail extends StatelessWidget {
                 style: TextButton.styleFrom(
                   textStyle: FujinText.inter13Medium,
                 ),
-                child: Text(l10n.close),
+                child: Text(context.intl.close),
               ),
             ),
             Column(
@@ -65,13 +64,13 @@ class _DayDetail extends StatelessWidget {
               spacing: FujinSpace.s1,
               children: [
                 Text(
-                  TitleText.capitalized(l10n.journalDay(day.date)),
+                  TitleText.capitalized(context.intl.journalDay(day.date)),
                   style: FujinText.inter13Regular.copyWith(
                     color: FujinColorRole.textSecondary,
                   ),
                 ),
                 Text(
-                  l10n.dayDetailTitle,
+                  context.intl.dayDetailTitle,
                   style: FujinText.hina30.copyWith(
                     color: FujinColorRole.textPrimary,
                   ),
@@ -80,11 +79,11 @@ class _DayDetail extends StatelessWidget {
                   label: const SizedBox.shrink(),
                   mfp: _Header(
                     dot: FujinColorRole.sourceMfp,
-                    label: l10n.sourceMyFitnessPal,
+                    label: context.intl.sourceMyFitnessPal,
                   ),
                   ekklo: _Header(
                     dot: FujinColorRole.sourceEkklo,
-                    label: l10n.sourceEkklo,
+                    label: context.intl.sourceEkklo,
                   ),
                 ),
               ],
@@ -115,7 +114,7 @@ class _DayDetail extends StatelessWidget {
                   color: FujinColorRole.textSecondary,
                 ),
               ),
-            if (SendLabel.of(l10n, counts.toSend, counts.toUpdate)
+            if (SendLabel.of(context.intl, counts.toSend, counts.toUpdate)
                 case final label?)
               FilledButton(
                 onPressed: () {
@@ -144,7 +143,6 @@ class _NutrientRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final style = switch (nutrient) {
       Nutrient.kilocalories => FujinText.inter13Semibold,
       Nutrient.protein ||
@@ -154,18 +152,18 @@ class _NutrientRow extends StatelessWidget {
     }.copyWith(color: FujinColorRole.textPrimary);
     return _Row(
       label: Text(
-        JournalText.name(l10n, nutrient),
+        JournalText.name(context.intl, nutrient),
         style: FujinText.inter13Regular.copyWith(
           color: FujinColorRole.textSecondary,
         ),
       ),
       mfp: Text(
-        JournalText.amount(l10n, mfp, nutrient),
+        JournalText.amount(context.intl, mfp, nutrient),
         style: style,
         textAlign: TextAlign.end,
       ),
       ekklo: Text(
-        JournalText.amount(l10n, ekklo, nutrient),
+        JournalText.amount(context.intl, ekklo, nutrient),
         style: style,
         textAlign: TextAlign.end,
       ),

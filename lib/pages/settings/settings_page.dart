@@ -6,7 +6,7 @@ import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/backup/backup.dart';
 import 'package:fujin/domain/accounts/account.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/automatic_mode_notifier.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
@@ -35,7 +35,6 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final memory = ref.watch(memoryProvider);
     final goals = ref.watch(goalsProvider);
     final automaticMode = ref.watch(automaticModeProvider);
@@ -43,7 +42,7 @@ class SettingsPage extends ConsumerWidget {
     final backup = ref.watch(backupProvider);
     final backups = ref.read(backupProvider.notifier);
     final sessions = ref.read(sessionsProvider.notifier);
-    final counts = l10n.memoryCounts(
+    final counts = context.intl.memoryCounts(
       memory.matches.length + memory.ownCopies.length,
       memory.meals.length,
     );
@@ -66,13 +65,13 @@ class SettingsPage extends ConsumerWidget {
             ).then((_) => backups.cancel()),
           );
         case BackupExported():
-          _tell(context, l10n.backupExported);
+          _tell(context, context.intl.backupExported);
         case BackupImported():
-          _tell(context, l10n.backupImported);
+          _tell(context, context.intl.backupImported);
         case BackupFailed(failure: BackupFailure.unreadable):
-          _tell(context, l10n.backupUnreadable);
+          _tell(context, context.intl.backupUnreadable);
         case BackupFailed(failure: BackupFailure.notWritten):
-          _tell(context, l10n.backupNotWritten);
+          _tell(context, context.intl.backupNotWritten);
         case BackupIdle() || BackupRunning():
           break;
       }
@@ -115,35 +114,35 @@ class SettingsPage extends ConsumerWidget {
             TextInset(
               bottom: FujinSpace.s1,
               child: Text(
-                l10n.tabSettings,
+                context.intl.tabSettings,
                 style: FujinText.hina30.copyWith(
                   color: FujinColorRole.textPrimary,
                 ),
               ),
             ),
             SettingsSection(
-              label: l10n.settingsAccounts,
+              label: context.intl.settingsAccounts,
               rows: [
                 AccountRow(
                   dot: FujinColorRole.sourceMfp,
-                  name: l10n.sourceMyFitnessPal,
+                  name: context.intl.sourceMyFitnessPal,
                   onSignOut: () => confirm(
                     icon: _lockIcon,
-                    title: l10n.signOutMfpTitle,
-                    message: l10n.signOutMfpDetail,
-                    confirmLabel: l10n.signOut,
+                    title: context.intl.signOutMfpTitle,
+                    message: context.intl.signOutMfpDetail,
+                    confirmLabel: context.intl.signOut,
                     onConfirm: () =>
                         unawaited(leave(() => sessions.signOut(Account.mfp))),
                   ),
                 ),
                 AccountRow(
                   dot: FujinColorRole.sourceEkklo,
-                  name: l10n.sourceEkklo,
+                  name: context.intl.sourceEkklo,
                   onSignOut: () => confirm(
                     icon: _lockIcon,
-                    title: l10n.signOutEkkloTitle,
-                    message: l10n.signOutEkkloDetail,
-                    confirmLabel: l10n.signOut,
+                    title: context.intl.signOutEkkloTitle,
+                    message: context.intl.signOutEkkloDetail,
+                    confirmLabel: context.intl.signOut,
                     onConfirm: () => unawaited(
                       leave(() => sessions.signOut(Account.ekklo)),
                     ),
@@ -152,22 +151,22 @@ class SettingsPage extends ConsumerWidget {
               ],
             ),
             SettingsSection(
-              label: l10n.settingsGoals,
+              label: context.intl.settingsGoals,
               rows: [
                 SettingsRow(
-                  title: l10n.goalsEveryDay,
-                  detail: GoalsText.summary(l10n, goals),
+                  title: context.intl.goalsEveryDay,
+                  detail: GoalsText.summary(context.intl, goals),
                   onTap: () =>
                       unawaited(context.push<void>(FujinRoute.goals.path)),
                 ),
               ],
             ),
             SettingsSection(
-              label: l10n.settingsSending,
+              label: context.intl.settingsSending,
               rows: [
                 SettingsSwitchRow(
-                  title: l10n.automaticMode,
-                  detail: l10n.automaticModeDetail,
+                  title: context.intl.automaticMode,
+                  detail: context.intl.automaticModeDetail,
                   value: automaticMode,
                   onChanged: (on) => unawaited(
                     ref.read(automaticModeProvider.notifier).turn(on: on),
@@ -176,19 +175,19 @@ class SettingsPage extends ConsumerWidget {
               ],
             ),
             SettingsSection(
-              label: l10n.settingsBackup,
+              label: context.intl.settingsBackup,
               rows: [
                 SettingsRow(
-                  title: l10n.backupExport,
-                  detail: l10n.backupExportDetail,
+                  title: context.intl.backupExport,
+                  detail: context.intl.backupExportDetail,
                   onTap: switch (idle) {
                     true => () => unawaited(backups.export()),
                     false => null,
                   },
                 ),
                 SettingsRow(
-                  title: l10n.backupImport,
-                  detail: l10n.backupImportDetail,
+                  title: context.intl.backupImport,
+                  detail: context.intl.backupImportDetail,
                   onTap: switch (idle) {
                     true => () => unawaited(backups.open()),
                     false => null,
@@ -197,29 +196,29 @@ class SettingsPage extends ConsumerWidget {
               ],
             ),
             SettingsSection(
-              label: l10n.settingsData,
+              label: context.intl.settingsData,
               rows: [
                 SettingsRow(
-                  title: l10n.clearSessions,
-                  detail: l10n.clearSessionsDetail,
+                  title: context.intl.clearSessions,
+                  detail: context.intl.clearSessionsDetail,
                   titleColor: FujinColorRole.textAlert,
                   onTap: () => confirm(
                     icon: _lockIcon,
-                    title: l10n.clearSessionsTitle,
-                    message: l10n.clearSessionsConfirm,
-                    confirmLabel: l10n.clearSessions,
+                    title: context.intl.clearSessionsTitle,
+                    message: context.intl.clearSessionsConfirm,
+                    confirmLabel: context.intl.clearSessions,
                     onConfirm: () => unawaited(leave(sessions.clearSessions)),
                   ),
                 ),
                 SettingsRow(
-                  title: l10n.clearMemory,
+                  title: context.intl.clearMemory,
                   detail: counts,
                   titleColor: FujinColorRole.textAlert,
                   onTap: () => confirm(
                     icon: _deleteIcon,
-                    title: l10n.clearMemoryTitle,
-                    message: l10n.clearMemoryConfirm(counts),
-                    confirmLabel: l10n.clearMemory,
+                    title: context.intl.clearMemoryTitle,
+                    message: context.intl.clearMemoryConfirm(counts),
+                    confirmLabel: context.intl.clearMemory,
                     onConfirm: () {
                       ref.read(memoryProvider.notifier).clear();
                       ref.invalidate(journalProvider);
@@ -231,7 +230,7 @@ class SettingsPage extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.only(top: FujinSpace.s3),
               child: Text(
-                l10n.appVersion(version),
+                context.intl.appVersion(version),
                 textAlign: TextAlign.center,
                 style: FujinText.inter12Regular.copyWith(
                   color: FujinColorRole.textTertiary,
@@ -249,18 +248,17 @@ class SettingsPage extends ConsumerWidget {
     Backup backup,
     VoidCallback onConfirm,
   ) {
-    final l10n = AppLocalizations.of(context);
     return showConfirmSheet(
       context,
       icon: _copyIcon,
-      title: l10n.importTitle,
-      message: l10n.importDetail(
+      title: context.intl.importTitle,
+      message: context.intl.importDetail(
         backup.exportedAt.toLocal(),
         backup.foodCount,
         backup.meals.length,
         backup.links.length,
       ),
-      confirmLabel: l10n.importConfirm,
+      confirmLabel: context.intl.importConfirm,
       onConfirm: onConfirm,
     );
   }

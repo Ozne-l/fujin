@@ -9,6 +9,7 @@ import 'package:fujin/domain/journal/journal_day.dart';
 import 'package:fujin/domain/journal/journal_read.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/goals_text.dart';
 import 'package:fujin/pages/common/progress_bar.dart';
 import 'package:fujin/pages/common/send_label.dart';
@@ -47,7 +48,6 @@ class DaySummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final fresh = switch ((read, stale)) {
       (BothSides(:final day), false) => day,
       _ => null,
@@ -63,14 +63,14 @@ class DaySummaryCard extends StatelessWidget {
     };
     final (sendLabel, onPressed) = switch (fresh) {
       final day? => switch (SendLabel.of(
-        l10n,
+        context.intl,
         day.counts.toSend,
         day.counts.toUpdate,
       )) {
         final label? => (label, onSend),
         null => (null, null),
       },
-      null => (l10n.sendToEkklo, null),
+      null => (context.intl.sendToEkklo, null),
     };
     return GestureDetector(
       onTap: switch (fresh) {
@@ -114,18 +114,18 @@ class DaySummaryCard extends StatelessWidget {
               children: [
                 if (rings != null) const Divider(),
                 ...switch ((fresh, read)) {
-                  (final day?, _) => _progress(l10n, day),
+                  (final day?, _) => _progress(context.intl, day),
                   (null, BothSides(:final day)) => [
-                    _counted(l10n, day.ekkloMeals),
+                    _counted(context.intl, day.ekkloMeals),
                   ],
                   (null, EkkloOnly(:final ekkloMeals)) => [
-                    _counted(l10n, ekkloMeals),
+                    _counted(context.intl, ekkloMeals),
                   ],
                   (null, MfpOnly()) => [
                     _SourceLine(
                       dot: FujinColorRole.sourceEkklo,
-                      label: l10n.sourceEkklo,
-                      trailing: [_faint(l10n.sideUnavailable)],
+                      label: context.intl.sourceEkklo,
+                      trailing: [_faint(context.intl.sideUnavailable)],
                     ),
                   ],
                 },
@@ -146,17 +146,17 @@ class DaySummaryCard extends StatelessWidget {
     );
   }
 
-  static List<Widget> _progress(AppLocalizations l10n, JournalDay day) => [
+  static List<Widget> _progress(AppLocalizations intl, JournalDay day) => [
     _SourceLine(
       dot: FujinColorRole.sourceEkklo,
-      label: l10n.sourceEkklo,
+      label: intl.sourceEkklo,
       trailing: [
         _strong(
-          l10n.kilocalories(day.ekkloNutrients.amount(Nutrient.kilocalories)),
+          intl.kilocalories(day.ekkloNutrients.amount(Nutrient.kilocalories)),
         ),
         _soft(switch (day.counts.total) {
-          0 => ' ${l10n.ekkloNoFood}',
-          final total => ' ${l10n.ekkloProgress(day.counts.inEkklo, total)}',
+          0 => ' ${intl.ekkloNoFood}',
+          final total => ' ${intl.ekkloProgress(day.counts.inEkklo, total)}',
         }),
       ],
     ),
@@ -170,20 +170,20 @@ class DaySummaryCard extends StatelessWidget {
   ];
 
   static Widget _counted(
-    AppLocalizations l10n,
+    AppLocalizations intl,
     List<EkkloDailyMeal> meals,
   ) => _SourceLine(
     dot: FujinColorRole.sourceEkklo,
-    label: l10n.sourceEkklo,
+    label: intl.sourceEkklo,
     trailing: [
       _strong(
-        l10n.kilocalories(
+        intl.kilocalories(
           DayNutrients.ofEkklo(meals).amount(Nutrient.kilocalories),
         ),
       ),
       _soft(switch (meals.fold(0, (count, meal) => count + meal.items.length)) {
-        0 => ' ${l10n.ekkloNoFood}',
-        final count => ' ${l10n.ekkloFoodCount(count)}',
+        0 => ' ${intl.ekkloNoFood}',
+        final count => ' ${intl.ekkloFoodCount(count)}',
       }),
     ],
   );
@@ -197,7 +197,6 @@ class _MfpRings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final eaten = nutrients.amount(Nutrient.kilocalories);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -205,13 +204,13 @@ class _MfpRings extends StatelessWidget {
       children: [
         _SourceLine(
           dot: FujinColorRole.sourceMfp,
-          label: l10n.sourceMyFitnessPal,
+          label: context.intl.sourceMyFitnessPal,
           trailing: [
             TextSpan(
-              text: l10n.kilocaloriesValue(eaten),
+              text: context.intl.kilocaloriesValue(eaten),
               style: FujinText.inter15Semibold,
             ),
-            _soft(' ${l10n.kilocaloriesGoal(goals.kilocalories)}'),
+            _soft(' ${context.intl.kilocaloriesGoal(goals.kilocalories)}'),
           ],
         ),
         ProgressBar(
@@ -232,7 +231,7 @@ class _MfpRings extends StatelessWidget {
             for (final nutrient in JournalText.macros)
               NutrientRing(
                 nutrient: nutrient,
-                label: JournalText.name(l10n, nutrient),
+                label: JournalText.name(context.intl, nutrient),
                 amount: nutrients.amount(nutrient),
                 partial: nutrients.isPartial(nutrient),
                 goal: goals.amount(nutrient),
@@ -252,17 +251,16 @@ class _MfpCompact extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final eaten = nutrients.amount(Nutrient.kilocalories);
     return _SourceBlock(
       trailing: switch (readAt) {
-        final readAt? => _faint(l10n.kilocaloriesAt(eaten, readAt)),
+        final readAt? => _faint(context.intl.kilocaloriesAt(eaten, readAt)),
         null => TextSpan(
-          text: l10n.kilocalories(eaten),
+          text: context.intl.kilocalories(eaten),
           style: FujinText.inter15Semibold,
         ),
       },
-      detail: JournalText.macroLine(l10n, nutrients),
+      detail: JournalText.macroLine(context.intl, nutrients),
     );
   }
 }
@@ -274,11 +272,12 @@ class _MfpUnavailable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return _SourceBlock(
-      trailing: _faint(l10n.sideUnavailable),
+      trailing: _faint(context.intl.sideUnavailable),
       detail: switch (goals) {
-        final goals? => l10n.goalLine(GoalsText.summary(l10n, goals)),
+        final goals? => context.intl.goalLine(
+          GoalsText.summary(context.intl, goals),
+        ),
         null => null,
       },
     );
@@ -298,7 +297,7 @@ class _SourceBlock extends StatelessWidget {
     children: [
       _SourceLine(
         dot: FujinColorRole.sourceMfp,
-        label: AppLocalizations.of(context).sourceMyFitnessPal,
+        label: context.intl.sourceMyFitnessPal,
         trailing: [trailing],
       ),
       if (detail case final detail?)

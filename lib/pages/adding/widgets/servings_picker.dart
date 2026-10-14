@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/grams_input.dart';
 
 class ServingsPicker extends HookWidget {
@@ -19,7 +19,6 @@ class ServingsPicker extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final custom = !presets.contains(servings);
     final other = useTextEditingController(
       text: switch (custom) {
@@ -65,9 +64,9 @@ class ServingsPicker extends HookWidget {
                 }
               },
               decoration: InputDecoration(
-                hintText: l10n.addServingsOther,
+                hintText: context.intl.addServingsOther,
                 suffixText: switch (custom) {
-                  true => l10n.addServingsUnit,
+                  true => context.intl.addServingsUnit,
                   false => null,
                 },
                 contentPadding: const EdgeInsets.symmetric(

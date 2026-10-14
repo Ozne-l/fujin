@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/breeze_indicator.dart';
 import 'package:fujin/pages/common/breeze_streaks.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
@@ -16,7 +16,6 @@ class TransitCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final labelStyle = FujinText.inter12Medium.copyWith(
       color: FujinColorRole.textSecondary,
     );
@@ -44,13 +43,13 @@ class TransitCard extends StatelessWidget {
                 spacing: FujinSpace.s2,
                 children: [
                   const SourceDot(color: FujinColorRole.sourceMfp),
-                  Text(l10n.sourceMyFitnessPal, style: labelStyle),
+                  Text(context.intl.sourceMyFitnessPal, style: labelStyle),
                 ],
               ),
               Row(
                 spacing: FujinSpace.s2,
                 children: [
-                  Text(l10n.sourceEkklo, style: labelStyle),
+                  Text(context.intl.sourceEkklo, style: labelStyle),
                   const SourceDot(color: FujinColorRole.sourceEkklo),
                 ],
               ),

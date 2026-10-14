@@ -10,6 +10,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/adding/widgets/food_view.dart';
 import 'package:fujin/pages/common/in_page_sheet.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
@@ -34,7 +35,6 @@ class ScannerPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final state = ref.watch(scannerProvider);
     final notifier = ref.read(scannerProvider.notifier);
     final camera = ref.watch(scanCameraProvider);
@@ -87,9 +87,9 @@ class ScannerPage extends HookConsumerWidget {
       ScannerAiming() || ScannerLooking() => null,
       ScannerRefused() => ScannerMessageSheet(
         icon: const Icon(Icons.no_photography_outlined),
-        title: l10n.scannerCameraRefusedTitle,
-        detail: l10n.scannerCameraRefusedDetail,
-        primary: (l10n.scannerTypeCode, notifier.type),
+        title: context.intl.scannerCameraRefusedTitle,
+        detail: context.intl.scannerCameraRefusedDetail,
+        primary: (context.intl.scannerTypeCode, notifier.type),
       ),
       ScannerTyping(:final code) => CodeEntrySheet(
         code: code,
@@ -120,28 +120,29 @@ class ScannerPage extends HookConsumerWidget {
             excludeFromSemantics: true,
           ),
           tone: PillTone.info,
-          title: l10n.addBarcodeUnresolvedTitle,
-          detail: l10n.addBarcodeUnresolvedDetail(switch (brandName?.trim()) {
+          title: context.intl.addBarcodeUnresolvedTitle,
+          detail: context.intl.addBarcodeUnresolvedDetail(switch (brandName
+              ?.trim()) {
             null || '' => description,
-            final brand => l10n.scannerNameAndBrand(description, brand),
+            final brand => context.intl.scannerNameAndBrand(description, brand),
           }),
           primary: (
-            l10n.addSearchQuoted(
+            context.intl.addSearchQuoted(
               ScannerSearch.queryOf(description, brandName),
             ),
             searchByText,
           ),
-          secondary: (l10n.scannerRescan, notifier.aim),
+          secondary: (context.intl.scannerRescan, notifier.aim),
         ),
       ScannerUnknown(:final code) => ScannerMessageSheet(
         icon: const Icon(Icons.help_outline),
-        title: l10n.addBarcodeUnknownTitle,
-        detail: l10n.addBarcodeUnknownDetail(code),
-        primary: (l10n.scannerSearchText, searchByText),
-        secondary: (l10n.scannerRescan, notifier.aim),
+        title: context.intl.addBarcodeUnknownTitle,
+        detail: context.intl.addBarcodeUnknownDetail(code),
+        primary: (context.intl.scannerSearchText, searchByText),
+        secondary: (context.intl.scannerRescan, notifier.aim),
       ),
       ScannerFailed(:final code, :final problem) => _failedSheet(
-        l10n,
+        context.intl,
         problem,
         code: code,
         onRetry: () => unawaited(notifier.retry()),
@@ -176,8 +177,8 @@ class ScannerPage extends HookConsumerWidget {
               ),
               AimFrame(
                 hint: switch (code) {
-                  final code? => l10n.scannerCodeRead(code),
-                  null => l10n.scannerAim,
+                  final code? => context.intl.scannerCodeRead(code),
+                  null => context.intl.scannerAim,
                 },
                 read: code != null,
                 busy: state is ScannerLooking,
@@ -195,7 +196,7 @@ class ScannerPage extends HookConsumerWidget {
                         children: [
                           CameraIconButton(
                             icon: Icons.close,
-                            tooltip: l10n.close,
+                            tooltip: context.intl.close,
                             onPressed: () => context.pop(),
                           ),
                           Expanded(
@@ -203,14 +204,17 @@ class ScannerPage extends HookConsumerWidget {
                               spacing: FujinSpace.s1,
                               children: [
                                 Text(
-                                  l10n.scannerTitle,
+                                  context.intl.scannerTitle,
                                   textAlign: TextAlign.center,
                                   style: FujinText.inter16Medium.copyWith(
                                     color: FujinColor.washi,
                                   ),
                                 ),
                                 Text(
-                                  l10n.scannerContext(mfpMealName, date),
+                                  context.intl.scannerContext(
+                                    mfpMealName,
+                                    date,
+                                  ),
                                   textAlign: TextAlign.center,
                                   style: FujinText.inter13Regular.copyWith(
                                     color: FujinColorRole.textDisabled,
@@ -224,7 +228,7 @@ class ScannerPage extends HookConsumerWidget {
                               true => Icons.flashlight_off_outlined,
                               false => Icons.flashlight_on_outlined,
                             },
-                            tooltip: l10n.scannerTorch,
+                            tooltip: context.intl.scannerTorch,
                             onPressed: () => torch.value = !torch.value,
                           ),
                         ],
@@ -238,7 +242,7 @@ class ScannerPage extends HookConsumerWidget {
                           Icons.keyboard_outlined,
                           size: FujinSize.searchIcon,
                         ),
-                        label: Text(l10n.scannerTypeCode),
+                        label: Text(context.intl.scannerTypeCode),
                         style: TextButton.styleFrom(
                           backgroundColor: FujinColorRole.backgroundGlass,
                           foregroundColor: FujinColor.washi,
@@ -258,7 +262,7 @@ class ScannerPage extends HookConsumerWidget {
   }
 
   static Widget _failedSheet(
-    AppLocalizations l10n,
+    AppLocalizations intl,
     ReadProblem problem, {
     required String code,
     required VoidCallback onRetry,
@@ -268,17 +272,17 @@ class ScannerPage extends HookConsumerWidget {
     ReadProblem.mfpSessionExpired => ScannerMessageSheet(
       icon: const Icon(Icons.lock_outline),
       tone: PillTone.error,
-      title: l10n.addMfpSessionTitle,
-      detail: l10n.scannerMfpSessionDetail(code),
-      primary: (l10n.mfpReconnect, onSignIn),
+      title: intl.addMfpSessionTitle,
+      detail: intl.scannerMfpSessionDetail(code),
+      primary: (intl.mfpReconnect, onSignIn),
     ),
     ReadProblem.offline => ScannerMessageSheet(
       icon: const Icon(Icons.wifi_off),
       tone: PillTone.error,
-      title: l10n.scannerOfflineTitle,
-      detail: l10n.scannerFailedDetail(code),
-      primary: (l10n.scannerSearchText, onSearch),
-      secondary: (l10n.scannerRetryScan, onRetry),
+      title: intl.scannerOfflineTitle,
+      detail: intl.scannerFailedDetail(code),
+      primary: (intl.scannerSearchText, onSearch),
+      secondary: (intl.scannerRetryScan, onRetry),
     ),
     ReadProblem.ekkloSessionExpired ||
     ReadProblem.mfpUnavailable ||
@@ -286,10 +290,10 @@ class ScannerPage extends HookConsumerWidget {
     ReadProblem.unknown => ScannerMessageSheet(
       icon: const Icon(Icons.dns_outlined),
       tone: PillTone.error,
-      title: l10n.scannerUnavailableTitle,
-      detail: l10n.scannerUnavailableDetail,
-      primary: (l10n.scannerSearchText, onSearch),
-      secondary: (l10n.scannerRetryScan, onRetry),
+      title: intl.scannerUnavailableTitle,
+      detail: intl.scannerUnavailableDetail,
+      primary: (intl.scannerSearchText, onSearch),
+      secondary: (intl.scannerRetryScan, onRetry),
     ),
   };
 }

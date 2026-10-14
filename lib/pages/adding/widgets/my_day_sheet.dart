@@ -4,7 +4,7 @@ import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/domain/goals/goal_amounts.dart';
 import 'package:fujin/domain/journal/day_nutrients.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
 import 'package:fujin/pages/sending/sheets/sheet_frame.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
@@ -39,15 +39,14 @@ class _MyDay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final food = DayNutrients.ofEntries([entry]);
     final nutrients = entry.nutrients;
     String amount(Nutrient nutrient, double value) => switch (nutrient) {
-      Nutrient.kilocalories => l10n.kilocaloriesValue(value),
+      Nutrient.kilocalories => context.intl.kilocaloriesValue(value),
       Nutrient.protein ||
       Nutrient.carbohydrates ||
       Nutrient.fat ||
-      Nutrient.fiber => l10n.macroValue(
+      Nutrient.fiber => context.intl.macroValue(
         double.parse(value.toStringAsFixed(_decimals)),
       ),
     };
@@ -56,8 +55,8 @@ class _MyDay extends StatelessWidget {
         final sugar?,
         final sodium?,
       ))
-        l10n.addDayExtras(sugar, sodium),
-      l10n.addDayNote,
+        context.intl.addDayExtras(sugar, sodium),
+      context.intl.addDayNote,
     ];
     final secondary = FujinText.inter13Regular.copyWith(
       color: FujinColorRole.textSecondary,
@@ -79,7 +78,7 @@ class _MyDay extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    l10n.addMyDay,
+                    context.intl.addMyDay,
                     style: FujinText.hina28.copyWith(
                       color: FujinColorRole.textPrimary,
                     ),
@@ -87,7 +86,7 @@ class _MyDay extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: Navigator.of(context).pop,
-                  child: Text(l10n.close),
+                  child: Text(context.intl.close),
                 ),
               ],
             ),
@@ -104,25 +103,31 @@ class _MyDay extends StatelessWidget {
               children: [
                 _row(
                   label: '',
-                  values: (l10n.addThisFood, l10n.addAfterAdding, l10n.addGoal),
+                  values: (
+                    context.intl.addThisFood,
+                    context.intl.addAfterAdding,
+                    context.intl.addGoal,
+                  ),
                   style: secondary,
                   total: secondary,
                 ),
                 for (final nutrient in Nutrient.values)
                   _row(
-                    label: JournalText.name(l10n, nutrient),
+                    label: JournalText.name(context.intl, nutrient),
                     values: (
-                      l10n.addPlus(amount(nutrient, food.amount(nutrient))),
+                      context.intl.addPlus(
+                        amount(nutrient, food.amount(nutrient)),
+                      ),
                       switch (day) {
                         final day? => amount(
                           nutrient,
                           day.amount(nutrient) + food.amount(nutrient),
                         ),
-                        null => l10n.macroUnknown,
+                        null => context.intl.macroUnknown,
                       },
                       switch ((goals?.amount(nutrient), nutrient)) {
                         (null, _) => '',
-                        (final goal?, Nutrient.fiber) => l10n.atLeast(
+                        (final goal?, Nutrient.fiber) => context.intl.atLeast(
                           amount(nutrient, goal),
                         ),
                         (final goal?, _) => amount(nutrient, goal),
@@ -138,7 +143,7 @@ class _MyDay extends StatelessWidget {
               ],
             ),
             Text(
-              notes.join(l10n.summarySeparator),
+              notes.join(context.intl.summarySeparator),
               style: FujinText.inter12Regular.copyWith(
                 color: FujinColorRole.textSecondary,
               ),

@@ -6,6 +6,7 @@ import 'package:fujin/domain/sending/send_plan.dart';
 import 'package:fujin/domain/sending/send_progress.dart';
 import 'package:fujin/domain/sending/send_step.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/sending/send_failure.dart';
 import 'package:fujin/pages/sending/send_notifier.dart';
 import 'package:fujin/pages/sending/widgets/step_list.dart';
@@ -27,20 +28,19 @@ class InterruptedView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final remaining = progress.remainingEntries;
     return StormView(
       plan: plan,
       card: StormCard(
-        title: l10n.interruptedTitle,
-        reason: _reason(l10n),
+        title: context.intl.interruptedTitle,
+        reason: _reason(context.intl),
         waiting: switch (remaining) {
-          > 0 => l10n.interruptedWaiting(remaining),
+          > 0 => context.intl.interruptedWaiting(remaining),
           _ => null,
         },
         action: switch (progress.steps) {
-          [] => l10n.tryAgain,
-          _ => l10n.sendRemaining(remaining),
+          [] => context.intl.tryAgain,
+          _ => context.intl.sendRemaining(remaining),
         },
         onPressed: () => unawaited(
           ref.read(sendProvider(plan.date).notifier).send(plan),
@@ -55,7 +55,7 @@ class InterruptedView extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: FujinSize.textInset),
           child: Text(
-            l10n.interruptedNote,
+            context.intl.interruptedNote,
             textAlign: TextAlign.center,
             style: FujinText.inter13Regular.copyWith(
               color: FujinColorRole.textSecondary,
@@ -66,20 +66,20 @@ class InterruptedView extends ConsumerWidget {
     );
   }
 
-  String _reason(AppLocalizations l10n) => switch ((
+  String _reason(AppLocalizations intl) => switch ((
     failure,
     _label(progress.failed),
   )) {
-    (SendFailure.network, final step?) => l10n.interruptedNetwork(step),
-    (SendFailure.ekkloSession, final step?) => l10n.interruptedSession(step),
-    (SendFailure.refused, final step?) => l10n.interruptedRefused(step),
-    (SendFailure.blockedInDev, final step?) => l10n.interruptedDev(step),
-    (SendFailure.mfpSession, _) => l10n.mfpSessionExpired,
-    (SendFailure.other, final step?) => l10n.interruptedOther(step),
+    (SendFailure.network, final step?) => intl.interruptedNetwork(step),
+    (SendFailure.ekkloSession, final step?) => intl.interruptedSession(step),
+    (SendFailure.refused, final step?) => intl.interruptedRefused(step),
+    (SendFailure.blockedInDev, final step?) => intl.interruptedDev(step),
+    (SendFailure.mfpSession, _) => intl.mfpSessionExpired,
+    (SendFailure.other, final step?) => intl.interruptedOther(step),
     (SendFailure.network || SendFailure.blockedInDev, null) =>
-      l10n.sendFailedNetwork,
-    (SendFailure.ekkloSession, null) => l10n.ekkloSessionExpired,
-    (SendFailure.refused || SendFailure.other, null) => l10n.sendFailedOther,
+      intl.sendFailedNetwork,
+    (SendFailure.ekkloSession, null) => intl.ekkloSessionExpired,
+    (SendFailure.refused || SendFailure.other, null) => intl.sendFailedOther,
   };
 
   static String? _label(SendStep? step) => switch (step) {

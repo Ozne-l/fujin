@@ -14,85 +14,85 @@ abstract final class GoalsText {
     Nutrient.fiber,
   ];
 
-  static String summary(AppLocalizations l10n, Goals? goals) => switch (goals) {
+  static String summary(AppLocalizations intl, Goals? goals) => switch (goals) {
     final goals? => [
-      l10n.kilocalories(goals.kilocalories),
+      intl.kilocalories(goals.kilocalories),
       for (final nutrient in _summarized)
         if (goals.amount(nutrient) case final amount?)
-          l10n.goalsSummaryPart(
-            SendText.nutrient(l10n, nutrient),
-            l10n.macroValue(amount),
+          intl.goalsSummaryPart(
+            SendText.nutrient(intl, nutrient),
+            intl.macroValue(amount),
           ),
-    ].join(l10n.summarySeparator),
-    null => l10n.goalsNone,
+    ].join(intl.summarySeparator),
+    null => intl.goalsNone,
   };
 
-  static String label(AppLocalizations l10n, Nutrient nutrient) =>
+  static String label(AppLocalizations intl, Nutrient nutrient) =>
       switch (nutrient) {
-        Nutrient.kilocalories => l10n.goalKilocalories,
-        Nutrient.protein => l10n.goalProtein,
-        Nutrient.carbohydrates => l10n.goalCarbohydrates,
-        Nutrient.fat => l10n.goalFat,
-        Nutrient.fiber => l10n.goalFiber,
+        Nutrient.kilocalories => intl.goalKilocalories,
+        Nutrient.protein => intl.goalProtein,
+        Nutrient.carbohydrates => intl.goalCarbohydrates,
+        Nutrient.fat => intl.goalFat,
+        Nutrient.fiber => intl.goalFiber,
       };
 
-  static String unit(AppLocalizations l10n, Nutrient nutrient) =>
+  static String unit(AppLocalizations intl, Nutrient nutrient) =>
       switch (nutrient) {
-        Nutrient.kilocalories => l10n.nutrientKilocalories,
+        Nutrient.kilocalories => intl.nutrientKilocalories,
         Nutrient.protein ||
         Nutrient.carbohydrates ||
         Nutrient.fat ||
-        Nutrient.fiber => l10n.gramsSuffix,
+        Nutrient.fiber => intl.gramsSuffix,
       };
 
-  static String? hint(AppLocalizations l10n, Nutrient nutrient) =>
+  static String? hint(AppLocalizations intl, Nutrient nutrient) =>
       switch (nutrient) {
         Nutrient.kilocalories => null,
         Nutrient.protein ||
         Nutrient.carbohydrates ||
         Nutrient.fat ||
-        Nutrient.fiber => l10n.goalOptional,
+        Nutrient.fiber => intl.goalOptional,
       };
 
   static (String, String?) energyNote(
-    AppLocalizations l10n,
+    AppLocalizations intl,
     MacroEnergy energy,
     double? kilocalories,
   ) => switch ((energy.missing, kilocalories)) {
     ([], final goal?) => (
-      l10n.macrosTotal(energy.kilocalories),
-      l10n.macrosGoal(goal),
+      intl.macrosTotal(energy.kilocalories),
+      intl.macrosGoal(goal),
     ),
-    ([], null) => (l10n.macrosTotal(energy.kilocalories), null),
+    ([], null) => (intl.macrosTotal(energy.kilocalories), null),
     (final missing, _) => (
-      l10n.macrosPartial(
+      intl.macrosPartial(
         energy.counted.length,
-        _list(l10n, [
+        _list(intl, [
           for (final nutrient in energy.counted)
-            SendText.nutrient(l10n, nutrient),
+            SendText.nutrient(intl, nutrient),
         ]),
         energy.kilocalories,
       ),
-      l10n.macrosMissing(
+      intl.macrosMissing(
         TitleText.capitalized(
-          _list(l10n, [for (final nutrient in missing) _name(l10n, nutrient)]),
+          _list(intl, [for (final nutrient in missing) _name(intl, nutrient)]),
         ),
       ),
     ),
   };
 
-  static String _name(AppLocalizations l10n, Nutrient nutrient) =>
+  static String _name(AppLocalizations intl, Nutrient nutrient) =>
       switch (nutrient) {
-        Nutrient.protein => l10n.macroNameProtein,
-        Nutrient.carbohydrates => l10n.macroNameCarbohydrates,
-        Nutrient.fat => l10n.macroNameFat,
-        Nutrient.kilocalories || Nutrient.fiber => label(l10n, nutrient),
+        Nutrient.protein => intl.macroNameProtein,
+        Nutrient.carbohydrates => intl.macroNameCarbohydrates,
+        Nutrient.fat => intl.macroNameFat,
+        Nutrient.kilocalories || Nutrient.fiber => label(intl, nutrient),
       };
 
-  static String _list(AppLocalizations l10n, List<String> items) =>
+  static String _list(AppLocalizations intl, List<String> items) =>
       switch (items) {
         [...final first, final last] when first.isNotEmpty =>
-          '${first.join(l10n.listSeparator)}${l10n.listLastSeparator}$last',
+          '${first.join(intl.listSeparator)}${intl.listLastSeparator}$last',
         _ => items.join(),
       };
 }

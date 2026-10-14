@@ -5,7 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/journal/calendar_week.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/day_pill.dart';
 import 'package:fujin/pages/common/fujin_icon_button.dart';
 import 'package:fujin/pages/common/gold_separator.dart';
@@ -32,7 +32,6 @@ class DayPickerSheet extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final today = ref.watch(todayProvider);
     final months = _monthsBetween(first, last) + 1;
     final initialPage = _monthsBetween(first, selected);
@@ -56,7 +55,7 @@ class DayPickerSheet extends HookConsumerWidget {
       scopesRoute: true,
       namesRoute: true,
       explicitChildNodes: true,
-      label: l10n.dayPickerTitle,
+      label: context.intl.dayPickerTitle,
       child: SafeArea(
         top: false,
         child: Padding(
@@ -77,7 +76,7 @@ class DayPickerSheet extends HookConsumerWidget {
                   Expanded(
                     child: Text(
                       TitleText.capitalized(
-                        l10n.dayPickerMonth(_monthOf(shown.value)),
+                        context.intl.dayPickerMonth(_monthOf(shown.value)),
                       ),
                       style: FujinText.hina24.copyWith(
                         color: FujinColorRole.textPrimary,
@@ -87,13 +86,13 @@ class DayPickerSheet extends HookConsumerWidget {
                   _Turn(
                     visible: shown.value > 0,
                     icon: Icons.chevron_left,
-                    tooltip: l10n.previousMonth,
+                    tooltip: context.intl.previousMonth,
                     onPressed: () => turnTo(shown.value - 1),
                   ),
                   _Turn(
                     visible: shown.value < months - 1,
                     icon: Icons.chevron_right,
-                    tooltip: l10n.nextMonth,
+                    tooltip: context.intl.nextMonth,
                     onPressed: () => turnTo(shown.value + 1),
                   ),
                 ],
@@ -107,7 +106,7 @@ class DayPickerSheet extends HookConsumerWidget {
                       for (final day in CalendarWeek.daysOf(today))
                         Expanded(
                           child: Text(
-                            l10n.weekdayShort(day),
+                            context.intl.weekdayShort(day),
                             textAlign: TextAlign.center,
                             style: FujinText.inter11Medium.copyWith(
                               color: FujinColorRole.textTertiary,
@@ -137,7 +136,7 @@ class DayPickerSheet extends HookConsumerWidget {
               if (!today.isBefore(first) && !today.isAfter(last))
                 TextButton(
                   onPressed: () => pick(today),
-                  child: Text(l10n.journalToday),
+                  child: Text(context.intl.journalToday),
                 ),
             ],
           ),
@@ -250,7 +249,6 @@ class _Day extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final chosen = day == selected;
     final inRange = !day.isBefore(first) && !day.isAfter(last);
 
@@ -262,7 +260,7 @@ class _Day extends StatelessWidget {
         },
         radius: FujinSize.touchTarget / 2,
         child: Semantics(
-          label: l10n.dayPickerDay(day),
+          label: context.intl.dayPickerDay(day),
           selected: chosen,
           button: true,
           enabled: inRange,
@@ -283,7 +281,7 @@ class _Day extends StatelessWidget {
                 false => null,
               },
               child: DayPill(
-                date: l10n.dayOfMonth(day),
+                date: context.intl.dayOfMonth(day),
                 selected: chosen,
                 idleColor: switch (inRange) {
                   true => FujinColorRole.textPrimary,

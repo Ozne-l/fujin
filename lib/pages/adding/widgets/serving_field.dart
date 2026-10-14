@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/adding/add_text.dart';
 import 'package:fujin/pages/common/fujin_menu.dart';
 import 'package:fujin/pages/common/fujin_menu_button.dart';
@@ -24,19 +24,18 @@ class ServingField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
       child: FujinMenu<MfpServingSize>(
         items: servings,
         selected: selected,
-        labelOf: (serving) => AddText.serving(l10n, serving),
+        labelOf: (serving) => AddText.serving(context.intl, serving),
         onSelected: onSelected,
         itemPadding: _padding,
         itemStyle: FujinText.inter15Medium,
         builder: (context, {required expanded, required toggle}) =>
             FujinMenuButton(
-              label: AddText.serving(l10n, selected),
+              label: AddText.serving(context.intl, selected),
               expanded: expanded,
               onTap: toggle,
               height: FujinSize.field,

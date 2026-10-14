@@ -9,9 +9,9 @@ enum FujinTab {
 
   final String icon;
 
-  String label(AppLocalizations l10n) => switch (this) {
-    FujinTab.journal => l10n.tabJournal,
-    FujinTab.memory => l10n.tabMemory,
-    FujinTab.settings => l10n.tabSettings,
+  String label(AppLocalizations intl) => switch (this) {
+    FujinTab.journal => intl.tabJournal,
+    FujinTab.memory => intl.tabMemory,
+    FujinTab.settings => intl.tabSettings,
   };
 }

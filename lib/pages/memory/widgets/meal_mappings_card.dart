@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/memory/meal_mapping.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/fujin_menu.dart';
 import 'package:fujin/pages/common/fujin_menu_button.dart';
 
@@ -64,7 +64,6 @@ class _MealRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Row(
       spacing: FujinSpace.s3,
       children: [
@@ -74,7 +73,7 @@ class _MealRow extends StatelessWidget {
             spacing: FujinSpace.s1,
             children: [
               Text(
-                l10n.sourceMyFitnessPal,
+                context.intl.sourceMyFitnessPal,
                 style: FujinText.inter11Medium.copyWith(
                   color: FujinColorRole.textTertiary,
                 ),
@@ -115,7 +114,7 @@ class _MealRow extends StatelessWidget {
                   radius: FujinRadius.menu,
                   padding: _padding,
                   spacing: FujinSize.textGap,
-                  semanticsLabel: l10n.memoryMealMenu(meal.mfpMealName),
+                  semanticsLabel: context.intl.memoryMealMenu(meal.mfpMealName),
                 ),
           ),
         ),

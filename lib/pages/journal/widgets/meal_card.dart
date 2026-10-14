@@ -8,6 +8,7 @@ import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/journal/journal_meal.dart';
 import 'package:fujin/domain/journal/status_counts.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
@@ -23,7 +24,6 @@ class MealCard extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final counts = meal.counts;
     final settled = counts.total > 0 && counts.pending == 0;
     final toggled = useState<({bool settled, bool open})?>(null);
@@ -35,7 +35,7 @@ class MealCard extends HookWidget {
     final pills = Wrap(
       spacing: FujinSpace.s1,
       children: [
-        for (final (label, tone) in _mealPills(l10n, counts))
+        for (final (label, tone) in _mealPills(context.intl, counts))
           StatusPill(key: ValueKey(tone), label: label, tone: tone),
       ],
     );
@@ -44,9 +44,9 @@ class MealCard extends HookWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: FujinSpace.s3,
         children: [
-          _title(l10n),
+          _title(context.intl),
           Text(
-            l10n.mealEmpty,
+            context.intl.mealEmpty,
             style: FujinText.inter13Regular.copyWith(
               color: FujinColorRole.textSecondary,
             ),
@@ -57,10 +57,10 @@ class MealCard extends HookWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: FujinSpace.s3,
         children: [
-          _title(l10n),
+          _title(context.intl),
           _Line(
             leading: Text(
-              l10n.mealProgress(counts.inEkklo, total),
+              context.intl.mealProgress(counts.inEkklo, total),
               style: FujinText.inter13Regular.copyWith(
                 color: FujinColorRole.textSecondary,
               ),
@@ -79,7 +79,7 @@ class MealCard extends HookWidget {
               children: [
                 _name(),
                 Text(
-                  l10n.mealFolded(
+                  context.intl.mealFolded(
                     counts.inEkklo,
                     total,
                     meal.entries
@@ -98,7 +98,7 @@ class MealCard extends HookWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             spacing: FujinSpace.s1,
-            children: [_kilocalories(l10n), pills],
+            children: [_kilocalories(context.intl), pills],
           ),
         ],
       ),
@@ -167,7 +167,7 @@ class MealCard extends HookWidget {
                 theme: const SvgTheme(currentColor: FujinColorRole.textLink),
                 excludeFromSemantics: true,
               ),
-              label: Text(l10n.mealAddFood),
+              label: Text(context.intl.mealAddFood),
             ),
           ),
         ],
@@ -182,26 +182,26 @@ class MealCard extends HookWidget {
     ),
   );
 
-  Widget _kilocalories(AppLocalizations l10n) => Text(
-    l10n.kilocalories(meal.kilocalories),
+  Widget _kilocalories(AppLocalizations intl) => Text(
+    intl.kilocalories(meal.kilocalories),
     style: FujinText.inter15Semibold.copyWith(
       color: FujinColorRole.textPrimary,
     ),
   );
 
-  Widget _title(AppLocalizations l10n) =>
-      _Line(leading: _name(), trailing: _kilocalories(l10n));
+  Widget _title(AppLocalizations intl) =>
+      _Line(leading: _name(), trailing: _kilocalories(intl));
 
   static List<(String, PillTone)> _mealPills(
-    AppLocalizations l10n,
+    AppLocalizations intl,
     StatusCounts counts,
   ) => switch ((counts.toSend, counts.toUpdate)) {
-    (0, 0) => [(l10n.statusInEkklo, PillTone.validated)],
-    (final send, 0) => [(l10n.mealToSend(send), PillTone.attention)],
-    (0, final update) => [(l10n.mealToUpdate(update), PillTone.info)],
+    (0, 0) => [(intl.statusInEkklo, PillTone.validated)],
+    (final send, 0) => [(intl.mealToSend(send), PillTone.attention)],
+    (0, final update) => [(intl.mealToUpdate(update), PillTone.info)],
     (final send, final update) => [
-      (l10n.mealToSend(send), PillTone.attention),
-      (l10n.mealToUpdate(update), PillTone.info),
+      (intl.mealToSend(send), PillTone.attention),
+      (intl.mealToUpdate(update), PillTone.info),
     ],
   };
 }
@@ -213,16 +213,15 @@ class _EntryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final entry = compared.entry;
     final detail = switch (compared.status) {
-      ToUpdate(:final link) => EntryText.linkedServing(l10n, link),
-      InEkklo() || ToSend() => EntryText.macros(l10n, entry.nutrients),
+      ToUpdate(:final link) => EntryText.linkedServing(context.intl, link),
+      InEkklo() || ToSend() => EntryText.macros(context.intl, entry.nutrients),
     };
     final (label, tone, icon) = switch (compared.status) {
-      InEkklo() => (l10n.statusInEkklo, PillTone.validated, null),
-      ToSend() => (l10n.statusToSend, PillTone.attention, null),
-      ToUpdate() => (l10n.statusToUpdate, PillTone.info, Icons.refresh),
+      InEkklo() => (context.intl.statusInEkklo, PillTone.validated, null),
+      ToSend() => (context.intl.statusToSend, PillTone.attention, null),
+      ToUpdate() => (context.intl.statusToUpdate, PillTone.info, Icons.refresh),
     };
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -236,7 +235,7 @@ class _EntryRow extends StatelessWidget {
             ),
           ),
           trailing: Text(
-            EntryText.energy(l10n, entry),
+            EntryText.energy(context.intl, entry),
             style: FujinText.inter15Semibold.copyWith(
               color: FujinColorRole.textPrimary,
             ),
@@ -248,7 +247,7 @@ class _EntryRow extends StatelessWidget {
             spacing: FujinSpace.s1,
             children: [
               Text(
-                EntryText.brandedServing(l10n, entry),
+                EntryText.brandedServing(context.intl, entry),
                 style: FujinText.inter13Regular.copyWith(
                   color: FujinColorRole.textSecondary,
                 ),

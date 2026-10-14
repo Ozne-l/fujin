@@ -7,7 +7,7 @@ import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/adding/adding_possible.dart';
 import 'package:fujin/domain/adding/meal_of_the_hour.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
 import 'package:fujin/pages/journal/journal_snack_bar.dart';
@@ -69,7 +69,7 @@ class TabShell extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(
             context,
-          ).showProblem(AppLocalizations.of(context), ReadProblem.of(error));
+          ).showProblem(context.intl, ReadProblem.of(error));
         }
         return;
       }
@@ -81,7 +81,7 @@ class TabShell extends ConsumerWidget {
         case null:
           ScaffoldMessenger.of(
             context,
-          ).showProblem(AppLocalizations.of(context), ReadProblem.unknown);
+          ).showProblem(context.intl, ReadProblem.unknown);
       }
     }
 

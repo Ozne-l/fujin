@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/glass_surface.dart';
 import 'package:fujin/pages/common/scan_button.dart';
 import 'package:fujin/pages/tabs/fujin_tab.dart';
@@ -23,7 +23,6 @@ class FloatingTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Stack(
       children: [
         Positioned.fill(
@@ -66,7 +65,7 @@ class FloatingTabBar extends StatelessWidget {
                             Expanded(
                               child: _TabButton(
                                 tab: tab,
-                                label: tab.label(l10n),
+                                label: tab.label(context.intl),
                                 active: tab == selected,
                                 onTap: () => onSelect(tab),
                               ),

@@ -8,8 +8,8 @@ extension FujinSnackBar on ScaffoldMessengerState {
   void showFujinSnackBar(SnackBar snackBar) =>
       showSnackBar(snackBar, snackBarAnimationStyle: FujinMotion.snackBar);
 
-  void showProblem(AppLocalizations l10n, ReadProblem problem) =>
+  void showProblem(AppLocalizations intl, ReadProblem problem) =>
       showFujinSnackBar(
-        SnackBar(content: Text(JournalText.problemHeadline(l10n, problem))),
+        SnackBar(content: Text(JournalText.problemHeadline(intl, problem))),
       );
 }

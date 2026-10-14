@@ -9,6 +9,7 @@ import 'package:fujin/domain/sending/rank_candidates.dart';
 import 'package:fujin/domain/sending/review_reason.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/status_pill.dart';
 import 'package:fujin/pages/sending/entry_choices.dart';
@@ -27,9 +28,11 @@ class ReviewCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final entry = planned.entry;
-    final (reasonLabel, reasonTone) = SendText.reason(l10n, planned.reason);
+    final (reasonLabel, reasonTone) = SendText.reason(
+      context.intl,
+      planned.reason,
+    );
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
       padding: const EdgeInsets.fromLTRB(
@@ -56,7 +59,7 @@ class ReviewCard extends ConsumerWidget {
                 Text(
                   switch (planned.ekkloMealName == entry.mealName) {
                     true => entry.mealName,
-                    false => l10n.mealTowards(
+                    false => context.intl.mealTowards(
                       entry.mealName,
                       planned.ekkloMealName,
                     ),
@@ -72,9 +75,9 @@ class ReviewCard extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  l10n.entryDetail(
-                    EntryText.brandedServing(l10n, entry),
-                    EntryText.energy(l10n, entry),
+                  context.intl.entryDetail(
+                    EntryText.brandedServing(context.intl, entry),
+                    EntryText.energy(context.intl, entry),
                   ),
                   style: FujinText.inter13Regular.copyWith(
                     color: FujinColorRole.textSecondary,
@@ -116,7 +119,7 @@ class ReviewCard extends ConsumerWidget {
                             foregroundColor: FujinColorRole.textOnDark,
                             textStyle: FujinText.inter16Medium,
                           ).copyWith(overlayColor: FujinTheme.pressedOverlay),
-                          child: Text(l10n.confirm),
+                          child: Text(context.intl.confirm),
                         ),
                     ],
                   ),
@@ -184,8 +187,7 @@ class _Proposal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final (title, detail, deltas) = _content(l10n);
+    final (title, detail, deltas) = _content(context.intl);
     return Container(
       padding: const EdgeInsets.all(FujinSpace.s3),
       decoration: BoxDecoration(
@@ -213,7 +215,7 @@ class _Proposal extends StatelessWidget {
                 child: InkWell(
                   onTap: onChange,
                   child: Text(
-                    l10n.change,
+                    context.intl.change,
                     style: FujinText.inter13Medium.copyWith(
                       color: FujinColorRole.textLink,
                     ),
@@ -239,7 +241,7 @@ class _Proposal extends StatelessWidget {
     );
   }
 
-  (String, String?, NutrientDeltas?) _content(AppLocalizations l10n) =>
+  (String, String?, NutrientDeltas?) _content(AppLocalizations intl) =>
       switch (planned.choice) {
         SendToEkkloFood(
           :final ekkloFoodId,
@@ -249,14 +251,14 @@ class _Proposal extends StatelessWidget {
           :final food,
         ) =>
           (
-            l10n.towards(ekkloFoodName),
+            intl.towards(ekkloFoodName),
             switch (planned.candidates
                 .where((candidate) => candidate.food.id == ekkloFoodId)
                 .firstOrNull) {
-              null => l10n.ekkloAmount(SendText.grams(l10n, grams)),
-              final candidate => l10n.ekkloAmountMatch(
-                SendText.grams(l10n, grams),
-                SendText.nameMatch(l10n, candidate.nameMatch),
+              null => intl.ekkloAmount(SendText.grams(intl, grams)),
+              final candidate => intl.ekkloAmountMatch(
+                SendText.grams(intl, grams),
+                SendText.nameMatch(intl, candidate.nameMatch),
               ),
             },
             switch (food) {
@@ -269,15 +271,15 @@ class _Proposal extends StatelessWidget {
             },
           ),
         SendAsOwnCopy(reuse: null) => (
-          l10n.towards(l10n.ownCopyToCreate),
-          l10n.ownCopyExact,
+          intl.towards(intl.ownCopyToCreate),
+          intl.ownCopyExact,
           null,
         ),
         SendAsOwnCopy() => (
-          l10n.towards(l10n.ownCopy),
-          l10n.ownCopyExact,
+          intl.towards(intl.ownCopy),
+          intl.ownCopyExact,
           null,
         ),
-        SkipEntry() => (l10n.skippedDetail, null, null),
+        SkipEntry() => (intl.skippedDetail, null, null),
       };
 }

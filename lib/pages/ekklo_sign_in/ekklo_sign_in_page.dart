@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/alert_banner.dart';
 import 'package:fujin/pages/common/fujin_spinner.dart';
 import 'package:fujin/pages/common/sign_in_failure.dart';
@@ -19,7 +20,6 @@ class EkkloSignInPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final state = ref.watch(ekkloSignInProvider);
     final notifier = ref.read(ekkloSignInProvider.notifier);
     final email = useTextEditingController();
@@ -54,7 +54,7 @@ class EkkloSignInPage extends HookConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TopBar(title: l10n.ekkloSignInTitle),
+            TopBar(title: context.intl.ekkloSignInTitle),
             Expanded(
               child: AutofillGroup(
                 child: ListView(
@@ -67,7 +67,7 @@ class EkkloSignInPage extends HookConsumerWidget {
                   children: [
                     _Inset(
                       child: Text(
-                        l10n.ekkloSignInHeading,
+                        context.intl.ekkloSignInHeading,
                         style: FujinText.hina30.copyWith(
                           color: FujinColorRole.textPrimary,
                         ),
@@ -76,18 +76,18 @@ class EkkloSignInPage extends HookConsumerWidget {
                     const SizedBox(height: FujinSpace.s2),
                     _Inset(
                       child: Text(
-                        l10n.ekkloSignInSubtitle,
+                        context.intl.ekkloSignInSubtitle,
                         style: FujinText.inter15Regular.copyWith(
                           color: FujinColorRole.textSecondary,
                         ),
                       ),
                     ),
                     const SizedBox(height: FujinSpace.s6),
-                    if (_banner(l10n, state) case final banner?) ...[
+                    if (_banner(context.intl, state) case final banner?) ...[
                       banner,
                       const SizedBox(height: FujinSpace.s6),
                     ],
-                    _Label(text: l10n.emailLabel),
+                    _Label(text: context.intl.emailLabel),
                     TextField(
                       controller: email,
                       readOnly: running,
@@ -99,7 +99,7 @@ class EkkloSignInPage extends HookConsumerWidget {
                       style: _fieldStyle,
                     ),
                     const SizedBox(height: FujinSpace.s4),
-                    _Label(text: l10n.passwordLabel),
+                    _Label(text: context.intl.passwordLabel),
                     _PasswordField(
                       controller: password,
                       readOnly: running,
@@ -122,7 +122,7 @@ class EkkloSignInPage extends HookConsumerWidget {
                 onPressed: submit,
                 child: switch (running) {
                   true => const FujinSpinner.button(),
-                  false => Text(l10n.signIn),
+                  false => Text(context.intl.signIn),
                 },
               ),
             ),
@@ -137,20 +137,20 @@ class EkkloSignInPage extends HookConsumerWidget {
   );
 
   static AlertBanner? _banner(
-    AppLocalizations l10n,
+    AppLocalizations intl,
     EkkloSignInState state,
   ) => switch (state) {
     EkkloSignInFailed(failure: SignInFailure.refused, :final message) =>
       AlertBanner(
-        title: l10n.ekkloSignInRefused,
+        title: intl.ekkloSignInRefused,
         detail: switch (message) {
-          final message? => l10n.ekkloSignInMessage(message),
+          final message? => intl.ekkloSignInMessage(message),
           null => null,
         },
       ),
     EkkloSignInFailed(failure: SignInFailure.unreachable) => AlertBanner(
-      title: l10n.ekkloSignInUnreachable,
-      detail: l10n.ekkloSignInUnreachableDetail,
+      title: intl.ekkloSignInUnreachable,
+      detail: intl.ekkloSignInUnreachableDetail,
     ),
     EkkloSignInIdle() || EkkloSignInRunning() || EkkloSignInDone() => null,
   };
@@ -206,7 +206,6 @@ class _PasswordField extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final shown = useState(false);
     final border = switch (refused) {
       true => FujinTheme.fieldErrorBorder,
@@ -235,8 +234,8 @@ class _PasswordField extends HookWidget {
           ),
           child: Text(
             switch (shown.value) {
-              true => l10n.passwordHide,
-              false => l10n.passwordShow,
+              true => context.intl.passwordHide,
+              false => context.intl.passwordShow,
             },
           ),
         ),

@@ -5,7 +5,7 @@ import 'package:fujin/domain/sending/send_plan.dart';
 import 'package:fujin/domain/sending/send_progress.dart';
 import 'package:fujin/domain/sending/send_step.dart';
 import 'package:fujin/domain/sending/step_state.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/sending/widgets/progress_card.dart';
 import 'package:fujin/pages/sending/widgets/send_header.dart';
 import 'package:fujin/pages/sending/widgets/step_list.dart';
@@ -19,7 +19,6 @@ class SendingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -29,9 +28,9 @@ class SendingView extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: FujinSpace.s6),
             children: [
               ProgressCard(
-                title: l10n.sendingTitle,
-                detail: l10n.sendingDetail,
-                note: l10n.sendingNote,
+                title: context.intl.sendingTitle,
+                detail: context.intl.sendingDetail,
+                note: context.intl.sendingNote,
                 done: progress.done,
                 total: progress.steps.length,
               ),

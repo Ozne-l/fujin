@@ -16,11 +16,11 @@ class CandidateCard extends StatelessWidget {
   final VoidCallback? onTap;
   final Widget child;
 
-  static String origin(AppLocalizations l10n, EkkloCandidate candidate) {
-    final match = SendText.nameMatch(l10n, candidate.nameMatch);
+  static String origin(AppLocalizations intl, EkkloCandidate candidate) {
+    final match = SendText.nameMatch(intl, candidate.nameMatch);
     return switch (candidate.food.brands) {
       null => match,
-      final brands => l10n.candidateBrandMatch(brands, match),
+      final brands => intl.candidateBrandMatch(brands, match),
     };
   }
 

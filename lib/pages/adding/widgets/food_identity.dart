@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/pill_size.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/source_dot.dart';
@@ -15,7 +15,6 @@ class FoodIdentity extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final secondary = FujinText.inter13Regular.copyWith(
       color: FujinColorRole.textSecondary,
     );
@@ -30,7 +29,7 @@ class FoodIdentity extends StatelessWidget {
             children: [
               const SourceDot(color: FujinColorRole.sourceMfp),
               Text(
-                l10n.sourceMyFitnessPal,
+                context.intl.sourceMyFitnessPal,
                 style: FujinText.inter12Medium.copyWith(
                   color: FujinColorRole.textSecondary,
                 ),
@@ -50,19 +49,19 @@ class FoodIdentity extends StatelessWidget {
                 Text(brand, style: secondary),
               switch (food.verified ?? false) {
                 true => StatusPill(
-                  label: l10n.addVerified,
+                  label: context.intl.addVerified,
                   tone: PillTone.validated,
                   icon: Icons.check,
                   size: PillSize.small,
                 ),
                 false => StatusPill(
-                  label: l10n.addUnverified,
+                  label: context.intl.addUnverified,
                   tone: PillTone.muted,
                   size: PillSize.small,
                 ),
               },
               if (barcode case final barcode?)
-                Text(l10n.addEan(barcode), style: secondary),
+                Text(context.intl.addEan(barcode), style: secondary),
             ],
           ),
         ],

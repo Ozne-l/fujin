@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:fujin/domain/sending/nutrient_deltas.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/pill_size.dart';
 import 'package:fujin/pages/common/status_pill.dart';
 import 'package:fujin/pages/sending/send_text.dart';
@@ -14,7 +14,6 @@ class DeltaPills extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Wrap(
       spacing: FujinSpace.s1,
       runSpacing: FujinSpace.s1,
@@ -22,7 +21,7 @@ class DeltaPills extends StatelessWidget {
         for (final nutrient in Nutrient.values)
           StatusPill(
             key: ValueKey(nutrient),
-            label: SendText.delta(l10n, deltas, nutrient),
+            label: SendText.delta(context.intl, deltas, nutrient),
             tone: SendText.deltaTone(deltas, nutrient),
             size: PillSize.small,
           ),
