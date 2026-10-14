@@ -6,6 +6,7 @@ import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/send_label.dart';
 import 'package:fujin/pages/common/sheet_frame.dart';
+import 'package:fujin/pages/common/sheet_header.dart';
 import 'package:fujin/pages/common/source_dot.dart';
 import 'package:fujin/pages/common/title_text.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
@@ -49,48 +50,33 @@ class _DayDetail extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           spacing: FujinSpace.s4,
           children: [
-            Align(
-              alignment: AlignmentDirectional.centerEnd,
-              child: TextButton(
-                onPressed: navigator.pop,
-                style: TextButton.styleFrom(
-                  textStyle: FujinText.inter13Medium,
-                ),
-                child: Text(context.intl.close),
+            SheetHeader(
+              title: context.intl.dayDetailTitle,
+              subtitle: TitleText.capitalized(
+                context.intl.journalDay(day.date),
               ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: FujinSpace.s1,
-              children: [
-                Text(
-                  TitleText.capitalized(context.intl.journalDay(day.date)),
-                  style: FujinText.inter13Regular.copyWith(
-                    color: FujinColorRole.textSecondary,
-                  ),
-                ),
-                Text(
-                  context.intl.dayDetailTitle,
-                  style: FujinText.hina30.copyWith(
-                    color: FujinColorRole.textPrimary,
-                  ),
-                ),
-                _Row(
-                  label: const SizedBox.shrink(),
-                  mfp: _Header(
-                    dot: FujinColorRole.sourceMfp,
-                    label: context.intl.sourceMyFitnessPal,
-                  ),
-                  ekklo: _Header(
-                    dot: FujinColorRole.sourceEkklo,
-                    label: context.intl.sourceEkklo,
-                  ),
-                ),
-              ],
+              titleStyle: FujinText.hina30,
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    top: FujinSpace.s4,
+                    bottom: FujinSpace.s3,
+                  ),
+                  child: _Row(
+                    label: const SizedBox.shrink(),
+                    mfp: _Header(
+                      dot: FujinColorRole.sourceMfp,
+                      label: context.intl.sourceMyFitnessPal,
+                    ),
+                    ekklo: _Header(
+                      dot: FujinColorRole.sourceEkklo,
+                      label: context.intl.sourceEkklo,
+                    ),
+                  ),
+                ),
                 for (final nutrient in Nutrient.values) ...[
                   const Divider(),
                   Padding(

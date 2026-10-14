@@ -6,6 +6,7 @@ import 'package:fujin/domain/journal/day_nutrients.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/sheet_frame.dart';
+import 'package:fujin/pages/common/sheet_header.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -74,23 +75,7 @@ class _MyDay extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           spacing: FujinSpace.s3,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    context.intl.addMyDay,
-                    style: FujinText.hina28.copyWith(
-                      color: FujinColorRole.textPrimary,
-                    ),
-                  ),
-                ),
-                TextButton(
-                  onPressed: Navigator.of(context).pop,
-                  child: Text(context.intl.close),
-                ),
-              ],
-            ),
-            Text(subtitle, style: secondary),
+            SheetHeader(title: context.intl.addMyDay, subtitle: subtitle),
             Table(
               columnWidths: const {0: FlexColumnWidth(_labelFlex)},
               defaultVerticalAlignment: TableCellVerticalAlignment.middle,
