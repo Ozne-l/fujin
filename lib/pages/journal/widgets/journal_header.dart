@@ -35,27 +35,32 @@ class JournalHeader extends StatelessWidget {
             context.intl.appName,
             style: FujinText.hina22.copyWith(color: FujinColorRole.textLink),
           ),
-          OverflowBar(
-            alignment: MainAxisAlignment.spaceBetween,
-            overflowAlignment: OverflowBarAlignment.end,
-            spacing: FujinSpace.s3,
-            children: [
-              Text(
-                title,
-                style: FujinText.hina30.copyWith(
-                  color: FujinColorRole.textPrimary,
-                ),
-              ),
-              if (link case (final label, final onTap))
-                TextButton(
-                  onPressed: onTap,
-                  style: TextButton.styleFrom(
-                    textStyle: FujinText.inter13Medium,
-                    padding: EdgeInsets.zero,
+          ConstrainedBox(
+            constraints: const BoxConstraints(
+              minHeight: FujinSize.touchTarget,
+            ),
+            child: OverflowBar(
+              alignment: MainAxisAlignment.spaceBetween,
+              overflowAlignment: OverflowBarAlignment.end,
+              spacing: FujinSpace.s3,
+              children: [
+                Text(
+                  title,
+                  style: FujinText.hina30.copyWith(
+                    color: FujinColorRole.textPrimary,
                   ),
-                  child: Text(label),
                 ),
-            ],
+                if (link case (final label, final onTap))
+                  TextButton(
+                    onPressed: onTap,
+                    style: TextButton.styleFrom(
+                      textStyle: FujinText.inter13Medium,
+                      padding: EdgeInsets.zero,
+                    ),
+                    child: Text(label),
+                  ),
+              ],
+            ),
           ),
         ],
       ),
