@@ -57,7 +57,10 @@ abstract final class SendText {
     AppLocalizations intl,
     ReviewReason reason,
   ) => switch (reason) {
-    ReviewReason.weightToConfirm => (intl.pillWeightToConfirm, PillTone.error),
+    ReviewReason.weightToConfirm => (
+      intl.pillWeightToConfirm,
+      PillTone.attention,
+    ),
     ReviewReason.newAssociation => (
       intl.pillNewAssociation,
       PillTone.attention,
