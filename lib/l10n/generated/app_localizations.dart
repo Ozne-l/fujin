@@ -932,6 +932,12 @@ abstract class AppLocalizations {
   /// **'D\'abord les aliments perso, puis un envoi par repas.'**
   String get sendingNote;
 
+  /// No description provided for @sendingStay.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'envoi va jusqu\'au bout. Tu pourras revenir au journal juste après.'**
+  String get sendingStay;
+
   /// No description provided for @stepOwnCopyDone.
   ///
   /// In fr, this message translates to:

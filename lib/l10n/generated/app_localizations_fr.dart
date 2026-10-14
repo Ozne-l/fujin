@@ -618,6 +618,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'D\'abord les aliments perso, puis un envoi par repas.';
 
   @override
+  String get sendingStay =>
+      'L\'envoi va jusqu\'au bout. Tu pourras revenir au journal juste après.';
+
+  @override
   String get stepOwnCopyDone => 'Aliment perso créé';
 
   @override

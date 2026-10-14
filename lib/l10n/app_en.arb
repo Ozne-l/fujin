@@ -139,6 +139,7 @@
   "sendingTitle": "Sending",
   "sendingDetail": "Foods are on their way to Ekklo…",
   "sendingNote": "Own foods first, then one send per meal.",
+  "sendingStay": "The send runs to the end. You can go back to the journal right after.",
   "stepOwnCopyDone": "Own food created",
   "stepOwnCopy": "Own food",
   "stepOnTheWay": "{subject} · on the way",

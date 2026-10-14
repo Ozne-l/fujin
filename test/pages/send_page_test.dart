@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:checks/checks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -53,6 +55,30 @@ void main() {
 
     _sees('Aucun aliment proche');
     check(tester.takeException()).isNull();
+  });
+
+  testWidgets('says why back does nothing while a send runs', (tester) async {
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [entry('E-1')],
+    );
+    await pumpFujin(tester, backends);
+    await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
+
+    final gate = backends.diaryGate = Completer<void>();
+    await tester.tap(find.text('Envoyer 1 aliment vers Ekklo'));
+    await tester.pump();
+    await tester.binding.handlePopRoute();
+    await tester.pump();
+
+    _sees('Envoi en cours');
+    _sees(
+      "L'envoi va jusqu'au bout. Tu pourras revenir au journal juste après.",
+    );
+
+    gate.complete();
+    await tester.pumpAndSettle();
+    _sees('Envoi terminé');
   });
 
   testWidgets('sends a day reviewed on screen 10 and comes back to a '

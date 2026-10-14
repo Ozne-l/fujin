@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:fujin/domain/sending/send_mode.dart';
+import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/automatic_mode_notifier.dart';
+import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/sending/send_notifier.dart';
 import 'package:fujin/pages/sending/send_plan_notifier.dart';
 import 'package:fujin/pages/sending/send_plan_state.dart';
@@ -36,6 +38,16 @@ class SendPage extends HookConsumerWidget {
 
     return PopScope(
       canPop: sendState is! SendRunning,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showFujinSnackBar(
+            SnackBar(
+              content: Text(context.intl.sendingStay),
+            ),
+          );
+      },
       child: Scaffold(
         body: SafeArea(
           child: switch ((sendState, planState)) {

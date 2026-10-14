@@ -356,6 +356,7 @@
   "sendingTitle": "Envoi en cours",
   "sendingDetail": "Les aliments partent vers Ekklo…",
   "sendingNote": "D'abord les aliments perso, puis un envoi par repas.",
+  "sendingStay": "L'envoi va jusqu'au bout. Tu pourras revenir au journal juste après.",
   "stepOwnCopyDone": "Aliment perso créé",
   "stepOwnCopy": "Aliment perso",
   "stepOnTheWay": "{subject} · en route",

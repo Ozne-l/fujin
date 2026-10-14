@@ -606,6 +606,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sendingNote => 'Own foods first, then one send per meal.';
 
   @override
+  String get sendingStay =>
+      'The send runs to the end. You can go back to the journal right after.';
+
+  @override
   String get stepOwnCopyDone => 'Own food created';
 
   @override
