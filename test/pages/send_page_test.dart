@@ -80,6 +80,10 @@ void main() {
     await _tap(tester, 'Envoyer 2 aliments vers Ekklo');
     _sees('1 à vérifier');
     _sees('Nouveau choix');
+    _sees(
+      'Écarts calculés sur la portion MFP. Vert : dans la tolérance '
+      '(kcal 12 %, macros 10 %). F n.c. : fibres non communiquées.',
+    );
 
     await _tap(tester, 'Envoyer 2 aliments vers Ekklo');
     _sees('Envoi terminé');

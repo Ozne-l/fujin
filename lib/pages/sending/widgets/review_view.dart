@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
+import 'package:fujin/domain/sending/planned_entry.dart';
+import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/domain/sending/send_plan.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
@@ -82,6 +84,18 @@ class ReviewView extends HookConsumerWidget {
                           planned: planned,
                         ),
                       ),
+                    if (plan.toReview.any(_showsDeltas))
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: FujinSize.textInset,
+                        ),
+                        child: Text(
+                          context.intl.toleranceNote,
+                          style: FujinText.inter12Regular.copyWith(
+                            color: FujinColorRole.textTertiary,
+                          ),
+                        ),
+                      ),
                   ],
                   _Section.automatic => [
                     PlanRow.card([
@@ -106,6 +120,11 @@ class ReviewView extends HookConsumerWidget {
     );
   }
 }
+
+bool _showsDeltas(PlannedEntry planned) => switch (planned.choice) {
+  SendToEkkloFood(:final food) => food != null,
+  SendAsOwnCopy() || SkipEntry() => false,
+};
 
 enum _Section {
   toReview(PillTone.attention),
