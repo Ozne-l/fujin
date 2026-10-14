@@ -33,7 +33,7 @@ class ProgressRing extends StatelessWidget {
   Widget build(BuildContext context) => SizedBox.square(
     dimension: size,
     child: SingleMotionBuilder(
-      motion: FujinMotion.progress,
+      motion: FujinMotion.of(context, FujinMotion.progress),
       value: progress.clamp(0, 1),
       builder: (context, value, child) => CustomPaint(
         painter: _RingPainter(

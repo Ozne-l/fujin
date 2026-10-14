@@ -64,13 +64,8 @@ class WeekBand extends HookConsumerWidget {
       return timer.cancel;
     }, const []);
 
-    void turnTo(int page) => unawaited(
-      controller.animateToPage(
-        page,
-        duration: FujinMotion.pageTurn.duration,
-        curve: FujinMotion.pageTurn.curve,
-      ),
-    );
+    void turnTo(int page) =>
+        unawaited(FujinMotion.turnPage(context, controller, page));
 
     useEffect(() {
       if (controller.hasClients && shown.value != selectedPage) {
@@ -153,7 +148,7 @@ class WeekBand extends HookConsumerWidget {
                     child: SequenceMotionBuilder<int, double>(
                       sequence: _nudge,
                       converter: const SingleMotionConverter(),
-                      playing: hinting,
+                      playing: hinting && !FujinMotion.reduced(context),
                       builder: (context, nudge, phase, child) =>
                           PageView.builder(
                             controller: controller,

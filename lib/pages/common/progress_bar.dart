@@ -23,7 +23,7 @@ class ProgressBar extends StatelessWidget {
       decoration: BoxDecoration(color: track, borderRadius: radius),
       alignment: AlignmentDirectional.centerStart,
       child: SingleMotionBuilder(
-        motion: FujinMotion.progress,
+        motion: FujinMotion.of(context, FujinMotion.progress),
         value: fraction.clamp(0, 1),
         builder: (context, value, child) => FractionallySizedBox(
           widthFactor: value.clamp(0, 1),

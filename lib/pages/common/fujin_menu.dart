@@ -132,7 +132,7 @@ class FujinMenu<T> extends HookWidget {
                   groupId: info.tapRegionGroupId,
                   onTapOutside: (event) => controller.close(),
                   child: SingleMotionBuilder(
-                    motion: FujinMotion.mealFold,
+                    motion: FujinMotion.of(context, FujinMotion.mealFold),
                     from: 0,
                     value: switch (expanded.value) {
                       true => 1,

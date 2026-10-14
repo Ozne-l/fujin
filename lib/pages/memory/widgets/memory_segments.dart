@@ -26,16 +26,10 @@ class MemorySegments extends StatelessWidget {
     _ => pages.initialPage.toDouble(),
   };
 
-  void _select(MemorySegment segment) {
+  void _select(BuildContext context, MemorySegment segment) {
     if (_page == segment.index) return;
     unawaited(HapticFeedback.selectionClick());
-    unawaited(
-      pages.animateToPage(
-        segment.index,
-        duration: FujinMotion.pageTurn.duration,
-        curve: FujinMotion.pageTurn.curve,
-      ),
-    );
+    unawaited(FujinMotion.turnPage(context, pages, segment.index));
   }
 
   @override
@@ -72,7 +66,7 @@ class MemorySegments extends StatelessWidget {
                     child: _Segment(
                       label: labelOf(segment),
                       active: (1 - (page - segment.index).abs()).clamp(0, 1),
-                      onTap: () => _select(segment),
+                      onTap: () => _select(context, segment),
                     ),
                   ),
               ],

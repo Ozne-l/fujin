@@ -60,7 +60,7 @@ class SouffleRefresh extends HookWidget {
 
     Widget settle(double target) => SingleMotionBuilder(
       key: ValueKey(target),
-      motion: FujinMotion.progress,
+      motion: FujinMotion.of(context, FujinMotion.progress),
       from: pull.value,
       value: target,
       builder: (context, progress, child) => placed(progress),
@@ -86,7 +86,7 @@ class SouffleRefresh extends HookWidget {
               child: Align(
                 alignment: Alignment.topCenter,
                 child: SingleMotionBuilder(
-                  motion: FujinMotion.pill,
+                  motion: FujinMotion.of(context, FujinMotion.pill),
                   value: status.value == RefreshIndicatorStatus.done ? 0 : 1,
                   onAnimationStatusChanged: left,
                   builder: (context, presence, child) => Opacity(
@@ -145,7 +145,7 @@ class _SouffleDisc extends StatelessWidget {
         boxShadow: const [FujinTheme.floatingShadow],
       ),
       child: SingleMotionBuilder(
-        motion: FujinMotion.pill,
+        motion: FujinMotion.of(context, FujinMotion.pill),
         value: armed ? _quarterTurn : 0,
         builder: (context, armedTurn, child) =>
             SequenceMotionBuilder<int, double>(

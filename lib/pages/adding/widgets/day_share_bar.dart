@@ -32,7 +32,7 @@ class DayShareBar extends StatelessWidget {
       false => (FujinColorRole.goalMinimumLeft, FujinColorRole.goalInProgress),
     };
     Widget segment(double share, Color color) => SingleMotionBuilder(
-      motion: FujinMotion.progress,
+      motion: FujinMotion.of(context, FujinMotion.progress),
       value: share.clamp(0, 1),
       builder: (context, value, child) => FractionallySizedBox(
         widthFactor: value,

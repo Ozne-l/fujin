@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:flutter/animation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:motor/motor.dart';
 
 abstract final class FujinMotion {
@@ -57,4 +57,26 @@ abstract final class FujinMotion {
     duration: Duration(milliseconds: 400),
     reverseDuration: Duration(milliseconds: 250),
   );
+
+  static bool reduced(BuildContext context) =>
+      MediaQuery.disableAnimationsOf(context);
+
+  static Motion of(BuildContext context, Motion motion) =>
+      switch (reduced(context)) {
+        true => const Motion.none(),
+        false => motion,
+      };
+
+  static Future<void> turnPage(
+    BuildContext context,
+    PageController controller,
+    int page,
+  ) => switch (reduced(context)) {
+    true => Future.sync(() => controller.jumpToPage(page)),
+    false => controller.animateToPage(
+      page,
+      duration: pageTurn.duration,
+      curve: pageTurn.curve,
+    ),
+  };
 }

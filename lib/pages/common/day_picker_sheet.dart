@@ -38,13 +38,8 @@ class DayPickerSheet extends HookConsumerWidget {
     final controller = usePageController(initialPage: initialPage);
     final shown = useState(initialPage);
 
-    void turnTo(int page) => unawaited(
-      controller.animateToPage(
-        page,
-        duration: FujinMotion.pageTurn.duration,
-        curve: FujinMotion.pageTurn.curve,
-      ),
-    );
+    void turnTo(int page) =>
+        unawaited(FujinMotion.turnPage(context, controller, page));
 
     void pick(DateTime day) {
       Navigator.of(context).pop();

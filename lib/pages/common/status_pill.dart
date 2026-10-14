@@ -77,7 +77,7 @@ class StatusPill extends HookWidget {
           null => row(content, style),
           (:final arrival, leaving: _) => SingleMotionBuilder(
             key: ValueKey(arrival),
-            motion: FujinMotion.pill,
+            motion: FujinMotion.of(context, FujinMotion.pill),
             from: 0,
             value: 1,
             onAnimationStatusChanged: (status) {
@@ -101,7 +101,7 @@ class StatusPill extends HookWidget {
               ],
             ),
             child: SingleMotionBuilder(
-              motion: FujinMotion.pillSettle,
+              motion: FujinMotion.of(context, FujinMotion.pillSettle),
               from: _arrivingScale,
               value: 1,
               builder: (context, scale, child) =>
@@ -116,12 +116,12 @@ class StatusPill extends HookWidget {
     return switch (firstTone) {
       null => pill(tone.background, tone.foreground),
       final first => MotionBuilder<Color>(
-        motion: FujinMotion.pill,
+        motion: FujinMotion.of(context, FujinMotion.pill),
         converter: MotionConverter.colorRgb,
         from: first.background,
         value: tone.background,
         builder: (context, background, _) => MotionBuilder<Color>(
-          motion: FujinMotion.pill,
+          motion: FujinMotion.of(context, FujinMotion.pill),
           converter: MotionConverter.colorRgb,
           from: first.foreground,
           value: tone.foreground,

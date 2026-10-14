@@ -70,7 +70,7 @@ class FujinMenuButton extends StatelessWidget {
                     ),
                   ),
                   SingleMotionBuilder(
-                    motion: FujinMotion.pill,
+                    motion: FujinMotion.of(context, FujinMotion.pill),
                     value: switch (expanded) {
                       true => 1,
                       false => 0,
