@@ -374,10 +374,16 @@ abstract class AppLocalizations {
   /// **'Ekklo a refusé la connexion'**
   String get ekkloSignInRefused;
 
+  /// No description provided for @ekkloSignInRefusedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifie ton email et ton mot de passe, puis réessaie.'**
+  String get ekkloSignInRefusedDetail;
+
   /// No description provided for @ekkloSignInMessage.
   ///
   /// In fr, this message translates to:
-  /// **'« {message} »'**
+  /// **'Vérifie ton email et ton mot de passe, puis réessaie. Réponse d’Ekklo : « {message} »'**
   String ekkloSignInMessage(String message);
 
   /// No description provided for @ekkloSignInUnreachable.

@@ -24,7 +24,11 @@ class EkkloSignInPage extends HookConsumerWidget {
     final notifier = ref.read(ekkloSignInProvider.notifier);
     final email = useTextEditingController();
     final password = useTextEditingController();
-    final passwordRefused = useState(false);
+    final refused = useState(false);
+    final fieldBorder = switch (refused.value) {
+      true => FujinTheme.fieldErrorBorder,
+      false => FujinTheme.fieldBorder,
+    };
     useListenable(Listenable.merge([email, password]));
 
     ref.listen(ekkloSignInProvider, (previous, next) {
@@ -32,7 +36,7 @@ class EkkloSignInPage extends HookConsumerWidget {
         case EkkloSignInDone():
           context.pop(true);
         case EkkloSignInFailed(failure: SignInFailure.refused):
-          passwordRefused.value = true;
+          refused.value = true;
         case EkkloSignInFailed(failure: SignInFailure.unreachable) ||
             EkkloSignInIdle() ||
             EkkloSignInRunning():
@@ -97,14 +101,19 @@ class EkkloSignInPage extends HookConsumerWidget {
                       autofillHints: const [AutofillHints.email],
                       cursorWidth: FujinTheme.cursorWidth,
                       style: _fieldStyle,
+                      onChanged: (_) => refused.value = false,
+                      decoration: InputDecoration(
+                        enabledBorder: fieldBorder,
+                        focusedBorder: fieldBorder,
+                      ),
                     ),
                     const SizedBox(height: FujinSpace.s4),
                     _Label(text: context.intl.passwordLabel),
                     _PasswordField(
                       controller: password,
                       readOnly: running,
-                      refused: passwordRefused.value,
-                      onChanged: (_) => passwordRefused.value = false,
+                      border: fieldBorder,
+                      onChanged: (_) => refused.value = false,
                       onSubmitted: submit,
                     ),
                   ],
@@ -145,7 +154,7 @@ class EkkloSignInPage extends HookConsumerWidget {
         title: intl.ekkloSignInRefused,
         detail: switch (message) {
           final message? => intl.ekkloSignInMessage(message),
-          null => null,
+          null => intl.ekkloSignInRefusedDetail,
         },
       ),
     EkkloSignInFailed(failure: SignInFailure.unreachable) => AlertBanner(
@@ -193,24 +202,20 @@ class _PasswordField extends HookWidget {
   const _PasswordField({
     required this.controller,
     required this.readOnly,
-    required this.refused,
+    required this.border,
     required this.onChanged,
     required this.onSubmitted,
   });
 
   final TextEditingController controller;
   final bool readOnly;
-  final bool refused;
+  final InputBorder border;
   final ValueChanged<String> onChanged;
   final VoidCallback? onSubmitted;
 
   @override
   Widget build(BuildContext context) {
     final shown = useState(false);
-    final border = switch (refused) {
-      true => FujinTheme.fieldErrorBorder,
-      false => FujinTheme.fieldBorder,
-    };
     return TextField(
       controller: controller,
       readOnly: readOnly,

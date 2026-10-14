@@ -130,7 +130,8 @@
   "passwordHide": "Masquer",
   "signIn": "Se connecter",
   "ekkloSignInRefused": "Ekklo a refusé la connexion",
-  "ekkloSignInMessage": "« {message} »",
+  "ekkloSignInRefusedDetail": "Vérifie ton email et ton mot de passe, puis réessaie.",
+  "ekkloSignInMessage": "Vérifie ton email et ton mot de passe, puis réessaie. Réponse d’Ekklo : « {message} »",
   "@ekkloSignInMessage": {
     "placeholders": {
       "message": {"type": "String"}

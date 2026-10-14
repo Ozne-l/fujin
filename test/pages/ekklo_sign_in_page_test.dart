@@ -2,6 +2,7 @@ import 'package:checks/checks.dart';
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:http/http.dart' as http;
 
 import '../support/fake_backends.dart';
@@ -34,6 +35,11 @@ Future<void> _signIn(
 
 Iterable<http.Request> _logins(FakeBackends backends) => backends.requests
     .where((request) => request.url.path == '/api/v1/auth/login');
+
+List<InputBorder?> _borders(WidgetTester tester) => [
+  for (final field in tester.widgetList<TextField>(find.byType(TextField)))
+    field.decoration?.enabledBorder,
+];
 
 void main() {
   testWidgets('signs in to Ekklo, then reads the day again', (tester) async {
@@ -69,21 +75,33 @@ void main() {
   });
 
   testWidgets(
-    "shows Ekklo's refusal with its message until the next attempt",
+    "explains Ekklo's refusal in French, outlines both fields until the next "
+    'attempt and keeps the message',
     (tester) async {
       final backends = FakeBackends(mealNames: [breakfast]);
       final store = await _openSignIn(tester, backends);
 
       await _signIn(tester, password: 'wrong-password');
+
+      check(await store.read()).isNull();
+      check(
+        _borders(tester),
+      ).every((it) => it.equals(FujinTheme.fieldErrorBorder));
+
       await tester.enterText(find.byType(TextField).last, 'another-try');
       await tester.pump();
 
-      check(await store.read()).isNull();
+      check(_borders(tester)).every((it) => it.equals(FujinTheme.fieldBorder));
       check(
         find.text('Ekklo a refusé la connexion').evaluate(),
       ).length.equals(1);
       check(
-        find.text('« ${FakeBackends.ekkloRefusal} »').evaluate(),
+        find
+            .text(
+              'Vérifie ton email et ton mot de passe, puis réessaie. '
+              'Réponse d’Ekklo : « ${FakeBackends.ekkloRefusal} »',
+            )
+            .evaluate(),
       ).length.equals(1);
     },
   );

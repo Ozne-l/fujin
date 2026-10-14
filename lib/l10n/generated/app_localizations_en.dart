@@ -254,8 +254,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ekkloSignInRefused => 'Ekklo refused the sign-in';
 
   @override
+  String get ekkloSignInRefusedDetail =>
+      'Check your email and password, then try again.';
+
+  @override
   String ekkloSignInMessage(String message) {
-    return '“$message”';
+    return 'Check your email and password, then try again. Ekklo said: “$message”';
   }
 
   @override
