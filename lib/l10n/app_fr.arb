@@ -569,6 +569,12 @@
   },
   "memoryForget": "Oublier cet aliment",
   "memoryForgetNote": "Le prochain envoi te redemandera quoi choisir.",
+  "memoryForgetTitle": "Oublier cet aliment ?",
+  "memoryForgetDetail": "Fūjin oublie l’aliment Ekklo choisi pour « {food} »{units, plural, =0{} =1{ et son poids d’unité} other{ et ses {units} poids d’unité}}. Le prochain envoi te redemandera quoi choisir.",
+  "@memoryForgetDetail": {
+    "placeholders": {"food": {"type": "String"}, "units": {"type": "int"}}
+  },
+  "memoryForgetConfirm": "Oublier",
   "memoryMealsNote": "Un repas MyFitnessPal sans correspondance\ngarde son nom dans Ekklo.",
   "memoryChangeSubtitle": "Choisis l'aliment Ekklo à retenir pour la suite.",
   "memoryEnergyPer": "{energy} · {portion}",

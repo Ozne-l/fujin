@@ -7,6 +7,8 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/confirm_sheet.dart';
+import 'package:fujin/pages/common/delete_icon.dart';
 import 'package:fujin/pages/common/fujin_icon_button.dart';
 import 'package:fujin/pages/common/gold_volute.dart';
 import 'package:fujin/pages/common/grams_input.dart';
@@ -121,10 +123,22 @@ class MemoryFoodPage extends HookConsumerWidget {
                     BorderSide(color: FujinColorRole.textAlert),
                   ),
                 ),
-                onPressed: () {
-                  context.pop();
-                  notifier.forget(food);
-                },
+                onPressed: () => unawaited(
+                  showConfirmSheet(
+                    context,
+                    icon: DeleteIcon.asset,
+                    title: context.intl.memoryForgetTitle,
+                    message: context.intl.memoryForgetDetail(
+                      food.mfpDescription,
+                      units.length,
+                    ),
+                    confirmLabel: context.intl.memoryForgetConfirm,
+                    onConfirm: () {
+                      context.pop();
+                      notifier.forget(food);
+                    },
+                  ),
+                ),
                 child: Text(context.intl.memoryForget),
               ),
             ),

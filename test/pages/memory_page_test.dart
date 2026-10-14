@@ -108,11 +108,18 @@ void main() {
     check(_count('1 cup = 200 g')).equals(1);
   });
 
-  testWidgets('forgets a food so the next send asks again', (tester) async {
+  testWidgets('forgets a food only once the owner confirms', (tester) async {
     await _openMemory(tester, FakeBackends(mealNames: [breakfast]));
 
     await _tap(tester, rice);
     await _tap(tester, 'Oublier cet aliment');
+    await _tap(tester, 'Annuler');
+    await _back(tester);
+    check(_count(rice)).equals(1);
+
+    await _tap(tester, rice);
+    await _tap(tester, 'Oublier cet aliment');
+    await _tap(tester, 'Oublier');
 
     check(_count('Aliments (1)')).equals(1);
     check(_count(rice)).equals(0);

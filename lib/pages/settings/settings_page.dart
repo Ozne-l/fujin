@@ -9,6 +9,7 @@ import 'package:fujin/domain/accounts/account.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/automatic_mode_notifier.dart';
 import 'package:fujin/pages/common/confirm_sheet.dart';
+import 'package:fujin/pages/common/delete_icon.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
 import 'package:fujin/pages/common/goals_text.dart';
@@ -30,7 +31,6 @@ class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   static const _lockIcon = 'assets/icons/lock.svg';
-  static const _deleteIcon = 'assets/icons/delete.svg';
   static const _copyIcon = 'assets/icons/copy.svg';
 
   @override
@@ -215,7 +215,7 @@ class SettingsPage extends ConsumerWidget {
                   detail: counts,
                   titleColor: FujinColorRole.textAlert,
                   onTap: () => confirm(
-                    icon: _deleteIcon,
+                    icon: DeleteIcon.asset,
                     title: context.intl.clearMemoryTitle,
                     message: context.intl.clearMemoryConfirm(counts),
                     confirmLabel: context.intl.clearMemory,

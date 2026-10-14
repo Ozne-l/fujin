@@ -1352,6 +1352,24 @@ abstract class AppLocalizations {
   /// **'Le prochain envoi te redemandera quoi choisir.'**
   String get memoryForgetNote;
 
+  /// No description provided for @memoryForgetTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oublier cet aliment ?'**
+  String get memoryForgetTitle;
+
+  /// No description provided for @memoryForgetDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fūjin oublie l’aliment Ekklo choisi pour « {food} »{units, plural, =0{} =1{ et son poids d’unité} other{ et ses {units} poids d’unité}}. Le prochain envoi te redemandera quoi choisir.'**
+  String memoryForgetDetail(String food, int units);
+
+  /// No description provided for @memoryForgetConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oublier'**
+  String get memoryForgetConfirm;
+
   /// No description provided for @memoryMealsNote.
   ///
   /// In fr, this message translates to:

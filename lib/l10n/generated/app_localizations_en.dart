@@ -967,6 +967,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get memoryForgetNote => 'The next send will ask you to choose again.';
 
   @override
+  String get memoryForgetTitle => 'Forget this food?';
+
+  @override
+  String memoryForgetDetail(String food, int units) {
+    String _temp0 = intl.Intl.pluralLogic(
+      units,
+      locale: localeName,
+      other: ' and its $units unit weights',
+      one: ' and its unit weight',
+      zero: '',
+    );
+    return 'Fūjin forgets the Ekklo food chosen for “$food”$_temp0. The next send will ask you to choose again.';
+  }
+
+  @override
+  String get memoryForgetConfirm => 'Forget';
+
+  @override
   String get memoryMealsNote =>
       'A MyFitnessPal meal with no match\nkeeps its name in Ekklo.';
 

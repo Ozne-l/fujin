@@ -982,6 +982,24 @@ class AppLocalizationsFr extends AppLocalizations {
       'Le prochain envoi te redemandera quoi choisir.';
 
   @override
+  String get memoryForgetTitle => 'Oublier cet aliment ?';
+
+  @override
+  String memoryForgetDetail(String food, int units) {
+    String _temp0 = intl.Intl.pluralLogic(
+      units,
+      locale: localeName,
+      other: ' et ses $units poids d’unité',
+      one: ' et son poids d’unité',
+      zero: '',
+    );
+    return 'Fūjin oublie l’aliment Ekklo choisi pour « $food »$_temp0. Le prochain envoi te redemandera quoi choisir.';
+  }
+
+  @override
+  String get memoryForgetConfirm => 'Oublier';
+
+  @override
   String get memoryMealsNote =>
       'Un repas MyFitnessPal sans correspondance\ngarde son nom dans Ekklo.';
 
