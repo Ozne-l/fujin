@@ -575,7 +575,7 @@ abstract class AppLocalizations {
   /// No description provided for @pillNewAssociation.
   ///
   /// In fr, this message translates to:
-  /// **'Nouvelle association'**
+  /// **'Nouveau choix'**
   String get pillNewAssociation;
 
   /// No description provided for @pillNoCloseFood.
@@ -1025,7 +1025,7 @@ abstract class AppLocalizations {
   /// No description provided for @sentAssociations.
   ///
   /// In fr, this message translates to:
-  /// **'{count} {count, plural, =1{nouvelle association} other{nouvelles associations}} : {names}'**
+  /// **'{count} {count, plural, =1{nouveau choix} other{nouveaux choix}} : {names}'**
   String sentAssociations(int count, String names);
 
   /// No description provided for @sentWeights.

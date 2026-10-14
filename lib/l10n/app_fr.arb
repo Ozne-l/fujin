@@ -196,7 +196,7 @@
   "pillNewUnit": "Nouvelle unité",
   "pillFoodChanged": "Aliment modifié",
   "pillWeightToConfirm": "Poids à confirmer",
-  "pillNewAssociation": "Nouvelle association",
+  "pillNewAssociation": "Nouveau choix",
   "pillNoCloseFood": "Aucun aliment proche",
   "pillConfirmed": "Confirmé",
   "pillSkipped": "Sauté",
@@ -412,7 +412,7 @@
       "count": {"type": "int"}
     }
   },
-  "sentAssociations": "{count} {count, plural, =1{nouvelle association} other{nouvelles associations}} : {names}",
+  "sentAssociations": "{count} {count, plural, =1{nouveau choix} other{nouveaux choix}} : {names}",
   "@sentAssociations": {
     "placeholders": {
       "count": {"type": "int"},

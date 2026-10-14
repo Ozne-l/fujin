@@ -391,7 +391,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get pillWeightToConfirm => 'Poids à confirmer';
 
   @override
-  String get pillNewAssociation => 'Nouvelle association';
+  String get pillNewAssociation => 'Nouveau choix';
 
   @override
   String get pillNoCloseFood => 'Aucun aliment proche';
@@ -720,8 +720,8 @@ class AppLocalizationsFr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'nouvelles associations',
-      one: 'nouvelle association',
+      other: 'nouveaux choix',
+      one: 'nouveau choix',
     );
     return '$count $_temp0 : $names';
   }

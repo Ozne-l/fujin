@@ -79,12 +79,12 @@ void main() {
 
     await _tap(tester, 'Envoyer 2 aliments vers Ekklo');
     _sees('1 à vérifier');
-    _sees('Nouvelle association');
+    _sees('Nouveau choix');
 
     await _tap(tester, 'Envoyer 2 aliments vers Ekklo');
     _sees('Envoi terminé');
     _sees('Fūjin a envoyé 2 aliments vers Ekklo.');
-    _sees('1 nouvelle association : Skyr nature');
+    _sees('1 nouveau choix : Skyr nature');
 
     await _tap(tester, 'Retour au journal');
     _sees('1/1 · $oats');
@@ -153,7 +153,7 @@ void main() {
     _sees('→ Skyr');
 
     await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
-    _sees('1 nouvelle association : Skyr nature');
+    _sees('1 nouveau choix : Skyr nature');
     check(backends.ekkloItems.single.foodId).equals(siggis.id);
 
     backends.entries = [skyrEntry, entry('E-2', food: skyr, servingValue: 250)];
