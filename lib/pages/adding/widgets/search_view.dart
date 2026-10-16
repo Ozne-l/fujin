@@ -29,6 +29,7 @@ import 'package:fujin/pages/common/flow_header.dart';
 import 'package:fujin/pages/common/glass_layer.dart';
 import 'package:fujin/pages/common/scan_button.dart';
 import 'package:fujin/pages/common/scan_icon.dart';
+import 'package:fujin/pages/common/scroll_edge_fade.dart';
 import 'package:fujin/pages/common/title_text.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
@@ -381,30 +382,32 @@ class SearchView extends HookConsumerWidget {
         Expanded(
           child: Stack(
             children: [
-              CustomScrollView(
-                slivers: [
-                  SliverPadding(
-                    padding: EdgeInsets.only(
-                      bottom:
-                          FujinSpace.s3 +
-                          FujinSize.tabBar +
-                          FujinSpace.s6 +
-                          MediaQuery.paddingOf(context).bottom,
-                    ),
-                    sliver: SliverMainAxisGroup(
-                      slivers: [
-                        for (final (index, child) in [
-                          if (scan case ScannerSearch(unresolved: true))
-                            _box(const ScannedBanner()),
-                          ...body,
-                        ].indexed) ...[
-                          if (index > 0) _gap,
-                          child,
+              ScrollEdgeFade(
+                child: CustomScrollView(
+                  slivers: [
+                    SliverPadding(
+                      padding: EdgeInsets.only(
+                        bottom:
+                            FujinSpace.s3 +
+                            FujinSize.tabBar +
+                            FujinSpace.s6 +
+                            MediaQuery.paddingOf(context).bottom,
+                      ),
+                      sliver: SliverMainAxisGroup(
+                        slivers: [
+                          for (final (index, child) in [
+                            if (scan case ScannerSearch(unresolved: true))
+                              _box(const ScannedBanner()),
+                            ...body,
+                          ].indexed) ...[
+                            if (index > 0) _gap,
+                            child,
+                          ],
                         ],
-                      ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               PositionedDirectional(
                 end: FujinSpace.s5,
