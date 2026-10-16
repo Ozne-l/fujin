@@ -22,13 +22,18 @@ final class Memory with MemoryMappable {
   final List<MealMapping> meals;
   final List<BarcodeLink> barcodeLinks;
 
-  RememberedFood? food(String mfpFoodId, String mfpUnit) =>
+  RememberedFood? food(String mfpFoodId, String? mfpUnit) =>
       matches.where((food) => food.mfpFoodId == mfpFoodId).firstOrNull ??
-      ownCopies
-          .where(
-            (copy) => copy.mfpFoodId == mfpFoodId && copy.mfpUnit == mfpUnit,
-          )
-          .firstOrNull;
+      switch (mfpUnit) {
+        null => null,
+        final mfpUnit =>
+          ownCopies
+              .where(
+                (copy) =>
+                    copy.mfpFoodId == mfpFoodId && copy.mfpUnit == mfpUnit,
+              )
+              .firstOrNull,
+      };
 
   bool hasOwnCopy(String mfpFoodId) =>
       ownCopies.any((copy) => copy.mfpFoodId == mfpFoodId);

@@ -1346,6 +1346,12 @@ abstract class AppLocalizations {
   /// **'Utilisé quand MyFitnessPal compte en {units}\net non en grammes.'**
   String memoryUnitWeightNote(String units);
 
+  /// No description provided for @memoryAdd.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter'**
+  String get memoryAdd;
+
   /// No description provided for @memoryForget.
   ///
   /// In fr, this message translates to:

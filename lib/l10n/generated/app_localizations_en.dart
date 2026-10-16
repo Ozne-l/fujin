@@ -965,6 +965,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get memoryAdd => 'Add';
+
+  @override
   String get memoryForget => 'Forget this food';
 
   @override

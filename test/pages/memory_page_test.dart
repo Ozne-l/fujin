@@ -3,12 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
+import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
 import '../support/pump_fujin.dart';
 
 const _snack = 'Collation';
+const _thaiRiceName = 'Riz thaï';
+
+FakeBackends _riceBackends() => FakeBackends(
+  mealNames: [breakfast, lunch],
+  mfpFoods: [
+    mfpFood(
+      rice,
+      description: _thaiRiceName,
+      servingSizes: const [
+        MfpServingSize(value: 100, unit: grams, nutritionMultiplier: 1),
+        MfpServingSize(value: 1, unit: cup, nutritionMultiplier: 1.8),
+      ],
+      nutrients: nutrients(kcal: 350),
+    ),
+  ],
+);
 
 Future<void> _tap(WidgetTester tester, String text) async {
   final target = find.text(text).last;
@@ -194,6 +211,87 @@ void main() {
 
     check(_count(_snack)).equals(0);
     check(_count(petitDejeuner)).equals(1);
+  });
+
+  testWidgets('adds a remembered food from its screen in its remembered unit, '
+      'confirms it and undoes it on request', (tester) async {
+    final backends = _riceBackends();
+    await _openMemory(tester, backends);
+    await _tap(tester, rice);
+
+    await _tap(tester, 'Ajouter');
+    check(_count('Ajouter à $breakfast')).equals(1);
+    await _tap(tester, 'Ajouter à MFP et Ekklo');
+
+    check(_count('Oublier cet aliment')).equals(1);
+    check(_count('$_thaiRiceName ajouté')).equals(1);
+    check(backends.entries.single)
+      ..has((entry) => entry.servingSize.unit, 'unit').equals(cup)
+      ..has((entry) => entry.date, 'date').equals(day)
+      ..has((entry) => entry.mealName, 'meal').equals(breakfast);
+
+    await _tap(tester, 'Annuler');
+    check(backends.entries).isEmpty();
+    check(_count('Ajout annulé')).equals(1);
+  });
+
+  testWidgets('returns to Mémoire with the confirmation when the add replaced '
+      'the food by an own copy', (tester) async {
+    final backends = _riceBackends();
+    await _openMemory(tester, backends);
+    await _tap(tester, rice);
+    await _tap(tester, 'Ajouter');
+
+    await tester.tap(find.textContaining('Ekklo : '));
+    await tester.pumpAndSettle();
+    await _tap(tester, 'Aliment perso');
+    await _tap(tester, "Créer l'aliment perso");
+    await _tap(tester, 'Ajouter à MFP et Ekklo');
+
+    check(_count('Oublier cet aliment')).equals(0);
+    check(_count('Aliments (2)')).equals(1);
+    check(_count('$_thaiRiceName ajouté')).equals(1);
+    check(backends.entries.single.servingSize.unit).equals(cup);
+  });
+
+  testWidgets('comes back to the food screen when the fiche is left', (
+    tester,
+  ) async {
+    final backends = _riceBackends();
+    await _openMemory(tester, backends);
+    await _tap(tester, rice);
+    await _tap(tester, 'Ajouter');
+    check(_count('Ajouter à MFP et Ekklo')).equals(1);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+
+    check(_count('Oublier cet aliment')).equals(1);
+    check(backends.entries).isEmpty();
+  });
+
+  testWidgets('greys out Ajouter while adding is not possible', (
+    tester,
+  ) async {
+    final backends = _riceBackends();
+    await pumpFujin(tester, backends, units: memory.units);
+    backends
+      ..mfpReachable = false
+      ..ekkloReachable = false;
+    await tester.fling(
+      find.byType(CustomScrollView),
+      const Offset(0, 1000),
+      1000,
+    );
+    await tester.pumpAndSettle();
+    await _tap(tester, 'Mémoire');
+    await _tap(tester, rice);
+
+    check(
+      tester
+          .widget<FilledButton>(find.widgetWithText(FilledButton, 'Ajouter'))
+          .onPressed,
+    ).isNull();
   });
 
   testWidgets('closes the open meal menu on back and stays on Mémoire', (

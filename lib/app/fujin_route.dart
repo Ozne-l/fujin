@@ -47,6 +47,15 @@ enum FujinRoute {
     },
   ).toString();
 
+  String forRemembered(DateTime date, String meal, RememberedFood food) => Uri(
+    path: forDate(date),
+    queryParameters: {
+      mealParameter: meal,
+      foodParameter: food.mfpFoodId,
+      if (food case OwnCopy(:final mfpUnit)) unitParameter: mfpUnit,
+    },
+  ).toString();
+
   static ScannerSearch? scanSearchOf(Map<String, String> parameters) =>
       switch (parameters[queryParameter]) {
         final query? => ScannerSearch(

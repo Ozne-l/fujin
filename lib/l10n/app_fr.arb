@@ -568,6 +568,7 @@
   "@memoryUnitWeightNote": {
     "placeholders": {"units": {"type": "String"}}
   },
+  "memoryAdd": "Ajouter",
   "memoryForget": "Oublier cet aliment",
   "memoryForgetNote": "Le prochain envoi te redemandera quoi choisir.",
   "memoryForgetTitle": "Oublier cet aliment ?",

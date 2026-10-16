@@ -2,11 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
+import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/adding/add_shortcut.dart';
 import 'package:fujin/pages/common/confirm_sheet.dart';
 import 'package:fujin/pages/common/delete_icon.dart';
 import 'package:fujin/pages/common/fujin_icon_button.dart';
@@ -14,6 +17,7 @@ import 'package:fujin/pages/common/gold_volute.dart';
 import 'package:fujin/pages/common/grams_input.dart';
 import 'package:fujin/pages/common/source_dot.dart';
 import 'package:fujin/pages/common/text_inset.dart';
+import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:fujin/pages/memory/change_food_sheet.dart';
 import 'package:fujin/pages/memory/memory_notifier.dart';
 import 'package:fujin/pages/memory/memory_text.dart';
@@ -30,17 +34,34 @@ class MemoryFoodPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final memory = ref.watch(memoryProvider);
     final notifier = ref.read(memoryProvider.notifier);
-    final food = switch (mfpUnit) {
-      final unit? => memory.food(mfpFoodId, unit),
-      null =>
-        memory.matches.where((food) => food.mfpFoodId == mfpFoodId).firstOrNull,
-    };
+    final shown = useRef<RememberedFood?>(null);
+    final food = memory.food(mfpFoodId, mfpUnit) ?? shown.value;
+    shown.value = food;
     if (food == null) return const Scaffold();
     final units = memory.unitsOf(food);
     final servedIn = switch (food) {
       OwnCopy(:final mfpUnit) => [mfpUnit],
       MatchedFood() => [for (final unit in units) unit.mfpUnit],
     };
+
+    Future<void> add() async {
+      final day = ref.read(selectedDayProvider);
+      final meal = await AddShortcut.mealOfNow(context, ref);
+      if (meal == null || !context.mounted) return;
+      final added = await context.push<AddedFood>(
+        FujinRoute.addFood.forRemembered(day, meal, food),
+      );
+      if (!context.mounted) return;
+      switch (added) {
+        case final added?:
+          AddShortcut.added(context, ref, added);
+          if (ref.read(memoryProvider).food(mfpFoodId, mfpUnit) case null) {
+            context.pop();
+          }
+        case null:
+          ref.invalidate(memoryProvider);
+      }
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -110,8 +131,18 @@ class MemoryFoodPage extends HookConsumerWidget {
               _UnitWeights(units: units, onSave: notifier.saveUnit),
             ],
             Padding(
+              padding: const EdgeInsets.only(top: FujinSpace.s4),
+              child: FilledButton(
+                onPressed: switch (AddShortcut.possible(ref)) {
+                  true => () => unawaited(add()),
+                  false => null,
+                },
+                child: Text(context.intl.memoryAdd),
+              ),
+            ),
+            Padding(
               padding: const EdgeInsets.only(
-                top: FujinSpace.s8,
+                top: FujinSpace.s3,
                 bottom: FujinSpace.s3,
               ),
               child: OutlinedButton(

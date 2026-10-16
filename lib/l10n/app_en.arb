@@ -208,6 +208,7 @@
   "memoryUnitWeights": "WEIGHT PER UNIT",
   "memoryOneUnit": "1 {unit}",
   "memoryUnitWeightNote": "Used when MyFitnessPal counts in {units}\nrather than grams.",
+  "memoryAdd": "Add",
   "memoryForget": "Forget this food",
   "memoryForgetNote": "The next send will ask you to choose again.",
   "memoryForgetTitle": "Forget this food?",

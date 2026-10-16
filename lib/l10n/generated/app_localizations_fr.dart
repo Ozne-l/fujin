@@ -979,6 +979,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get memoryAdd => 'Ajouter';
+
+  @override
   String get memoryForget => 'Oublier cet aliment';
 
   @override

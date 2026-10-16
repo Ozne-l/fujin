@@ -4,7 +4,7 @@ Date: 2026-10-10
 
 ## Status
 
-Accepted. Implements the adding and undo parts of [0002](0002-write-ordering.md). The scanner (Figma section 03) and the search prefilled after a scan (02d) are built by [0027](0027-barcode-scanner.md). [0034](0034-remembered-foods-in-the-add-search.md) adds the remembered foods to the search.
+Accepted. Implements the adding and undo parts of [0002](0002-write-ordering.md). The scanner (Figma section 03) and the search prefilled after a scan (02d) are built by [0027](0027-barcode-scanner.md). [0034](0034-remembered-foods-in-the-add-search.md) adds the remembered foods to the search and "Ajouter" to screen 19.
 
 ## Context
 

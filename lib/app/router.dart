@@ -126,6 +126,8 @@ final routerProvider = Provider<GoRouter>((ref) {
             date: SelectedDay.calendarDay(DateTime.parse(date)),
             mfpMealName: meal,
             scan: FujinRoute.scanSearchOf(state.uri.queryParameters),
+            mfpFoodId: state.uri.queryParameters[FujinRoute.foodParameter],
+            mfpUnit: state.uri.queryParameters[FujinRoute.unitParameter],
           ),
           _ => throw StateError(
             '${FujinRoute.addFood.path} needs ${FujinRoute.dateParameter} '

@@ -29,7 +29,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0023](0023-ui-flags-in-shared-preferences.md) | UI flags in shared preferences | Accepted (settings and `FujinPreferences.open` added by 0025) |
 | [0024](0024-splash-from-the-first-frame.md) | Splash from the first frame | Accepted |
 | [0025](0025-automatic-mode.md) | Automatic mode: unattended items instead of Memory, a setting in shared preferences | Accepted |
-| [0026](0026-adding-a-food.md) | Adding a food: one draft, the send flow's Ekklo half, undo | Accepted (scanner and 02d built by 0027; remembered foods added to the search by 0034) |
+| [0026](0026-adding-a-food.md) | Adding a food: one draft, the send flow's Ekklo half, undo | Accepted (scanner and 02d built by 0027; remembered foods added to the search, and "Ajouter" to screen 19, by 0034) |
 | [0027](0027-barcode-scanner.md) | Barcode scanner: full-screen camera, barcode links in Memory, backup v2 | Accepted (built) |
 | [0028](0028-fujin-drawn-controls.md) | Fūjin-drawn controls instead of stock Material | Accepted |
 | [0029](0029-journal-reads-held-for-display.md) | Journal reads held in memory for display, writes read live | Accepted |
@@ -37,4 +37,4 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0031](0031-reduced-motion.md) | Reduced motion follows the phone setting | Accepted |
 | [0032](0032-text-contrast.md) | Text roles meet 4.5:1 on page and card | Accepted |
 | [0033](0033-liquid-glass-and-fade-through.md) | Liquid glass tab bar and fade-through navigation | Proposed |
-| [0034](0034-remembered-foods-in-the-add-search.md) | Remembered foods in the add search | Accepted |
+| [0034](0034-remembered-foods-in-the-add-search.md) | Remembered foods in the add search, and "Ajouter" on screen 19 | Accepted |
