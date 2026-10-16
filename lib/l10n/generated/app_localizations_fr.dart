@@ -1532,6 +1532,32 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get addRememberedFoods => 'MÉMORISÉS';
+
+  @override
+  String get addRememberedLinked => 'liés à Ekklo';
+
+  @override
+  String addRememberedFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count trouvés',
+      one: '1 trouvé',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get addRememberedNote =>
+      'Fūjin les envoie vers Ekklo sans rien te demander.';
+
+  @override
+  String addOwnCopyTarget(String unit) {
+    return '→ Aliment perso · $unit';
+  }
+
+  @override
   String get addThisMorning => 'ce matin';
 
   @override

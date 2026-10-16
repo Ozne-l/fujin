@@ -424,7 +424,7 @@ void main() {
         await _tap(
           tester,
           find.descendant(
-            of: find.byType(ListView),
+            of: find.byType(CustomScrollView),
             matching: find.text(_oatsName),
           ),
         );

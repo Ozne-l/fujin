@@ -642,4 +642,78 @@ void main() {
         ..has((it) => it.entry.nutrients.energy?.value, 'kcal').equals(128);
     });
   });
+
+  group('remembered foods', () {
+    test('opens an own copy in its unit, one portion', () async {
+      final (_, adding) = await services();
+      const skyrInPots = OwnCopy(
+        mfpFoodId: skyr,
+        mfpDescription: 'Skyr nature',
+        ekkloFoodId: 'own-skyr',
+        ekkloFoodName: 'Skyr nature',
+        mfpUnit: pot,
+      );
+      memoryRepository.saveFood(skyrInPots);
+
+      final draft = await adding.openRemembered(
+        skyrInPots,
+        mfpMealName: breakfast,
+        date: day,
+      );
+
+      check(draft).isNotNull()
+        ..has((it) => it.food, 'food').equals(_skyr)
+        ..has((it) => it.servingSize, 'serving').equals(_onePot)
+        ..has((it) => it.servings, 'servings').equals(AddDraft.oneServing)
+        ..has((it) => it.mfpMealName, 'meal').equals(breakfast);
+    });
+
+    test(
+      'opens a matched food in the serving it was last added with',
+      () async {
+        final (_, adding) = await services();
+        await add(adding, _draft(_skyr, serving: _onePot, servings: 2));
+
+        final draft = await adding.openRemembered(
+          const MatchedFood(
+            mfpFoodId: skyr,
+            mfpDescription: 'Skyr nature',
+            ekkloFoodId: 'isey',
+            ekkloFoodName: 'Skyr nature 0 %',
+          ),
+          mfpMealName: lunch,
+          date: day,
+        );
+
+        check(draft).isNotNull()
+          ..has((it) => it.servingSize, 'serving').equals(_onePot)
+          ..has((it) => it.servings, 'servings').equals(AddDraft.oneServing);
+      },
+    );
+
+    test(
+      'opens a food without a served remembered unit on its first serving',
+      () async {
+        final (_, adding) = await services();
+
+        final draft = await adding.openRemembered(
+          const MatchedFood(
+            mfpFoodId: skyr,
+            mfpDescription: 'Skyr nature',
+            ekkloFoodId: 'isey',
+            ekkloFoodName: 'Skyr nature 0 %',
+          ),
+          mfpMealName: lunch,
+          date: day,
+        );
+
+        check(
+              draft,
+            )
+            .isNotNull()
+            .has((it) => it.servingSize, 'serving')
+            .equals(_hundredGrams);
+      },
+    );
+  });
 }

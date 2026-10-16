@@ -21,6 +21,7 @@ class AddSearchStateMapper extends ClassMapperBase<AddSearchState> {
       AddBarcodeMissingMapper.ensureInitialized();
       AddSearchFailedMapper.ensureInitialized();
       RecentFoodMapper.ensureInitialized();
+      RememberedFoodMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -41,12 +42,16 @@ class AddSearchStateMapper extends ClassMapperBase<AddSearchState> {
     'recents',
     _$recents,
   );
+  static List<RememberedFood> _$remembered(AddSearchState v) => v.remembered;
+  static const Field<AddSearchState, List<RememberedFood>> _f$remembered =
+      Field('remembered', _$remembered);
 
   @override
   final MappableFields<AddSearchState> fields = const {
     #query: _f$query,
     #verifiedOnly: _f$verifiedOnly,
     #recents: _f$recents,
+    #remembered: _f$remembered,
   };
   @override
   final bool ignoreNull = true;
@@ -82,7 +87,18 @@ abstract class AddSearchStateCopyWith<$R, $In extends AddSearchState, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, RecentFood, RecentFoodCopyWith<$R, RecentFood, RecentFood>>
   get recents;
-  $R call({String? query, bool? verifiedOnly, List<RecentFood>? recents});
+  ListCopyWith<
+    $R,
+    RememberedFood,
+    RememberedFoodCopyWith<$R, RememberedFood, RememberedFood>
+  >
+  get remembered;
+  $R call({
+    String? query,
+    bool? verifiedOnly,
+    List<RecentFood>? recents,
+    List<RememberedFood>? remembered,
+  });
   AddSearchStateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
   );
@@ -97,6 +113,7 @@ class AddSearchIdleMapper extends SubClassMapperBase<AddSearchIdle> {
       MapperContainer.globals.use(_instance = AddSearchIdleMapper._());
       AddSearchStateMapper.ensureInitialized().addSubMapper(_instance!);
       RecentFoodMapper.ensureInitialized();
+      RememberedFoodMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -117,12 +134,18 @@ class AddSearchIdleMapper extends SubClassMapperBase<AddSearchIdle> {
     'recents',
     _$recents,
   );
+  static List<RememberedFood> _$remembered(AddSearchIdle v) => v.remembered;
+  static const Field<AddSearchIdle, List<RememberedFood>> _f$remembered = Field(
+    'remembered',
+    _$remembered,
+  );
 
   @override
   final MappableFields<AddSearchIdle> fields = const {
     #query: _f$query,
     #verifiedOnly: _f$verifiedOnly,
     #recents: _f$recents,
+    #remembered: _f$remembered,
   };
   @override
   final bool ignoreNull = true;
@@ -140,6 +163,7 @@ class AddSearchIdleMapper extends SubClassMapperBase<AddSearchIdle> {
       query: data.dec(_f$query),
       verifiedOnly: data.dec(_f$verifiedOnly),
       recents: data.dec(_f$recents),
+      remembered: data.dec(_f$remembered),
     );
   }
 
@@ -209,7 +233,19 @@ abstract class AddSearchIdleCopyWith<$R, $In extends AddSearchIdle, $Out>
   ListCopyWith<$R, RecentFood, RecentFoodCopyWith<$R, RecentFood, RecentFood>>
   get recents;
   @override
-  $R call({String? query, bool? verifiedOnly, List<RecentFood>? recents});
+  ListCopyWith<
+    $R,
+    RememberedFood,
+    RememberedFoodCopyWith<$R, RememberedFood, RememberedFood>
+  >
+  get remembered;
+  @override
+  $R call({
+    String? query,
+    bool? verifiedOnly,
+    List<RecentFood>? recents,
+    List<RememberedFood>? remembered,
+  });
   AddSearchIdleCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -229,19 +265,36 @@ class _AddSearchIdleCopyWithImpl<$R, $Out>
     (v) => call(recents: v),
   );
   @override
-  $R call({String? query, bool? verifiedOnly, List<RecentFood>? recents}) =>
-      $apply(
-        FieldCopyWithData({
-          if (query != null) #query: query,
-          if (verifiedOnly != null) #verifiedOnly: verifiedOnly,
-          if (recents != null) #recents: recents,
-        }),
-      );
+  ListCopyWith<
+    $R,
+    RememberedFood,
+    RememberedFoodCopyWith<$R, RememberedFood, RememberedFood>
+  >
+  get remembered => ListCopyWith(
+    $value.remembered,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(remembered: v),
+  );
+  @override
+  $R call({
+    String? query,
+    bool? verifiedOnly,
+    List<RecentFood>? recents,
+    List<RememberedFood>? remembered,
+  }) => $apply(
+    FieldCopyWithData({
+      if (query != null) #query: query,
+      if (verifiedOnly != null) #verifiedOnly: verifiedOnly,
+      if (recents != null) #recents: recents,
+      if (remembered != null) #remembered: remembered,
+    }),
+  );
   @override
   AddSearchIdle $make(CopyWithData data) => AddSearchIdle(
     query: data.get(#query, or: $value.query),
     verifiedOnly: data.get(#verifiedOnly, or: $value.verifiedOnly),
     recents: data.get(#recents, or: $value.recents),
+    remembered: data.get(#remembered, or: $value.remembered),
   );
 
   @override
@@ -259,6 +312,7 @@ class AddSearchRunningMapper extends SubClassMapperBase<AddSearchRunning> {
       MapperContainer.globals.use(_instance = AddSearchRunningMapper._());
       AddSearchStateMapper.ensureInitialized().addSubMapper(_instance!);
       RecentFoodMapper.ensureInitialized();
+      RememberedFoodMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -282,12 +336,16 @@ class AddSearchRunningMapper extends SubClassMapperBase<AddSearchRunning> {
     'recents',
     _$recents,
   );
+  static List<RememberedFood> _$remembered(AddSearchRunning v) => v.remembered;
+  static const Field<AddSearchRunning, List<RememberedFood>> _f$remembered =
+      Field('remembered', _$remembered);
 
   @override
   final MappableFields<AddSearchRunning> fields = const {
     #query: _f$query,
     #verifiedOnly: _f$verifiedOnly,
     #recents: _f$recents,
+    #remembered: _f$remembered,
   };
   @override
   final bool ignoreNull = true;
@@ -305,6 +363,7 @@ class AddSearchRunningMapper extends SubClassMapperBase<AddSearchRunning> {
       query: data.dec(_f$query),
       verifiedOnly: data.dec(_f$verifiedOnly),
       recents: data.dec(_f$recents),
+      remembered: data.dec(_f$remembered),
     );
   }
 
@@ -374,7 +433,19 @@ abstract class AddSearchRunningCopyWith<$R, $In extends AddSearchRunning, $Out>
   ListCopyWith<$R, RecentFood, RecentFoodCopyWith<$R, RecentFood, RecentFood>>
   get recents;
   @override
-  $R call({String? query, bool? verifiedOnly, List<RecentFood>? recents});
+  ListCopyWith<
+    $R,
+    RememberedFood,
+    RememberedFoodCopyWith<$R, RememberedFood, RememberedFood>
+  >
+  get remembered;
+  @override
+  $R call({
+    String? query,
+    bool? verifiedOnly,
+    List<RecentFood>? recents,
+    List<RememberedFood>? remembered,
+  });
   AddSearchRunningCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
   );
@@ -396,19 +467,36 @@ class _AddSearchRunningCopyWithImpl<$R, $Out>
     (v) => call(recents: v),
   );
   @override
-  $R call({String? query, bool? verifiedOnly, List<RecentFood>? recents}) =>
-      $apply(
-        FieldCopyWithData({
-          if (query != null) #query: query,
-          if (verifiedOnly != null) #verifiedOnly: verifiedOnly,
-          if (recents != null) #recents: recents,
-        }),
-      );
+  ListCopyWith<
+    $R,
+    RememberedFood,
+    RememberedFoodCopyWith<$R, RememberedFood, RememberedFood>
+  >
+  get remembered => ListCopyWith(
+    $value.remembered,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(remembered: v),
+  );
+  @override
+  $R call({
+    String? query,
+    bool? verifiedOnly,
+    List<RecentFood>? recents,
+    List<RememberedFood>? remembered,
+  }) => $apply(
+    FieldCopyWithData({
+      if (query != null) #query: query,
+      if (verifiedOnly != null) #verifiedOnly: verifiedOnly,
+      if (recents != null) #recents: recents,
+      if (remembered != null) #remembered: remembered,
+    }),
+  );
   @override
   AddSearchRunning $make(CopyWithData data) => AddSearchRunning(
     query: data.get(#query, or: $value.query),
     verifiedOnly: data.get(#verifiedOnly, or: $value.verifiedOnly),
     recents: data.get(#recents, or: $value.recents),
+    remembered: data.get(#remembered, or: $value.remembered),
   );
 
   @override
@@ -426,6 +514,7 @@ class AddSearchResultsMapper extends SubClassMapperBase<AddSearchResults> {
       MapperContainer.globals.use(_instance = AddSearchResultsMapper._());
       AddSearchStateMapper.ensureInitialized().addSubMapper(_instance!);
       RecentFoodMapper.ensureInitialized();
+      RememberedFoodMapper.ensureInitialized();
       MfpFoodMapper.ensureInitialized();
     }
     return _instance!;
@@ -450,6 +539,9 @@ class AddSearchResultsMapper extends SubClassMapperBase<AddSearchResults> {
     'recents',
     _$recents,
   );
+  static List<RememberedFood> _$remembered(AddSearchResults v) => v.remembered;
+  static const Field<AddSearchResults, List<RememberedFood>> _f$remembered =
+      Field('remembered', _$remembered);
   static List<MfpFood> _$foods(AddSearchResults v) => v.foods;
   static const Field<AddSearchResults, List<MfpFood>> _f$foods = Field(
     'foods',
@@ -461,6 +553,7 @@ class AddSearchResultsMapper extends SubClassMapperBase<AddSearchResults> {
     #query: _f$query,
     #verifiedOnly: _f$verifiedOnly,
     #recents: _f$recents,
+    #remembered: _f$remembered,
     #foods: _f$foods,
   };
   @override
@@ -479,6 +572,7 @@ class AddSearchResultsMapper extends SubClassMapperBase<AddSearchResults> {
       query: data.dec(_f$query),
       verifiedOnly: data.dec(_f$verifiedOnly),
       recents: data.dec(_f$recents),
+      remembered: data.dec(_f$remembered),
       foods: data.dec(_f$foods),
     );
   }
@@ -548,12 +642,20 @@ abstract class AddSearchResultsCopyWith<$R, $In extends AddSearchResults, $Out>
   @override
   ListCopyWith<$R, RecentFood, RecentFoodCopyWith<$R, RecentFood, RecentFood>>
   get recents;
+  @override
+  ListCopyWith<
+    $R,
+    RememberedFood,
+    RememberedFoodCopyWith<$R, RememberedFood, RememberedFood>
+  >
+  get remembered;
   ListCopyWith<$R, MfpFood, MfpFoodCopyWith<$R, MfpFood, MfpFood>> get foods;
   @override
   $R call({
     String? query,
     bool? verifiedOnly,
     List<RecentFood>? recents,
+    List<RememberedFood>? remembered,
     List<MfpFood>? foods,
   });
   AddSearchResultsCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
@@ -577,6 +679,17 @@ class _AddSearchResultsCopyWithImpl<$R, $Out>
     (v) => call(recents: v),
   );
   @override
+  ListCopyWith<
+    $R,
+    RememberedFood,
+    RememberedFoodCopyWith<$R, RememberedFood, RememberedFood>
+  >
+  get remembered => ListCopyWith(
+    $value.remembered,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(remembered: v),
+  );
+  @override
   ListCopyWith<$R, MfpFood, MfpFoodCopyWith<$R, MfpFood, MfpFood>> get foods =>
       ListCopyWith(
         $value.foods,
@@ -588,12 +701,14 @@ class _AddSearchResultsCopyWithImpl<$R, $Out>
     String? query,
     bool? verifiedOnly,
     List<RecentFood>? recents,
+    List<RememberedFood>? remembered,
     List<MfpFood>? foods,
   }) => $apply(
     FieldCopyWithData({
       if (query != null) #query: query,
       if (verifiedOnly != null) #verifiedOnly: verifiedOnly,
       if (recents != null) #recents: recents,
+      if (remembered != null) #remembered: remembered,
       if (foods != null) #foods: foods,
     }),
   );
@@ -602,6 +717,7 @@ class _AddSearchResultsCopyWithImpl<$R, $Out>
     query: data.get(#query, or: $value.query),
     verifiedOnly: data.get(#verifiedOnly, or: $value.verifiedOnly),
     recents: data.get(#recents, or: $value.recents),
+    remembered: data.get(#remembered, or: $value.remembered),
     foods: data.get(#foods, or: $value.foods),
   );
 
@@ -620,6 +736,7 @@ class AddBarcodeMissingMapper extends SubClassMapperBase<AddBarcodeMissing> {
       MapperContainer.globals.use(_instance = AddBarcodeMissingMapper._());
       AddSearchStateMapper.ensureInitialized().addSubMapper(_instance!);
       RecentFoodMapper.ensureInitialized();
+      RememberedFoodMapper.ensureInitialized();
       MfpBarcodeResultMapper.ensureInitialized();
     }
     return _instance!;
@@ -644,6 +761,9 @@ class AddBarcodeMissingMapper extends SubClassMapperBase<AddBarcodeMissing> {
     'recents',
     _$recents,
   );
+  static List<RememberedFood> _$remembered(AddBarcodeMissing v) => v.remembered;
+  static const Field<AddBarcodeMissing, List<RememberedFood>> _f$remembered =
+      Field('remembered', _$remembered);
   static MfpBarcodeResult _$result(AddBarcodeMissing v) => v.result;
   static const Field<AddBarcodeMissing, MfpBarcodeResult> _f$result = Field(
     'result',
@@ -655,6 +775,7 @@ class AddBarcodeMissingMapper extends SubClassMapperBase<AddBarcodeMissing> {
     #query: _f$query,
     #verifiedOnly: _f$verifiedOnly,
     #recents: _f$recents,
+    #remembered: _f$remembered,
     #result: _f$result,
   };
   @override
@@ -673,6 +794,7 @@ class AddBarcodeMissingMapper extends SubClassMapperBase<AddBarcodeMissing> {
       query: data.dec(_f$query),
       verifiedOnly: data.dec(_f$verifiedOnly),
       recents: data.dec(_f$recents),
+      remembered: data.dec(_f$remembered),
       result: data.dec(_f$result),
     );
   }
@@ -751,12 +873,20 @@ abstract class AddBarcodeMissingCopyWith<
   @override
   ListCopyWith<$R, RecentFood, RecentFoodCopyWith<$R, RecentFood, RecentFood>>
   get recents;
+  @override
+  ListCopyWith<
+    $R,
+    RememberedFood,
+    RememberedFoodCopyWith<$R, RememberedFood, RememberedFood>
+  >
+  get remembered;
   MfpBarcodeResultCopyWith<$R, MfpBarcodeResult, MfpBarcodeResult> get result;
   @override
   $R call({
     String? query,
     bool? verifiedOnly,
     List<RecentFood>? recents,
+    List<RememberedFood>? remembered,
     MfpBarcodeResult? result,
   });
   AddBarcodeMissingCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
@@ -780,6 +910,17 @@ class _AddBarcodeMissingCopyWithImpl<$R, $Out>
     (v) => call(recents: v),
   );
   @override
+  ListCopyWith<
+    $R,
+    RememberedFood,
+    RememberedFoodCopyWith<$R, RememberedFood, RememberedFood>
+  >
+  get remembered => ListCopyWith(
+    $value.remembered,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(remembered: v),
+  );
+  @override
   MfpBarcodeResultCopyWith<$R, MfpBarcodeResult, MfpBarcodeResult> get result =>
       $value.result.copyWith.$chain((v) => call(result: v));
   @override
@@ -787,12 +928,14 @@ class _AddBarcodeMissingCopyWithImpl<$R, $Out>
     String? query,
     bool? verifiedOnly,
     List<RecentFood>? recents,
+    List<RememberedFood>? remembered,
     MfpBarcodeResult? result,
   }) => $apply(
     FieldCopyWithData({
       if (query != null) #query: query,
       if (verifiedOnly != null) #verifiedOnly: verifiedOnly,
       if (recents != null) #recents: recents,
+      if (remembered != null) #remembered: remembered,
       if (result != null) #result: result,
     }),
   );
@@ -801,6 +944,7 @@ class _AddBarcodeMissingCopyWithImpl<$R, $Out>
     query: data.get(#query, or: $value.query),
     verifiedOnly: data.get(#verifiedOnly, or: $value.verifiedOnly),
     recents: data.get(#recents, or: $value.recents),
+    remembered: data.get(#remembered, or: $value.remembered),
     result: data.get(#result, or: $value.result),
   );
 
@@ -819,6 +963,7 @@ class AddSearchFailedMapper extends SubClassMapperBase<AddSearchFailed> {
       MapperContainer.globals.use(_instance = AddSearchFailedMapper._());
       AddSearchStateMapper.ensureInitialized().addSubMapper(_instance!);
       RecentFoodMapper.ensureInitialized();
+      RememberedFoodMapper.ensureInitialized();
       ReadProblemMapper.ensureInitialized();
     }
     return _instance!;
@@ -843,6 +988,9 @@ class AddSearchFailedMapper extends SubClassMapperBase<AddSearchFailed> {
     'recents',
     _$recents,
   );
+  static List<RememberedFood> _$remembered(AddSearchFailed v) => v.remembered;
+  static const Field<AddSearchFailed, List<RememberedFood>> _f$remembered =
+      Field('remembered', _$remembered);
   static ReadProblem _$problem(AddSearchFailed v) => v.problem;
   static const Field<AddSearchFailed, ReadProblem> _f$problem = Field(
     'problem',
@@ -861,6 +1009,7 @@ class AddSearchFailedMapper extends SubClassMapperBase<AddSearchFailed> {
     #query: _f$query,
     #verifiedOnly: _f$verifiedOnly,
     #recents: _f$recents,
+    #remembered: _f$remembered,
     #problem: _f$problem,
     #statusCode: _f$statusCode,
   };
@@ -880,6 +1029,7 @@ class AddSearchFailedMapper extends SubClassMapperBase<AddSearchFailed> {
       query: data.dec(_f$query),
       verifiedOnly: data.dec(_f$verifiedOnly),
       recents: data.dec(_f$recents),
+      remembered: data.dec(_f$remembered),
       problem: data.dec(_f$problem),
       statusCode: data.dec(_f$statusCode),
     );
@@ -951,10 +1101,18 @@ abstract class AddSearchFailedCopyWith<$R, $In extends AddSearchFailed, $Out>
   ListCopyWith<$R, RecentFood, RecentFoodCopyWith<$R, RecentFood, RecentFood>>
   get recents;
   @override
+  ListCopyWith<
+    $R,
+    RememberedFood,
+    RememberedFoodCopyWith<$R, RememberedFood, RememberedFood>
+  >
+  get remembered;
+  @override
   $R call({
     String? query,
     bool? verifiedOnly,
     List<RecentFood>? recents,
+    List<RememberedFood>? remembered,
     ReadProblem? problem,
     int? statusCode,
   });
@@ -979,10 +1137,22 @@ class _AddSearchFailedCopyWithImpl<$R, $Out>
     (v) => call(recents: v),
   );
   @override
+  ListCopyWith<
+    $R,
+    RememberedFood,
+    RememberedFoodCopyWith<$R, RememberedFood, RememberedFood>
+  >
+  get remembered => ListCopyWith(
+    $value.remembered,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(remembered: v),
+  );
+  @override
   $R call({
     String? query,
     bool? verifiedOnly,
     List<RecentFood>? recents,
+    List<RememberedFood>? remembered,
     ReadProblem? problem,
     Object? statusCode = $none,
   }) => $apply(
@@ -990,6 +1160,7 @@ class _AddSearchFailedCopyWithImpl<$R, $Out>
       if (query != null) #query: query,
       if (verifiedOnly != null) #verifiedOnly: verifiedOnly,
       if (recents != null) #recents: recents,
+      if (remembered != null) #remembered: remembered,
       if (problem != null) #problem: problem,
       if (statusCode != $none) #statusCode: statusCode,
     }),
@@ -999,6 +1170,7 @@ class _AddSearchFailedCopyWithImpl<$R, $Out>
     query: data.get(#query, or: $value.query),
     verifiedOnly: data.get(#verifiedOnly, or: $value.verifiedOnly),
     recents: data.get(#recents, or: $value.recents),
+    remembered: data.get(#remembered, or: $value.remembered),
     problem: data.get(#problem, or: $value.problem),
     statusCode: data.get(#statusCode, or: $value.statusCode),
   );

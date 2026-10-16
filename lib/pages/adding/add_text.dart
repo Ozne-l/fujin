@@ -1,3 +1,4 @@
+import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/recents/recent_food.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/ekklo_side.dart';
@@ -61,6 +62,14 @@ abstract final class AddText {
     ),
     when(intl, recent.addedAt, today: today),
   );
+
+  static String remembered(AppLocalizations intl, RememberedFood food) =>
+      switch (food) {
+        MatchedFood(:final ekkloFoodName) => intl.memoryTarget(ekkloFoodName),
+        OwnCopy(:final mfpUnit) => intl.addOwnCopyTarget(
+          intl.memoryUnitQuoted(mfpUnit),
+        ),
+      };
 
   static String when(
     AppLocalizations intl,

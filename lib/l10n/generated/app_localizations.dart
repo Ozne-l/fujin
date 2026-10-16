@@ -2090,6 +2090,36 @@ abstract class AppLocalizations {
   /// **'{detail} · {when}'**
   String addRecentLine(String detail, String when);
 
+  /// No description provided for @addRememberedFoods.
+  ///
+  /// In fr, this message translates to:
+  /// **'MÉMORISÉS'**
+  String get addRememberedFoods;
+
+  /// No description provided for @addRememberedLinked.
+  ///
+  /// In fr, this message translates to:
+  /// **'liés à Ekklo'**
+  String get addRememberedLinked;
+
+  /// No description provided for @addRememberedFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{1 trouvé} other{{count} trouvés}}'**
+  String addRememberedFound(int count);
+
+  /// No description provided for @addRememberedNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fūjin les envoie vers Ekklo sans rien te demander.'**
+  String get addRememberedNote;
+
+  /// No description provided for @addOwnCopyTarget.
+  ///
+  /// In fr, this message translates to:
+  /// **'→ Aliment perso · {unit}'**
+  String addOwnCopyTarget(String unit);
+
   /// No description provided for @addThisMorning.
   ///
   /// In fr, this message translates to:

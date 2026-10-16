@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/recents/recent_food.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
@@ -93,6 +94,17 @@ class SearchView extends HookConsumerWidget {
       }
     }
 
+    Future<void> openRemembered(RememberedFood remembered) async {
+      if (await notifier.openRemembered(
+            remembered,
+            mfpMealName: mfpMealName,
+            date: date,
+          )
+          case final draft?) {
+        onOpen(draft);
+      }
+    }
+
     Future<void> lookUp(String code) async {
       if (await notifier.lookUp() case final food?) open(food, barcode: code);
     }
@@ -108,9 +120,9 @@ class SearchView extends HookConsumerWidget {
     }
 
     List<Widget> recentList(String trailing) => [
-      AddSectionLabel(label: context.intl.addRecents, trailing: trailing),
+      _box(AddSectionLabel(label: context.intl.addRecents, trailing: trailing)),
       switch (recents) {
-        [] => _note(context.intl.addRecentsEmpty),
+        [] => _box(_note(context.intl.addRecentsEmpty)),
         _ => FoodList(
           rows: [
             for (final recent in recents)
@@ -129,113 +141,187 @@ class SearchView extends HookConsumerWidget {
       },
     ];
 
-    final body = switch (search) {
-      AddSearchIdle() || AddSearchRunning() when barcode != null => [
-        BarcodeCard(
-          format: AddText.barcodeFormat(barcode.format),
-          running: search is AddSearchRunning,
-          onTap: () => unawaited(lookUp(barcode.barcode)),
-        ),
-        Center(
-          child: TextButton(
-            onPressed: () => searchText(barcode.barcode),
-            child: Text(context.intl.addSearchAsText(barcode.barcode)),
+    List<Widget> rememberedList(List<RememberedFood> foods) => switch (foods) {
+      [] => const [],
+      _ => [
+        _box(
+          AddSectionLabel(
+            label: context.intl.addRememberedFoods,
+            trailing: switch (search.query) {
+              '' => context.intl.addRememberedLinked,
+              _ => context.intl.addRememberedFound(foods.length),
+            },
+            dot: FujinColorRole.sourceEkklo,
           ),
-        ),
-      ],
-      AddSearchIdle() => [
-        ...recentList(context.intl.addRecentsAddedFromFujin),
-        if (recents.isNotEmpty) _note(context.intl.addRecentsNote),
-      ],
-      AddSearchRunning() => [
-        AddSectionLabel(
-          label: context.intl.addMfpResults,
-          trailing: context.intl.addSearching,
-          dot: FujinColorRole.sourceMfp,
-        ),
-      ],
-      AddSearchResults(foods: []) => [
-        AddStatePanel(
-          icon: Icons.search,
-          title: context.intl.addNoResultTitle,
-          detail: context.intl.addNoResultDetail,
-        ),
-        ..._suggestions(context.intl, search, searchText, notifier),
-      ],
-      AddSearchResults(:final foods) => [
-        AddSectionLabel(
-          label: context.intl.addMfpResults,
-          trailing: switch (foods.length) {
-            MfpFoods.defaultMaxResults => context.intl.addFirstResults(
-              foods.length,
-            ),
-            final count => context.intl.addResultCount(count),
-          },
-          dot: FujinColorRole.sourceMfp,
         ),
         FoodList(
           rows: [
             for (final food in foods)
               (
-                title: food.description,
-                detail: AddText.result(context.intl, food),
-                verified: food.verified ?? false,
-                energy: switch (AddText.kilocalories(food)) {
-                  final energy? => context.intl.kilocalories(energy),
-                  null => null,
-                },
-                onTap: () => open(food),
+                title: food.mfpDescription,
+                detail: AddText.remembered(context.intl, food),
+                verified: false,
+                energy: null,
+                onTap: () => unawaited(openRemembered(food)),
               ),
           ],
         ),
+        if (search.query.isEmpty) _box(_note(context.intl.addRememberedNote)),
       ],
+    };
+
+    final body = switch (search) {
+      AddSearchIdle() || AddSearchRunning() when barcode != null => [
+        _box(
+          BarcodeCard(
+            format: AddText.barcodeFormat(barcode.format),
+            running: search is AddSearchRunning,
+            onTap: () => unawaited(lookUp(barcode.barcode)),
+          ),
+        ),
+        _box(
+          Center(
+            child: TextButton(
+              onPressed: () => searchText(barcode.barcode),
+              child: Text(context.intl.addSearchAsText(barcode.barcode)),
+            ),
+          ),
+        ),
+      ],
+      AddSearchIdle(:final rememberedBesideRecents) => [
+        ...recentList(context.intl.addRecentsAddedFromFujin),
+        if (recents.isNotEmpty) _box(_note(context.intl.addRecentsNote)),
+        ...rememberedList(rememberedBesideRecents),
+      ],
+      AddSearchRunning(:final query, :final remembered) => [
+        if (query.isNotEmpty) ...rememberedList(remembered),
+        _box(
+          AddSectionLabel(
+            label: context.intl.addMfpResults,
+            trailing: context.intl.addSearching,
+            dot: FujinColorRole.sourceMfp,
+          ),
+        ),
+      ],
+      AddSearchResults(foods: [], :final remembered) => [
+        ...rememberedList(remembered),
+        _box(
+          AddStatePanel(
+            icon: Icons.search,
+            title: context.intl.addNoResultTitle,
+            detail: context.intl.addNoResultDetail,
+          ),
+        ),
+        ..._suggestions(
+          context.intl,
+          search,
+          searchText,
+          notifier,
+        ).map(_box),
+      ],
+      AddSearchResults(
+        :final foods,
+        :final remembered,
+        :final foodsBesideRemembered,
+      ) =>
+        [
+          ...rememberedList(remembered),
+          if (foodsBesideRemembered.isNotEmpty) ...[
+            _box(
+              AddSectionLabel(
+                label: context.intl.addMfpResults,
+                trailing: switch (foods.length) {
+                  MfpFoods.defaultMaxResults => context.intl.addFirstResults(
+                    foods.length,
+                  ),
+                  _ => context.intl.addResultCount(
+                    foodsBesideRemembered.length,
+                  ),
+                },
+                dot: FujinColorRole.sourceMfp,
+              ),
+            ),
+            FoodList(
+              rows: [
+                for (final food in foodsBesideRemembered)
+                  (
+                    title: food.description,
+                    detail: AddText.result(context.intl, food),
+                    verified: food.verified ?? false,
+                    energy: switch (AddText.kilocalories(food)) {
+                      final energy? => context.intl.kilocalories(energy),
+                      null => null,
+                    },
+                    onTap: () => open(food),
+                  ),
+              ],
+            ),
+          ],
+        ],
       AddBarcodeMissing(
         result: MfpBarcodeUnresolved(:final description, :final brandName),
       ) =>
-        [_unresolved(context.intl, description, brandName, searchText)],
+        [_box(_unresolved(context.intl, description, brandName, searchText))],
       AddBarcodeMissing(:final result) => [
-        AddStatePanel(
-          icon: Icons.qr_code_2,
-          title: context.intl.addBarcodeUnknownTitle,
-          detail: context.intl.addBarcodeUnknownDetail(result.barcode),
+        _box(
+          AddStatePanel(
+            icon: Icons.qr_code_2,
+            title: context.intl.addBarcodeUnknownTitle,
+            detail: context.intl.addBarcodeUnknownDetail(result.barcode),
+          ),
         ),
       ],
-      AddSearchFailed(problem: ReadProblem.offline) => [
-        OfflineCard(onRetry: retry),
-        ...recentList(context.intl.addRecentsOnPhone),
-      ],
-      AddSearchFailed(problem: ReadProblem.mfpSessionExpired) => [
-        AddStatePanel(
-          icon: Icons.lock_outline,
-          alert: true,
-          title: context.intl.addMfpSessionTitle,
-          detail: context.intl.addMfpSessionSearchDetail,
-          actionIcon: Icons.login,
-          action: (context.intl.mfpReconnect, () => unawaited(signIn())),
-        ),
-      ],
-      AddSearchFailed(:final problem, :final statusCode) => [
-        AddStatePanel(
-          icon: Icons.dns_outlined,
-          alert: true,
-          title: switch (problem) {
-            ReadProblem.mfpUnavailable => context.intl.addServerTitle,
-            ReadProblem.offline ||
-            ReadProblem.mfpSessionExpired ||
-            ReadProblem.ekkloSessionExpired ||
-            ReadProblem.ekkloUnavailable ||
-            ReadProblem.unknown => JournalText.problemHeadline(
-              context.intl,
-              problem,
+      AddSearchFailed(
+        problem: ReadProblem.offline,
+        :final rememberedBesideRecents,
+      ) =>
+        [
+          _box(OfflineCard(onRetry: retry)),
+          ...recentList(context.intl.addRecentsOnPhone),
+          ...rememberedList(rememberedBesideRecents),
+        ],
+      AddSearchFailed(
+        problem: ReadProblem.mfpSessionExpired,
+        :final remembered,
+      ) =>
+        [
+          _box(
+            AddStatePanel(
+              icon: Icons.lock_outline,
+              alert: true,
+              title: context.intl.addMfpSessionTitle,
+              detail: context.intl.addMfpSessionSearchDetail,
+              actionIcon: Icons.login,
+              action: (context.intl.mfpReconnect, () => unawaited(signIn())),
             ),
-          },
-          detail: context.intl.addServerDetail,
-          action: (context.intl.tryAgain, retry),
-          note: switch (statusCode) {
-            final code? => context.intl.addServerCode(code),
-            null => null,
-          },
+          ),
+          ...rememberedList(remembered),
+        ],
+      AddSearchFailed(:final problem, :final statusCode, :final remembered) => [
+        _box(
+          AddStatePanel(
+            icon: Icons.dns_outlined,
+            alert: true,
+            title: switch (problem) {
+              ReadProblem.mfpUnavailable => context.intl.addServerTitle,
+              ReadProblem.offline ||
+              ReadProblem.mfpSessionExpired ||
+              ReadProblem.ekkloSessionExpired ||
+              ReadProblem.ekkloUnavailable ||
+              ReadProblem.unknown => JournalText.problemHeadline(
+                context.intl,
+                problem,
+              ),
+            },
+            detail: context.intl.addServerDetail,
+            action: (context.intl.tryAgain, retry),
+            note: switch (statusCode) {
+              final code? => context.intl.addServerCode(code),
+              null => null,
+            },
+          ),
         ),
+        ...rememberedList(remembered),
       ],
     };
 
@@ -295,23 +381,29 @@ class SearchView extends HookConsumerWidget {
         Expanded(
           child: Stack(
             children: [
-              ListView(
-                padding: EdgeInsets.only(
-                  bottom:
-                      FujinSpace.s3 +
-                      FujinSize.tabBar +
-                      FujinSpace.s6 +
-                      MediaQuery.paddingOf(context).bottom,
-                ),
-                children: [
-                  for (final (index, child) in [
-                    if (scan case ScannerSearch(unresolved: true))
-                      const ScannedBanner(),
-                    ...body,
-                  ].indexed) ...[
-                    if (index > 0) const SizedBox(height: FujinSpace.s3),
-                    child,
-                  ],
+              CustomScrollView(
+                slivers: [
+                  SliverPadding(
+                    padding: EdgeInsets.only(
+                      bottom:
+                          FujinSpace.s3 +
+                          FujinSize.tabBar +
+                          FujinSpace.s6 +
+                          MediaQuery.paddingOf(context).bottom,
+                    ),
+                    sliver: SliverMainAxisGroup(
+                      slivers: [
+                        for (final (index, child) in [
+                          if (scan case ScannerSearch(unresolved: true))
+                            _box(const ScannedBanner()),
+                          ...body,
+                        ].indexed) ...[
+                          if (index > 0) _gap,
+                          child,
+                        ],
+                      ],
+                    ),
+                  ),
                 ],
               ),
               PositionedDirectional(
@@ -329,6 +421,12 @@ class SearchView extends HookConsumerWidget {
       ],
     );
   }
+
+  static const _gap = SliverToBoxAdapter(
+    child: SizedBox(height: FujinSpace.s3),
+  );
+
+  static Widget _box(Widget child) => SliverToBoxAdapter(child: child);
 
   static Widget _note(String text) => Padding(
     padding: const EdgeInsets.symmetric(horizontal: FujinSize.textInset),

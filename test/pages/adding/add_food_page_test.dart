@@ -8,6 +8,7 @@ import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/router.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/goals/goals.dart';
+import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/pages/adding/add_search_notifier.dart';
 import 'package:fujin/pages/common/day_picker_sheet.dart';
@@ -95,6 +96,20 @@ final MfpFood _skyrInGrams = mfpFood(
   description: _skyrName,
   nutrients: nutrients(kcal: 60, protein: 10, carbs: 4, fat: 0.2),
 );
+
+const _skyrInPotsCopy = OwnCopy(
+  mfpFoodId: skyr,
+  mfpDescription: _skyrName,
+  ekkloFoodId: 'own-skyr',
+  ekkloFoodName: _skyrName,
+  mfpUnit: pot,
+);
+
+const _otherSkyrNames = ['Skyr vanille', 'Skyr myrtille'];
+
+final List<MfpFood> _otherSkyrs = [
+  for (final name in _otherSkyrNames) mfpFood('$skyr-$name', description: name),
+];
 
 FakeBackends _skyrBackends(MfpFood food) => FakeBackends(
   mealNames: [breakfast, lunch],
@@ -360,6 +375,155 @@ void main() {
     await _search(tester, _query);
     _sees('Pas de connexion');
     _sees('RÉCENTS');
+  });
+
+  testWidgets('lists the remembered foods under the recents, without the '
+      'foods already recent (A02a)', (tester) async {
+    final backends = _backends();
+    await pumpFujin(tester, backends, ownCopies: [_skyrInPotsCopy]);
+    final first = await _openAdd(tester);
+    await _openOats(tester);
+    await _tap(tester, _addToBoth);
+    await first;
+
+    await _openAdd(tester);
+
+    _sees('MÉMORISÉS');
+    _sees('liés à Ekklo');
+    _sees('Fūjin les envoie vers Ekklo sans rien te demander.');
+    _sees('→ $riceInEkklo');
+    _sees('→ Aliment perso · « $pot »');
+    check(find.text(oats).evaluate()).isEmpty();
+    check(
+      tester.getTopLeft(find.text('RÉCENTS')).dy,
+    ).isLessThan(tester.getTopLeft(find.text('MÉMORISÉS')).dy);
+  });
+
+  testWidgets('lists the remembered foods matching the search at once, above '
+      'the MyFitnessPal results that drop them (A02b)', (tester) async {
+    final others = [
+      for (var index = 1; index < MfpFoods.defaultMaxResults; index++)
+        mfpFood('$skyr-$index', description: 'Skyr $index'),
+    ];
+    final backends = _skyrBackends(_skyrInPots)
+      ..mfpSearches = {
+        'skyr': [_skyrInPots, ...others],
+      };
+    await pumpFujin(tester, backends, ownCopies: [_skyrInPotsCopy]);
+    await _openAdd(tester);
+
+    await tester.enterText(find.byType(TextField).first, 'skyr');
+    await tester.pump();
+    _sees('1 trouvé');
+    _sees('recherche…');
+
+    await tester.pump(AddSearchNotifier.typingPause);
+    await tester.pumpAndSettle();
+    _sees(_skyrName);
+    _sees('25 premiers');
+    check(find.text(rice).evaluate()).isEmpty();
+    check(
+      tester.getTopLeft(find.text('MÉMORISÉS')).dy,
+    ).isLessThan(tester.getTopLeft(find.text('RÉSULTATS MYFITNESSPAL')).dy);
+  });
+
+  testWidgets('counts the MyFitnessPal rows left beside the remembered foods '
+      'when MyFitnessPal returned less than a page (A02b)', (tester) async {
+    final backends = _skyrBackends(_skyrInPots)
+      ..mfpSearches = {
+        'skyr': [_skyrInPots, ..._otherSkyrs],
+      };
+    await pumpFujin(tester, backends, ownCopies: [_skyrInPotsCopy]);
+    await _openAdd(tester);
+
+    await _search(tester, 'skyr');
+
+    _sees('2 résultats');
+    _sees(_skyrName);
+    _otherSkyrNames.forEach(_sees);
+  });
+
+  testWidgets('comes back from a remembered food to the results it left '
+      '(A02b)', (tester) async {
+    final backends = _skyrBackends(_skyrInPots)
+      ..mfpSearches = {
+        'skyr': [_skyrInPots, ..._otherSkyrs],
+      };
+    await pumpFujin(tester, backends, ownCopies: [_skyrInPotsCopy]);
+    await _openAdd(tester);
+    await _search(tester, 'skyr');
+
+    await _tap(tester, _skyrName);
+    _sees(_addToBoth);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+
+    _sees('1 trouvé');
+    _sees('2 résultats');
+    _otherSkyrNames.forEach(_sees);
+    check(find.text(rice).evaluate()).isEmpty();
+  });
+
+  testWidgets('opens a remembered food touched while MyFitnessPal is still '
+      'searching', (tester) async {
+    final searching = Completer<void>();
+    final reading = Completer<void>();
+    final backends = _skyrBackends(_skyrInPots)
+      ..mfpSearchGate = searching
+      ..mfpFoodGate = reading;
+    await pumpFujin(tester, backends, ownCopies: [_skyrInPotsCopy]);
+    await _openAdd(tester);
+    await tester.enterText(find.byType(TextField).first, 'skyr');
+    await tester.pump(AddSearchNotifier.typingPause);
+
+    await tester.tap(find.text(_skyrName));
+    await tester.pump();
+    searching.complete();
+    await tester.pump();
+    reading.complete();
+    await tester.pumpAndSettle();
+
+    _sees(_addToBoth);
+  });
+
+  testWidgets('opens a remembered food in its remembered unit', (
+    tester,
+  ) async {
+    final basmati = mfpFood(
+      rice,
+      description: 'Riz basmati',
+      servingSizes: const [
+        MfpServingSize(value: 100, unit: grams, nutritionMultiplier: 1),
+        MfpServingSize(value: 1, unit: cup, nutritionMultiplier: 1.8),
+      ],
+      nutrients: nutrients(kcal: 350),
+    );
+    final backends = _backends(stored: [basmati]);
+    await pumpFujin(tester, backends, units: memory.units);
+    final result = await _openAdd(tester);
+
+    await _tap(tester, rice);
+    _sees('Ajouter à Breakfast');
+    await _tap(tester, _addToBoth);
+
+    check(await result).isNotNull();
+    check(
+      backends.entries.single,
+    ).has((entry) => entry.servingSize.unit, 'unit').equals(cup);
+  });
+
+  testWidgets('keeps the remembered foods on screen when offline', (
+    tester,
+  ) async {
+    final backends = _backends();
+    await pumpFujin(tester, backends);
+    await _openAdd(tester);
+    backends.mfpReachable = false;
+
+    await _search(tester, 'rice');
+    _sees('Pas de connexion');
+    _sees('MÉMORISÉS');
+    _sees(rice);
   });
 
   testWidgets('keeps the Ekklo choice when the meal changes', (tester) async {

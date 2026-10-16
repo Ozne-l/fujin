@@ -1528,6 +1528,32 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get addRememberedFoods => 'REMEMBERED';
+
+  @override
+  String get addRememberedLinked => 'linked to Ekklo';
+
+  @override
+  String addRememberedFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count found',
+      one: '1 found',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get addRememberedNote =>
+      'Fūjin sends them to Ekklo without asking you anything.';
+
+  @override
+  String addOwnCopyTarget(String unit) {
+    return '→ Own food · $unit';
+  }
+
+  @override
   String get addThisMorning => 'this morning';
 
   @override

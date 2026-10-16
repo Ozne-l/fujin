@@ -7,26 +7,28 @@ class FoodList extends StatelessWidget {
 
   final List<FoodListRow> rows;
 
+  static final _card = BoxDecoration(
+    color: FujinColorRole.backgroundCard,
+    borderRadius: BorderRadius.circular(FujinRadius.card),
+    border: Border.all(color: FujinColorRole.borderCard),
+  );
+
   @override
-  Widget build(BuildContext context) => Container(
-    margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
-    decoration: BoxDecoration(
-      color: FujinColorRole.backgroundCard,
-      borderRadius: BorderRadius.circular(FujinRadius.card),
-      border: Border.all(color: FujinColorRole.borderCard),
-    ),
-    clipBehavior: Clip.antiAlias,
-    child: Column(
-      children: [
-        for (final (index, row) in rows.indexed) ...[
-          if (index > 0)
-            const Divider(
-              height: FujinStroke.card,
-              thickness: FujinStroke.card,
-            ),
-          _Row(row: row),
-        ],
-      ],
+  Widget build(BuildContext context) => SliverPadding(
+    padding: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
+    sliver: DecoratedSliver(
+      decoration: _card,
+      sliver: SliverPadding(
+        padding: _card.padding,
+        sliver: SliverList.separated(
+          itemCount: rows.length,
+          itemBuilder: (context, index) => _Row(row: rows[index]),
+          separatorBuilder: (context, index) => const Divider(
+            height: FujinStroke.card,
+            thickness: FujinStroke.card,
+          ),
+        ),
+      ),
     ),
   );
 }

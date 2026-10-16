@@ -1,5 +1,7 @@
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/recents/recent_food.dart';
+import 'package:fujin/domain/adding/recent_of.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -11,11 +13,18 @@ sealed class AddSearchState with AddSearchStateMappable {
     required this.query,
     required this.verifiedOnly,
     required this.recents,
+    required this.remembered,
   });
 
   final String query;
   final bool verifiedOnly;
   final List<RecentFood> recents;
+  final List<RememberedFood> remembered;
+
+  List<RememberedFood> get rememberedBesideRecents => [
+    for (final food in remembered)
+      if (recentOf(food, recents) == null) food,
+  ];
 }
 
 @MappableClass(discriminatorValue: 'idle')
@@ -24,6 +33,7 @@ final class AddSearchIdle extends AddSearchState with AddSearchIdleMappable {
     required super.query,
     required super.verifiedOnly,
     required super.recents,
+    required super.remembered,
   });
 }
 
@@ -34,6 +44,7 @@ final class AddSearchRunning extends AddSearchState
     required super.query,
     required super.verifiedOnly,
     required super.recents,
+    required super.remembered,
   });
 }
 
@@ -44,10 +55,17 @@ final class AddSearchResults extends AddSearchState
     required super.query,
     required super.verifiedOnly,
     required super.recents,
+    required super.remembered,
     required this.foods,
   });
 
   final List<MfpFood> foods;
+
+  List<MfpFood> get foodsBesideRemembered => [
+    for (final food in foods)
+      if (!remembered.any((remembered) => remembered.mfpFoodId == food.id))
+        food,
+  ];
 }
 
 @MappableClass(discriminatorValue: 'barcode_missing')
@@ -57,6 +75,7 @@ final class AddBarcodeMissing extends AddSearchState
     required super.query,
     required super.verifiedOnly,
     required super.recents,
+    required super.remembered,
     required this.result,
   });
 
@@ -70,6 +89,7 @@ final class AddSearchFailed extends AddSearchState
     required super.query,
     required super.verifiedOnly,
     required super.recents,
+    required super.remembered,
     required this.problem,
     this.statusCode,
   });

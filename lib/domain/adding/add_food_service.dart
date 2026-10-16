@@ -1,13 +1,16 @@
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
+import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
+import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/recents/recent_food.dart';
 import 'package:fujin/data/recents/recent_food_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_outcome.dart';
 import 'package:fujin/domain/adding/add_stage.dart';
 import 'package:fujin/domain/adding/added_food.dart';
+import 'package:fujin/domain/adding/remembered_serving.dart';
 import 'package:fujin/domain/adding/rescale_planned.dart';
 import 'package:fujin/domain/adding/scan_outcome.dart';
 import 'package:fujin/domain/adding/undo_outcome.dart';
@@ -97,14 +100,49 @@ final class AddFoodService {
     RecentFood recent, {
     required String mfpMealName,
     required DateTime date,
-  }) async => switch (await _mfp.foods.byId(recent.mfpFoodId)) {
-    final food? => AddDraft.of(
-      food,
-      mfpMealName: mfpMealName,
-      date: date,
-      servingSize: recent.servingSize,
-      servings: recent.servings,
+  }) => _open(
+    recent.mfpFoodId,
+    mfpMealName: mfpMealName,
+    date: date,
+    serving: (_) => (recent.servingSize, recent.servings),
+  );
+
+  Memory memory() => _memory.load();
+
+  Future<AddDraft?> openRemembered(
+    RememberedFood remembered, {
+    required String mfpMealName,
+    required DateTime date,
+  }) => _open(
+    remembered.mfpFoodId,
+    mfpMealName: mfpMealName,
+    date: date,
+    serving: (food) => (
+      rememberedServing(
+        food,
+        remembered: remembered,
+        memory: _memory.load(),
+        recents: _recents.latest(),
+      ),
+      AddDraft.oneServing,
     ),
+  );
+
+  Future<AddDraft?> _open(
+    String mfpFoodId, {
+    required String mfpMealName,
+    required DateTime date,
+    required (MfpServingSize?, double) Function(MfpFood food) serving,
+  }) async => switch (await _mfp.foods.byId(mfpFoodId)) {
+    final food? => switch (serving(food)) {
+      (final servingSize, final servings) => AddDraft.of(
+        food,
+        mfpMealName: mfpMealName,
+        date: date,
+        servingSize: servingSize,
+        servings: servings,
+      ),
+    },
     null => null,
   };
 

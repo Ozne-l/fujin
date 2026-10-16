@@ -1,10 +1,13 @@
 import 'dart:async';
 
 import 'package:fujin/app/providers.dart';
+import 'package:fujin/data/memory/memory.dart';
+import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/recents/recent_food.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_food_service.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
+import 'package:fujin/domain/memory/memory_rules.dart';
 import 'package:fujin/pages/adding/add_search_state.dart';
 import 'package:fujin/pages/scanner/scanner_exit.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -24,26 +27,41 @@ final class AddSearchNotifier extends Notifier<AddSearchState> {
 
   final ScannerSearch? scan;
   Timer? _typing;
+  Memory _memory = const Memory();
 
   @override
   AddSearchState build() {
     ref.onDispose(() => _typing?.cancel());
-    final recents = ref.read(addFoodServiceProvider).recents();
+    final service = ref.read(addFoodServiceProvider);
+    _memory = service.memory();
+    final recents = service.recents();
     final query = scan?.query.trim() ?? '';
+    final remembered = rememberedFoods(_memory, query);
     if (query.isEmpty) {
-      return AddSearchIdle(query: query, verifiedOnly: false, recents: recents);
+      return AddSearchIdle(
+        query: query,
+        verifiedOnly: false,
+        recents: recents,
+        remembered: remembered,
+      );
     }
     _typing = Timer(Duration.zero, () => unawaited(search(query)));
     return AddSearchRunning(
       query: query,
       verifiedOnly: false,
       recents: recents,
+      remembered: remembered,
     );
   }
 
-  void refreshRecents() => state = state.copyWith(
-    recents: ref.read(addFoodServiceProvider).recents(),
-  );
+  void refreshRecents() {
+    final service = ref.read(addFoodServiceProvider);
+    _memory = service.memory();
+    state = state.copyWith(
+      recents: service.recents(),
+      remembered: rememberedFoods(_memory, state.query),
+    );
+  }
 
   void type(String text) {
     _typing?.cancel();
@@ -70,16 +88,19 @@ final class AddSearchNotifier extends Notifier<AddSearchState> {
       final foods = await ref
           .read(addFoodServiceProvider)
           .search(query, verifiedOnly: running.verifiedOnly);
-      if (ref.mounted && state == running) {
+      if (ref.mounted && identical(state, running)) {
         state = AddSearchResults(
           query: query,
           verifiedOnly: running.verifiedOnly,
           recents: running.recents,
+          remembered: running.remembered,
           foods: foods,
         );
       }
     } on Object catch (error) {
-      if (ref.mounted && state == running) state = _failed(running, error);
+      if (ref.mounted && identical(state, running)) {
+        state = _failed(running, error);
+      }
     }
   }
 
@@ -91,10 +112,10 @@ final class AddSearchNotifier extends Notifier<AddSearchState> {
 
   Future<MfpFood?> lookUp() => _fetch(
     (service, query) => service.byBarcode(query),
-    (idle, result) => switch (result) {
-      MfpBarcodeFound(:final food) => (idle, food),
+    (before, result) => switch (result) {
+      MfpBarcodeFound(:final food) => (before, food),
       MfpBarcodeUnknown() || MfpBarcodeUnresolved() => (
-        _missing(idle, result),
+        _missing(before, result),
         null,
       ),
     },
@@ -104,48 +125,71 @@ final class AddSearchNotifier extends Notifier<AddSearchState> {
     RecentFood recent, {
     required String mfpMealName,
     required DateTime date,
+  }) => _open(
+    (service) => service.reopen(recent, mfpMealName: mfpMealName, date: date),
+    unopened: 'Recent food ${recent.mfpFoodId} cannot be reopened',
+  );
+
+  Future<AddDraft?> openRemembered(
+    RememberedFood remembered, {
+    required String mfpMealName,
+    required DateTime date,
+  }) => _open(
+    (service) => service.openRemembered(
+      remembered,
+      mfpMealName: mfpMealName,
+      date: date,
+    ),
+    unopened: 'Remembered food ${remembered.mfpFoodId} cannot be opened',
+  );
+
+  Future<AddDraft?> _open(
+    Future<AddDraft?> Function(AddFoodService service) open, {
+    required String unopened,
   }) => _fetch(
-    (service, _) =>
-        service.reopen(recent, mfpMealName: mfpMealName, date: date),
-    (idle, draft) => switch (draft) {
-      final draft? => (idle, draft),
-      null => (
-        _failed(
-          idle,
-          StateError('Recent food ${recent.mfpFoodId} cannot be reopened'),
-        ),
-        null,
-      ),
+    (service, _) => open(service),
+    (before, draft) => switch (draft) {
+      final draft? => (before, draft),
+      null => (_failed(before, StateError(unopened)), null),
     },
   );
 
   Future<T?> _fetch<R, T>(
     Future<R> Function(AddFoodService service, String query) fetch,
-    (AddSearchState, T?) Function(AddSearchIdle idle, R result) settle,
+    (AddSearchState, T?) Function(AddSearchState before, R result) settle,
   ) async {
     _typing?.cancel();
-    final idle = _idle(state.query);
-    final running = _running(idle.query);
+    final before = switch (state) {
+      final AddSearchResults results => results,
+      _ => _idle(state.query),
+    };
+    final running = _running(before.query);
     state = running;
     try {
-      final result = await fetch(ref.read(addFoodServiceProvider), idle.query);
-      if (!ref.mounted || state != running) return null;
-      final (settled, value) = settle(idle, result);
+      final result = await fetch(
+        ref.read(addFoodServiceProvider),
+        before.query,
+      );
+      if (!ref.mounted || !identical(state, running)) return null;
+      final (settled, value) = settle(before, result);
       state = settled;
       return value;
     } on Object catch (error) {
-      if (ref.mounted && state == running) state = _failed(running, error);
+      if (ref.mounted && identical(state, running)) {
+        state = _failed(running, error);
+      }
       return null;
     }
   }
 
   static AddBarcodeMissing _missing(
-    AddSearchIdle idle,
+    AddSearchState before,
     MfpBarcodeResult result,
   ) => AddBarcodeMissing(
-    query: idle.query,
-    verifiedOnly: idle.verifiedOnly,
-    recents: idle.recents,
+    query: before.query,
+    verifiedOnly: before.verifiedOnly,
+    recents: before.recents,
+    remembered: before.remembered,
     result: result,
   );
 
@@ -153,12 +197,14 @@ final class AddSearchNotifier extends Notifier<AddSearchState> {
     query: query,
     verifiedOnly: verifiedOnly ?? state.verifiedOnly,
     recents: state.recents,
+    remembered: rememberedFoods(_memory, query),
   );
 
   AddSearchRunning _running(String query) => AddSearchRunning(
     query: query,
     verifiedOnly: state.verifiedOnly,
     recents: state.recents,
+    remembered: rememberedFoods(_memory, query),
   );
 
   static AddSearchFailed _failed(AddSearchState running, Object error) =>
@@ -166,6 +212,7 @@ final class AddSearchNotifier extends Notifier<AddSearchState> {
         query: running.query,
         verifiedOnly: running.verifiedOnly,
         recents: running.recents,
+        remembered: running.remembered,
         problem: ReadProblem.of(error),
         statusCode: switch (error) {
           MfpApiException(:final statusCode) ||

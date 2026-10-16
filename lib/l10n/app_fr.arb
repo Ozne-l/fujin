@@ -820,6 +820,17 @@
       "when": {"type": "String"}
     }
   },
+  "addRememberedFoods": "MÉMORISÉS",
+  "addRememberedLinked": "liés à Ekklo",
+  "addRememberedFound": "{count, plural, =1{1 trouvé} other{{count} trouvés}}",
+  "@addRememberedFound": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "addRememberedNote": "Fūjin les envoie vers Ekklo sans rien te demander.",
+  "addOwnCopyTarget": "→ Aliment perso · {unit}",
+  "@addOwnCopyTarget": {
+    "placeholders": {"unit": {"type": "String"}}
+  },
   "addThisMorning": "ce matin",
   "addThisAfternoon": "cet après-midi",
   "addThisEvening": "ce soir",

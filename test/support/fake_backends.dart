@@ -53,6 +53,8 @@ final class FakeBackends {
   int? mfpSyncStatus;
   Completer<void>? diaryGate;
   Completer<void>? mealsGate;
+  Completer<void>? mfpSearchGate;
+  Completer<void>? mfpFoodGate;
   final requests = <http.Request>[];
 
   static const ekkloEmail = 'owner@example.com';
@@ -74,6 +76,12 @@ final class FakeBackends {
     }
     if (mealsGate case final gate?
         when request.method == 'GET' && request.url.path == dailyMealsPath) {
+      await gate.future;
+    }
+    if (mfpSearchGate case final gate? when request.url.path == _mfpSearch) {
+      await gate.future;
+    }
+    if (mfpFoodGate case final gate? when request.url.path == _mfpFoods) {
       await gate.future;
     }
     return switch ((request.method, request.url.host, request.url.path)) {
