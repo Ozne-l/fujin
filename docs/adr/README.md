@@ -31,7 +31,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0025](0025-automatic-mode.md) | Automatic mode: unattended items instead of Memory, a setting in shared preferences | Accepted |
 | [0026](0026-adding-a-food.md) | Adding a food: one draft, the send flow's Ekklo half, undo | Accepted (scanner and 02d built by 0027; remembered foods added to the search, and "Ajouter" to screen 19, by 0034) |
 | [0027](0027-barcode-scanner.md) | Barcode scanner: full-screen camera, barcode links in Memory, backup v2 | Accepted (built) |
-| [0028](0028-fujin-drawn-controls.md) | Fūjin-drawn controls instead of stock Material | Accepted |
+| [0028](0028-fujin-drawn-controls.md) | Fūjin-drawn controls instead of stock Material | Accepted (Android stretch under the pull replaced by the bounce in 0038) |
 | [0029](0029-journal-reads-held-for-display.md) | Journal reads held in memory for display, writes read live | Accepted |
 | [0030](0030-mfp-foods-shown-when-a-side-is-missing.md) | MyFitnessPal foods shown when Ekklo or the network is missing | Accepted |
 | [0031](0031-reduced-motion.md) | Reduced motion follows the phone setting | Accepted |
@@ -41,3 +41,4 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0035](0035-dark-theme-and-appearance-setting.md) | Dark theme and the "Apparence" setting | Accepted |
 | [0036](0036-glass-on-buttons-search-and-filters.md) | Glass on buttons, the search field and filters | Proposed |
 | [0037](0037-progressive-blur-under-fixed-headers.md) | Progressive blur under fixed headers | Proposed |
+| [0038](0038-bouncing-scroll-on-every-platform.md) | Bouncing scroll on every platform | Proposed |

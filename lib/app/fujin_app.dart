@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/router.dart';
+import 'package:fujin/app/theme/fujin_scroll_behavior.dart';
 import 'package:fujin/app/theme/fujin_system_bars.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
@@ -25,6 +26,7 @@ class FujinApp extends ConsumerWidget {
       darkTheme: FujinTheme.dark(),
       themeMode: themeModeOf(appearance),
       themeAnimationStyle: AnimationStyle.noAnimation,
+      scrollBehavior: const FujinScrollBehavior(),
       routerConfig: ref.watch(routerProvider),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,

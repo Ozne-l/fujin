@@ -26,7 +26,11 @@ class TabShell extends HookConsumerWidget {
 
     bool onScroll(ScrollUpdateNotification notification) {
       final metrics = notification.metrics;
-      final delta = notification.scrollDelta ?? 0;
+      double inRange(double pixels) =>
+          pixels.clamp(metrics.minScrollExtent, metrics.maxScrollExtent);
+      final delta =
+          inRange(metrics.pixels) -
+          inRange(metrics.pixels - (notification.scrollDelta ?? 0));
       if (metrics.axis != Axis.vertical || delta == 0) return false;
       travel.value = switch (travel.value.sign == delta.sign) {
         true => travel.value + delta,

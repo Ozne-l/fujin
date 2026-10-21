@@ -22,7 +22,7 @@ A list scrolling under a fixed header used to end in a 24 px gradient of the pag
 - Mémoire: the title, the subtitle and the segments are the header, and both pages fill the screen under it. The search field of the Aliments page stays fixed below the segments, and the list starts below the field.
 - Réglages: the large title scrolls with the list; as it leaves, a small "Réglages" (Hina 22) fades in at the centre of the toggle's line, as in iOS.
 - Add search and send review: the flow header, the search field and chip, or the review filters are the header.
-- `ScrollExtentListener` (`lib/pages/common/scroll_extent_listener.dart`) reports how far the list below it has scrolled, negative while it is pulled down, so the Journal header follows the pull.
+- `ScrollExtentListener` (`lib/pages/common/scroll_extent_listener.dart`) reports how far the list below it has scrolled, negative while it is pulled down ([0038](0038-bouncing-scroll-on-every-platform.md)), so the Journal header follows the pull.
 
 ## Consequences
 
