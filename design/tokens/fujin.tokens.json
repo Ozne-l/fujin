@@ -1523,10 +1523,10 @@
             0.102,
             0.0902
           ],
-          "alpha": 0.8,
+          "alpha": 0.9,
           "hex": "#1B1A17"
         },
-        "$description": "Sumi at 80% over the refracted backdrop: the primary button and the chosen filter.",
+        "$description": "Sumi at 90% over the refracted backdrop: the primary button and the chosen filter.",
         "$type": "color"
       },
       "lens-reflection": {
@@ -1727,7 +1727,7 @@
           "hex": "#FFFFFF"
         },
         "$type": "color",
-        "$description": "Lit edge of ink glass, the primary button colour at 80%: outer stops of its 1 px inside gradient stroke."
+        "$description": "Lit edge of ink glass, the primary button colour at 90%: outer stops of its 1 px inside gradient stroke."
       },
       "glass-ink-shade": {
         "$value": {

@@ -131,11 +131,11 @@
             0.902,
             0.8275
           ],
-          "alpha": 0.8,
+          "alpha": 0.9,
           "hex": "#EDE6D3"
         },
         "$type": "color",
-        "$description": "Cream at 80% over the refracted backdrop: the primary button and the chosen filter."
+        "$description": "Cream at 90% over the refracted backdrop: the primary button and the chosen filter."
       },
       "lens-reflection": {
         "$value": {
@@ -416,7 +416,7 @@
           "hex": "#FFFFFF"
         },
         "$type": "color",
-        "$description": "Lit edge of ink glass, the primary button colour at 80%: outer stops of its 1 px inside gradient stroke."
+        "$description": "Lit edge of ink glass, the primary button colour at 90%: outer stops of its 1 px inside gradient stroke."
       },
       "glass-ink-shade": {
         "$value": {
