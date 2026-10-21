@@ -15,6 +15,7 @@ Run `flutter` and `dart` directly (Flutter 3.44.9, Dart 3.12.2).
 | Before handing work back | `dart analyze --fatal-infos` |
 | Before handing work back | `dart format lib test tool` |
 | Before handing work back | `flutter test` |
+| Before a build for the owner's phone | raise `version` in `pubspec.yaml` ([ADR 0039](docs/adr/0039-app-version.md)), commit `chore(release): <version>` |
 
 Generated files (`*.mapper.dart`, `lib/l10n/generated/`, `lib/app/theme/fujin_tokens.g.dart`) are committed; regenerate, never hand-edit.
 
