@@ -100,13 +100,13 @@ class SheetFrame extends HookWidget {
                         Text(
                           title,
                           style: titleStyle.copyWith(
-                            color: FujinColorRole.textPrimary,
+                            color: context.colors.textPrimary,
                           ),
                         ),
                         Text(
                           subtitle,
                           style: subtitleStyle.copyWith(
-                            color: FujinColorRole.textSecondary,
+                            color: context.colors.textSecondary,
                           ),
                         ),
                       ],
@@ -127,7 +127,7 @@ class SheetFrame extends HookWidget {
                         Text(
                           sectionLabel,
                           style: FujinText.inter12Medium.copyWith(
-                            color: FujinColorRole.textSecondary,
+                            color: context.colors.textSecondary,
                           ),
                         ),
                       ),
@@ -181,22 +181,22 @@ class _SearchField extends StatelessWidget {
     controller: controller,
     textInputAction: TextInputAction.search,
     style: FujinText.inter16Regular.copyWith(
-      color: FujinColorRole.textPrimary,
+      color: context.colors.textPrimary,
     ),
     decoration: InputDecoration(
       hintText: context.intl.searchEkklo,
       hintStyle: FujinText.inter16Regular.copyWith(
-        color: FujinColorRole.textSecondary,
+        color: context.colors.textSecondary,
       ),
-      prefixIcon: const Icon(
+      prefixIcon: Icon(
         Icons.search,
         size: FujinSize.searchIcon,
-        color: FujinColorRole.textSecondary,
+        color: context.colors.textSecondary,
       ),
       contentPadding: const EdgeInsets.symmetric(vertical: FujinSpace.s4),
-      border: FujinTheme.searchFieldBorder,
-      enabledBorder: FujinTheme.searchFieldBorder,
-      focusedBorder: FujinTheme.searchFieldBorder,
+      border: FujinTheme.searchFieldBorder(context.colors),
+      enabledBorder: FujinTheme.searchFieldBorder(context.colors),
+      focusedBorder: FujinTheme.searchFieldBorder(context.colors),
     ),
     onSubmitted: (text) {
       if (text.trim().isEmpty) return;

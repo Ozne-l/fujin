@@ -21,8 +21,8 @@ class CameraIconButton extends StatelessWidget {
     icon: Icon(icon),
     style: IconButton.styleFrom(
       fixedSize: const Size.square(FujinSize.touchTarget),
-      backgroundColor: FujinColorRole.backgroundDark,
-      foregroundColor: FujinColor.washi,
-    ).copyWith(overlayColor: FujinTheme.pressedOverlay),
+      backgroundColor: context.colors.cameraBackground,
+      foregroundColor: context.colors.cameraText,
+    ).copyWith(overlayColor: FujinTheme.pressedOverlay(context.colors)),
   );
 }

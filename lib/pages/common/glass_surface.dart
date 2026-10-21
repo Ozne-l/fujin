@@ -1,69 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:fujin/app/theme/fujin_motion.dart';
+import 'package:fujin/app/theme/fujin_glass.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/pages/common/glass_body.dart';
+import 'package:fujin/pages/common/glass_touch_glow.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
-class GlassSurface extends StatelessWidget {
-  const GlassSurface({required this.child, super.key});
+class GlassSurface extends ConsumerWidget {
+  const GlassSurface({
+    required this.child,
+    this.height = FujinSize.tabBar,
+    this.overlay,
+    this.glows = false,
+    this.shadow = FujinTheme.floatingShadow,
+    super.key,
+  });
 
   final Widget child;
-
-  static const double _radius = FujinSize.tabBar / 2;
-  static const double _stillScale = 1;
-  static const double _stillStretch = 0;
+  final double height;
+  final Widget? overlay;
+  final bool glows;
+  final BoxShadow Function(FujinColors colors) shadow;
 
   @override
-  Widget build(BuildContext context) {
-    final reduced = FujinMotion.reduced(context);
-    return CustomPaint(
-      painter: const _OuterShadowPainter(),
-      child: LiquidStretch(
-        interactionScale: switch (reduced) {
-          true => _stillScale,
-          false => FujinMotion.glassPress,
-        },
-        stretch: switch (reduced) {
-          true => _stillStretch,
-          false => FujinMotion.glassStretch,
-        },
-        child: LiquidGlass.grouped(
-          shape: const LiquidRoundedSuperellipse(borderRadius: _radius),
-          child: GlassGlow(
-            glowColor: FujinColorRole.backgroundGlass,
-            child: SizedBox(height: FujinSize.tabBar, child: child),
-          ),
-        ),
-      ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
+    return GlassBody.grouped(
+      shape: LiquidRoundedSuperellipse(borderRadius: height / 2),
+      reduced: FujinGlass.reduced(context, ref),
+      opaque: colors.backgroundCard,
+      fill: colors.backgroundGlass,
+      highlight: colors.borderGlassHighlight,
+      shade: colors.borderGlassShade,
+      glow: switch (glows) {
+        true => GlassTouchGlow.underTint,
+        false => GlassTouchGlow.none,
+      },
+      pressable: true,
+      overlay: overlay,
+      shadow: shadow(colors),
+      child: SizedBox(height: height, child: child),
     );
   }
-}
-
-class _OuterShadowPainter extends CustomPainter {
-  const _OuterShadowPainter();
-
-  static const _radius = BorderRadius.all(
-    Radius.circular(GlassSurface._radius),
-  );
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final shape = _radius.toRSuperellipse(Offset.zero & size);
-    const shadow = FujinTheme.floatingShadow;
-    final reach = shadow.blurRadius + shadow.offset.distance;
-    canvas
-      ..save()
-      ..clipPath(
-        Path.combine(
-          PathOperation.difference,
-          Path()..addRect(shape.outerRect.inflate(reach)),
-          Path()..addRSuperellipse(shape),
-        ),
-      )
-      ..drawRSuperellipse(shape.shift(shadow.offset), shadow.toPaint())
-      ..restore();
-  }
-
-  @override
-  bool shouldRepaint(_OuterShadowPainter oldDelegate) => false;
 }

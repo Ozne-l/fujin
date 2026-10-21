@@ -91,9 +91,9 @@ class _Streak extends StatelessWidget {
     margin: EdgeInsetsDirectional.only(start: start),
     width: length,
     height: FujinStroke.streak,
-    decoration: const BoxDecoration(
-      color: FujinColor.sora,
-      borderRadius: BorderRadius.all(Radius.circular(FujinRadius.pill)),
+    decoration: BoxDecoration(
+      color: context.colors.textInfo,
+      borderRadius: const BorderRadius.all(Radius.circular(FujinRadius.pill)),
     ),
   );
 }

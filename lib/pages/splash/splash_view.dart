@@ -26,24 +26,24 @@ class SplashView extends StatelessWidget {
                 Text(
                   context.intl.appName,
                   style: FujinText.hina44.copyWith(
-                    color: FujinColorRole.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: FujinSpace.s4),
                 Text(
                   context.intl.splashTagline,
                   style: FujinText.hina22.copyWith(
-                    color: FujinColorRole.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: FujinSize.splashRuleGap),
-                const SizedBox(
+                SizedBox(
                   width: FujinSize.goldRuleWidth,
                   height: FujinStroke.goldRule,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: FujinColorRole.borderDivider,
-                      borderRadius: BorderRadius.all(
+                      color: context.colors.borderDivider,
+                      borderRadius: const BorderRadius.all(
                         Radius.circular(FujinRadius.pill),
                       ),
                     ),
@@ -64,20 +64,20 @@ class _Logo extends StatelessWidget {
   static const _image = AssetImage('assets/images/logo.png');
 
   @override
-  Widget build(BuildContext context) => const SizedBox.square(
+  Widget build(BuildContext context) => SizedBox.square(
     dimension: FujinSize.logo,
     child: DecoratedBox(
       decoration: BoxDecoration(
-        image: DecorationImage(image: _image),
+        image: const DecorationImage(image: _image),
         border: Border.fromBorderSide(
-          BorderSide(color: FujinColorRole.borderCard),
+          BorderSide(color: context.colors.borderCard),
         ),
-        borderRadius: BorderRadius.all(Radius.circular(FujinRadius.logo)),
+        borderRadius: const BorderRadius.all(Radius.circular(FujinRadius.logo)),
         boxShadow: [
           BoxShadow(
-            color: FujinColorRole.shadowLogo,
+            color: context.colors.shadowLogo,
             blurRadius: FujinSize.logoShadowBlur,
-            offset: Offset(0, FujinSize.logoShadowOffset),
+            offset: const Offset(0, FujinSize.logoShadowOffset),
           ),
         ],
       ),

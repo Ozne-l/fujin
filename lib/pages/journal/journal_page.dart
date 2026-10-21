@@ -10,8 +10,12 @@ import 'package:fujin/domain/journal/journal_read.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/domain/sending/food_words.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/adding/add_shortcut.dart';
+import 'package:fujin/pages/common/appearance_corner.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
 import 'package:fujin/pages/common/gold_separator.dart';
+import 'package:fujin/pages/common/header_layout.dart';
+import 'package:fujin/pages/common/scroll_extent_listener.dart';
 import 'package:fujin/pages/common/snack_bar_content.dart';
 import 'package:fujin/pages/common/snack_bar_glyph.dart';
 import 'package:fujin/pages/common/souffle_refresh.dart';
@@ -25,6 +29,7 @@ import 'package:fujin/pages/journal/undo_add_state.dart';
 import 'package:fujin/pages/journal/widgets/day_detail_sheet.dart';
 import 'package:fujin/pages/journal/widgets/day_summary_card.dart';
 import 'package:fujin/pages/journal/widgets/diary_meal_card.dart';
+import 'package:fujin/pages/journal/widgets/journal_brand.dart';
 import 'package:fujin/pages/journal/widgets/journal_header.dart';
 import 'package:fujin/pages/journal/widgets/journal_problem_card.dart';
 import 'package:fujin/pages/journal/widgets/loading_meal_card.dart';
@@ -42,6 +47,7 @@ class JournalPage extends HookConsumerWidget {
   static const _offlineRetry = Duration(seconds: 15);
   static const _loadingMeals = 3;
   static const _undoneDuration = Duration(seconds: 4);
+  static const double _top = 0;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -52,6 +58,7 @@ class JournalPage extends HookConsumerWidget {
     final notifier = ref.read(journalProvider(day).notifier);
     final undo = ref.read(undoAddProvider.notifier);
     final lifecycle = useAppLifecycleState();
+    final scrolled = useValueNotifier(_top);
     final offline = switch (journal) {
       AsyncValue(:final error?) => ReadProblem.of(error) == ReadProblem.offline,
       AsyncValue(value: MfpOnly(ekkloProblem: ReadProblem.offline)) => true,
@@ -141,15 +148,12 @@ class JournalPage extends HookConsumerWidget {
       final added = await context.push<AddedFood>(
         FujinRoute.addFood.forMeal(day, meal),
       );
-      ref.invalidate(memoryProvider);
-      await notifier.reload();
       if (!context.mounted) return;
-      if (added case final added?) {
-        JournalSnackBar.added(
-          context,
-          added,
-          onUndo: () => unawaited(undo.undo(added)),
-        );
+      switch (added) {
+        case final added?:
+          AddShortcut.added(context, ref, added);
+        case null:
+          ref.invalidate(memoryProvider);
       }
     }
 
@@ -199,90 +203,108 @@ class JournalPage extends HookConsumerWidget {
         );
 
     return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: SouffleRefresh(
-          onRefresh: refresh,
-          slivers: [
-            SliverToBoxAdapter(
-              child: JournalHeader(
-                day: day,
-                today: today,
-                link: switch ((day == today, goals)) {
-                  (false, _) => (context.intl.backToToday, () => select(today)),
-                  (true, null) => (
-                    context.intl.setGoals,
-                    () => unawaited(context.push<void>(FujinRoute.goals.path)),
-                  ),
-                  (true, Goals()) => null,
-                },
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(vertical: FujinSpace.s3),
-              sliver: SliverToBoxAdapter(
-                child: WeekBand(
-                  selected: day,
-                  today: today,
-                  goals: goals,
-                  onSelect: select,
+      body: AppearanceCorner(
+        child: ScrollExtentListener(
+          scrolled: scrolled,
+          child: HeaderLayout(
+            header: JournalHeader(
+              day: day,
+              today: today,
+              scrolled: scrolled,
+              link: switch ((day == today, goals)) {
+                (false, _) => (
+                  context.intl.backToToday,
+                  () => select(today),
                 ),
+                (true, null) => (
+                  context.intl.setGoals,
+                  () => unawaited(
+                    context.push<void>(FujinRoute.goals.path),
+                  ),
+                ),
+                (true, Goals()) => null,
+              },
+              band: WeekBand(
+                selected: day,
+                today: today,
+                goals: goals,
+                onSelect: select,
               ),
             ),
-            ...switch (journal) {
-              AsyncValue(value: final read?, error: final error?) => [
-                ...problem(ReadProblem.of(error), readAt: read.readAt),
-                summary(read, stale: true),
-                ...switch (read.diaryMeals) {
-                  [] => const <Widget>[],
-                  final meals => _meals(context, [
-                    for (final meal in meals)
-                      DiaryMealCard(key: ValueKey(meal.name), meal: meal),
-                  ]),
+            body: (context, extent) => SouffleRefresh(
+              onRefresh: refresh,
+              slivers: [
+                SliverPadding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.paddingOf(context).top,
+                  ),
+                  sliver: const SliverToBoxAdapter(child: JournalBrand()),
+                ),
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height:
+                        extent -
+                        MediaQuery.paddingOf(context).top -
+                        JournalBrand.extent(context),
+                  ),
+                ),
+                ...switch (journal) {
+                  AsyncValue(value: final read?, error: final error?) => [
+                    ...problem(ReadProblem.of(error), readAt: read.readAt),
+                    summary(read, stale: true),
+                    ...switch (read.diaryMeals) {
+                      [] => const <Widget>[],
+                      final meals => _meals(context, [
+                        for (final meal in meals)
+                          DiaryMealCard(key: ValueKey(meal.name), meal: meal),
+                      ]),
+                    },
+                  ],
+                  AsyncValue(value: BothSides(:final day) && final read) => [
+                    summary(read, stale: false),
+                    ..._meals(context, [
+                      for (final meal in day.meals)
+                        MealCard(
+                          key: ValueKey((day.date, meal.name)),
+                          meal: meal,
+                          onAdd: () => unawaited(add(meal.name)),
+                        ),
+                    ]),
+                  ],
+                  AsyncValue(value: MfpOnly() && final read) => [
+                    ...problem(read.ekkloProblem),
+                    summary(read, stale: false),
+                    ..._meals(context, [
+                      for (final meal in read.diaryMeals)
+                        DiaryMealCard(
+                          key: ValueKey(meal.name),
+                          meal: meal,
+                          note: context.intl.ekkloUnavailable,
+                        ),
+                    ]),
+                  ],
+                  AsyncValue(value: EkkloOnly() && final read) => [
+                    ...problem(read.mfpProblem),
+                    summary(read, stale: false),
+                  ],
+                  AsyncError(:final error) => problem(ReadProblem.of(error)),
+                  AsyncLoading() => [
+                    const SliverToBoxAdapter(child: LoadingSummaryCard()),
+                    ..._meals(context, [
+                      for (var index = 0; index < _loadingMeals; index++)
+                        const LoadingMealCard(),
+                    ]),
+                  ],
                 },
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height:
+                        FujinSpace.s8 + MediaQuery.paddingOf(context).bottom,
+                  ),
+                ),
               ],
-              AsyncValue(value: BothSides(:final day) && final read) => [
-                summary(read, stale: false),
-                ..._meals(context, [
-                  for (final meal in day.meals)
-                    MealCard(
-                      key: ValueKey((day.date, meal.name)),
-                      meal: meal,
-                      onAdd: () => unawaited(add(meal.name)),
-                    ),
-                ]),
-              ],
-              AsyncValue(value: MfpOnly() && final read) => [
-                ...problem(read.ekkloProblem),
-                summary(read, stale: false),
-                ..._meals(context, [
-                  for (final meal in read.diaryMeals)
-                    DiaryMealCard(
-                      key: ValueKey(meal.name),
-                      meal: meal,
-                      note: context.intl.ekkloUnavailable,
-                    ),
-                ]),
-              ],
-              AsyncValue(value: EkkloOnly() && final read) => [
-                ...problem(read.mfpProblem),
-                summary(read, stale: false),
-              ],
-              AsyncError(:final error) => problem(ReadProblem.of(error)),
-              AsyncLoading() => [
-                const SliverToBoxAdapter(child: LoadingSummaryCard()),
-                ..._meals(context, [
-                  for (var index = 0; index < _loadingMeals; index++)
-                    const LoadingMealCard(),
-                ]),
-              ],
-            },
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: FujinSpace.s8 + MediaQuery.paddingOf(context).bottom,
-              ),
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -307,7 +329,7 @@ class JournalPage extends HookConsumerWidget {
         child: Text(
           context.intl.mealsOfTheDay,
           style: FujinText.inter12Medium.copyWith(
-            color: FujinColorRole.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ),
       ),

@@ -21,5 +21,5 @@ Rejected: a bootstrap `FutureProvider` that the splash waits on. It would make `
 
 ## Consequences
 
-- Any change to `FujinApp`'s theme, copy or banner must reach `SplashApp` too; the banner comes from `FujinApp.bannerFor`, the theme and copy are repeated. The test "hands over to the splash route without moving the logo, the title or the tagline" (`test/pages/splash_page_test.dart`) fails if the two splashes drift apart.
+- Any change to `FujinApp`'s theme, copy or banner must reach `SplashApp` too; the builder (banner, system bars, theme reveal) comes from `FujinApp.builderFor(environment, appearance: appearance)`; `theme`, `darkTheme`, `themeMode`, `themeAnimationStyle` and the copy are repeated. The test "hands over to the splash route without moving the logo, the title or the tagline" (`test/pages/splash_page_test.dart`) fails if the two splashes drift apart.
 - The logo and band images are decoded during the first phase; the image cache serves them at once after the handover.

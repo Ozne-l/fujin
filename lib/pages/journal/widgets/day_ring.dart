@@ -23,39 +23,39 @@ class DayRing extends StatelessWidget {
     final (fill, track, arc) = switch (state) {
       DayGoalState.upcoming || DayGoalState.noGoal => (null, null, null),
       DayGoalState.nothingLogged => (
-        FujinColorRole.backgroundCard,
-        FujinColorRole.goalTrack,
+        context.colors.backgroundCard,
+        context.colors.goalTrack,
         null,
       ),
       DayGoalState.inProgress => (
-        FujinColorRole.backgroundCard,
-        FujinColorRole.goalTrack,
-        FujinColorRole.goalInProgress,
+        context.colors.backgroundCard,
+        context.colors.goalTrack,
+        context.colors.goalInProgress,
       ),
       DayGoalState.missed => (
-        FujinColorRole.goalMissedBackground,
-        FujinColorRole.goalTrack,
-        FujinColorRole.goalMissed,
+        context.colors.goalMissedBackground,
+        context.colors.goalTrack,
+        context.colors.goalMissed,
       ),
       DayGoalState.reached => (
-        FujinColorRole.goalReachedBackground,
-        FujinColorRole.goalReached,
+        context.colors.goalReachedBackground,
+        context.colors.goalReached,
         null,
       ),
       DayGoalState.exceeded => (
-        FujinColorRole.goalExceededBackground,
-        FujinColorRole.goalExceeded,
+        context.colors.goalExceededBackground,
+        context.colors.goalExceeded,
         null,
       ),
     };
     final idleColor = switch (state) {
-      DayGoalState.upcoming => FujinColorRole.textDisabled,
-      DayGoalState.nothingLogged => FujinColorRole.textSecondary,
+      DayGoalState.upcoming => context.colors.textDisabled,
+      DayGoalState.nothingLogged => context.colors.textSecondary,
       DayGoalState.noGoal ||
       DayGoalState.inProgress ||
       DayGoalState.missed ||
       DayGoalState.reached ||
-      DayGoalState.exceeded => FujinColorRole.textPrimary,
+      DayGoalState.exceeded => context.colors.textPrimary,
     };
     return ProgressRing(
       size: FujinSize.dayRing,

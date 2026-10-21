@@ -15,7 +15,7 @@ Fūjin's code, docs and commits are in English, but the design tokens came from 
 - Identifiers, file names, SQL names, docs, issues and commit messages are in English.
 - French appears only in `lib/l10n/app_fr.arb`, where a doc or test quotes the app's French copy verbatim, and in sample diary data in tests (meal and food names such as `Petit-déjeuner` or `Riz basmati`), which mirror what MyFitnessPal returns.
 - Design tokens are named in English at the source, in Figma: groups `color`, `space`, `radius`, `stroke`, `size`, `role/background|border|text|button|source|goal`, `font/family|weight`, text styles under `text/`, mode `Light`. Token descriptions are in English too. The Japanese palette names (`sumi`, `kin`, `sora`, `shu`, `washi`...) stay: they are proper names of the palette, only their variants are English (`kin-light`, `kin-dark`).
-- Figma and `design/tokens/` carry the same names; `tool/generate_tokens.dart` holds no translation table. Role colours are generated as `FujinColorRole` (formerly `FujinRole`), next to the raw palette `FujinColor`.
+- Figma and `design/tokens/` carry the same names; `tool/generate_tokens.dart` holds no translation table. Role colours are the fields of `FujinColors` (a light and a dark instance); primitives stay in the JSON and are not generated ([ADR 0035](0035-dark-theme-and-appearance-setting.md)).
 - The Figma plugin behind the FujinFigma MCP server has `get_variables` and `rename_tokens` commands; renames go through `rename_tokens`, then `design/tokens/` is updated to match and checked against `get_variables`.
 - When an agent finds French anywhere else in the repository, it reports it to the owner instead of renaming on its own; the owner decides.
 
@@ -23,4 +23,4 @@ Fūjin's code, docs and commits are in English, but the design tokens came from 
 
 - A token rename touches Figma, `design/tokens/`, the generated Dart and every widget using the token; the analyzer lists the widgets.
 - The generator's group paths are constants in `tool/generate_tokens.dart` and change with the Figma groups.
-- [ADR 0008](0008-theme-from-design-tokens.md) still says `FujinRole`; read it as `FujinColorRole`.
+- [ADR 0008](0008-theme-from-design-tokens.md) said `FujinRole`, later `FujinColorRole`; since [ADR 0035](0035-dark-theme-and-appearance-setting.md) the roles are the fields of `FujinColors`.

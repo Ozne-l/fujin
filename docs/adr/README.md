@@ -11,7 +11,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0005](0005-backup.md) | Backup: Auto Backup whitelist, manual JSON file | Accepted (B implemented, C implemented by 0021) |
 | [0006](0006-riverpod-notifiers-as-presenters.md) | Riverpod notifiers as presenters | Accepted (undo notifier built by 0026, import and export by 0021) |
 | [0007](0007-dart-mappable-models.md) | dart_mappable models | Accepted |
-| [0008](0008-theme-from-design-tokens.md) | Theme from design tokens, motion with motor | Accepted (goal rings built by 0022, send progress by 0018; pill, sheet and snackbar motion built; reduced motion added by 0031; `hai-light` darkened by 0032) |
+| [0008](0008-theme-from-design-tokens.md) | Theme from design tokens, motion with motor | Accepted, amended by 0035 (goal rings built by 0022, send progress by 0018; pill, sheet and snackbar motion built; reduced motion added by 0031; `hai-light` darkened by 0032) |
 | [0009](0009-french-only-copy.md) | French-only copy | Superseded by 0015 |
 | [0010](0010-go-router-navigation.md) | go_router navigation | Accepted (tab plans superseded by 0019) |
 | [0011](0011-sessions-in-secure-storage.md) | Sessions in secure storage | Accepted |
@@ -22,7 +22,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0016](0016-english-in-code-and-tokens.md) | English in code, design tokens and docs | Accepted |
 | [0017](0017-read-only-dev-environment.md) | Read-only dev environment | Accepted (barcode lookup let through by 0027) |
 | [0018](0018-send-flow.md) | Send flow: matching, review and execution | Accepted (automatic sends amended by 0025) |
-| [0019](0019-tab-shell.md) | Tab shell: Journal and Mémoire tabs, Scanner disabled | Accepted (Scanner enabled by 0027) |
+| [0019](0019-tab-shell.md) | Tab shell: Journal and Mémoire tabs, Scanner disabled | Accepted (Scanner enabled by 0027; amended by 0033 and 0037) |
 | [0020](0020-goals.md) | Goals: one row in Fūjin's SQLite | Accepted |
 | [0021](0021-backup-file.md) | Backup file: fujin-backup v1 behind the BackupFiles seam | Accepted (version 2 by 0027) |
 | [0022](0022-journal-states-and-goal-rings.md) | Journal states and goal rings | Accepted (band reads held and neighbour weeks prefetched by 0029; MyFitnessPal foods shown with Ekklo missing and offline by 0030) |
@@ -36,5 +36,8 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0030](0030-mfp-foods-shown-when-a-side-is-missing.md) | MyFitnessPal foods shown when Ekklo or the network is missing | Accepted |
 | [0031](0031-reduced-motion.md) | Reduced motion follows the phone setting | Accepted |
 | [0032](0032-text-contrast.md) | Text roles meet 4.5:1 on page and card | Accepted |
-| [0033](0033-liquid-glass-and-fade-through.md) | Liquid glass tab bar and fade-through navigation | Proposed |
+| [0033](0033-liquid-glass-and-fade-through.md) | Liquid glass tab bar and fade-through navigation | Proposed (extended by 0036; top fade replaced by 0037) |
 | [0034](0034-remembered-foods-in-the-add-search.md) | Remembered foods in the add search, and "Ajouter" on screen 19 | Accepted |
+| [0035](0035-dark-theme-and-appearance-setting.md) | Dark theme and the "Apparence" setting | Accepted |
+| [0036](0036-glass-on-buttons-search-and-filters.md) | Glass on buttons, the search field and filters | Proposed |
+| [0037](0037-progressive-blur-under-fixed-headers.md) | Progressive blur under fixed headers | Proposed |

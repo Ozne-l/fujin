@@ -14,7 +14,7 @@ class SentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rows = _rows(context.intl);
+    final rows = _rows(context.intl, context.colors);
     return SentFrame(
       report: report,
       note: TitleText.capitalized(
@@ -24,6 +24,7 @@ class SentView extends StatelessWidget {
         if (rows.isNotEmpty) ...[
           const SizedBox(height: FujinSpace.s3),
           SentFrame.card(
+            context.colors,
             rows,
             dividerIndent: FujinSize.tile + FujinSpace.s3,
           ),
@@ -32,22 +33,22 @@ class SentView extends StatelessWidget {
     );
   }
 
-  List<_Row> _rows(AppLocalizations intl) {
+  List<_Row> _rows(AppLocalizations intl, FujinColors colors) {
     final separator = intl.listSeparator;
     return [
       if (report.reused > 0)
         _Row(
           label: intl.sentReused(report.reused),
-          tile: FujinColorRole.backgroundSuccess,
+          tile: colors.backgroundSuccess,
           icon: Icons.refresh,
-          iconColor: FujinColorRole.textLink,
+          iconColor: colors.textLink,
         ),
       if (report.newAssociations case final names when names.isNotEmpty)
         _Row(
           label: intl.sentAssociations(names.length, names.join(separator)),
-          tile: FujinColor.kinLight,
+          tile: colors.backgroundHighlight,
           icon: Icons.auto_awesome_outlined,
-          iconColor: FujinColorRole.textGold,
+          iconColor: colors.textGold,
         ),
       if (report.weights case final weights when weights.isNotEmpty)
         _Row(
@@ -62,23 +63,23 @@ class SentView extends StatelessWidget {
                 )
                 .join(separator),
           ),
-          tile: FujinColor.kinari,
+          tile: colors.backgroundNeutral,
           icon: Icons.scale_outlined,
-          iconColor: FujinColorRole.textPrimary,
+          iconColor: colors.textPrimary,
         ),
       if (report.ownCopies case final names when names.isNotEmpty)
         _Row(
           label: intl.sentOwnCopies(names.length, names.join(separator)),
-          tile: FujinColor.kinari,
+          tile: colors.backgroundNeutral,
           icon: Icons.add,
-          iconColor: FujinColorRole.textPrimary,
+          iconColor: colors.textPrimary,
         ),
       if (report.updated > 0)
         _Row(
           label: intl.sentUpdated(report.updated),
-          tile: FujinColorRole.backgroundInfo,
+          tile: colors.backgroundInfo,
           icon: Icons.refresh,
-          iconColor: FujinColor.sora,
+          iconColor: colors.textInfo,
         ),
     ];
   }
@@ -116,7 +117,7 @@ class _Row extends StatelessWidget {
           child: Text(
             label,
             style: FujinText.inter14Medium.copyWith(
-              color: FujinColorRole.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
         ),

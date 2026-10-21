@@ -5,12 +5,15 @@ import 'package:flutter_test/flutter_test.dart'
     show WidgetTester, addTearDown, find, testWidgets;
 import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/splash_app.dart';
+import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/settings/appearance.dart';
 import 'package:fujin/pages/common/seigaiha_band.dart';
 import 'package:fujin/pages/splash/splash_view.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
 import '../support/gated_ekklo_token_store.dart';
+import '../support/phone_brightness.dart';
 import '../support/pump_fujin.dart';
 
 const _title = 'Fūjin';
@@ -26,6 +29,16 @@ void main() {
       check(find.text(_tagline).evaluate()).length.equals(1);
     },
   );
+
+  testWidgets('shows the dark splash on a light phone when Apparence is '
+      'Sombre', (tester) async {
+    phoneBrightness(tester, Brightness.light);
+    await _pumpSplashApp(tester, appearance: Appearance.dark);
+
+    check(
+      colorsAt(tester, find.byType(SplashView)),
+    ).identicalTo(FujinColors.dark);
+  });
 
   testWidgets(
     'hands over to the splash route without moving the logo, the title or '
@@ -89,11 +102,17 @@ void main() {
   );
 }
 
-Future<void> _pumpSplashApp(WidgetTester tester) async {
+Future<void> _pumpSplashApp(
+  WidgetTester tester, {
+  Appearance appearance = Appearance.system,
+}) async {
   tester.platformDispatcher.localesTestValue = const [Locale('fr')];
   addTearDown(tester.platformDispatcher.clearLocalesTestValue);
   await tester.pumpWidget(
-    const SplashApp(environment: AppEnvironment.production),
+    SplashApp(
+      environment: AppEnvironment.production,
+      appearance: appearance,
+    ),
   );
 }
 

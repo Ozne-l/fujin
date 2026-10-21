@@ -18,21 +18,21 @@ class MemoryEmptyView extends StatelessWidget {
             FujinTab.memory.icon,
             width: FujinSize.glyphHero,
             height: FujinSize.glyphHero,
-            theme: const SvgTheme(currentColor: FujinColorRole.textPrimary),
+            theme: SvgTheme(currentColor: context.colors.textPrimary),
             excludeFromSemantics: true,
           ),
           Text(
             context.intl.memoryEmptyTitle,
             textAlign: TextAlign.center,
             style: FujinText.hina26.copyWith(
-              color: FujinColorRole.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           Text(
             context.intl.memoryEmptyDetail,
             textAlign: TextAlign.center,
             style: FujinText.inter15Regular.copyWith(
-              color: FujinColorRole.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
         ],

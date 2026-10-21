@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/config.dart';
+import 'package:fujin/data/accessibility/reduce_transparency_setting.dart';
 import 'package:fujin/data/backup/backup_files.dart';
 import 'package:fujin/data/backup/backup_repository.dart';
 import 'package:fujin/data/backup/picker_backup_files.dart';
@@ -51,6 +52,10 @@ final clearWebCookiesProvider = Provider<Future<void> Function()>(
   (ref) => () async {
     await CookieManager.instance().deleteAllCookies();
   },
+);
+
+final reduceTransparencyProvider = StreamProvider<bool>(
+  (ref) => ReduceTransparencySetting.watch(),
 );
 
 final backupFilesProvider = Provider<BackupFiles>(

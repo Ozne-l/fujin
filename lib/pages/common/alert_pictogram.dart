@@ -12,7 +12,7 @@ class AlertPictogram extends StatelessWidget {
     icon: icon,
     side: FujinSize.pictogram,
     iconSide: FujinSize.pictogramIcon,
-    background: FujinColorRole.backgroundAlert,
-    foreground: FujinColorRole.textAlert,
+    background: context.colors.backgroundAlert,
+    foreground: context.colors.textAlert,
   );
 }

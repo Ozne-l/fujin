@@ -18,48 +18,53 @@ class SnackBarContent extends StatelessWidget {
   final (String, VoidCallback)? action;
 
   @override
-  Widget build(BuildContext context) => Row(
-    spacing: FujinSpace.s3,
-    children: [
-      RoundPictogram(
-        icon: glyph.asset,
-        side: FujinSize.icon,
-        iconSide: FujinSize.tileIcon,
-        background: glyph.background,
-        foreground: FujinColorRole.textOnDark,
-      ),
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          spacing: FujinSize.textGap,
-          children: [
-            Text(
-              title,
-              style: FujinText.inter14Medium.copyWith(color: FujinColor.washi),
-            ),
-            Text(
-              detail,
-              style: FujinText.inter12Regular.copyWith(
-                color: FujinColorRole.textDisabled,
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Row(
+      spacing: FujinSpace.s3,
+      children: [
+        RoundPictogram(
+          icon: glyph.asset,
+          side: FujinSize.icon,
+          iconSide: FujinSize.tileIcon,
+          background: glyph.background(colors),
+          foreground: glyph.foreground(colors),
+        ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            spacing: FujinSize.textGap,
+            children: [
+              Text(
+                title,
+                style: FujinText.inter14Medium.copyWith(
+                  color: colors.textOnDark,
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
-      if (action case (final label, final onPressed))
-        TextButton(
-          onPressed: () {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            onPressed();
-          },
-          style: TextButton.styleFrom(
-            foregroundColor: FujinColor.kin,
-            textStyle: FujinText.inter14Semibold,
-            padding: const EdgeInsets.symmetric(horizontal: FujinSpace.s4),
+              Text(
+                detail,
+                style: FujinText.inter12Regular.copyWith(
+                  color: colors.textDisabled,
+                ),
+              ),
+            ],
           ),
-          child: Text(label),
         ),
-    ],
-  );
+        if (action case (final label, final onPressed))
+          TextButton(
+            onPressed: () {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              onPressed();
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: colors.textOnDarkAccent,
+              textStyle: FujinText.inter14Semibold,
+              padding: const EdgeInsets.symmetric(horizontal: FujinSpace.s4),
+            ),
+            child: Text(label),
+          ),
+      ],
+    );
+  }
 }

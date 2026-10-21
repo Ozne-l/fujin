@@ -70,9 +70,9 @@ class MobileScanCamera extends HookWidget {
         }
       },
       errorBuilder: (context, error) =>
-          const ColoredBox(color: FujinColorRole.backgroundDark),
+          ColoredBox(color: context.colors.cameraBackground),
       placeholderBuilder: (context) =>
-          const ColoredBox(color: FujinColorRole.backgroundDark),
+          ColoredBox(color: context.colors.cameraBackground),
     );
   }
 }

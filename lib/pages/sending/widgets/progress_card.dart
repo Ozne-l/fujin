@@ -26,9 +26,9 @@ class ProgressCard extends StatelessWidget {
     return GlyphCard(
       weather: FujinWeather.breeze,
       title: title,
-      titleColor: FujinColor.sora,
-      background: FujinColorRole.backgroundCard,
-      border: FujinColorRole.borderCard,
+      titleColor: context.colors.textInfo,
+      background: context.colors.backgroundCard,
+      border: context.colors.borderCard,
       padding: const EdgeInsets.fromLTRB(
         FujinSpace.s5,
         FujinSpace.s5,
@@ -42,7 +42,7 @@ class ProgressCard extends StatelessWidget {
           Text(
             detail,
             style: FujinText.inter15Medium.copyWith(
-              color: FujinColorRole.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           Row(
@@ -54,13 +54,13 @@ class ProgressCard extends StatelessWidget {
                     0 => 0,
                     _ => done / total,
                   },
-                  color: FujinColor.sora,
+                  color: context.colors.textInfo,
                 ),
               ),
               Text(
                 context.intl.progressCount(done, total),
                 style: FujinText.inter13Medium.copyWith(
-                  color: FujinColorRole.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
             ],
@@ -68,7 +68,7 @@ class ProgressCard extends StatelessWidget {
           Text(
             note,
             style: FujinText.inter13Regular.copyWith(
-              color: FujinColorRole.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
         ],

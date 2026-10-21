@@ -23,12 +23,12 @@ class FujinWeatherGlyph extends StatelessWidget {
     height: side,
     padding: EdgeInsets.all(side * _paddingRatio),
     decoration: BoxDecoration(
-      color: weather.background,
+      color: weather.background(context.colors),
       borderRadius: BorderRadius.circular(side * _cornerRatio),
     ),
     child: SvgPicture.asset(
       weather.asset,
-      theme: SvgTheme(currentColor: weather.foreground),
+      theme: SvgTheme(currentColor: weather.foreground(context.colors)),
     ),
   );
 }

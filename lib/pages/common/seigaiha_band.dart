@@ -1,10 +1,11 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 
 class SeigaihaBand extends StatelessWidget {
   const SeigaihaBand({this.height = FujinSize.motifBand, super.key});
 
-  static const _tile = AssetImage('assets/images/seigaiha.png');
+  static const _lightTile = AssetImage('assets/images/seigaiha.png');
+  static const _darkTile = AssetImage('assets/images/seigaiha_dark.png');
 
   final double height;
 
@@ -12,10 +13,13 @@ class SeigaihaBand extends StatelessWidget {
   Widget build(BuildContext context) => SizedBox(
     height: height,
     width: double.infinity,
-    child: const DecoratedBox(
+    child: DecoratedBox(
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: _tile,
+          image: switch (Theme.of(context).brightness) {
+            Brightness.light => _lightTile,
+            Brightness.dark => _darkTile,
+          },
           repeat: ImageRepeat.repeat,
           alignment: Alignment.topLeft,
         ),

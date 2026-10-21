@@ -3,6 +3,8 @@ import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/sending/send_plan.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/glass_fill.dart';
+import 'package:fujin/pages/common/glass_finish.dart';
 import 'package:fujin/pages/sending/widgets/send_footer.dart';
 import 'package:fujin/pages/sending/widgets/send_header.dart';
 import 'package:fujin/pages/sending/widgets/storm_card.dart';
@@ -33,7 +35,11 @@ class StormView extends StatelessWidget {
       ),
       SendFooter(
         child: OutlinedButton(
-          style: FujinTheme.largeOutlinedButtonStyle,
+          style: GlassFill.style(
+            context.colors,
+            GlassFinish.clear,
+            floating: true,
+          ).merge(FujinTheme.largeOutlinedButtonStyle),
           onPressed: context.pop,
           child: Text(context.intl.later),
         ),

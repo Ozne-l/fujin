@@ -56,7 +56,7 @@ class ServingsPicker extends HookWidget {
                 decimal: true,
               ),
               style: FujinText.inter16Medium.copyWith(
-                color: FujinColorRole.textPrimary,
+                color: context.colors.textPrimary,
               ),
               onChanged: (text) {
                 if (GramsInput.parse(context, text) case final value?) {
@@ -73,9 +73,9 @@ class ServingsPicker extends HookWidget {
                   horizontal: FujinSpace.s4,
                 ),
                 filled: true,
-                fillColor: FujinColorRole.backgroundCard,
-                enabledBorder: _border(outlined: outlined),
-                focusedBorder: _border(outlined: true),
+                fillColor: context.colors.backgroundCard,
+                enabledBorder: _border(context.colors, outlined: outlined),
+                focusedBorder: _border(context.colors, outlined: true),
               ),
             ),
           ),
@@ -84,17 +84,19 @@ class ServingsPicker extends HookWidget {
     );
   }
 
-  static OutlineInputBorder _border({required bool outlined}) =>
-      OutlineInputBorder(
-        borderRadius: BorderRadius.circular(FujinRadius.pill),
-        borderSide: switch (outlined) {
-          true => const BorderSide(
-            color: FujinColorRole.textLink,
-            width: FujinStroke.fieldFocus,
-          ),
-          false => const BorderSide(color: FujinColorRole.borderCard),
-        },
-      );
+  static OutlineInputBorder _border(
+    FujinColors colors, {
+    required bool outlined,
+  }) => OutlineInputBorder(
+    borderRadius: BorderRadius.circular(FujinRadius.pill),
+    borderSide: switch (outlined) {
+      true => BorderSide(
+        color: colors.textLink,
+        width: FujinStroke.fieldFocus,
+      ),
+      false => BorderSide(color: colors.borderCard),
+    },
+  );
 }
 
 class _Choice extends StatelessWidget {
@@ -114,13 +116,13 @@ class _Choice extends StatelessWidget {
     button: true,
     child: Material(
       color: switch (selected) {
-        true => FujinColorRole.backgroundDark,
-        false => FujinColorRole.backgroundCard,
+        true => context.colors.backgroundDark,
+        false => context.colors.backgroundCard,
       },
       shape: StadiumBorder(
         side: switch (selected) {
           true => BorderSide.none,
-          false => const BorderSide(color: FujinColorRole.borderCard),
+          false => BorderSide(color: context.colors.borderCard),
         },
       ),
       child: InkWell(
@@ -133,8 +135,8 @@ class _Choice extends StatelessWidget {
               label,
               style: FujinText.inter16Medium.copyWith(
                 color: switch (selected) {
-                  true => FujinColorRole.textOnDark,
-                  false => FujinColorRole.textPrimary,
+                  true => context.colors.textOnDark,
+                  false => context.colors.textPrimary,
                 },
               ),
             ),

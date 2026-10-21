@@ -22,12 +22,12 @@ class CodeKeypad extends StatelessWidget {
       child: Text(
         '$value',
         style: FujinText.inter22Regular.copyWith(
-          color: FujinColorRole.textPrimary,
+          color: context.colors.textPrimary,
         ),
       ),
     );
     return ColoredBox(
-      color: FujinColorRole.borderCard,
+      color: context.colors.borderCard,
       child: SafeArea(
         top: false,
         child: Padding(
@@ -52,10 +52,10 @@ class CodeKeypad extends StatelessWidget {
                     child: _Key(
                       onTap: onErase,
                       label: context.intl.scannerErase,
-                      child: const Icon(
+                      child: Icon(
                         Icons.backspace_outlined,
                         size: FujinSize.icon,
-                        color: FujinColorRole.textPrimary,
+                        color: context.colors.textPrimary,
                       ),
                     ),
                   ),
@@ -81,7 +81,7 @@ class _Key extends StatelessWidget {
     button: true,
     label: label,
     child: Material(
-      color: FujinColorRole.backgroundCard,
+      color: context.colors.backgroundCard,
       borderRadius: BorderRadius.circular(FujinRadius.key),
       child: InkWell(
         borderRadius: BorderRadius.circular(FujinRadius.key),

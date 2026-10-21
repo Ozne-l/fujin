@@ -37,25 +37,25 @@ class PlanRow extends StatelessWidget {
       _Planned(:final planned) => (
         planned.entry.food.description,
         SendText.target(context.intl, planned),
-        FujinColorRole.textSecondary,
+        context.colors.textSecondary,
         _plannedPill(context.intl, planned),
       ),
       _Pending(:final entry, searching: true) => (
         entry.food.description,
         context.intl.rowSearching,
-        FujinColor.sora,
+        context.colors.textInfo,
         const BreezeIndicator(streaks: BreezeStreaks.searching),
       ),
       _Pending(:final entry, searching: false) => (
         entry.food.description,
         context.intl.rowWaiting,
-        FujinColorRole.textTertiary,
+        context.colors.textTertiary,
         null,
       ),
       _InEkkloRow(:final entry, :final link) => (
         entry.food.description,
         EntryText.linkedServing(context.intl, link),
-        FujinColorRole.textSecondary,
+        context.colors.textSecondary,
         StatusPill(label: context.intl.statusInEkklo, tone: PillTone.validated),
       ),
     };
@@ -72,7 +72,7 @@ class PlanRow extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: FujinText.inter15Medium.copyWith(
-                  color: FujinColorRole.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
               Text(
@@ -152,9 +152,9 @@ class _PlanCard extends StatelessWidget {
       FujinSpace.s3,
     ),
     decoration: BoxDecoration(
-      color: FujinColorRole.backgroundCard,
+      color: context.colors.backgroundCard,
       borderRadius: BorderRadius.circular(FujinRadius.card),
-      border: Border.all(color: FujinColorRole.borderCard),
+      border: Border.all(color: context.colors.borderCard),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

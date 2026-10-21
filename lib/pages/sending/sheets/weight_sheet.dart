@@ -73,7 +73,7 @@ class _WeightSheet extends HookWidget {
                   Text(
                     context.intl.weightLabel(unit),
                     style: FujinText.inter13Medium.copyWith(
-                      color: FujinColorRole.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                 ),
@@ -86,12 +86,12 @@ class _WeightSheet extends HookWidget {
                   ),
                   textInputAction: TextInputAction.done,
                   style: FujinText.inter17Medium.copyWith(
-                    color: FujinColorRole.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                   decoration: InputDecoration(
                     suffixText: context.intl.gramsSuffix,
                     suffixStyle: FujinText.inter15Regular.copyWith(
-                      color: FujinColorRole.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ),
@@ -100,7 +100,7 @@ class _WeightSheet extends HookWidget {
                     Text(
                       estimate,
                       style: FujinText.inter12Regular.copyWith(
-                        color: FujinColorRole.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                   ),
@@ -109,7 +109,7 @@ class _WeightSheet extends HookWidget {
             Container(
               padding: const EdgeInsets.all(FujinSpace.s3),
               decoration: BoxDecoration(
-                color: FujinColorRole.backgroundPage,
+                color: context.colors.backgroundPage,
                 borderRadius: BorderRadius.circular(FujinRadius.field),
               ),
               child: Column(
@@ -119,7 +119,7 @@ class _WeightSheet extends HookWidget {
                   Text(
                     context.intl.inEkkloTitle,
                     style: FujinText.inter12Medium.copyWith(
-                      color: FujinColorRole.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                   Text(
@@ -131,7 +131,7 @@ class _WeightSheet extends HookWidget {
                       null => choice.ekkloFoodName,
                     },
                     style: FujinText.inter13Medium.copyWith(
-                      color: FujinColorRole.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                 ],
@@ -144,12 +144,14 @@ class _WeightSheet extends HookWidget {
                   Icon(
                     Icons.check,
                     size: _rememberedStyle.fontSize,
-                    color: FujinColorRole.textGold,
+                    color: context.colors.textGold,
                   ),
                   Expanded(
                     child: Text(
                       context.intl.weightRemembered,
-                      style: _rememberedStyle,
+                      style: _rememberedStyle.copyWith(
+                        color: context.colors.textGold,
+                      ),
                     ),
                   ),
                 ],
@@ -169,9 +171,7 @@ class _WeightSheet extends HookWidget {
     );
   }
 
-  static final TextStyle _rememberedStyle = FujinText.inter12Medium.copyWith(
-    color: FujinColorRole.textGold,
-  );
+  static const TextStyle _rememberedStyle = FujinText.inter12Medium;
 
   String? _estimate(AppLocalizations intl) => switch ((
     planned.entry.nutrients.energy?.kilocalories,

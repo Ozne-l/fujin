@@ -39,9 +39,9 @@ class NutritionCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
       padding: const EdgeInsets.all(FujinSpace.s4),
       decoration: BoxDecoration(
-        color: FujinColorRole.backgroundCard,
+        color: context.colors.backgroundCard,
         borderRadius: BorderRadius.circular(FujinRadius.card),
-        border: Border.all(color: FujinColorRole.borderCard),
+        border: Border.all(color: context.colors.borderCard),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -53,7 +53,7 @@ class NutritionCard extends StatelessWidget {
                 child: Text(
                   servingLine,
                   style: FujinText.inter13Regular.copyWith(
-                    color: FujinColorRole.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ),
@@ -65,13 +65,13 @@ class NutritionCard extends StatelessWidget {
                     Text(
                       context.intl.addMyDay,
                       style: FujinText.inter13Medium.copyWith(
-                        color: FujinColorRole.textLink,
+                        color: context.colors.textLink,
                       ),
                     ),
-                    const Icon(
+                    Icon(
                       Icons.chevron_right,
                       size: FujinSize.rowChevron,
-                      color: FujinColorRole.textLink,
+                      color: context.colors.textLink,
                     ),
                   ],
                 ),
@@ -88,14 +88,14 @@ class NutritionCard extends StatelessWidget {
                 child: Text(
                   context.intl.kilocaloriesValue(kilocalories),
                   style: FujinText.inter28Semibold.copyWith(
-                    color: FujinColorRole.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                 ),
               ),
               Text(
                 context.intl.nutrientKilocalories,
                 style: FujinText.inter14Regular.copyWith(
-                  color: FujinColorRole.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               const Spacer(),
@@ -107,8 +107,8 @@ class NutritionCard extends StatelessWidget {
                   },
                   style: FujinText.inter14Medium.copyWith(
                     color: switch (left) {
-                      < 0 => FujinColorRole.goalExceeded,
-                      _ => FujinColorRole.goalInProgress,
+                      < 0 => context.colors.goalExceeded,
+                      _ => context.colors.goalInProgress,
                     },
                   ),
                 ),
@@ -127,7 +127,7 @@ class NutritionCard extends StatelessWidget {
                       Text(
                         JournalText.name(context.intl, nutrient),
                         style: FujinText.inter11Regular.copyWith(
-                          color: FujinColorRole.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
                       _Highlight(
@@ -140,7 +140,7 @@ class NutritionCard extends StatelessWidget {
                             ),
                           },
                           style: FujinText.inter15Medium.copyWith(
-                            color: FujinColorRole.textPrimary,
+                            color: context.colors.textPrimary,
                           ),
                         ),
                       ),
@@ -166,13 +166,11 @@ class NutritionCard extends StatelessWidget {
         (final goal, final day)? => DayShareBar(
           before: day.amount(nutrient) / goal,
           added: food.amount(nutrient) / goal,
-          exceeded:
-              GoalStatus.of(
-                nutrient,
-                amount: day.amount(nutrient) + food.amount(nutrient),
-                goal: goal,
-              ) ==
-              GoalStatus.exceeded,
+          status: GoalStatus.of(
+            nutrient,
+            amount: day.amount(nutrient) + food.amount(nutrient),
+            goal: goal,
+          ),
           thin: thin,
         ),
         null => null,
@@ -190,7 +188,7 @@ class _Highlight extends StatelessWidget {
     false => child,
     true => DecoratedBox(
       decoration: BoxDecoration(
-        color: FujinColorRole.backgroundHighlight,
+        color: context.colors.backgroundHighlight,
         borderRadius: BorderRadius.circular(FujinRadius.tile),
       ),
       child: Padding(

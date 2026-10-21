@@ -33,28 +33,28 @@ class NutrientRing extends StatelessWidget {
     };
     final (fill, track, arc) = switch ((status, nutrient)) {
       (null, _) => (
-        FujinColorRole.backgroundCard,
-        FujinColorRole.textDisabled,
+        context.colors.backgroundCard,
+        context.colors.textDisabled,
         null,
       ),
       (GoalStatus.below, Nutrient.fiber) => (
-        FujinColorRole.backgroundCard,
-        FujinColorRole.goalMinimumLeft,
-        FujinColorRole.goalInProgress,
+        context.colors.backgroundCard,
+        context.colors.goalMinimumLeft,
+        context.colors.goalInProgress,
       ),
       (GoalStatus.below, _) => (
-        FujinColorRole.backgroundCard,
-        FujinColorRole.goalTrack,
-        FujinColorRole.goalInProgress,
+        context.colors.backgroundCard,
+        context.colors.goalTrack,
+        context.colors.goalInProgress,
       ),
       (GoalStatus.reached, _) => (
-        FujinColorRole.goalReachedBackground,
-        FujinColorRole.goalReached,
+        context.colors.goalReachedBackground,
+        context.colors.goalReached,
         null,
       ),
       (GoalStatus.exceeded, _) => (
-        FujinColorRole.goalExceededBackground,
-        FujinColorRole.goalExceeded,
+        context.colors.goalExceededBackground,
+        context.colors.goalExceeded,
         null,
       ),
     };
@@ -79,14 +79,14 @@ class NutrientRing extends StatelessWidget {
               Text(
                 value,
                 style: FujinText.inter13Medium.copyWith(
-                  color: FujinColorRole.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
               if (goal case final goal?)
                 Text(
                   context.intl.ringGoal(goal),
                   style: FujinText.inter10Regular.copyWith(
-                    color: FujinColorRole.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
             ],
@@ -95,7 +95,7 @@ class NutrientRing extends StatelessWidget {
         Text(
           label,
           style: FujinText.inter11Regular.copyWith(
-            color: FujinColorRole.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ),
       ],

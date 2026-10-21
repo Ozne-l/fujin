@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
@@ -10,8 +11,9 @@ import 'package:fujin/domain/sending/send_plan.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/fade_through.dart';
+import 'package:fujin/pages/common/header_layout.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
-import 'package:fujin/pages/common/scroll_edge_fade.dart';
+import 'package:fujin/pages/common/scroll_edge_blur.dart';
 import 'package:fujin/pages/common/send_label.dart';
 import 'package:fujin/pages/sending/send_notifier.dart';
 import 'package:fujin/pages/sending/widgets/plan_row.dart';
@@ -32,14 +34,29 @@ class ReviewView extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      SendHeader(plan: plan),
       Expanded(
-        child: FadeThrough(
-          scale: _unscaled,
-          child: switch (searching) {
-            true => _Searching(key: const ValueKey(true), plan: plan),
-            false => _Review(key: const ValueKey(false), plan: plan),
-          },
+        child: HeaderLayout(
+          header: HeaderLayout.shield(
+            Padding(
+              padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
+              child: SendHeader(plan: plan),
+            ),
+          ),
+          body: (context, extent) => FadeThrough(
+            scale: _unscaled,
+            child: switch (searching) {
+              true => _Searching(
+                key: const ValueKey(true),
+                plan: plan,
+                top: extent,
+              ),
+              false => _Review(
+                key: const ValueKey(false),
+                plan: plan,
+                top: extent,
+              ),
+            },
+          ),
         ),
       ),
       _Footer(plan: plan, searching: searching),
@@ -50,9 +67,10 @@ class ReviewView extends StatelessWidget {
 }
 
 class _Searching extends StatelessWidget {
-  const _Searching({required this.plan, super.key});
+  const _Searching({required this.plan, required this.top, super.key});
 
   final SendPlan plan;
+  final double top;
 
   @override
   Widget build(BuildContext context) {
@@ -61,29 +79,33 @@ class _Searching extends StatelessWidget {
       for (final (index, entry) in plan.pending.indexed)
         PlanRow.pending(entry, searching: index == 0),
     ];
-    return ListView(
-      padding: const EdgeInsets.only(bottom: FujinSpace.s6),
-      children: [
-        ProgressCard(
-          title: context.intl.searchingTitle,
-          detail: context.intl.searchingDetail,
-          note: context.intl.searchingNote,
-          done: plan.entries.length,
-          total: plan.total,
-        ),
-        if (rows.isNotEmpty) ...[
-          const SizedBox(height: FujinSpace.s4),
-          PlanRow.card(rows),
+    return ScrollEdgeBlur(
+      top: top,
+      child: ListView(
+        padding: EdgeInsets.only(top: top, bottom: FujinSpace.s6),
+        children: [
+          ProgressCard(
+            title: context.intl.searchingTitle,
+            detail: context.intl.searchingDetail,
+            note: context.intl.searchingNote,
+            done: plan.entries.length,
+            total: plan.total,
+          ),
+          if (rows.isNotEmpty) ...[
+            const SizedBox(height: FujinSpace.s4),
+            PlanRow.card(rows),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
 
 class _Review extends HookWidget {
-  const _Review({required this.plan, super.key});
+  const _Review({required this.plan, required this.top, super.key});
 
   final SendPlan plan;
+  final double top;
 
   @override
   Widget build(BuildContext context) {
@@ -96,88 +118,93 @@ class _Review extends HookWidget {
       final chosen? when available.contains(chosen) => chosen,
       _ => available.firstOrNull,
     };
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: FujinSpace.s3,
-      children: [
-        if (available.isNotEmpty)
-          ReviewFilters(
-            chips: [
-              for (final filter in available)
-                (
-                  key: ValueKey(filter),
-                  label: filter.label(context.intl, filter.count(plan)),
-                  tone: filter.tone,
-                  selected: filter == section,
-                  onSelected: () => chosen.value = filter,
-                ),
-            ],
-          ),
-        Expanded(
-          child: ScrollEdgeFade(
-            child: ListView(
-              padding: const EdgeInsets.only(
-                top: FujinSpace.s3,
-                bottom: FujinSpace.s6,
-              ),
-              children: [
-                if (section case final section?) ...[
-                  Padding(
-                    padding: const EdgeInsetsDirectional.only(
-                      start: FujinSize.textInset,
-                      end: FujinSize.textInset,
-                      bottom: FujinSpace.s3,
+    return HeaderLayout(
+      header: Padding(
+        padding: EdgeInsets.only(top: top),
+        child: switch (available) {
+          [] => const SizedBox.shrink(),
+          _ => HeaderLayout.shield(
+            Padding(
+              padding: const EdgeInsets.only(bottom: FujinSpace.s3),
+              child: ReviewFilters(
+                chips: [
+                  for (final filter in available)
+                    (
+                      key: ValueKey(filter),
+                      label: filter.label(context.intl, filter.count(plan)),
+                      tone: filter.tone,
+                      selected: filter == section,
+                      onSelected: () => chosen.value = filter,
                     ),
-                    child: Text(
-                      section.heading(context.intl),
-                      style: FujinText.inter12Medium.copyWith(
-                        color: FujinColorRole.textSecondary,
-                      ),
-                    ),
-                  ),
-                  ...switch (section) {
-                    _Section.toReview => [
-                      for (final planned in plan.toReview)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: FujinSpace.s3),
-                          child: ReviewCard(
-                            key: ValueKey(planned.entryId),
-                            planned: planned,
-                          ),
-                        ),
-                      if (plan.toReview.any(_showsDeltas))
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: FujinSize.textInset,
-                          ),
-                          child: Text(
-                            context.intl.toleranceNote,
-                            style: FujinText.inter12Regular.copyWith(
-                              color: FujinColorRole.textTertiary,
-                            ),
-                          ),
-                        ),
-                    ],
-                    _Section.automatic => [
-                      PlanRow.card([
-                        for (final planned in plan.automatic)
-                          PlanRow.planned(planned),
-                      ]),
-                    ],
-                    _Section.inEkklo => [
-                      PlanRow.card([
-                        for (final compared in plan.inEkklo)
-                          if (compared.status case InEkklo(:final link))
-                            PlanRow.inEkklo(compared.entry, link),
-                      ]),
-                    ],
-                  },
                 ],
-              ],
+              ),
             ),
           ),
+        },
+      ),
+      body: (context, extent) => ScrollEdgeBlur(
+        top: extent + FujinSpace.s3,
+        child: ListView(
+          padding: EdgeInsets.only(
+            top: extent + FujinSpace.s3,
+            bottom: FujinSpace.s6,
+          ),
+          children: [
+            if (section case final section?) ...[
+              Padding(
+                padding: const EdgeInsetsDirectional.only(
+                  start: FujinSize.textInset,
+                  end: FujinSize.textInset,
+                  bottom: FujinSpace.s3,
+                ),
+                child: Text(
+                  section.heading(context.intl),
+                  style: FujinText.inter12Medium.copyWith(
+                    color: context.colors.textSecondary,
+                  ),
+                ),
+              ),
+              ...switch (section) {
+                _Section.toReview => [
+                  for (final planned in plan.toReview)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: FujinSpace.s3),
+                      child: ReviewCard(
+                        key: ValueKey(planned.entryId),
+                        planned: planned,
+                      ),
+                    ),
+                  if (plan.toReview.any(_showsDeltas))
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: FujinSize.textInset,
+                      ),
+                      child: Text(
+                        context.intl.toleranceNote,
+                        style: FujinText.inter12Regular.copyWith(
+                          color: context.colors.textTertiary,
+                        ),
+                      ),
+                    ),
+                ],
+                _Section.automatic => [
+                  PlanRow.card([
+                    for (final planned in plan.automatic)
+                      PlanRow.planned(planned),
+                  ]),
+                ],
+                _Section.inEkklo => [
+                  PlanRow.card([
+                    for (final compared in plan.inEkklo)
+                      if (compared.status case InEkklo(:final link))
+                        PlanRow.inEkklo(compared.entry, link),
+                  ]),
+                ],
+              },
+            ],
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -239,10 +266,11 @@ class _Footer extends ConsumerWidget {
             context.intl.proposalsUsed,
             textAlign: TextAlign.center,
             style: FujinText.inter12Regular.copyWith(
-              color: FujinColorRole.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
           FilledButton(
+            style: FujinTheme.floatingButtonStyle(context.colors),
             onPressed: switch (label) {
               null => null,
               _ => () => unawaited(

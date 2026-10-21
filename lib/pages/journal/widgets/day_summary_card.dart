@@ -20,14 +20,14 @@ import 'package:fujin/pages/journal/widgets/nutrient_ring.dart';
 TextSpan _strong(String text) =>
     TextSpan(text: text, style: FujinText.inter13Semibold);
 
-TextSpan _soft(String text) => TextSpan(
+TextSpan _soft(FujinColors colors, String text) => TextSpan(
   text: text,
-  style: FujinText.inter13Regular.copyWith(color: FujinColorRole.textSecondary),
+  style: FujinText.inter13Regular.copyWith(color: colors.textSecondary),
 );
 
-TextSpan _faint(String text) => TextSpan(
+TextSpan _faint(FujinColors colors, String text) => TextSpan(
   text: text,
-  style: FujinText.inter13Regular.copyWith(color: FujinColorRole.textTertiary),
+  style: FujinText.inter13Regular.copyWith(color: colors.textTertiary),
 );
 
 class DaySummaryCard extends StatelessWidget {
@@ -72,6 +72,7 @@ class DaySummaryCard extends StatelessWidget {
       },
       null => (context.intl.sendToEkklo, null),
     };
+    final colors = context.colors;
     return GestureDetector(
       onTap: switch (fresh) {
         JournalDay() => onDetail,
@@ -86,9 +87,9 @@ class DaySummaryCard extends StatelessWidget {
           FujinSpace.s4,
         ),
         decoration: BoxDecoration(
-          color: FujinColorRole.backgroundCard,
+          color: colors.backgroundCard,
           borderRadius: BorderRadius.circular(FujinRadius.card),
-          border: Border.all(color: FujinColorRole.borderCard),
+          border: Border.all(color: colors.borderCard),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -114,18 +115,18 @@ class DaySummaryCard extends StatelessWidget {
               children: [
                 if (rings != null) const Divider(),
                 ...switch ((fresh, read)) {
-                  (final day?, _) => _progress(context.intl, day),
+                  (final day?, _) => _progress(context.intl, colors, day),
                   (null, BothSides(:final day)) => [
-                    _counted(context.intl, day.ekkloMeals),
+                    _counted(context.intl, colors, day.ekkloMeals),
                   ],
                   (null, EkkloOnly(:final ekkloMeals)) => [
-                    _counted(context.intl, ekkloMeals),
+                    _counted(context.intl, colors, ekkloMeals),
                   ],
                   (null, MfpOnly()) => [
                     _SourceLine(
-                      dot: FujinColorRole.sourceEkklo,
+                      dot: colors.sourceEkklo,
                       label: context.intl.sourceEkklo,
-                      trailing: [_faint(context.intl.sideUnavailable)],
+                      trailing: [_faint(colors, context.intl.sideUnavailable)],
                     ),
                   ],
                 },
@@ -146,15 +147,19 @@ class DaySummaryCard extends StatelessWidget {
     );
   }
 
-  static List<Widget> _progress(AppLocalizations intl, JournalDay day) => [
+  static List<Widget> _progress(
+    AppLocalizations intl,
+    FujinColors colors,
+    JournalDay day,
+  ) => [
     _SourceLine(
-      dot: FujinColorRole.sourceEkklo,
+      dot: colors.sourceEkklo,
       label: intl.sourceEkklo,
       trailing: [
         _strong(
           intl.kilocalories(day.ekkloNutrients.amount(Nutrient.kilocalories)),
         ),
-        _soft(switch (day.counts.total) {
+        _soft(colors, switch (day.counts.total) {
           0 => ' ${intl.ekkloNoFood}',
           final total => ' ${intl.ekkloProgress(day.counts.inEkklo, total)}',
         }),
@@ -165,15 +170,16 @@ class DaySummaryCard extends StatelessWidget {
         0 => 0,
         final total => day.counts.inEkklo / total,
       },
-      color: FujinColor.fujin,
+      color: colors.backgroundAccent,
     ),
   ];
 
   static Widget _counted(
     AppLocalizations intl,
+    FujinColors colors,
     List<EkkloDailyMeal> meals,
   ) => _SourceLine(
-    dot: FujinColorRole.sourceEkklo,
+    dot: colors.sourceEkklo,
     label: intl.sourceEkklo,
     trailing: [
       _strong(
@@ -181,7 +187,10 @@ class DaySummaryCard extends StatelessWidget {
           DayNutrients.ofEkklo(meals).amount(Nutrient.kilocalories),
         ),
       ),
-      _soft(switch (meals.fold(0, (count, meal) => count + meal.items.length)) {
+      _soft(colors, switch (meals.fold(
+        0,
+        (count, meal) => count + meal.items.length,
+      )) {
         0 => ' ${intl.ekkloNoFood}',
         final count => ' ${intl.ekkloFoodCount(count)}',
       }),
@@ -203,14 +212,17 @@ class _MfpRings extends StatelessWidget {
       spacing: FujinSpace.s3,
       children: [
         _SourceLine(
-          dot: FujinColorRole.sourceMfp,
+          dot: context.colors.sourceMfp,
           label: context.intl.sourceMyFitnessPal,
           trailing: [
             TextSpan(
               text: context.intl.kilocaloriesValue(eaten),
               style: FujinText.inter15Semibold,
             ),
-            _soft(' ${context.intl.kilocaloriesGoal(goals.kilocalories)}'),
+            _soft(
+              context.colors,
+              ' ${context.intl.kilocaloriesGoal(goals.kilocalories)}',
+            ),
           ],
         ),
         ProgressBar(
@@ -220,9 +232,9 @@ class _MfpRings extends StatelessWidget {
             amount: eaten,
             goal: goals.kilocalories,
           )) {
-            GoalStatus.below => FujinColorRole.goalInProgress,
-            GoalStatus.reached => FujinColorRole.goalReached,
-            GoalStatus.exceeded => FujinColorRole.goalExceeded,
+            GoalStatus.below => context.colors.goalInProgress,
+            GoalStatus.reached => context.colors.goalReached,
+            GoalStatus.exceeded => context.colors.goalExceeded,
           },
         ),
         Row(
@@ -254,7 +266,10 @@ class _MfpCompact extends StatelessWidget {
     final eaten = nutrients.amount(Nutrient.kilocalories);
     return _SourceBlock(
       trailing: switch (readAt) {
-        final readAt? => _faint(context.intl.kilocaloriesAt(eaten, readAt)),
+        final readAt? => _faint(
+          context.colors,
+          context.intl.kilocaloriesAt(eaten, readAt),
+        ),
         null => TextSpan(
           text: context.intl.kilocalories(eaten),
           style: FujinText.inter15Semibold,
@@ -273,7 +288,7 @@ class _MfpUnavailable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _SourceBlock(
-      trailing: _faint(context.intl.sideUnavailable),
+      trailing: _faint(context.colors, context.intl.sideUnavailable),
       detail: switch (goals) {
         final goals? => context.intl.goalLine(
           GoalsText.summary(context.intl, goals),
@@ -296,7 +311,7 @@ class _SourceBlock extends StatelessWidget {
     spacing: FujinSpace.s1,
     children: [
       _SourceLine(
-        dot: FujinColorRole.sourceMfp,
+        dot: context.colors.sourceMfp,
         label: context.intl.sourceMyFitnessPal,
         trailing: [trailing],
       ),
@@ -308,7 +323,7 @@ class _SourceBlock extends StatelessWidget {
           child: Text(
             detail,
             style: FujinText.inter12Medium.copyWith(
-              color: FujinColorRole.textTertiary,
+              color: context.colors.textTertiary,
             ),
           ),
         ),
@@ -335,13 +350,13 @@ class _SourceLine extends StatelessWidget {
       Text(
         label,
         style: FujinText.inter13Medium.copyWith(
-          color: FujinColorRole.textPrimary,
+          color: context.colors.textPrimary,
         ),
       ),
       Expanded(
         child: Text.rich(
           TextSpan(
-            style: const TextStyle(color: FujinColorRole.textPrimary),
+            style: TextStyle(color: context.colors.textPrimary),
             children: trailing,
           ),
           textAlign: TextAlign.end,

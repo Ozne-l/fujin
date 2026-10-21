@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/domain/goals/goal_status.dart';
 import 'package:motor/motor.dart';
 
 class DayShareBar extends StatelessWidget {
   const DayShareBar({
     required this.before,
     required this.added,
-    required this.exceeded,
+    required this.status,
     this.thin = false,
     super.key,
   });
 
   final double before;
   final double added;
-  final bool exceeded;
+  final GoalStatus status;
   final bool thin;
 
   @override
@@ -24,12 +25,11 @@ class DayShareBar extends StatelessWidget {
       false => FujinSize.kcalBar,
     };
     final radius = BorderRadius.circular(height / 2);
-    final (soFar, adding) = switch (exceeded) {
-      true => (
-        FujinColorRole.goalExceededBackground,
-        FujinColorRole.goalExceeded,
-      ),
-      false => (FujinColorRole.goalMinimumLeft, FujinColorRole.goalInProgress),
+    final colors = context.colors;
+    final (soFar, adding) = switch (status) {
+      GoalStatus.below => (colors.goalInProgressLogged, colors.goalInProgress),
+      GoalStatus.reached => (colors.goalReachedLogged, colors.goalReached),
+      GoalStatus.exceeded => (colors.goalExceededLogged, colors.goalExceeded),
     };
     Widget segment(double share, Color color) => SingleMotionBuilder(
       motion: FujinMotion.of(context, FujinMotion.progress),
@@ -39,16 +39,13 @@ class DayShareBar extends StatelessWidget {
         heightFactor: 1,
         child: child,
       ),
-      child: DecoratedBox(
-        decoration: BoxDecoration(color: color, borderRadius: radius),
-      ),
+      child: ColoredBox(color: color),
     );
     return Container(
+      width: double.infinity,
       height: height,
-      decoration: BoxDecoration(
-        color: FujinColorRole.goalTrack,
-        borderRadius: radius,
-      ),
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(color: colors.goalTrack, borderRadius: radius),
       child: Stack(
         alignment: AlignmentDirectional.centerStart,
         children: [segment(before + added, adding), segment(before, soFar)],

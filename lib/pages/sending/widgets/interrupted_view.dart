@@ -58,7 +58,7 @@ class InterruptedView extends ConsumerWidget {
             context.intl.interruptedNote,
             textAlign: TextAlign.center,
             style: FujinText.inter13Regular.copyWith(
-              color: FujinColorRole.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
         ),

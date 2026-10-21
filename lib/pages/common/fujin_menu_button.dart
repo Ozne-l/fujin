@@ -47,11 +47,11 @@ class FujinMenuButton extends StatelessWidget {
         width: width,
         height: height,
         child: Material(
-          color: FujinColorRole.backgroundCard,
+          color: context.colors.backgroundCard,
           clipBehavior: Clip.antiAlias,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radius),
-            side: const BorderSide(color: FujinColorRole.borderCard),
+            side: BorderSide(color: context.colors.borderCard),
           ),
           child: InkWell(
             onTap: onTap,
@@ -66,7 +66,7 @@ class FujinMenuButton extends StatelessWidget {
                       label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: style.copyWith(color: FujinColorRole.textPrimary),
+                      style: style.copyWith(color: context.colors.textPrimary),
                     ),
                   ),
                   SingleMotionBuilder(
@@ -82,7 +82,7 @@ class FujinMenuButton extends StatelessWidget {
                     child: Icon(
                       Icons.expand_more,
                       size: chevronSize,
-                      color: FujinColorRole.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                 ],

@@ -23,9 +23,9 @@ class StepList extends StatelessWidget {
         FujinSpace.s4,
       ),
       decoration: BoxDecoration(
-        color: FujinColorRole.backgroundCard,
+        color: context.colors.backgroundCard,
         borderRadius: BorderRadius.circular(FujinRadius.card),
-        border: Border.all(color: FujinColorRole.borderCard),
+        border: Border.all(color: context.colors.borderCard),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -40,19 +40,19 @@ class StepList extends StatelessWidget {
                 ),
                 child: Divider(),
               ),
-            _row(context.intl, step),
+            _row(context.intl, context.colors, step),
           ],
         ],
       ),
     );
   }
 
-  Widget _row(AppLocalizations intl, SendStep step) {
-    final (title, subtitle, subtitleColor) = _texts(intl, step);
+  Widget _row(AppLocalizations intl, FujinColors colors, SendStep step) {
+    final (title, subtitle, subtitleColor) = _texts(intl, colors, step);
     return Row(
       spacing: FujinSpace.s4,
       children: [
-        _marker(step.state),
+        _marker(colors, step.state),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,7 +61,7 @@ class StepList extends StatelessWidget {
               Text(
                 title,
                 style: FujinText.inter15Medium.copyWith(
-                  color: FujinColorRole.textPrimary,
+                  color: colors.textPrimary,
                 ),
               ),
               Text(
@@ -77,93 +77,94 @@ class StepList extends StatelessWidget {
 
   (String, String, Color) _texts(
     AppLocalizations intl,
+    FujinColors colors,
     SendStep step,
   ) => switch ((step, step.state)) {
     (OwnCopyStep(:final name), StepState.done) => (
       intl.stepOwnCopyDone,
       name,
-      FujinColorRole.textSecondary,
+      colors.textSecondary,
     ),
     (OwnCopyStep(:final name), StepState.running) => (
       intl.stepOwnCopy,
       intl.stepOnTheWay(name),
-      FujinColor.sora,
+      colors.textInfo,
     ),
     (OwnCopyStep(:final name), StepState.pending) => (
       intl.stepOwnCopy,
       intl.stepWaiting(name),
-      FujinColorRole.textTertiary,
+      colors.textTertiary,
     ),
     (OwnCopyStep(), StepState.failed) => (
       intl.stepOwnCopy,
       intl.stepFailed,
-      FujinColorRole.textAlert,
+      colors.textAlert,
     ),
     (MealStep(:final ekkloMealName, :final entryIds), StepState.done) => (
       ekkloMealName,
       intl.stepFoodsAdded(entryIds.length),
-      FujinColorRole.textSecondary,
+      colors.textSecondary,
     ),
     (MealStep(:final ekkloMealName, :final entryIds), StepState.running) => (
       ekkloMealName,
       intl.stepOnTheWay(intl.stepFoods(entryIds.length)),
-      FujinColor.sora,
+      colors.textInfo,
     ),
     (MealStep(:final ekkloMealName, :final entryIds), StepState.pending) => (
       ekkloMealName,
       intl.stepWaiting(intl.stepFoods(entryIds.length)),
-      FujinColorRole.textTertiary,
+      colors.textTertiary,
     ),
     (MealStep(:final ekkloMealName, :final entryIds), StepState.failed) => (
       ekkloMealName,
       intl.stepFoodsNotSent(entryIds.length),
-      FujinColorRole.textAlert,
+      colors.textAlert,
     ),
     (QuantityUpdateStep(:final name), StepState.done) => (
       name,
       intl.stepQuantityDone,
-      FujinColorRole.textSecondary,
+      colors.textSecondary,
     ),
     (QuantityUpdateStep(:final name), StepState.running) => (
       name,
       intl.stepOnTheWay(intl.stepQuantity),
-      FujinColor.sora,
+      colors.textInfo,
     ),
     (QuantityUpdateStep(:final name), StepState.pending) => (
       name,
       intl.stepWaiting(intl.stepQuantity),
-      FujinColorRole.textTertiary,
+      colors.textTertiary,
     ),
     (QuantityUpdateStep(:final name), StepState.failed) => (
       name,
       intl.stepQuantityFailed,
-      FujinColorRole.textAlert,
+      colors.textAlert,
     ),
   };
 
-  Widget _marker(StepState state) => switch (state) {
-    StepState.done => const _Circle(
-      color: FujinColor.fujin,
+  Widget _marker(FujinColors colors, StepState state) => switch (state) {
+    StepState.done => _Circle(
+      color: colors.backgroundAccent,
       child: Icon(
         Icons.check,
         size: FujinSize.stepIcon,
-        color: FujinColorRole.textOnDark,
+        color: colors.textOnAccent,
       ),
     ),
-    StepState.running => const _Circle(
-      color: FujinColorRole.backgroundInfo,
-      child: BreezeIndicator(streaks: BreezeStreaks.marker),
+    StepState.running => _Circle(
+      color: colors.backgroundInfo,
+      child: const BreezeIndicator(streaks: BreezeStreaks.marker),
     ),
-    StepState.pending => const _Circle(
-      color: FujinColorRole.backgroundCard,
-      border: FujinColorRole.borderCard,
+    StepState.pending => _Circle(
+      color: colors.backgroundCard,
+      border: colors.borderCard,
     ),
-    StepState.failed => const _Circle(
-      color: FujinColorRole.backgroundAlert,
+    StepState.failed => _Circle(
+      color: colors.backgroundAlert,
       child: Icon(
         Icons.close,
         size: FujinSize.stepIcon,
-        color: FujinColorRole.textAlert,
+        color: colors.textAlert,
       ),
     ),
   };

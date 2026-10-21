@@ -33,7 +33,7 @@
       "$value": {
         "colorSpace": "srgb",
         "components": [
-          0.4510,
+          0.451,
           0.4235,
           0.3529
         ],
@@ -305,6 +305,62 @@
         "hex": "#DCE6F7"
       },
       "$type": "color"
+    },
+    "fujin-pale": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.6314,
+          0.7098,
+          0.6196
+        ],
+        "alpha": 1,
+        "hex": "#A1B59E"
+      },
+      "$description": "Pale Fūjin green: share already logged in a progress bar.",
+      "$type": "color"
+    },
+    "mfp-pale": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.6039,
+          0.7333,
+          0.902
+        ],
+        "alpha": 1,
+        "hex": "#9ABBE6"
+      },
+      "$description": "Pale MyFitnessPal blue: share already logged in a progress bar.",
+      "$type": "color"
+    },
+    "seigaiha": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9255,
+          0.8941,
+          0.8118
+        ],
+        "alpha": 1,
+        "hex": "#ECE4CF"
+      },
+      "$description": "Wave lines of the seigaiha pattern on washi.",
+      "$type": "color"
+    },
+    "shu-pale": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8627,
+          0.6471,
+          0.5922
+        ],
+        "alpha": 1,
+        "hex": "#DCA597"
+      },
+      "$description": "Pale vermilion: share already logged in a progress bar.",
+      "$type": "color"
     }
   },
   "space": {
@@ -488,6 +544,14 @@
         "value": 1.5,
         "unit": "px"
       },
+      "$type": "dimension"
+    },
+    "glass-tint-rim": {
+      "$value": {
+        "value": 1.5,
+        "unit": "px"
+      },
+      "$description": "Rim of a tinted glass button inside a card (Confirmer).",
       "$type": "dimension"
     },
     "macro-ring": {
@@ -889,6 +953,62 @@
       "$description": "Height of a segmented control and of a menu button.",
       "$type": "dimension"
     },
+    "control-note-gap": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$description": "Gap between a segmented control and the note under it in a card.",
+      "$type": "dimension"
+    },
+    "switch-width": {
+      "$value": {
+        "value": 63,
+        "unit": "px"
+      },
+      "$description": "Width of the track of a switch, as the iOS 26 switch (Figma component \"Interrupteur\").",
+      "$type": "dimension"
+    },
+    "switch-height": {
+      "$value": {
+        "value": 28,
+        "unit": "px"
+      },
+      "$description": "Height of the track of a switch, as the iOS 26 switch.",
+      "$type": "dimension"
+    },
+    "switch-thumb-width": {
+      "$value": {
+        "value": 37,
+        "unit": "px"
+      },
+      "$description": "Width of the stadium thumb of a switch, 2 inside the track.",
+      "$type": "dimension"
+    },
+    "switch-thumb-height": {
+      "$value": {
+        "value": 24,
+        "unit": "px"
+      },
+      "$description": "Height of the stadium thumb of a switch, 2 inside the track.",
+      "$type": "dimension"
+    },
+    "switch-lens-width": {
+      "$value": {
+        "value": 58,
+        "unit": "px"
+      },
+      "$description": "Width of the glass lens the thumb of a switch becomes while held.",
+      "$type": "dimension"
+    },
+    "switch-lens-height": {
+      "$value": {
+        "value": 37,
+        "unit": "px"
+      },
+      "$description": "Height of the glass lens the thumb of a switch becomes while held, past the track above and below.",
+      "$type": "dimension"
+    },
     "search-field": {
       "$value": {
         "value": 44,
@@ -943,6 +1063,22 @@
         "unit": "px"
       },
       "$description": "Scan icon in the Scanner button.",
+      "$type": "dimension"
+    },
+    "appearance-toggle": {
+      "$value": {
+        "value": 40,
+        "unit": "px"
+      },
+      "$description": "Side of the glass drop of the day/night toggle, centred in a 48 touch target.",
+      "$type": "dimension"
+    },
+    "appearance-toggle-icon": {
+      "$value": {
+        "value": 20,
+        "unit": "px"
+      },
+      "$description": "Moon or sun icon in the day/night toggle.",
       "$type": "dimension"
     },
     "aim-frame-width": {
@@ -1009,6 +1145,22 @@
       "$description": "Vertical offset of the floating glass drop shadow.",
       "$type": "dimension"
     },
+    "floating-shadow-small-blur": {
+      "$value": {
+        "value": 8,
+        "unit": "px"
+      },
+      "$description": "Blur radius of the drop shadow of a small glass button (the day/night toggle).",
+      "$type": "dimension"
+    },
+    "floating-shadow-small-offset": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      },
+      "$description": "Vertical offset of the drop shadow of a small glass button (the day/night toggle).",
+      "$type": "dimension"
+    },
     "scroll-fade": {
       "$value": {
         "value": 110,
@@ -1019,10 +1171,10 @@
     },
     "scroll-edge-fade": {
       "$value": {
-        "value": 24,
+        "value": 32,
         "unit": "px"
       },
-      "$description": "Fade at the top of a list scrolling under a fixed header, such as the Mémoire segments or the send filters.",
+      "$description": "Where a list scrolls under a fixed header, the length over which the progressive blur and the page wash fade out below the header.",
       "$type": "dimension"
     },
     "button-medium": {
@@ -1357,10 +1509,66 @@
             0.9882,
             0.9569
           ],
-          "alpha": 0.4,
+          "alpha": 0.25,
           "hex": "#FFFCF4"
         },
-        "$description": "Kinu at 40% over a blurred backdrop: the tab plate and the Scanner button.",
+        "$description": "Kinu at 25% over the refracted backdrop: the tab plate and the Scanner button.",
+        "$type": "color"
+      },
+      "glass-ink": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1059,
+            0.102,
+            0.0902
+          ],
+          "alpha": 0.8,
+          "hex": "#1B1A17"
+        },
+        "$description": "Sumi at 80% over the refracted backdrop: the primary button and the chosen filter.",
+        "$type": "color"
+      },
+      "lens-reflection": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.10588,
+            0.10196,
+            0.0902
+          ],
+          "alpha": 0.35,
+          "hex": "#1B1A17"
+        },
+        "$type": "color",
+        "$description": "Reflection along the top and bottom edges inside the glass lens over a held switch, fading towards the middle."
+      },
+      "glass-lens": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0.06,
+          "hex": "#000000"
+        },
+        "$description": "Black at 6%, the tint of the glass lens that swells under the finger on the tab plate.",
+        "$type": "color"
+      },
+      "glass-glow": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            1,
+            1
+          ],
+          "alpha": 0.5,
+          "hex": "#FFFFFF"
+        },
+        "$description": "White at 50%, the light that grows under the finger inside a pressed glass button.",
         "$type": "color"
       },
       "tab-active": {
@@ -1404,6 +1612,16 @@
         },
         "$description": "Sumi at 6%, the ink wash under a pressed, hovered or focused surface.",
         "$type": "color"
+      },
+      "accent": {
+        "$value": "{color.fujin}",
+        "$description": "Accent fill: progress, checkbox and switch on, done step, green button, verified dot.",
+        "$type": "color"
+      },
+      "neutral": {
+        "$value": "{color.kinari}",
+        "$description": "Neutral fills: neutral chips, switch off, segmented control, clear button, skeletons, offline banner.",
+        "$type": "color"
       }
     },
     "shadow": {
@@ -1418,7 +1636,7 @@
           "alpha": 0.12,
           "hex": "#1B1A17"
         },
-        "$description": "Drop shadow of floating glass: the tab plate and the Scanner button.",
+        "$description": "Drop shadow of floating glass: the tab plate, the Scanner button and the day/night toggle.",
         "$type": "color"
       },
       "logo": {
@@ -1448,6 +1666,96 @@
       "divider": {
         "$value": "{color.kin}",
         "$type": "color"
+      },
+      "alert": {
+        "$value": "{color.shu}",
+        "$description": "Field in error, danger outline button.",
+        "$type": "color"
+      },
+      "control": {
+        "$value": "{color.usuzumi}",
+        "$description": "Unselected radio, sheet handle, dashed empty ring, offline banner outline.",
+        "$type": "color"
+      },
+      "focus": {
+        "$value": "{color.fujin}",
+        "$description": "Focused field, selected radio, selected candidate.",
+        "$type": "color"
+      },
+      "warning": {
+        "$value": "{color.kin}",
+        "$description": "Gold outline of an item to review (Ekklo match to choose).",
+        "$type": "color"
+      },
+      "glass-highlight": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            1,
+            1
+          ],
+          "alpha": 0.9,
+          "hex": "#FFFFFF"
+        },
+        "$type": "color",
+        "$description": "Lit edge of liquid glass: 1 px inside gradient stroke (top-left and bottom-right) on the tab plate and the glass buttons."
+      },
+      "glass-shade": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            1,
+            1
+          ],
+          "alpha": 0.12,
+          "hex": "#FFFFFF"
+        },
+        "$type": "color",
+        "$description": "Middle stop of the liquid glass edge gradient (shaded sides)."
+      },
+      "glass-ink-highlight": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            1,
+            1
+          ],
+          "alpha": 0.35,
+          "hex": "#FFFFFF"
+        },
+        "$type": "color",
+        "$description": "Lit edge of ink glass, the primary button colour at 80%: outer stops of its 1 px inside gradient stroke."
+      },
+      "glass-ink-shade": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            1,
+            1
+          ],
+          "alpha": 0.05,
+          "hex": "#FFFFFF"
+        },
+        "$type": "color",
+        "$description": "Middle stop of the ink glass edge gradient (shaded sides)."
+      },
+      "lens-edge": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.10588,
+            0.10196,
+            0.0902
+          ],
+          "alpha": 0.3,
+          "hex": "#1B1A17"
+        },
+        "$type": "color",
+        "$description": "Outline of the glass lens over a held switch: 1 px gradient stroke, this colour at the top-left fading to glass-highlight at the bottom-right."
       }
     },
     "text": {
@@ -1485,6 +1793,16 @@
       },
       "info": {
         "$value": "{color.sora}",
+        "$type": "color"
+      },
+      "on-accent": {
+        "$value": "{color.kinu}",
+        "$description": "Text and icons on an accent, source or goal fill.",
+        "$type": "color"
+      },
+      "on-dark-accent": {
+        "$value": "{color.kin}",
+        "$description": "Action label on role/background/dark (snackbar « Annuler »).",
         "$type": "color"
       }
     },
@@ -1573,6 +1891,57 @@
       "missed-background": {
         "$value": "{color.mfp-light}",
         "$description": "Background of a past day that stayed under 98% of its goal.",
+        "$type": "color"
+      },
+      "exceeded-logged": {
+        "$value": "{color.shu-pale}",
+        "$description": "Share already logged, goal exceeded (food sheet bars).",
+        "$type": "color"
+      },
+      "in-progress-logged": {
+        "$value": "{color.mfp-pale}",
+        "$description": "Share already logged, goal not reached (food sheet bars).",
+        "$type": "color"
+      },
+      "reached-logged": {
+        "$value": "{color.fujin-pale}",
+        "$description": "Share already logged, goal reached (food sheet bars).",
+        "$type": "color"
+      }
+    },
+    "camera": {
+      "accent": {
+        "$value": "{color.kin}",
+        "$description": "Viewfinder corners and scan line. Same value in both themes.",
+        "$type": "color"
+      },
+      "background": {
+        "$value": "{color.sumi}",
+        "$description": "Camera chrome: round buttons over the camera. Same value in both themes.",
+        "$type": "color"
+      },
+      "button": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9686,
+            0.9451,
+            0.8784
+          ],
+          "alpha": 0.18,
+          "hex": "#F7F1E0"
+        },
+        "$description": "Button over the camera: washi at 18 % on the camera feed, label role/camera/text. Same value in both themes.",
+        "$type": "color"
+      },
+      "text": {
+        "$value": "{color.washi}",
+        "$description": "Text and icons over the camera. Same value in both themes.",
+        "$type": "color"
+      },
+      "text-secondary": {
+        "$value": "{color.usuzumi}",
+        "$description": "Secondary text over the camera, under the scanner title. Same value in both themes.",
         "$type": "color"
       }
     }

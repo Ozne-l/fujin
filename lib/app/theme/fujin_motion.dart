@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
+import 'package:fujin/app/theme/instant_motion.dart';
 import 'package:motor/motor.dart';
 
 abstract final class FujinMotion {
@@ -48,11 +49,36 @@ abstract final class FujinMotion {
   static const double tabSquashLimit = 0.25;
   static const double glassPress = 1.04;
   static const double glassStretch = 0.3;
+  static const double buttonSwell = 1.15;
+  static const Motion iconTurn = CupertinoMotion.bouncy(
+    duration: Duration(milliseconds: 450),
+    snapToEnd: true,
+  );
+  static const double iconTurnAngle = math.pi / 2;
+  static const Motion lensFollow = CupertinoMotion.interactive(
+    snapToEnd: true,
+  );
+  static const Motion lensSwell = CupertinoMotion.snappy(
+    duration: Duration(milliseconds: 300),
+    snapToEnd: true,
+  );
+  static const double lensFling = 0.3;
+  static const double lensTravel = 0.3;
+  static const double lensFade = 0.2;
+  static const Motion barMinimize = CupertinoMotion.smooth(
+    duration: Duration(milliseconds: 400),
+    snapToEnd: true,
+  );
+  static const double minimizedBarScale = 0.86;
   static const CurvedMotion fadeThrough = CurvedMotion(
     Duration(milliseconds: 280),
     Curves.easeOutCubic,
   );
   static const double fadeThroughScale = 0.98;
+  static const CurvedMotion themeReveal = CurvedMotion(
+    Duration(milliseconds: 675),
+    Curves.easeOutCubic,
+  );
   static const Motion sheetIn = Motion.customSpring(
     SpringDescription(mass: 1, stiffness: 110, damping: 21),
   );
@@ -75,7 +101,7 @@ abstract final class FujinMotion {
 
   static Motion of(BuildContext context, Motion motion) =>
       switch (reduced(context)) {
-        true => const Motion.none(),
+        true => const InstantMotion(),
         false => motion,
       };
 

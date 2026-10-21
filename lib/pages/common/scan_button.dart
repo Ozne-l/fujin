@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fujin/l10n/intl_context.dart';
-import 'package:fujin/pages/common/glass_surface.dart';
+import 'package:fujin/pages/common/fujin_glass_button.dart';
+import 'package:fujin/pages/common/fujin_glass_button_size.dart';
 import 'package:fujin/pages/common/scan_icon.dart';
 
 class ScanButton extends StatelessWidget {
@@ -11,37 +10,10 @@ class ScanButton extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    button: true,
-    enabled: onTap != null,
+  Widget build(BuildContext context) => FujinGlassButton(
+    icon: ScanIcon.asset,
     label: context.intl.tabScanner,
-    excludeSemantics: true,
-    onTap: onTap,
-    child: GlassSurface(
-      child: SizedBox.square(
-        dimension: FujinSize.tabBar,
-        child: Material(
-          type: MaterialType.transparency,
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            onTap: onTap,
-            child: Center(
-              child: SvgPicture.asset(
-                ScanIcon.asset,
-                width: FujinSize.scanIcon,
-                height: FujinSize.scanIcon,
-                theme: SvgTheme(
-                  currentColor: switch (onTap) {
-                    null => FujinColorRole.textDisabled,
-                    _ => FujinColorRole.textPrimary,
-                  },
-                ),
-                excludeFromSemantics: true,
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
+    onPressed: onTap,
+    size: FujinGlassButtonSize.large,
   );
 }

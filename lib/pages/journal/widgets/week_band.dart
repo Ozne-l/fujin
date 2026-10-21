@@ -297,10 +297,10 @@ class _Day extends StatelessWidget {
                 maxLines: 1,
                 style: switch (selected) {
                   true => FujinText.inter11Semibold.copyWith(
-                    color: FujinColorRole.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                   false => FujinText.inter11Regular.copyWith(
-                    color: FujinColorRole.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 },
               ),
@@ -345,8 +345,8 @@ class _Fade extends StatelessWidget {
             begin: alignment,
             end: -alignment,
             colors: [
-              FujinColorRole.backgroundScrollFade,
-              FujinColorRole.backgroundScrollFade.withValues(alpha: 0),
+              context.colors.backgroundScrollFade,
+              context.colors.backgroundScrollFade.withValues(alpha: 0),
             ],
           ),
         ),

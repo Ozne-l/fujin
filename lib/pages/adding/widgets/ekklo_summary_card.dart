@@ -35,26 +35,26 @@ class EkkloSummaryCard extends StatelessWidget {
     final (icon, iconColor, iconBackground) = switch (side) {
       EkkloSide.willBeCreated => (
         Icons.copy_all_outlined,
-        FujinColorRole.sourceEkkloText,
-        FujinColorRole.sourceEkkloBackground,
+        context.colors.sourceEkkloText,
+        context.colors.sourceEkkloBackground,
       ),
       EkkloSide.toChoose => (
         Icons.help_outline,
-        FujinColorRole.textPrimary,
-        FujinColorRole.backgroundCard,
+        context.colors.textPrimary,
+        context.colors.backgroundCard,
       ),
       EkkloSide.remembered ||
       EkkloSide.foundAutomatically ||
       EkkloSide.chosen ||
       null => (
         Icons.bookmark_border,
-        FujinColorRole.sourceEkkloText,
-        FujinColorRole.sourceEkkloBackground,
+        context.colors.sourceEkkloText,
+        context.colors.sourceEkkloBackground,
       ),
     };
     final (tileColor, tile) = switch (planned ?? problem) {
       null => (
-        FujinColorRole.backgroundInfo,
+        context.colors.backgroundInfo,
         const BreezeIndicator(
           streaks: BreezeStreaks.searching,
           drifting: true,
@@ -83,17 +83,17 @@ class EkkloSummaryCard extends StatelessWidget {
     final detailColor = switch (side) {
       EkkloSide.remembered ||
       EkkloSide.foundAutomatically ||
-      EkkloSide.chosen => FujinColorRole.textLink,
-      EkkloSide.willBeCreated => FujinColorRole.sourceEkkloText,
-      EkkloSide.toChoose => FujinColorRole.textGold,
-      null => FujinColorRole.textSecondary,
+      EkkloSide.chosen => context.colors.textLink,
+      EkkloSide.willBeCreated => context.colors.sourceEkkloText,
+      EkkloSide.toChoose => context.colors.textGold,
+      null => context.colors.textSecondary,
     };
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(FujinRadius.card),
       side: BorderSide(
         color: switch (toChoose) {
-          true => FujinColorRole.textGold,
-          false => FujinColorRole.borderCard,
+          true => context.colors.borderWarning,
+          false => context.colors.borderCard,
         },
       ),
     );
@@ -101,8 +101,8 @@ class EkkloSummaryCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
       child: Material(
         color: switch (toChoose) {
-          true => FujinColorRole.backgroundHighlight,
-          false => FujinColorRole.backgroundCard,
+          true => context.colors.backgroundHighlight,
+          false => context.colors.backgroundCard,
         },
         shape: shape,
         child: InkWell(
@@ -131,7 +131,7 @@ class EkkloSummaryCard extends StatelessWidget {
                       Text(
                         title,
                         style: FujinText.inter15Medium.copyWith(
-                          color: FujinColorRole.textPrimary,
+                          color: context.colors.textPrimary,
                         ),
                       ),
                       if (detail.isNotEmpty)
@@ -144,10 +144,10 @@ class EkkloSummaryCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.chevron_right,
                   size: FujinSize.rowChevron,
-                  color: FujinColorRole.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ],
             ),

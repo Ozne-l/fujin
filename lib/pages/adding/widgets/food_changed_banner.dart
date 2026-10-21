@@ -18,10 +18,10 @@ class FoodChangedBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InfoBanner(
-      icon: const Icon(
+      icon: Icon(
         Icons.refresh,
         size: FujinSize.searchIcon,
-        color: FujinColorRole.textOnDark,
+        color: context.colors.textOnDark,
       ),
       title: context.intl.addFoodChangedTitle,
       detail: context.intl.addFoodChangedDetail(before, after, serving),

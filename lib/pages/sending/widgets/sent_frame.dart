@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/sending/send_report.dart';
 import 'package:fujin/l10n/intl_context.dart';
@@ -21,31 +22,34 @@ class SentFrame extends StatelessWidget {
   final String note;
   final List<Widget> children;
 
-  static Widget card(List<Widget> rows, {double dividerIndent = 0}) =>
-      Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: FujinSpace.s4,
-          vertical: FujinSpace.s1,
-        ),
-        decoration: BoxDecoration(
-          color: FujinColorRole.backgroundCard,
-          borderRadius: BorderRadius.circular(FujinRadius.card),
-          border: Border.all(color: FujinColorRole.borderCard),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (final (index, row) in rows.indexed) ...[
-              if (index > 0)
-                Padding(
-                  padding: EdgeInsetsDirectional.only(start: dividerIndent),
-                  child: const Divider(),
-                ),
-              row,
-            ],
-          ],
-        ),
-      );
+  static Widget card(
+    FujinColors colors,
+    List<Widget> rows, {
+    double dividerIndent = 0,
+  }) => Container(
+    padding: const EdgeInsets.symmetric(
+      horizontal: FujinSpace.s4,
+      vertical: FujinSpace.s1,
+    ),
+    decoration: BoxDecoration(
+      color: colors.backgroundCard,
+      borderRadius: BorderRadius.circular(FujinRadius.card),
+      border: Border.all(color: colors.borderCard),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final (index, row) in rows.indexed) ...[
+          if (index > 0)
+            Padding(
+              padding: EdgeInsetsDirectional.only(start: dividerIndent),
+              child: const Divider(),
+            ),
+          row,
+        ],
+      ],
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +84,7 @@ class SentFrame extends StatelessWidget {
                     context.intl.sentTitle,
                     textAlign: TextAlign.center,
                     style: FujinText.hina44.copyWith(
-                      color: FujinColorRole.textLink,
+                      color: context.colors.textLink,
                     ),
                   ),
                   const SizedBox(height: FujinSpace.s5),
@@ -88,7 +92,7 @@ class SentFrame extends StatelessWidget {
                     context.intl.sentDetail(report.sent),
                     textAlign: TextAlign.center,
                     style: FujinText.inter15Medium.copyWith(
-                      color: FujinColorRole.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: FujinSpace.s1),
@@ -96,7 +100,7 @@ class SentFrame extends StatelessWidget {
                     note,
                     textAlign: TextAlign.center,
                     style: FujinText.inter13Regular.copyWith(
-                      color: FujinColorRole.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: FujinSpace.s5),
@@ -112,6 +116,7 @@ class SentFrame extends StatelessWidget {
             ),
             SendFooter(
               child: FilledButton(
+                style: FujinTheme.floatingButtonStyle(context.colors),
                 onPressed: context.pop,
                 child: Text(context.intl.backToJournal),
               ),

@@ -15,9 +15,9 @@ class LoadingSummaryCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
       padding: const EdgeInsets.all(FujinSpace.s5),
       decoration: BoxDecoration(
-        color: FujinColorRole.backgroundCard,
+        color: context.colors.backgroundCard,
         borderRadius: BorderRadius.circular(FujinRadius.card),
-        border: Border.all(color: FujinColorRole.borderCard),
+        border: Border.all(color: context.colors.borderCard),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -31,7 +31,7 @@ class LoadingSummaryCard extends StatelessWidget {
                 child: Text(
                   context.intl.journalLoading,
                   style: FujinText.inter15Medium.copyWith(
-                    color: FujinColorRole.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                 ),
               ),

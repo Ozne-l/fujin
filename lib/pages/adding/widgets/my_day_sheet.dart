@@ -60,7 +60,7 @@ class _MyDay extends StatelessWidget {
       context.intl.addDayNote,
     ];
     final secondary = FujinText.inter13Regular.copyWith(
-      color: FujinColorRole.textSecondary,
+      color: context.colors.textSecondary,
     );
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(
@@ -79,14 +79,15 @@ class _MyDay extends StatelessWidget {
             Table(
               columnWidths: const {0: FlexColumnWidth(_labelFlex)},
               defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              border: const TableBorder(
+              border: TableBorder(
                 horizontalInside: BorderSide(
-                  color: FujinColorRole.borderHairline,
+                  color: context.colors.borderHairline,
                 ),
-                bottom: BorderSide(color: FujinColorRole.borderHairline),
+                bottom: BorderSide(color: context.colors.borderHairline),
               ),
               children: [
                 _row(
+                  colors: context.colors,
                   label: '',
                   values: (
                     context.intl.addThisFood,
@@ -98,6 +99,7 @@ class _MyDay extends StatelessWidget {
                 ),
                 for (final nutrient in Nutrient.values)
                   _row(
+                    colors: context.colors,
                     label: JournalText.name(context.intl, nutrient),
                     values: (
                       context.intl.addPlus(
@@ -119,10 +121,10 @@ class _MyDay extends StatelessWidget {
                       },
                     ),
                     style: FujinText.inter15Regular.copyWith(
-                      color: FujinColorRole.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                     total: FujinText.inter15Semibold.copyWith(
-                      color: FujinColorRole.goalInProgress,
+                      color: context.colors.goalInProgress,
                     ),
                   ),
               ],
@@ -130,7 +132,7 @@ class _MyDay extends StatelessWidget {
             Text(
               notes.join(context.intl.summarySeparator),
               style: FujinText.inter12Regular.copyWith(
-                color: FujinColorRole.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
           ],
@@ -140,6 +142,7 @@ class _MyDay extends StatelessWidget {
   }
 
   static TableRow _row({
+    required FujinColors colors,
     required String label,
     required (String, String, String) values,
     required TextStyle style,
@@ -155,7 +158,7 @@ class _MyDay extends StatelessWidget {
         Text(label, style: style),
         cell(food, style),
         cell(after, total),
-        cell(goal, style.copyWith(color: FujinColorRole.textSecondary)),
+        cell(goal, style.copyWith(color: colors.textSecondary)),
       ],
     );
   }

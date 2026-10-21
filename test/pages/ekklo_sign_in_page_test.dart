@@ -3,6 +3,7 @@ import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
+import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:http/http.dart' as http;
 
 import '../support/fake_backends.dart';
@@ -86,12 +87,16 @@ void main() {
       check(await store.read()).isNull();
       check(
         _borders(tester),
-      ).every((it) => it.equals(FujinTheme.fieldErrorBorder));
+      ).every(
+        (it) => it.equals(FujinTheme.fieldErrorBorder(FujinColors.light)),
+      );
 
       await tester.enterText(find.byType(TextField).last, 'another-try');
       await tester.pump();
 
-      check(_borders(tester)).every((it) => it.equals(FujinTheme.fieldBorder));
+      check(
+        _borders(tester),
+      ).every((it) => it.equals(FujinTheme.fieldBorder(FujinColors.light)));
       check(
         find.text('Ekklo a refusé la connexion').evaluate(),
       ).length.equals(1);

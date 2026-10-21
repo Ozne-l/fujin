@@ -16,9 +16,14 @@ import '../support/fixtures.dart';
 import '../support/in_memory_preferences.dart';
 import '../support/pump_fujin.dart';
 
+const double _middle = 0.5;
+
 Future<void> _tap(WidgetTester tester, String text) async {
   final target = find.text(text);
-  await tester.ensureVisible(target);
+  await Scrollable.ensureVisible(
+    tester.element(target),
+    alignment: _middle,
+  );
   await tester.pumpAndSettle();
   await tester.tap(target);
   await tester.pumpAndSettle();

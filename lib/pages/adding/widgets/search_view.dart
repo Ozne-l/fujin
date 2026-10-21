@@ -27,9 +27,10 @@ import 'package:fujin/pages/adding/widgets/suggestion_row.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/flow_header.dart';
 import 'package:fujin/pages/common/glass_layer.dart';
+import 'package:fujin/pages/common/header_layout.dart';
 import 'package:fujin/pages/common/scan_button.dart';
 import 'package:fujin/pages/common/scan_icon.dart';
-import 'package:fujin/pages/common/scroll_edge_fade.dart';
+import 'package:fujin/pages/common/scroll_edge_blur.dart';
 import 'package:fujin/pages/common/title_text.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
@@ -123,7 +124,7 @@ class SearchView extends HookConsumerWidget {
     List<Widget> recentList(String trailing) => [
       _box(AddSectionLabel(label: context.intl.addRecents, trailing: trailing)),
       switch (recents) {
-        [] => _box(_note(context.intl.addRecentsEmpty)),
+        [] => _box(_note(context.colors, context.intl.addRecentsEmpty)),
         _ => FoodList(
           rows: [
             for (final recent in recents)
@@ -152,7 +153,7 @@ class SearchView extends HookConsumerWidget {
               '' => context.intl.addRememberedLinked,
               _ => context.intl.addRememberedFound(foods.length),
             },
-            dot: FujinColorRole.sourceEkklo,
+            dot: context.colors.sourceEkklo,
           ),
         ),
         FoodList(
@@ -167,7 +168,8 @@ class SearchView extends HookConsumerWidget {
               ),
           ],
         ),
-        if (search.query.isEmpty) _box(_note(context.intl.addRememberedNote)),
+        if (search.query.isEmpty)
+          _box(_note(context.colors, context.intl.addRememberedNote)),
       ],
     };
 
@@ -191,7 +193,8 @@ class SearchView extends HookConsumerWidget {
       ],
       AddSearchIdle(:final rememberedBesideRecents) => [
         ...recentList(context.intl.addRecentsAddedFromFujin),
-        if (recents.isNotEmpty) _box(_note(context.intl.addRecentsNote)),
+        if (recents.isNotEmpty)
+          _box(_note(context.colors, context.intl.addRecentsNote)),
         ...rememberedList(rememberedBesideRecents),
       ],
       AddSearchRunning(:final query, :final remembered) => [
@@ -200,12 +203,11 @@ class SearchView extends HookConsumerWidget {
           AddSectionLabel(
             label: context.intl.addMfpResults,
             trailing: context.intl.addSearching,
-            dot: FujinColorRole.sourceMfp,
+            dot: context.colors.sourceMfp,
           ),
         ),
       ],
-      AddSearchResults(foods: [], :final remembered) => [
-        ...rememberedList(remembered),
+      AddSearchResults(foods: [], remembered: []) => [
         _box(
           AddStatePanel(
             icon: Icons.search,
@@ -239,7 +241,7 @@ class SearchView extends HookConsumerWidget {
                     foodsBesideRemembered.length,
                   ),
                 },
-                dot: FujinColorRole.sourceMfp,
+                dot: context.colors.sourceMfp,
               ),
             ),
             FoodList(
@@ -326,7 +328,7 @@ class SearchView extends HookConsumerWidget {
       ],
     };
 
-    return Column(
+    final header = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         FlowHeader(
@@ -362,7 +364,7 @@ class SearchView extends HookConsumerWidget {
                   ScanIcon.asset,
                   width: FujinSize.searchIcon,
                   height: FujinSize.searchIcon,
-                  theme: const SvgTheme(currentColor: FujinColorRole.textLink),
+                  theme: SvgTheme(currentColor: context.colors.textLink),
                 ),
               ),
               null => AddChip(
@@ -379,46 +381,58 @@ class SearchView extends HookConsumerWidget {
             },
           ),
         ),
-        Expanded(
-          child: Stack(
-            children: [
-              ScrollEdgeFade(
-                child: CustomScrollView(
-                  slivers: [
-                    SliverPadding(
-                      padding: EdgeInsets.only(
-                        bottom:
-                            FujinSpace.s3 +
-                            FujinSize.tabBar +
-                            FujinSpace.s6 +
-                            MediaQuery.paddingOf(context).bottom,
-                      ),
-                      sliver: SliverMainAxisGroup(
-                        slivers: [
-                          for (final (index, child) in [
-                            if (scan case ScannerSearch(unresolved: true))
-                              _box(const ScannedBanner()),
-                            ...body,
-                          ].indexed) ...[
-                            if (index > 0) _gap,
-                            child,
-                          ],
-                        ],
-                      ),
-                    ),
-                  ],
+      ],
+    );
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        HeaderLayout(
+          header: HeaderLayout.shield(
+            Padding(
+              padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
+              child: header,
+            ),
+          ),
+          body: (context, extent) => ScrollEdgeBlur(
+            top: extent,
+            child: CustomScrollView(
+              slivers: [
+                SliverPadding(
+                  padding: EdgeInsets.only(
+                    top: extent,
+                    bottom:
+                        FujinSpace.s3 +
+                        FujinSize.tabBar +
+                        FujinSpace.s6 +
+                        MediaQuery.paddingOf(context).bottom,
+                  ),
+                  sliver: SliverMainAxisGroup(
+                    slivers: [
+                      for (final (index, child) in [
+                        if (scan case ScannerSearch(unresolved: true))
+                          _box(const ScannedBanner()),
+                        ...body,
+                      ].indexed) ...[
+                        if (index > 0) _gap,
+                        child,
+                      ],
+                    ],
+                  ),
                 ),
-              ),
-              PositionedDirectional(
-                end: FujinSpace.s5,
-                bottom: 0,
-                child: SafeArea(
-                  top: false,
-                  minimum: const EdgeInsets.only(bottom: FujinSpace.s6),
-                  child: GlassLayer(child: ScanButton(onTap: onScan)),
-                ),
-              ),
-            ],
+              ],
+            ),
+          ),
+        ),
+        PositionedDirectional(
+          end: FujinSpace.s5,
+          bottom: 0,
+          child: SafeArea(
+            top: false,
+            minimum: const EdgeInsets.only(bottom: FujinSpace.s6),
+            child: GlassLayer(
+              child: ScanButton(onTap: onScan),
+            ),
           ),
         ),
       ],
@@ -431,12 +445,12 @@ class SearchView extends HookConsumerWidget {
 
   static Widget _box(Widget child) => SliverToBoxAdapter(child: child);
 
-  static Widget _note(String text) => Padding(
+  static Widget _note(FujinColors colors, String text) => Padding(
     padding: const EdgeInsets.symmetric(horizontal: FujinSize.textInset),
     child: Text(
       text,
       style: FujinText.inter12Regular.copyWith(
-        color: FujinColorRole.textSecondary,
+        color: colors.textSecondary,
       ),
     ),
   );

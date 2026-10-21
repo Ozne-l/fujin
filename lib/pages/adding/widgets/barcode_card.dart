@@ -21,15 +21,15 @@ class BarcodeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(FujinRadius.card),
-      side: const BorderSide(
-        color: FujinColorRole.textLink,
+      side: BorderSide(
+        color: context.colors.textLink,
         width: FujinStroke.fieldFocus,
       ),
     );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
       child: Material(
-        color: FujinColorRole.backgroundCard,
+        color: context.colors.backgroundCard,
         shape: shape,
         child: InkWell(
           onTap: switch (running) {
@@ -44,13 +44,13 @@ class BarcodeCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: FujinSize.tile / 2,
-                  backgroundColor: FujinColorRole.backgroundSuccess,
+                  backgroundColor: context.colors.backgroundSuccess,
                   child: SvgPicture.asset(
                     ScanIcon.asset,
                     width: FujinSize.searchIcon,
                     height: FujinSize.searchIcon,
-                    theme: const SvgTheme(
-                      currentColor: FujinColorRole.textLink,
+                    theme: SvgTheme(
+                      currentColor: context.colors.textLink,
                     ),
                   ),
                 ),
@@ -62,13 +62,13 @@ class BarcodeCard extends StatelessWidget {
                       Text(
                         context.intl.addSearchBarcode,
                         style: FujinText.inter15Medium.copyWith(
-                          color: FujinColorRole.textPrimary,
+                          color: context.colors.textPrimary,
                         ),
                       ),
                       Text(
                         context.intl.addBarcodeValid(format),
                         style: FujinText.inter12Regular.copyWith(
-                          color: FujinColorRole.textLink,
+                          color: context.colors.textLink,
                         ),
                       ),
                     ],
@@ -76,10 +76,10 @@ class BarcodeCard extends StatelessWidget {
                 ),
                 switch (running) {
                   true => const FujinSpinner.card(),
-                  false => const Icon(
+                  false => Icon(
                     Icons.chevron_right,
                     size: FujinSize.rowChevron,
-                    color: FujinColorRole.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 },
               ],

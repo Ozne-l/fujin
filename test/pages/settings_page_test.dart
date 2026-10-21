@@ -1,20 +1,30 @@
 import 'dart:convert';
+import 'dart:ui' show Tristate;
 
 import 'package:checks/checks.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/backup/backup.dart';
 import 'package:fujin/data/backup/backup_codec.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/preferences/fujin_preferences.dart';
+import 'package:fujin/pages/common/fujin_switch.dart';
+import 'package:fujin/pages/common/switch_lens.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fake_backup_files.dart';
 import '../support/fixtures.dart';
+import '../support/gestures.dart';
+import '../support/phone_brightness.dart';
 import '../support/pump_fujin.dart';
 
 const _space = '\u202f';
+const _scrolledPast = 120.0;
+const _width = 800.0;
+const _shortHeight = 900.0;
 
 Future<void> _tap(WidgetTester tester, String text) async {
   final target = find.text(text).last;
@@ -25,6 +35,9 @@ Future<void> _tap(WidgetTester tester, String text) async {
 }
 
 int _count(String text) => find.text(text).evaluate().length;
+
+bool _switchedOn(WidgetTester tester) =>
+    tester.widget<FujinSwitch>(find.byType(FujinSwitch)).value;
 
 Future<void> _fill(WidgetTester tester, List<String> values) async {
   for (final (index, value) in values.indexed) {
@@ -50,7 +63,7 @@ void main() {
         TestWidgetsFlutterBinding.instance.platformDispatcher.views.first;
     addTearDown(view.reset);
     view
-      ..physicalSize = const Size(800, 1800)
+      ..physicalSize = const Size(_width, 1800)
       ..devicePixelRatio = 1;
   });
 
@@ -68,15 +81,13 @@ void main() {
   testWidgets('keeps the automatic mode, off at first, across launches', (
     tester,
   ) async {
-    bool switchedOn() =>
-        tester.widget<CupertinoSwitch>(find.byType(CupertinoSwitch)).value;
-
     await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
     await _tap(tester, 'Réglages');
-    check(switchedOn()).isFalse();
+    check(_switchedOn(tester)).isFalse();
 
-    await _tap(tester, 'Mode automatique');
-    check(switchedOn()).isTrue();
+    await tester.tap(find.byType(FujinSwitch));
+    await tester.pumpAndSettle();
+    check(_switchedOn(tester)).isTrue();
 
     await tester.pumpWidget(const SizedBox());
     await pumpFujin(
@@ -85,7 +96,169 @@ void main() {
       preferences: await FujinPreferences.open(),
     );
     await _tap(tester, 'Réglages');
-    check(switchedOn()).isTrue();
+    check(_switchedOn(tester)).isTrue();
+  });
+
+  testWidgets('leaves the automatic mode off when its title or its note is '
+      'tapped', (tester) async {
+    await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+    await _tap(tester, 'Réglages');
+
+    await _tap(tester, 'Mode automatique');
+    check(_switchedOn(tester)).isFalse();
+
+    await tester.tap(find.textContaining('Ne me demande rien'));
+    await tester.pumpAndSettle();
+    check(_switchedOn(tester)).isFalse();
+  });
+
+  testWidgets('turns the automatic mode on when its thumb is slid across', (
+    tester,
+  ) async {
+    await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+    await _tap(tester, 'Réglages');
+    final thumb = find.byType(FujinSwitch);
+    await tester.ensureVisible(thumb);
+    await tester.pumpAndSettle();
+
+    await tester.drag(thumb, const Offset(FujinSize.switchWidth, 0));
+    await tester.pumpAndSettle();
+
+    check(_switchedOn(tester)).isTrue();
+  });
+
+  testWidgets('turns the thumb of a held switch into a glass lens and back '
+      'on release', (tester) async {
+    int lenses() => find
+        .descendant(
+          of: find.byType(FujinSwitch),
+          matching: find.byType(SwitchLens),
+        )
+        .evaluate()
+        .length;
+
+    await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+    await _tap(tester, 'Réglages');
+    final thumb = find.byType(FujinSwitch);
+    await tester.ensureVisible(thumb);
+    await tester.pumpAndSettle();
+    check(lenses()).equals(0);
+
+    final finger = await tester.startGesture(tester.getCenter(thumb));
+    await tester.pumpAndSettle();
+    check(lenses()).equals(1);
+
+    await finger.up();
+    await tester.pumpAndSettle();
+    check(lenses()).equals(0);
+  });
+
+  testWidgets('swells no glass lens over a held switch or segmented control '
+      'when the phone reduces transparency', (tester) async {
+    await pumpFujin(
+      tester,
+      FakeBackends(mealNames: [breakfast]),
+      reduceTransparency: true,
+    );
+    await _tap(tester, 'Réglages');
+
+    for (final held in [find.text('Sombre'), find.byType(FujinSwitch)]) {
+      await tester.ensureVisible(held);
+      await tester.pumpAndSettle();
+      final finger = await tester.startGesture(tester.getCenter(held));
+      await tester.pumpAndSettle();
+
+      check(find.byType(LiquidGlass).evaluate()).isEmpty();
+      check(find.byType(SwitchLens).evaluate()).isEmpty();
+      await finger.cancel();
+      await tester.pumpAndSettle();
+    }
+  });
+
+  group('the APPARENCE card', () {
+    const label = 'APPARENCE';
+
+    FujinColors colors(WidgetTester tester) =>
+        colorsAt(tester, find.text(label));
+
+    Brightness? statusIcons(WidgetTester tester) => tester
+        .widget<AnnotatedRegion<SystemUiOverlayStyle>>(
+          find
+              .ancestor(
+                of: find.text(label),
+                matching: find.byType(AnnotatedRegion<SystemUiOverlayStyle>),
+              )
+              .first,
+        )
+        .value
+        .statusBarIconBrightness;
+
+    testWidgets('switches the app to dark with "Sombre" on a light phone, '
+        'light status icons included, and keeps it across launches', (
+      tester,
+    ) async {
+      phoneBrightness(tester, Brightness.light);
+      await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+      await _tap(tester, 'Réglages');
+      check(colors(tester)).identicalTo(FujinColors.light);
+      check(statusIcons(tester)).equals(Brightness.dark);
+
+      await _tap(tester, 'Sombre');
+      check(colors(tester)).identicalTo(FujinColors.dark);
+      check(statusIcons(tester)).equals(Brightness.light);
+
+      await tester.pumpWidget(const SizedBox());
+      await pumpFujin(
+        tester,
+        FakeBackends(mealNames: [breakfast]),
+        preferences: await FujinPreferences.open(),
+      );
+      await _tap(tester, 'Réglages');
+      check(colors(tester)).identicalTo(FujinColors.dark);
+    });
+
+    testWidgets('switches to dark when the finger slides from "Système" to '
+        '"Sombre" and lifts there', (tester) async {
+      phoneBrightness(tester, Brightness.light);
+      await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+      await _tap(tester, 'Réglages');
+      final from = tester.getCenter(find.text('Système'));
+      final to = tester.getCenter(find.text('Sombre'));
+
+      await slide(tester, from, to);
+      await tester.pumpAndSettle();
+
+      check(colors(tester)).identicalTo(FujinColors.dark);
+    });
+
+    testWidgets('follows the phone with "Système"', (tester) async {
+      phoneBrightness(tester, Brightness.light);
+      await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+      await _tap(tester, 'Réglages');
+      await _tap(tester, 'Sombre');
+      await _tap(tester, 'Système');
+      check(colors(tester)).identicalTo(FujinColors.light);
+
+      phoneBrightness(tester, Brightness.dark);
+      await tester.pumpAndSettle();
+      check(colors(tester)).identicalTo(FujinColors.dark);
+      check(statusIcons(tester)).equals(Brightness.light);
+    });
+  });
+
+  testWidgets('pins a small Réglages title in the bar once the large title '
+      'has scrolled past, and shows none at rest', (tester) async {
+    tester.view.physicalSize = const Size(_width, _shortHeight);
+    await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+    await _tap(tester, 'Réglages');
+    int titles() =>
+        find.text('Réglages', skipOffstage: false).evaluate().length;
+    final atRest = titles();
+
+    await tester.drag(find.byType(ListView), const Offset(0, -_scrolledPast));
+    await tester.pumpAndSettle();
+
+    check(titles()).equals(atRest + 1);
   });
 
   testWidgets('saves the goals and sums them up in the OBJECTIFS card', (
@@ -228,5 +401,28 @@ void main() {
     check(_count("Fichier illisible, rien n'a changé")).equals(1);
     check(_count('Importer cette sauvegarde ?')).equals(0);
     check(_count('2 aliments et 2 repas')).equals(1);
+  });
+
+  testWidgets('shows Réglages and the chosen Apparence at once when the phone '
+      'asks for less motion', (tester) async {
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    final semantics = tester.ensureSemantics();
+    await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+
+    await _tap(tester, 'Réglages');
+
+    check(_count('REPAS DU JOUR')).equals(0);
+
+    await _tap(tester, 'Sombre');
+
+    check(
+      tester
+          .getSemantics(find.bySemanticsLabel('Sombre'))
+          .flagsCollection
+          .isSelected,
+    ).equals(Tristate.isTrue);
+    semantics.dispose();
   });
 }

@@ -10,7 +10,7 @@ class GoldVolute extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SvgPicture.asset(
     _asset,
-    theme: const SvgTheme(currentColor: FujinColor.kin),
+    theme: SvgTheme(currentColor: context.colors.borderDivider),
     excludeFromSemantics: true,
   );
 }

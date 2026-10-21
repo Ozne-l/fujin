@@ -14,7 +14,7 @@ class ScannedBanner extends StatelessWidget {
       ScanIcon.asset,
       width: FujinSize.tileIcon,
       height: FujinSize.tileIcon,
-      theme: const SvgTheme(currentColor: FujinColorRole.textOnDark),
+      theme: SvgTheme(currentColor: context.colors.textOnDark),
       excludeFromSemantics: true,
     ),
     detail: context.intl.addScannedUnresolved,

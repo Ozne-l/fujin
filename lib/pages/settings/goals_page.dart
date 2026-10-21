@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/goals/goal_amounts.dart';
 import 'package:fujin/domain/goals/macro_energy.dart';
@@ -19,6 +20,7 @@ class GoalsPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
     final stored = ref.watch(goalsProvider);
     final fields = {
       for (final nutrient in Nutrient.values)
@@ -69,7 +71,7 @@ class GoalsPage extends HookConsumerWidget {
                     child: Text(
                       context.intl.goalsHeading,
                       style: FujinText.hina30.copyWith(
-                        color: FujinColorRole.textPrimary,
+                        color: colors.textPrimary,
                       ),
                     ),
                   ),
@@ -77,7 +79,7 @@ class GoalsPage extends HookConsumerWidget {
                     child: Text(
                       context.intl.goalsSubtitle,
                       style: FujinText.inter15Regular.copyWith(
-                        color: FujinColorRole.textSecondary,
+                        color: colors.textSecondary,
                       ),
                     ),
                   ),
@@ -87,7 +89,7 @@ class GoalsPage extends HookConsumerWidget {
                     child: Text(
                       context.intl.goalsSection,
                       style: FujinText.inter12Medium.copyWith(
-                        color: FujinColorRole.textSecondary,
+                        color: colors.textSecondary,
                       ),
                     ),
                   ),
@@ -117,9 +119,9 @@ class GoalsPage extends HookConsumerWidget {
                         (final title, final detail) => NoteCard(
                           title: title,
                           detail: detail,
-                          background: FujinColorRole.backgroundInfo,
-                          titleColor: FujinColorRole.textPrimary,
-                          detailColor: FujinColorRole.textInfo,
+                          background: colors.backgroundInfo,
+                          titleColor: colors.textPrimary,
+                          detailColor: colors.textInfo,
                         ),
                       },
                     ),
@@ -141,11 +143,12 @@ class GoalsPage extends HookConsumerWidget {
                     NoteCard(
                       title: context.intl.goalsSavedTitle,
                       detail: context.intl.goalsSavedDetail,
-                      background: FujinColorRole.backgroundSuccess,
-                      titleColor: FujinColorRole.textLink,
-                      detailColor: FujinColorRole.textLink,
+                      background: colors.backgroundSuccess,
+                      titleColor: colors.textLink,
+                      detailColor: colors.textLink,
                     ),
                   FilledButton(
+                    style: FujinTheme.floatingButtonStyle(colors),
                     onPressed: save,
                     child: Text(switch (saved.value) {
                       true => context.intl.saved,

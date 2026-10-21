@@ -56,8 +56,8 @@ class MealDateRow extends StatelessWidget {
                   _bookIcon,
                   width: FujinSize.mealArrow,
                   height: FujinSize.mealArrow,
-                  theme: const SvgTheme(
-                    currentColor: FujinColorRole.textPrimary,
+                  theme: SvgTheme(
+                    currentColor: context.colors.textPrimary,
                   ),
                   excludeFromSemantics: true,
                 ),
@@ -79,10 +79,10 @@ class MealDateRow extends StatelessWidget {
                   ),
                 ),
               ),
-              leading: const Icon(
+              leading: Icon(
                 Icons.calendar_today_outlined,
                 size: FujinSize.mealArrow,
-                color: FujinColorRole.textPrimary,
+                color: context.colors.textPrimary,
               ),
             ),
           ),

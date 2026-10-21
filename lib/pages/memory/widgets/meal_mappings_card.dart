@@ -24,19 +24,19 @@ class MealMappingsCard extends StatelessWidget {
       vertical: FujinSpace.s5,
     ),
     decoration: BoxDecoration(
-      color: FujinColorRole.backgroundCard,
+      color: context.colors.backgroundCard,
       borderRadius: BorderRadius.circular(FujinRadius.card),
-      border: Border.all(color: FujinColorRole.borderCard),
+      border: Border.all(color: context.colors.borderCard),
     ),
     child: Column(
       spacing: FujinSpace.s4,
       children: [
         for (final (index, meal) in meals.indexed) ...[
           if (index > 0)
-            const Divider(
+            Divider(
               height: FujinStroke.card,
               thickness: FujinStroke.card,
-              color: FujinColorRole.borderHairline,
+              color: context.colors.borderHairline,
             ),
           _MealRow(
             meal: meal,
@@ -75,22 +75,22 @@ class _MealRow extends StatelessWidget {
               Text(
                 context.intl.sourceMyFitnessPal,
                 style: FujinText.inter11Medium.copyWith(
-                  color: FujinColorRole.textTertiary,
+                  color: context.colors.textTertiary,
                 ),
               ),
               Text(
                 meal.mfpMealName,
                 style: FujinText.inter15Medium.copyWith(
-                  color: FujinColorRole.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
             ],
           ),
         ),
-        const Icon(
+        Icon(
           Icons.arrow_forward,
           size: FujinSize.mealArrow,
-          color: FujinColorRole.textGold,
+          color: context.colors.textGold,
         ),
         Padding(
           padding: const EdgeInsets.symmetric(

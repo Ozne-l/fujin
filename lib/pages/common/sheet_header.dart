@@ -27,13 +27,13 @@ class SheetHeader extends StatelessWidget {
           children: [
             Text(
               title,
-              style: titleStyle.copyWith(color: FujinColorRole.textPrimary),
+              style: titleStyle.copyWith(color: context.colors.textPrimary),
             ),
             if (subtitle case final subtitle?)
               Text(
                 subtitle,
                 style: FujinText.inter13Regular.copyWith(
-                  color: FujinColorRole.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
           ],

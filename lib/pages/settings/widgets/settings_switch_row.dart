@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/pages/common/fujin_switch.dart';
 
 class SettingsSwitchRow extends StatelessWidget {
   const SettingsSwitchRow({
@@ -17,9 +17,9 @@ class SettingsSwitchRow extends StatelessWidget {
   final ValueChanged<bool> onChanged;
 
   @override
-  Widget build(BuildContext context) => MergeSemantics(
-    child: InkWell(
-      onTap: () => onChanged(!value),
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return MergeSemantics(
       child: Padding(
         padding: const EdgeInsetsDirectional.symmetric(
           horizontal: FujinSpace.s5,
@@ -36,28 +36,22 @@ class SettingsSwitchRow extends StatelessWidget {
                   child: Text(
                     title,
                     style: FujinText.inter15Medium.copyWith(
-                      color: FujinColorRole.textPrimary,
+                      color: colors.textPrimary,
                     ),
                   ),
                 ),
-                CupertinoSwitch(
-                  value: value,
-                  onChanged: onChanged,
-                  activeTrackColor: FujinColor.fujin,
-                  inactiveTrackColor: FujinColor.kinari,
-                  thumbColor: FujinColorRole.backgroundCard,
-                ),
+                FujinSwitch(value: value, onChanged: onChanged),
               ],
             ),
             Text(
               detail,
               style: FujinText.inter13Regular.copyWith(
-                color: FujinColorRole.textSecondary,
+                color: colors.textSecondary,
               ),
             ),
           ],
         ),
       ),
-    ),
-  );
+    );
+  }
 }

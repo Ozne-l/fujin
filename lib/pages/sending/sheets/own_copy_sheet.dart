@@ -66,13 +66,13 @@ class _OwnCopySheet extends StatelessWidget {
               Text(
                 context.intl.ownCopyLabel,
                 style: FujinText.inter12Medium.copyWith(
-                  color: FujinColorRole.textLink,
+                  color: context.colors.textLink,
                 ),
               ),
               Text(
                 productName(entry.food),
                 style: FujinText.inter15Medium.copyWith(
-                  color: FujinColorRole.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
               Text(
@@ -81,13 +81,13 @@ class _OwnCopySheet extends StatelessWidget {
                   energy,
                 ),
                 style: FujinText.inter12Regular.copyWith(
-                  color: FujinColorRole.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               Text(
                 EntryText.macros(context.intl, entry.nutrients),
                 style: FujinText.inter12Medium.copyWith(
-                  color: FujinColorRole.textTertiary,
+                  color: context.colors.textTertiary,
                 ),
               ),
             ],
@@ -136,17 +136,17 @@ class _NoCloseFood extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(FujinSpace.s3),
       decoration: BoxDecoration(
-        color: FujinColorRole.backgroundInfo,
+        color: context.colors.backgroundInfo,
         borderRadius: BorderRadius.circular(FujinRadius.field),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: FujinSpace.s3,
         children: [
-          const Icon(
+          Icon(
             Icons.info_outline,
             size: FujinSize.icon,
-            color: FujinColor.sora,
+            color: context.colors.textInfo,
           ),
           Expanded(
             child: Column(
@@ -156,13 +156,13 @@ class _NoCloseFood extends StatelessWidget {
                 Text(
                   context.intl.noCloseFoodTitle,
                   style: FujinText.inter14Medium.copyWith(
-                    color: FujinColorRole.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                 ),
                 Text(
                   context.intl.noCloseFoodDetail,
                   style: FujinText.inter12Regular.copyWith(
-                    color: FujinColorRole.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],
@@ -182,11 +182,11 @@ class _Rejected extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: FujinColorRole.backgroundCard,
+    color: context.colors.backgroundCard,
     clipBehavior: Clip.antiAlias,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(FujinRadius.card),
-      side: const BorderSide(color: FujinColorRole.borderCard),
+      side: BorderSide(color: context.colors.borderCard),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -231,13 +231,13 @@ class _RejectedRow extends StatelessWidget {
                   Text(
                     candidate.food.name,
                     style: FujinText.inter15Medium.copyWith(
-                      color: FujinColorRole.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                   Text(
                     CandidateCard.origin(context.intl, candidate),
                     style: FujinText.inter12Regular.copyWith(
-                      color: FujinColorRole.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],

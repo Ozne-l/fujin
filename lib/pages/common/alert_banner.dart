@@ -13,7 +13,7 @@ class AlertBanner extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(FujinSpace.s4),
     decoration: BoxDecoration(
-      color: FujinColorRole.backgroundAlert,
+      color: context.colors.backgroundAlert,
       borderRadius: BorderRadius.circular(FujinRadius.card),
     ),
     child: Row(
@@ -28,14 +28,14 @@ class AlertBanner extends StatelessWidget {
               Text(
                 title,
                 style: FujinText.inter15Medium.copyWith(
-                  color: FujinColorRole.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
               if (detail case final detail?)
                 Text(
                   detail,
                   style: FujinText.inter13Regular.copyWith(
-                    color: FujinColorRole.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
             ],

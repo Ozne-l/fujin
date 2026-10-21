@@ -17,9 +17,9 @@ class SuggestionRow extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
     child: Material(
-      color: FujinColorRole.backgroundCard,
-      shape: const StadiumBorder(
-        side: BorderSide(color: FujinColorRole.borderCard),
+      color: context.colors.backgroundCard,
+      shape: StadiumBorder(
+        side: BorderSide(color: context.colors.borderCard),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -35,7 +35,7 @@ class SuggestionRow extends StatelessWidget {
                 Icon(
                   icon,
                   size: FujinSize.searchIcon,
-                  color: FujinColorRole.textLink,
+                  color: context.colors.textLink,
                 ),
                 Expanded(
                   child: Text(
@@ -43,14 +43,14 @@ class SuggestionRow extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: FujinText.inter15Medium.copyWith(
-                      color: FujinColorRole.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.chevron_right,
                   size: FujinSize.mealArrow,
-                  color: FujinColorRole.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ],
             ),

@@ -19,9 +19,9 @@ class DayPill extends StatelessWidget {
     height: FujinSize.dayPill,
     alignment: Alignment.center,
     decoration: switch (selected) {
-      true => const BoxDecoration(
+      true => BoxDecoration(
         shape: BoxShape.circle,
-        color: FujinColorRole.goalSelectedDay,
+        color: context.colors.goalSelectedDay,
       ),
       false => null,
     },
@@ -29,7 +29,7 @@ class DayPill extends StatelessWidget {
       date,
       style: FujinText.inter13Medium.copyWith(
         color: switch (selected) {
-          true => FujinColorRole.textOnDark,
+          true => context.colors.textOnDark,
           false => idleColor,
         },
       ),

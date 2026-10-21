@@ -17,7 +17,7 @@ class TransitCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final labelStyle = FujinText.inter12Medium.copyWith(
-      color: FujinColorRole.textSecondary,
+      color: context.colors.textSecondary,
     );
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
@@ -28,9 +28,9 @@ class TransitCard extends StatelessWidget {
         FujinSpace.s3,
       ),
       decoration: BoxDecoration(
-        color: FujinColorRole.backgroundCard,
+        color: context.colors.backgroundCard,
         borderRadius: BorderRadius.circular(FujinRadius.card),
-        border: Border.all(color: FujinColorRole.borderCard),
+        border: Border.all(color: context.colors.borderCard),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -42,7 +42,7 @@ class TransitCard extends StatelessWidget {
               Row(
                 spacing: FujinSpace.s2,
                 children: [
-                  const SourceDot(color: FujinColorRole.sourceMfp),
+                  SourceDot(color: context.colors.sourceMfp),
                   Text(context.intl.sourceMyFitnessPal, style: labelStyle),
                 ],
               ),
@@ -50,7 +50,7 @@ class TransitCard extends StatelessWidget {
                 spacing: FujinSpace.s2,
                 children: [
                   Text(context.intl.sourceEkklo, style: labelStyle),
-                  const SourceDot(color: FujinColorRole.sourceEkklo),
+                  SourceDot(color: context.colors.sourceEkklo),
                 ],
               ),
             ],

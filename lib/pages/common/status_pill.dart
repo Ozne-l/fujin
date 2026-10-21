@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/pages/common/glass_fill.dart';
 import 'package:fujin/pages/common/pill_size.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:motor/motor.dart';
@@ -16,6 +17,7 @@ class StatusPill extends HookWidget {
     required this.tone,
     this.icon,
     this.size = PillSize.regular,
+    this.glass = false,
     super.key,
   });
 
@@ -23,6 +25,7 @@ class StatusPill extends HookWidget {
   final PillTone tone;
   final IconData? icon;
   final PillSize size;
+  final bool glass;
 
   static const double _arrivingScale = 0.9;
 
@@ -69,7 +72,7 @@ class StatusPill extends HookWidget {
 
     Widget pill(Color background, Color foreground) {
       final style = size.style.copyWith(color: foreground);
-      return Container(
+      final body = Container(
         height: size.height,
         padding: EdgeInsets.symmetric(horizontal: size.inset),
         clipBehavior: switch (leaving) {
@@ -77,7 +80,10 @@ class StatusPill extends HookWidget {
           _ => Clip.antiAlias,
         },
         decoration: BoxDecoration(
-          color: background,
+          color: switch (glass) {
+            true => null,
+            false => background,
+          },
           borderRadius: BorderRadius.circular(FujinRadius.pill),
         ),
         child: switch (change) {
@@ -118,20 +124,25 @@ class StatusPill extends HookWidget {
           ),
         },
       );
+      return switch (glass) {
+        false => body,
+        true => GlassFill(finish: tone.glass, pressable: true, child: body),
+      };
     }
 
+    final colors = context.colors;
     return switch (firstTone) {
-      null => pill(tone.background, tone.foreground),
+      null => pill(tone.background(colors), tone.foreground(colors)),
       final first => MotionBuilder<Color>(
         motion: FujinMotion.of(context, FujinMotion.pill),
         converter: MotionConverter.colorRgb,
-        from: first.background,
-        value: tone.background,
+        from: first.background(colors),
+        value: tone.background(colors),
         builder: (context, background, _) => MotionBuilder<Color>(
           motion: FujinMotion.of(context, FujinMotion.pill),
           converter: MotionConverter.colorRgb,
-          from: first.foreground,
-          value: tone.foreground,
+          from: first.foreground(colors),
+          value: tone.foreground(colors),
           builder: (context, foreground, _) => pill(background, foreground),
         ),
       ),

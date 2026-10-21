@@ -41,6 +41,7 @@ Future<void> pumpFujin(
   SharedPreferencesWithCache? preferences,
   FakeScanCamera? camera,
   List<BarcodeLink> barcodeLinks = const [],
+  bool reduceTransparency = false,
 }) async {
   tester.platformDispatcher.localesTestValue = const [Locale('fr')];
   addTearDown(tester.platformDispatcher.clearLocalesTestValue);
@@ -75,6 +76,9 @@ Future<void> pumpFujin(
         preferencesProvider.overrideWithValue(storedPreferences),
         scanCameraProvider.overrideWithValue(
           (camera ?? FakeScanCamera()).build,
+        ),
+        reduceTransparencyProvider.overrideWith(
+          (ref) => Stream.value(reduceTransparency),
         ),
       ],
       child: const FujinApp(),

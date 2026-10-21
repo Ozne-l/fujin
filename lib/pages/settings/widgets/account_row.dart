@@ -18,6 +18,7 @@ class AccountRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Padding(
       padding: const EdgeInsetsDirectional.fromSTEB(
         FujinSpace.s5,
@@ -45,13 +46,13 @@ class AccountRow extends StatelessWidget {
                       Text(
                         name,
                         style: FujinText.inter15Medium.copyWith(
-                          color: FujinColorRole.textPrimary,
+                          color: colors.textPrimary,
                         ),
                       ),
                       Text(
                         context.intl.settingsAccountActive,
                         style: FujinText.inter13Regular.copyWith(
-                          color: FujinColorRole.textSecondary,
+                          color: colors.textSecondary,
                         ),
                       ),
                     ],
@@ -63,11 +64,11 @@ class AccountRow extends StatelessWidget {
           TextButton(
             onPressed: onSignOut,
             style: TextButton.styleFrom(
-              foregroundColor: FujinColorRole.textAlert,
+              foregroundColor: colors.textAlert,
               textStyle: FujinText.inter14Medium,
               padding: const EdgeInsets.symmetric(horizontal: FujinSpace.s3),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ).copyWith(overlayColor: FujinTheme.pressedOverlay),
+            ).copyWith(overlayColor: FujinTheme.pressedOverlay(colors)),
             child: Text(context.intl.signOut),
           ),
         ],

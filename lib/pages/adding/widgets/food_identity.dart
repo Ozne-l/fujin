@@ -16,7 +16,7 @@ class FoodIdentity extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final secondary = FujinText.inter13Regular.copyWith(
-      color: FujinColorRole.textSecondary,
+      color: context.colors.textSecondary,
     );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: FujinSize.textInset),
@@ -27,18 +27,18 @@ class FoodIdentity extends StatelessWidget {
           Row(
             spacing: FujinSpace.s2,
             children: [
-              const SourceDot(color: FujinColorRole.sourceMfp),
+              SourceDot(color: context.colors.sourceMfp),
               Text(
                 context.intl.sourceMyFitnessPal,
                 style: FujinText.inter12Medium.copyWith(
-                  color: FujinColorRole.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
             ],
           ),
           Text(
             food.description,
-            style: FujinText.hina28.copyWith(color: FujinColorRole.textPrimary),
+            style: FujinText.hina28.copyWith(color: context.colors.textPrimary),
           ),
           Wrap(
             spacing: FujinSpace.s2,

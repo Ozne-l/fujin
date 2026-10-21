@@ -26,8 +26,8 @@ class EkkloSignInPage extends HookConsumerWidget {
     final password = useTextEditingController();
     final refused = useState(false);
     final fieldBorder = switch (refused.value) {
-      true => FujinTheme.fieldErrorBorder,
-      false => FujinTheme.fieldBorder,
+      true => FujinTheme.fieldErrorBorder(context.colors),
+      false => FujinTheme.fieldBorder(context.colors),
     };
     useListenable(Listenable.merge([email, password]));
 
@@ -73,7 +73,7 @@ class EkkloSignInPage extends HookConsumerWidget {
                       child: Text(
                         context.intl.ekkloSignInHeading,
                         style: FujinText.hina30.copyWith(
-                          color: FujinColorRole.textPrimary,
+                          color: context.colors.textPrimary,
                         ),
                       ),
                     ),
@@ -82,7 +82,7 @@ class EkkloSignInPage extends HookConsumerWidget {
                       child: Text(
                         context.intl.ekkloSignInSubtitle,
                         style: FujinText.inter15Regular.copyWith(
-                          color: FujinColorRole.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
                     ),
@@ -100,7 +100,7 @@ class EkkloSignInPage extends HookConsumerWidget {
                       autocorrect: false,
                       autofillHints: const [AutofillHints.email],
                       cursorWidth: FujinTheme.cursorWidth,
-                      style: _fieldStyle,
+                      style: _fieldStyle(context.colors),
                       onChanged: (_) => refused.value = false,
                       decoration: InputDecoration(
                         enabledBorder: fieldBorder,
@@ -128,6 +128,7 @@ class EkkloSignInPage extends HookConsumerWidget {
                 FujinSpace.s4,
               ),
               child: FilledButton(
+                style: FujinTheme.floatingButtonStyle(context.colors),
                 onPressed: submit,
                 child: switch (running) {
                   true => const FujinSpinner.button(),
@@ -141,9 +142,10 @@ class EkkloSignInPage extends HookConsumerWidget {
     );
   }
 
-  static final TextStyle _fieldStyle = FujinText.inter16Regular.copyWith(
-    color: FujinColorRole.textPrimary,
-  );
+  static TextStyle _fieldStyle(FujinColors colors) =>
+      FujinText.inter16Regular.copyWith(
+        color: colors.textPrimary,
+      );
 
   static AlertBanner? _banner(
     AppLocalizations intl,
@@ -191,7 +193,7 @@ class _Label extends StatelessWidget {
       child: Text(
         text,
         style: FujinText.inter13Medium.copyWith(
-          color: FujinColorRole.textPrimary,
+          color: context.colors.textPrimary,
         ),
       ),
     ),
@@ -226,7 +228,7 @@ class _PasswordField extends HookWidget {
       enableSuggestions: false,
       autofillHints: const [AutofillHints.password],
       cursorWidth: FujinTheme.cursorWidth,
-      style: EkkloSignInPage._fieldStyle,
+      style: EkkloSignInPage._fieldStyle(context.colors),
       onChanged: onChanged,
       onSubmitted: (_) => onSubmitted?.call(),
       decoration: InputDecoration(

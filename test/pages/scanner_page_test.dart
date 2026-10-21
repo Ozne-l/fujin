@@ -10,6 +10,7 @@ import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/router.dart';
 import 'package:fujin/app/theme/fujin_system_bars.dart';
+import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/pages/adding/add_search_notifier.dart';
 import 'package:fujin/pages/common/scan_button.dart';
@@ -33,6 +34,10 @@ const _query = '$_oatsName $_brand';
 const _addToBoth = 'Ajouter à MFP et Ekklo';
 const _scannerTitle = 'Scanner un code-barres';
 const _journal = 'Journal';
+final SystemUiOverlayStyle _lightBars = FujinSystemBars.of(
+  FujinColors.light,
+  Brightness.light,
+);
 const _memory = 'Mémoire';
 const _settings = 'Réglages';
 const _aim = 'Place le code-barres dans le cadre';
@@ -132,6 +137,9 @@ Finder _tab(String label) => find.descendant(
   of: find.byType(FloatingTabBar),
   matching: find.text(label),
 );
+
+Color? _tabColor(WidgetTester tester, String label) =>
+    tester.widget<Text>(_tab(label)).style?.color;
 
 Future<void> _pullToRefresh(WidgetTester tester) async {
   await tester.fling(
@@ -254,16 +262,18 @@ void main() {
         );
 
         await _openScanner(tester);
-        check(SystemChrome.latestStyle).equals(FujinSystemBars.onDark);
+        check(
+          SystemChrome.latestStyle,
+        ).equals(FujinSystemBars.camera(FujinColors.light));
         await _tap(tester, find.byTooltip('Fermer'));
         _seesNo(_scannerTitle);
-        check(SystemChrome.latestStyle).equals(FujinSystemBars.onLight);
+        check(SystemChrome.latestStyle).equals(_lightBars);
 
         await _openScanner(tester);
         await _read(tester, camera, _code);
         await _tapText(tester, "C'est bien ce produit");
         _sees('Ajouter à $_dinner');
-        check(SystemChrome.latestStyle).equals(FujinSystemBars.onLight);
+        check(SystemChrome.latestStyle).equals(_lightBars);
       },
     );
 
@@ -639,6 +649,25 @@ void main() {
       check(_scanEnabled(tester)).isTrue();
       await _openScanner(tester);
       _sees(_scannerTitle);
+    });
+
+    testWidgets('marks the Journal tab once a food scanned from Mémoire is '
+        'added', (tester) async {
+      final camera = FakeScanCamera();
+      await pumpFujin(
+        tester,
+        _backends(barcodes: {_code: _oats}),
+        camera: camera,
+      );
+      await _tap(tester, _tab(_memory));
+
+      await _openScanner(tester);
+      await _read(tester, camera, _code);
+      await _tapText(tester, "C'est bien ce produit");
+      await _tapText(tester, _addToBoth);
+
+      check(_tabColor(tester, _journal)).equals(FujinColors.light.textLink);
+      check(_tabColor(tester, _memory)).equals(FujinColors.light.textPrimary);
     });
 
     testWidgets('stays usable when MyFitnessPal answers with a server error', (

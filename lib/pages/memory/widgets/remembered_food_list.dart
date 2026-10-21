@@ -22,11 +22,11 @@ class RememberedFoodList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: FujinColorRole.backgroundCard,
+    color: context.colors.backgroundCard,
     clipBehavior: Clip.antiAlias,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(FujinRadius.card),
-      side: const BorderSide(color: FujinColorRole.borderCard),
+      side: BorderSide(color: context.colors.borderCard),
     ),
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: FujinSpace.s1),
@@ -34,12 +34,12 @@ class RememberedFoodList extends StatelessWidget {
         children: [
           for (final (index, food) in foods.indexed) ...[
             if (index > 0)
-              const Divider(
+              Divider(
                 height: FujinStroke.card,
                 thickness: FujinStroke.card,
                 indent: FujinSpace.s5,
                 endIndent: FujinSpace.s5,
-                color: FujinColorRole.borderHairline,
+                color: context.colors.borderHairline,
               ),
             _FoodRow(
               key: ValueKey(food),
@@ -90,13 +90,13 @@ class _FoodRow extends StatelessWidget {
                     Text(
                       food.mfpDescription,
                       style: FujinText.inter15Medium.copyWith(
-                        color: FujinColorRole.textPrimary,
+                        color: context.colors.textPrimary,
                       ),
                     ),
                     Text(
                       MemoryText.target(context.intl, food),
                       style: FujinText.inter13Regular.copyWith(
-                        color: FujinColorRole.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                   ],
@@ -119,10 +119,10 @@ class _FoodRow extends StatelessWidget {
                       ),
                   ],
                 ),
-              const Icon(
+              Icon(
                 Icons.chevron_right,
                 size: FujinSize.rowChevron,
-                color: FujinColorRole.textTertiary,
+                color: context.colors.textTertiary,
               ),
             ],
           ),

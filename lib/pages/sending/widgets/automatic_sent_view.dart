@@ -32,7 +32,7 @@ class AutomaticSentView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final choices = ref.watch(keptChoicesProvider(report.date));
     final note = FujinText.inter12Regular.copyWith(
-      color: FujinColorRole.textSecondary,
+      color: context.colors.textSecondary,
     );
     return SentFrame(
       report: report,
@@ -46,11 +46,11 @@ class AutomaticSentView extends ConsumerWidget {
             child: Text(
               context.intl.unattendedChoices(unattended.length),
               style: FujinText.inter12Medium.copyWith(
-                color: FujinColorRole.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
           ),
-          SentFrame.card([
+          SentFrame.card(context.colors, [
             for (final planned in unattended)
               _ChoiceRow(
                 key: ValueKey(planned.entryId),
@@ -96,7 +96,7 @@ class _ChoiceRow extends ConsumerWidget {
                 Text(
                   sent.entry.food.description,
                   style: FujinText.inter15Medium.copyWith(
-                    color: FujinColorRole.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                 ),
                 Text(
@@ -105,7 +105,7 @@ class _ChoiceRow extends ConsumerWidget {
                     null => SendText.unattended(context.intl, sent),
                   },
                   style: FujinText.inter13Regular.copyWith(
-                    color: FujinColorRole.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],
@@ -128,8 +128,8 @@ class _ChoiceRow extends ConsumerWidget {
                   context.intl.review,
                   style: FujinText.inter15Medium.copyWith(
                     color: switch (keeping) {
-                      true => FujinColorRole.textDisabled,
-                      false => FujinColorRole.textLink,
+                      true => context.colors.textDisabled,
+                      false => context.colors.textLink,
                     },
                   ),
                 ),

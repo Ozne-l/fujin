@@ -13,20 +13,20 @@ class OfflineCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
       padding: const EdgeInsets.all(FujinSpace.s4),
       decoration: BoxDecoration(
-        color: FujinColorRole.borderCard,
+        color: context.colors.borderCard,
         borderRadius: BorderRadius.circular(FujinRadius.card),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: FujinSpace.s3,
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: FujinSize.tile / 2,
-            backgroundColor: FujinColorRole.backgroundCard,
+            backgroundColor: context.colors.backgroundCard,
             child: Icon(
               Icons.wifi_off,
               size: FujinSize.searchIcon,
-              color: FujinColorRole.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           Expanded(
@@ -37,13 +37,13 @@ class OfflineCard extends StatelessWidget {
                 Text(
                   context.intl.addOfflineTitle,
                   style: FujinText.inter15Medium.copyWith(
-                    color: FujinColorRole.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                 ),
                 Text(
                   context.intl.addOfflineDetail,
                   style: FujinText.inter13Regular.copyWith(
-                    color: FujinColorRole.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: FujinSpace.s2),

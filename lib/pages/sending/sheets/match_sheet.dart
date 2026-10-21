@@ -82,12 +82,12 @@ class _MatchSheet extends HookConsumerWidget {
       ),
       sectionLabel: context.intl.ekkloCandidates,
       body: [
-        ..._candidates(context.intl, search, selected, picked),
+        ..._candidates(context.intl, context.colors, search, selected, picked),
         SheetFrame.inset(
           Text(
             context.intl.toleranceNote,
             style: FujinText.inter12Regular.copyWith(
-              color: FujinColorRole.textTertiary,
+              color: context.colors.textTertiary,
             ),
           ),
         ),
@@ -130,6 +130,7 @@ class _MatchSheet extends HookConsumerWidget {
 
   static List<Widget> _candidates(
     AppLocalizations intl,
+    FujinColors colors,
     EkkloSearchState search,
     EkkloCandidate? selected,
     ValueNotifier<String?> picked,
@@ -144,14 +145,14 @@ class _MatchSheet extends HookConsumerWidget {
           SendFailure.blockedInDev ||
           SendFailure.other => intl.searchFailedOther,
         },
-        color: FujinColorRole.textAlert,
+        color: colors.textAlert,
       ),
     ],
     EkkloSearchRunning() => [const SheetSearching()],
     EkkloSearchDone(results: []) => [
       SheetMessage(
         text: intl.noEkkloResult,
-        color: FujinColorRole.textSecondary,
+        color: colors.textSecondary,
       ),
     ],
     EkkloSearchDone(:final results) => [
@@ -176,7 +177,7 @@ class _MfpReference extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(FujinSpace.s3),
       decoration: BoxDecoration(
-        color: FujinColorRole.backgroundPage,
+        color: context.colors.backgroundPage,
         borderRadius: BorderRadius.circular(FujinRadius.field),
       ),
       child: Column(
@@ -186,19 +187,19 @@ class _MfpReference extends StatelessWidget {
           Row(
             spacing: FujinSpace.s2,
             children: [
-              const SourceDot(color: FujinColorRole.sourceMfp),
+              SourceDot(color: context.colors.sourceMfp),
               Expanded(
                 child: Text(
                   context.intl.sourceMyFitnessPal,
                   style: FujinText.inter12Medium.copyWith(
-                    color: FujinColorRole.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ),
               Text(
                 EntryText.energy(context.intl, planned.entry),
                 style: FujinText.inter15Semibold.copyWith(
-                  color: FujinColorRole.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
             ],
@@ -206,7 +207,7 @@ class _MfpReference extends StatelessWidget {
           Text(
             EntryText.macros(context.intl, planned.entry.nutrients),
             style: FujinText.inter12Medium.copyWith(
-              color: FujinColorRole.textTertiary,
+              color: context.colors.textTertiary,
             ),
           ),
         ],
@@ -237,14 +238,14 @@ class _CandidateDetail extends StatelessWidget {
                   child: Text(
                     candidate.food.name,
                     style: FujinText.inter15Medium.copyWith(
-                      color: FujinColorRole.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                 ),
                 Text(
                   SendText.grams(context.intl, candidate.grams),
                   style: FujinText.inter13Regular.copyWith(
-                    color: FujinColorRole.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],
@@ -252,7 +253,7 @@ class _CandidateDetail extends StatelessWidget {
             Text(
               CandidateCard.origin(context.intl, candidate),
               style: FujinText.inter12Regular.copyWith(
-                color: FujinColorRole.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
           ],

@@ -46,11 +46,11 @@ class MealCard extends HookWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: FujinSpace.s3,
         children: [
-          _title(context.intl),
+          _title(context.intl, context.colors),
           Text(
             context.intl.mealEmpty,
             style: FujinText.inter13Regular.copyWith(
-              color: FujinColorRole.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
         ],
@@ -59,12 +59,12 @@ class MealCard extends HookWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: FujinSpace.s3,
         children: [
-          _title(context.intl),
+          _title(context.intl, context.colors),
           SplitLine(
             leading: Text(
               context.intl.mealProgress(counts.inEkklo, total),
               style: FujinText.inter13Regular.copyWith(
-                color: FujinColorRole.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
             trailing: pills,
@@ -79,7 +79,7 @@ class MealCard extends HookWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: FujinSpace.s2,
               children: [
-                _name(),
+                _name(context.colors),
                 Text(
                   context.intl.mealFolded(
                     counts.inEkklo,
@@ -91,7 +91,7 @@ class MealCard extends HookWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: FujinText.inter13Regular.copyWith(
-                    color: FujinColorRole.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],
@@ -100,7 +100,7 @@ class MealCard extends HookWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             spacing: FujinSpace.s1,
-            children: [_kilocalories(context.intl), pills],
+            children: [_kilocalories(context.intl, context.colors), pills],
           ),
         ],
       ),
@@ -114,10 +114,10 @@ class MealCard extends HookWidget {
         FujinSpace.s2,
       ),
       decoration: BoxDecoration(
-        color: FujinColorRole.backgroundCard,
+        color: context.colors.backgroundCard,
         borderRadius: BorderRadius.circular(FujinRadius.card),
         border: Border.all(
-          color: FujinColorRole.borderCard,
+          color: context.colors.borderCard,
         ),
       ),
       child: Column(
@@ -166,7 +166,7 @@ class MealCard extends HookWidget {
                 _plusIcon,
                 width: FujinSize.tileIcon,
                 height: FujinSize.tileIcon,
-                theme: const SvgTheme(currentColor: FujinColorRole.textLink),
+                theme: SvgTheme(currentColor: context.colors.textLink),
                 excludeFromSemantics: true,
               ),
               label: Text(context.intl.mealAddFood),
@@ -177,22 +177,22 @@ class MealCard extends HookWidget {
     );
   }
 
-  Widget _name() => Text(
+  Widget _name(FujinColors colors) => Text(
     meal.name,
     style: FujinText.inter16Medium.copyWith(
-      color: FujinColorRole.textPrimary,
+      color: colors.textPrimary,
     ),
   );
 
-  Widget _kilocalories(AppLocalizations intl) => Text(
+  Widget _kilocalories(AppLocalizations intl, FujinColors colors) => Text(
     intl.kilocalories(meal.kilocalories),
     style: FujinText.inter15Semibold.copyWith(
-      color: FujinColorRole.textPrimary,
+      color: colors.textPrimary,
     ),
   );
 
-  Widget _title(AppLocalizations intl) =>
-      SplitLine(leading: _name(), trailing: _kilocalories(intl));
+  Widget _title(AppLocalizations intl, FujinColors colors) =>
+      SplitLine(leading: _name(colors), trailing: _kilocalories(intl, colors));
 
   static List<(String, PillTone)> _mealPills(
     AppLocalizations intl,

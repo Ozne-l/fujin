@@ -41,6 +41,7 @@ class FlowHeader extends StatelessWidget {
                 false => localizations.backButtonTooltip,
               },
               onPressed: back,
+              floating: true,
             ),
           Expanded(
             child: Padding(
@@ -57,13 +58,13 @@ class FlowHeader extends StatelessWidget {
                   Text(
                     title,
                     style: FujinText.inter16Medium.copyWith(
-                      color: FujinColorRole.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                   Text(
                     subtitle,
                     style: FujinText.inter13Regular.copyWith(
-                      color: FujinColorRole.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],

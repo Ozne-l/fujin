@@ -74,7 +74,7 @@ class DayPickerSheet extends HookConsumerWidget {
                         context.intl.dayPickerMonth(_monthOf(shown.value)),
                       ),
                       style: FujinText.hina24.copyWith(
-                        color: FujinColorRole.textPrimary,
+                        color: context.colors.textPrimary,
                       ),
                     ),
                   ),
@@ -104,7 +104,7 @@ class DayPickerSheet extends HookConsumerWidget {
                             context.intl.weekdayShort(day),
                             textAlign: TextAlign.center,
                             style: FujinText.inter11Medium.copyWith(
-                              color: FujinColorRole.textTertiary,
+                              color: context.colors.textTertiary,
                             ),
                           ),
                         ),
@@ -269,7 +269,7 @@ class _Day extends StatelessWidget {
                 true => BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: FujinColorRole.textLink,
+                    color: context.colors.textLink,
                     width: FujinStroke.dayRing,
                   ),
                 ),
@@ -279,8 +279,8 @@ class _Day extends StatelessWidget {
                 date: context.intl.dayOfMonth(day),
                 selected: chosen,
                 idleColor: switch (inRange) {
-                  true => FujinColorRole.textPrimary,
-                  false => FujinColorRole.textDisabled,
+                  true => context.colors.textPrimary,
+                  false => context.colors.textDisabled,
                 },
               ),
             ),

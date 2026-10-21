@@ -13,11 +13,11 @@ class SheetPictogram extends StatelessWidget {
     alignment: AlignmentDirectional.centerStart,
     child: CircleAvatar(
       radius: FujinSize.pictogram / 2,
-      backgroundColor: tone.background,
+      backgroundColor: tone.background(context.colors),
       child: IconTheme(
         data: IconThemeData(
           size: FujinSize.pictogramIcon,
-          color: tone.foreground,
+          color: tone.foreground(context.colors),
         ),
         child: icon,
       ),

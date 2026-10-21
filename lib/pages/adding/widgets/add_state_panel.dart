@@ -38,29 +38,29 @@ class AddStatePanel extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: switch (alert) {
-              true => FujinColorRole.backgroundAlert,
-              false => FujinColorRole.borderCard,
+              true => context.colors.backgroundAlert,
+              false => context.colors.borderCard,
             },
           ),
           child: Icon(
             icon,
             size: FujinSize.pictogramIcon,
             color: switch (alert) {
-              true => FujinColorRole.textAlert,
-              false => FujinColorRole.textSecondary,
+              true => context.colors.textAlert,
+              false => context.colors.textSecondary,
             },
           ),
         ),
         Text(
           title,
           textAlign: TextAlign.center,
-          style: FujinText.hina22.copyWith(color: FujinColorRole.textPrimary),
+          style: FujinText.hina22.copyWith(color: context.colors.textPrimary),
         ),
         Text(
           detail,
           textAlign: TextAlign.center,
           style: FujinText.inter15Regular.copyWith(
-            color: FujinColorRole.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ),
         if (action case (final label, final onPressed))
@@ -73,7 +73,7 @@ class AddStatePanel extends StatelessWidget {
           Text(
             note,
             style: FujinText.inter12Regular.copyWith(
-              color: FujinColorRole.textTertiary,
+              color: context.colors.textTertiary,
             ),
           ),
       ],

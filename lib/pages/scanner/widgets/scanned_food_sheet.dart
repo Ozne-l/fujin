@@ -42,29 +42,29 @@ class ScannedFoodSheet extends StatelessWidget {
           spacing: FujinSpace.s2,
           children: switch (remembered) {
             true => [
-              const SourceDot(color: FujinColorRole.textLink),
+              SourceDot(color: context.colors.textLink),
               Flexible(
                 child: Text(
                   context.intl.scannerFromMemory,
                   style: FujinText.inter12Medium.copyWith(
-                    color: FujinColorRole.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ),
             ],
             false => [
-              const SourceDot(color: FujinColorRole.sourceMfp),
+              SourceDot(color: context.colors.sourceMfp),
               Text(
                 context.intl.sourceMyFitnessPal,
                 style: FujinText.inter12Medium.copyWith(
-                  color: FujinColorRole.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               Flexible(
                 child: Text(
                   context.intl.scannerFoundByBarcode,
                   style: FujinText.inter12Regular.copyWith(
-                    color: FujinColorRole.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ),
@@ -73,12 +73,12 @@ class ScannedFoodSheet extends StatelessWidget {
         ),
         Text(
           food.description,
-          style: FujinText.hina24.copyWith(color: FujinColorRole.textPrimary),
+          style: FujinText.hina24.copyWith(color: context.colors.textPrimary),
         ),
         Text(
           ScannerText.foodLine(context.intl, food),
           style: FujinText.inter15Regular.copyWith(
-            color: FujinColorRole.textPrimary,
+            color: context.colors.textPrimary,
           ),
         ),
         Wrap(
@@ -117,7 +117,7 @@ class ScannedFoodSheet extends StatelessWidget {
           Text(
             detail,
             style: FujinText.inter15Regular.copyWith(
-              color: FujinColorRole.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
         const SizedBox(height: FujinSpace.s1),

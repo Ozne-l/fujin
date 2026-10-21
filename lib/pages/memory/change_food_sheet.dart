@@ -64,13 +64,13 @@ class _ChangeFoodSheet extends HookConsumerWidget {
               SendFailure.blockedInDev ||
               SendFailure.other => context.intl.searchFailedOther,
             },
-            color: FujinColorRole.textAlert,
+            color: context.colors.textAlert,
           ),
         ],
         AsyncData(value: []) => [
           SheetMessage(
             text: context.intl.noEkkloResult,
-            color: FujinColorRole.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ],
         AsyncData(:final value) => [
@@ -109,14 +109,14 @@ class _Candidate extends StatelessWidget {
         Text(
           food.name,
           style: FujinText.inter15Medium.copyWith(
-            color: FujinColorRole.textPrimary,
+            color: context.colors.textPrimary,
           ),
         ),
         if (food.brands case final brands?)
           Text(
             brands,
             style: FujinText.inter12Regular.copyWith(
-              color: FujinColorRole.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
         Text(
@@ -125,7 +125,7 @@ class _Candidate extends StatelessWidget {
             MemoryText.portion(context.intl, food),
           ),
           style: FujinText.inter12Medium.copyWith(
-            color: FujinColorRole.textTertiary,
+            color: context.colors.textTertiary,
           ),
         ),
       ],

@@ -1466,6 +1466,48 @@ abstract class AppLocalizations {
   /// **'Ne me demande rien : aliments mémorisés,\npuis meilleur candidat, sinon aliment perso.'**
   String get automaticModeDetail;
 
+  /// No description provided for @settingsAppearance.
+  ///
+  /// In fr, this message translates to:
+  /// **'APPARENCE'**
+  String get settingsAppearance;
+
+  /// No description provided for @appearanceSystem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Système'**
+  String get appearanceSystem;
+
+  /// No description provided for @appearanceLight.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clair'**
+  String get appearanceLight;
+
+  /// No description provided for @appearanceDark.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sombre'**
+  String get appearanceDark;
+
+  /// No description provided for @appearanceDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Système suit le réglage du téléphone.'**
+  String get appearanceDetail;
+
+  /// No description provided for @appearanceToDark.
+  ///
+  /// In fr, this message translates to:
+  /// **'Passer en thème sombre'**
+  String get appearanceToDark;
+
+  /// No description provided for @appearanceToLight.
+  ///
+  /// In fr, this message translates to:
+  /// **'Passer en thème clair'**
+  String get appearanceToLight;
+
   /// No description provided for @settingsBackup.
   ///
   /// In fr, this message translates to:

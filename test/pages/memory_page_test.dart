@@ -2,7 +2,9 @@ import 'package:checks/checks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
+import 'package:fujin/pages/memory/memory_food_page.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../support/fake_backends.dart';
@@ -11,6 +13,9 @@ import '../support/pump_fujin.dart';
 
 const _snack = 'Collation';
 const _thaiRiceName = 'Riz thaï';
+const _manyCopies = 40;
+const _listScroll = 200.0;
+const _subtitle = 'Ce que Fūjin a appris de tes choix.';
 
 FakeBackends _riceBackends() => FakeBackends(
   mealNames: [breakfast, lunch],
@@ -36,6 +41,25 @@ Future<void> _tap(WidgetTester tester, String text) async {
 }
 
 int _count(String text) => find.text(text).evaluate().length;
+
+Future<void> _openManyFoods(WidgetTester tester) async {
+  await pumpFujin(
+    tester,
+    FakeBackends(mealNames: [breakfast]),
+    units: memory.units,
+    ownCopies: [
+      for (var copy = 0; copy < _manyCopies; copy++)
+        OwnCopy(
+          mfpFoodId: 'own-$copy',
+          mfpDescription: 'Plat maison $copy',
+          ekkloFoodId: 'ekklo-own-$copy',
+          ekkloFoodName: 'Plat maison $copy',
+          mfpUnit: grams,
+        ),
+    ],
+  );
+  await _tap(tester, 'Mémoire');
+}
 
 Future<void> _back(WidgetTester tester) async {
   await tester.tap(find.byIcon(Icons.chevron_left));
@@ -168,6 +192,45 @@ void main() {
     check(_count('→ $riceInEkklo')).equals(0);
   });
 
+  testWidgets('keeps the search field in place while the foods scroll under '
+      'it, and still finds a food from there', (tester) async {
+    await _openManyFoods(tester);
+    final field = tester.getRect(find.byType(TextField));
+    final first = tester.getTopLeft(find.text(oats));
+
+    await tester.drag(find.text(oats), const Offset(0, -_listScroll));
+    await tester.pumpAndSettle();
+
+    check(tester.getTopLeft(find.text(oats)).dy).isLessThan(first.dy);
+    check(tester.getRect(find.byType(TextField))).equals(field);
+
+    await tester.enterText(find.byType(TextField), 'rice');
+    await tester.pumpAndSettle();
+    check(_count('→ $riceInEkklo')).equals(1);
+    check(_count(oats)).equals(0);
+  });
+
+  testWidgets('scrolls the foods up under the title, where a tap on the title '
+      'does not open the food under it', (tester) async {
+    await _openManyFoods(tester);
+    final subtitle = find.text(_subtitle);
+    final under = tester.getCenter(subtitle);
+    final list = find
+        .ancestor(of: find.text(oats), matching: find.byType(Scrollable))
+        .first;
+    tester
+        .state<ScrollableState>(list)
+        .position
+        .jumpTo(tester.getCenter(find.text(oats)).dy - under.dy);
+    await tester.pump();
+    check(tester.getCenter(find.text(oats)).dy).equals(under.dy);
+
+    await tester.tap(subtitle);
+    await tester.pumpAndSettle();
+
+    check(find.byType(MemoryFoodPage).evaluate()).isEmpty();
+  });
+
   testWidgets('swipes between foods and meals and keeps the search', (
     tester,
   ) async {
@@ -204,7 +267,7 @@ void main() {
     check(_count(_snack)).equals(1);
     check(
       tester.widget<Text>(find.text(petitDejeuner).last).style?.color,
-    ).equals(FujinColorRole.textLink);
+    ).equals(FujinColors.light.textLink);
 
     await tester.tapAt(Offset.zero);
     await tester.pumpAndSettle();

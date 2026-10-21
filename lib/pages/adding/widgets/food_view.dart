@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:fujin/app/fujin_route.dart';
+import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_outcome.dart';
@@ -297,7 +298,7 @@ class FoodView extends HookConsumerWidget {
                       context.intl.addWriteOrder,
                       textAlign: TextAlign.center,
                       style: FujinText.inter12Regular.copyWith(
-                        color: FujinColorRole.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                   ],
@@ -317,6 +318,7 @@ class FoodView extends HookConsumerWidget {
                     FujinSpace.s4,
                   ),
                   child: FilledButton(
+                    style: FujinTheme.floatingButtonStyle(context.colors),
                     onPressed: switch ((planned, running)) {
                       (_?, false) => onPrimary,
                       _ => null,

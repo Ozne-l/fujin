@@ -3,26 +3,26 @@ import 'dart:ui';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 
 enum FujinWeather {
-  calm(
-    'assets/icons/weather/calm.svg',
-    FujinColorRole.backgroundSuccess,
-    FujinColor.fujin,
-  ),
-  breeze(
-    'assets/icons/weather/breeze.svg',
-    FujinColorRole.backgroundInfo,
-    FujinColor.sora,
-  ),
-  gust(
-    'assets/icons/weather/gust.svg',
-    FujinColor.kinLight,
-    FujinColor.kinDark,
-  ),
-  storm('assets/icons/weather/storm.svg', FujinColor.kinu, FujinColor.shu);
+  calm('assets/icons/weather/calm.svg'),
+  breeze('assets/icons/weather/breeze.svg'),
+  gust('assets/icons/weather/gust.svg'),
+  storm('assets/icons/weather/storm.svg');
 
-  const FujinWeather(this.asset, this.background, this.foreground);
+  const FujinWeather(this.asset);
 
   final String asset;
-  final Color background;
-  final Color foreground;
+
+  Color background(FujinColors colors) => switch (this) {
+    calm => colors.backgroundSuccess,
+    breeze => colors.backgroundInfo,
+    gust => colors.backgroundHighlight,
+    storm => colors.backgroundCard,
+  };
+
+  Color foreground(FujinColors colors) => switch (this) {
+    calm => colors.textLink,
+    breeze => colors.textInfo,
+    gust => colors.textGold,
+    storm => colors.textAlert,
+  };
 }

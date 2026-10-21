@@ -24,15 +24,15 @@ class CodeEntrySheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final check = checkBarcode(code);
     final value = FujinText.inter18Medium.copyWith(
-      color: FujinColorRole.textPrimary,
+      color: context.colors.textPrimary,
     );
     final (border, borderWidth) = switch (check) {
       MfpBarcodeWrongCheckDigit() => (
-        FujinColorRole.textAlert,
+        context.colors.textAlert,
         FujinStroke.fieldError,
       ),
       MfpValidBarcode() || MfpBarcodeNotDigits() || MfpBarcodeWrongLength() => (
-        FujinColorRole.textLink,
+        context.colors.textLink,
         FujinStroke.fieldFocus,
       ),
     };
@@ -48,13 +48,13 @@ class CodeEntrySheet extends StatelessWidget {
             Text(
               context.intl.scannerTypeTitle,
               style: FujinText.hina24.copyWith(
-                color: FujinColorRole.textPrimary,
+                color: context.colors.textPrimary,
               ),
             ),
             Container(
               padding: const EdgeInsets.all(FujinSpace.s4),
               decoration: BoxDecoration(
-                color: FujinColorRole.backgroundCard,
+                color: context.colors.backgroundCard,
                 borderRadius: BorderRadius.circular(FujinRadius.field),
                 border: Border.all(color: border, width: borderWidth),
               ),
@@ -64,7 +64,7 @@ class CodeEntrySheet extends StatelessWidget {
                   Container(
                     width: FujinStroke.fieldFocus,
                     height: value.fontSize,
-                    color: FujinColorRole.textLink,
+                    color: context.colors.textLink,
                   ),
                 ],
               ),
@@ -74,19 +74,19 @@ class CodeEntrySheet extends StatelessWidget {
                 _helper(
                   Icons.check_circle,
                   context.intl.scannerCodeValid(AddText.barcodeFormat(format)),
-                  FujinColorRole.textLink,
+                  context.colors.textLink,
                 ),
               ],
               MfpBarcodeWrongCheckDigit(:final actual, :final expected) => [
                 _helper(
                   Icons.warning_amber_rounded,
                   context.intl.scannerCheckDigit(actual, expected),
-                  FujinColorRole.textAlert,
+                  context.colors.textAlert,
                 ),
                 Text(
                   context.intl.scannerCheckedOnPhone,
                   style: FujinText.inter12Regular.copyWith(
-                    color: FujinColorRole.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],

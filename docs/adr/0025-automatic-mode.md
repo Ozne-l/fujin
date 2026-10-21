@@ -19,9 +19,9 @@ Two rules of [0018](0018-send-flow.md) stand in the way of "not remembered":
 
 The setting:
 
-- `Setting.automaticMode` (`lib/data/settings/setting.dart`, key `setting_automatic_mode`), read and written by `SettingsRepository` (`lib/data/settings/settings_repository.dart`) in the shared preferences of [0023](0023-ui-flags-in-shared-preferences.md), off when absent. `FujinPreferences.open` (`lib/data/preferences/fujin_preferences.dart`) now opens the cache for the keys of `Hint` and `Setting`; it replaces `HintRepository.openPreferences`.
+- `Setting.automaticMode` (`lib/data/settings/setting.dart`, key `setting_automatic_mode`), read and written by `SettingsRepository` (`lib/data/settings/settings_repository.dart`) in the shared preferences of [0023](0023-ui-flags-in-shared-preferences.md), off when absent. `FujinPreferences.open` (`lib/data/preferences/fujin_preferences.dart`) now opens the cache for the keys of `Hint` and `Setting` (and `Appearance.preferenceKey` since [0035](0035-dark-theme-and-appearance-setting.md), read and written by `SettingsRepository.appearance()` and `setAppearance()`); it replaces `HintRepository.openPreferences`.
 - It is a preference of this phone, not the owner's work: it stays out of `fujin.db` and out of the backup file, and Auto Backup does not carry it. A new phone starts in reviewed mode.
-- Presenter `AutomaticModeNotifier` (`automaticModeProvider`, `lib/pages/common/automatic_mode_notifier.dart`); the switch is `SettingsSwitchRow` (`lib/pages/settings/widgets/settings_switch_row.dart`), a `CupertinoSwitch` in the colours of the Figma component "Interrupteur" (track `fujin` on, `kinari` off, thumb `background/card`), the whole row toggling it.
+- Presenter `AutomaticModeNotifier` (`automaticModeProvider`, `lib/pages/common/automatic_mode_notifier.dart`); the switch is `SettingsSwitchRow` (`lib/pages/settings/widgets/settings_switch_row.dart`), a `FujinSwitch` (`lib/pages/common/fujin_switch.dart`, formerly a `CupertinoSwitch`, with the glass lens of [0033](0033-liquid-glass-and-fade-through.md)) in the colours of the Figma component "Interrupteur" (track `fujin` on, `kinari` off, thumb `background/card`). Only the switch toggles it: the owner asked that a tap on the title or the note does nothing (2026-10-21), so the row no longer reacts to a tap.
 
 The send:
 

@@ -1,0 +1,980 @@
+{
+  "$description": "Fūjin dark theme (DTCG 2025.10): the dark value of every role.* path of fujin.tokens.json, from the Figma collection « Fūjin · Sombre ». Raw values: the dark theme has no primitives. role.camera.* keeps the light value on purpose: the camera is dark in both themes.",
+  "role": {
+    "background": {
+      "page": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0902,
+            0.0863,
+            0.0745
+          ],
+          "alpha": 1,
+          "hex": "#171613"
+        },
+        "$type": "color"
+      },
+      "card": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1333,
+            0.1255,
+            0.1098
+          ],
+          "alpha": 1,
+          "hex": "#22201C"
+        },
+        "$type": "color"
+      },
+      "info": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1059,
+            0.1569,
+            0.1882
+          ],
+          "alpha": 1,
+          "hex": "#1B2830"
+        },
+        "$type": "color"
+      },
+      "alert": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.2118,
+            0.1294,
+            0.1098
+          ],
+          "alpha": 1,
+          "hex": "#36211C"
+        },
+        "$type": "color"
+      },
+      "success": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1176,
+            0.1765,
+            0.1255
+          ],
+          "alpha": 1,
+          "hex": "#1E2D20"
+        },
+        "$type": "color"
+      },
+      "highlight": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1961,
+            0.1608,
+            0.098
+          ],
+          "alpha": 1,
+          "hex": "#322919"
+        },
+        "$type": "color",
+        "$description": "Light gold behind what needs the owner: the Ekklo food to choose (04d) and values that moved in MyFitnessPal (06e)."
+      },
+      "scrim": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0.5,
+          "hex": "#000000"
+        },
+        "$type": "color",
+        "$description": "Modal scrim under sheets, at 50% opacity."
+      },
+      "dark": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9294,
+            0.902,
+            0.8275
+          ],
+          "alpha": 1,
+          "hex": "#EDE6D3"
+        },
+        "$type": "color",
+        "$description": "Background of camera screens and dark pills."
+      },
+      "glass": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1686,
+            0.1608,
+            0.1451
+          ],
+          "alpha": 0.45,
+          "hex": "#2B2925"
+        },
+        "$type": "color",
+        "$description": "#2B2925 at 45% over the refracted backdrop: the tab plate and the Scanner button."
+      },
+      "glass-ink": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9294,
+            0.902,
+            0.8275
+          ],
+          "alpha": 0.8,
+          "hex": "#EDE6D3"
+        },
+        "$type": "color",
+        "$description": "Cream at 80% over the refracted backdrop: the primary button and the chosen filter."
+      },
+      "lens-reflection": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            1,
+            1
+          ],
+          "alpha": 0.35,
+          "hex": "#FFFFFF"
+        },
+        "$type": "color",
+        "$description": "Reflection along the top and bottom edges inside the glass lens over a held switch, fading towards the middle."
+      },
+      "glass-lens": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            1,
+            1
+          ],
+          "alpha": 0.16,
+          "hex": "#FFFFFF"
+        },
+        "$type": "color",
+        "$description": "White at 16%, the tint of the glass lens that swells under the finger on the tab plate."
+      },
+      "glass-glow": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            1,
+            1
+          ],
+          "alpha": 0.2,
+          "hex": "#FFFFFF"
+        },
+        "$type": "color",
+        "$description": "White at 20%, the light that grows under the finger inside a pressed glass button."
+      },
+      "tab-active": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1843,
+            0.2941,
+            0.1922
+          ],
+          "alpha": 0.85,
+          "hex": "#2F4B31"
+        },
+        "$type": "color",
+        "$description": "Matcha at 80% behind the active tab."
+      },
+      "scroll-fade": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0902,
+            0.0863,
+            0.0745
+          ],
+          "alpha": 0.55,
+          "hex": "#171613"
+        },
+        "$type": "color",
+        "$description": "Washi at 55%, the end of the fade content scrolls into under the tab bar."
+      },
+      "pressed": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9686,
+            0.9451,
+            0.8784
+          ],
+          "alpha": 0.08,
+          "hex": "#F7F1E0"
+        },
+        "$type": "color",
+        "$description": "Sumi at 6%, the ink wash under a pressed, hovered or focused surface."
+      },
+      "accent": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.5608,
+            0.7647,
+            0.5451
+          ],
+          "alpha": 1,
+          "hex": "#8FC38B"
+        },
+        "$type": "color",
+        "$description": "Accent fill: progress, checkbox and switch on, done step, green button, verified dot."
+      },
+      "neutral": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.2039,
+            0.1922,
+            0.1647
+          ],
+          "alpha": 1,
+          "hex": "#34312A"
+        },
+        "$type": "color",
+        "$description": "Neutral fills: neutral chips, switch off, segmented control, clear button, skeletons, offline banner."
+      }
+    },
+    "shadow": {
+      "floating": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0.36,
+          "hex": "#000000"
+        },
+        "$type": "color",
+        "$description": "Drop shadow of floating glass: the tab plate and the Scanner button."
+      },
+      "logo": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0.3,
+          "hex": "#000000"
+        },
+        "$type": "color",
+        "$description": "Drop shadow of the Fūjin logo on the splash screen."
+      }
+    },
+    "border": {
+      "card": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.2118,
+            0.2,
+            0.1725
+          ],
+          "alpha": 1,
+          "hex": "#36332C"
+        },
+        "$type": "color"
+      },
+      "hairline": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1804,
+            0.1686,
+            0.1451
+          ],
+          "alpha": 1,
+          "hex": "#2E2B25"
+        },
+        "$type": "color"
+      },
+      "divider": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6118,
+            0.4824,
+            0.2275
+          ],
+          "alpha": 1,
+          "hex": "#9C7B3A"
+        },
+        "$type": "color"
+      },
+      "alert": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9333,
+            0.5255,
+            0.4392
+          ],
+          "alpha": 1,
+          "hex": "#EE8670"
+        },
+        "$type": "color",
+        "$description": "Field in error, danger outline button."
+      },
+      "control": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3686,
+            0.3451,
+            0.2941
+          ],
+          "alpha": 1,
+          "hex": "#5E584B"
+        },
+        "$type": "color",
+        "$description": "Unselected radio, sheet handle, dashed empty ring, offline banner outline."
+      },
+      "focus": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.5608,
+            0.7647,
+            0.5451
+          ],
+          "alpha": 1,
+          "hex": "#8FC38B"
+        },
+        "$type": "color",
+        "$description": "Focused field, selected radio, selected candidate."
+      },
+      "warning": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.7686,
+            0.6039,
+            0.2706
+          ],
+          "alpha": 1,
+          "hex": "#C49A45"
+        },
+        "$type": "color",
+        "$description": "Gold outline of an item to review (Ekklo match to choose)."
+      },
+      "glass-highlight": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            1,
+            1
+          ],
+          "alpha": 0.14,
+          "hex": "#FFFFFF"
+        },
+        "$type": "color",
+        "$description": "Lit edge of liquid glass: 1 px inside gradient stroke (top-left and bottom-right) on the tab plate and the glass buttons."
+      },
+      "glass-shade": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            1,
+            1
+          ],
+          "alpha": 0.04,
+          "hex": "#FFFFFF"
+        },
+        "$type": "color",
+        "$description": "Middle stop of the liquid glass edge gradient (shaded sides)."
+      },
+      "glass-ink-highlight": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            1,
+            1
+          ],
+          "alpha": 0.5,
+          "hex": "#FFFFFF"
+        },
+        "$type": "color",
+        "$description": "Lit edge of ink glass, the primary button colour at 80%: outer stops of its 1 px inside gradient stroke."
+      },
+      "glass-ink-shade": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            1,
+            1
+          ],
+          "alpha": 0.05,
+          "hex": "#FFFFFF"
+        },
+        "$type": "color",
+        "$description": "Middle stop of the ink glass edge gradient (shaded sides)."
+      },
+      "lens-edge": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            1,
+            1
+          ],
+          "alpha": 0.3,
+          "hex": "#FFFFFF"
+        },
+        "$type": "color",
+        "$description": "Outline of the glass lens over a held switch: 1 px gradient stroke, this colour at the top-left fading to glass-highlight at the bottom-right."
+      }
+    },
+    "text": {
+      "primary": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9412,
+            0.9137,
+            0.8471
+          ],
+          "alpha": 1,
+          "hex": "#F0E9D8"
+        },
+        "$type": "color"
+      },
+      "secondary": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.7412,
+            0.7059,
+            0.6118
+          ],
+          "alpha": 1,
+          "hex": "#BDB49C"
+        },
+        "$type": "color"
+      },
+      "tertiary": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6275,
+            0.5961,
+            0.498
+          ],
+          "alpha": 1,
+          "hex": "#A0987F"
+        },
+        "$type": "color"
+      },
+      "disabled": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.4196,
+            0.3961,
+            0.3373
+          ],
+          "alpha": 1,
+          "hex": "#6B6556"
+        },
+        "$type": "color"
+      },
+      "link": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.5608,
+            0.7647,
+            0.5451
+          ],
+          "alpha": 1,
+          "hex": "#8FC38B"
+        },
+        "$type": "color"
+      },
+      "gold": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.851,
+            0.6824,
+            0.3412
+          ],
+          "alpha": 1,
+          "hex": "#D9AE57"
+        },
+        "$type": "color"
+      },
+      "alert": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9333,
+            0.5255,
+            0.4392
+          ],
+          "alpha": 1,
+          "hex": "#EE8670"
+        },
+        "$type": "color"
+      },
+      "on-dark": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1059,
+            0.102,
+            0.0902
+          ],
+          "alpha": 1,
+          "hex": "#1B1A17"
+        },
+        "$type": "color"
+      },
+      "info": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.5608,
+            0.7176,
+            0.8
+          ],
+          "alpha": 1,
+          "hex": "#8FB7CC"
+        },
+        "$type": "color"
+      },
+      "on-accent": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0745,
+            0.1294,
+            0.0588
+          ],
+          "alpha": 1,
+          "hex": "#13210F"
+        },
+        "$type": "color",
+        "$description": "Text and icons on an accent, source or goal fill."
+      },
+      "on-dark-accent": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.4784,
+            0.3412,
+            0.0784
+          ],
+          "alpha": 1,
+          "hex": "#7A5714"
+        },
+        "$type": "color",
+        "$description": "Action label on role/background/dark (snackbar « Annuler »)."
+      }
+    },
+    "button": {
+      "primary-background": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9294,
+            0.902,
+            0.8275
+          ],
+          "alpha": 1,
+          "hex": "#EDE6D3"
+        },
+        "$type": "color"
+      },
+      "primary-text": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1059,
+            0.102,
+            0.0902
+          ],
+          "alpha": 1,
+          "hex": "#1B1A17"
+        },
+        "$type": "color"
+      },
+      "disabled-background": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1804,
+            0.1686,
+            0.1451
+          ],
+          "alpha": 1,
+          "hex": "#2E2B25"
+        },
+        "$type": "color"
+      },
+      "disabled-text": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.4863,
+            0.4588,
+            0.3882
+          ],
+          "alpha": 1,
+          "hex": "#7C7563"
+        },
+        "$type": "color"
+      },
+      "alert-background": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.698,
+            0.2275,
+            0.149
+          ],
+          "alpha": 1,
+          "hex": "#B23A26"
+        },
+        "$type": "color"
+      },
+      "alert-text": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            0.9882,
+            0.9569
+          ],
+          "alpha": 1,
+          "hex": "#FFFCF4"
+        },
+        "$type": "color"
+      }
+    },
+    "source": {
+      "mfp": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.4157,
+            0.6353,
+            0.9333
+          ],
+          "alpha": 1,
+          "hex": "#6AA2EE"
+        },
+        "$type": "color"
+      },
+      "ekklo": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6627,
+            0.5451,
+            0.902
+          ],
+          "alpha": 1,
+          "hex": "#A98BE6"
+        },
+        "$type": "color"
+      },
+      "ekklo-background": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1647,
+            0.1373,
+            0.2196
+          ],
+          "alpha": 1,
+          "hex": "#2A2338"
+        },
+        "$type": "color"
+      },
+      "ekklo-text": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.7725,
+            0.6902,
+            0.949
+          ],
+          "alpha": 1,
+          "hex": "#C5B0F2"
+        },
+        "$type": "color"
+      }
+    },
+    "goal": {
+      "track": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.2118,
+            0.2,
+            0.1725
+          ],
+          "alpha": 1,
+          "hex": "#36332C"
+        },
+        "$type": "color"
+      },
+      "in-progress": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.4157,
+            0.6353,
+            0.9333
+          ],
+          "alpha": 1,
+          "hex": "#6AA2EE"
+        },
+        "$type": "color"
+      },
+      "reached": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.5608,
+            0.7647,
+            0.5451
+          ],
+          "alpha": 1,
+          "hex": "#8FC38B"
+        },
+        "$type": "color"
+      },
+      "reached-background": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1176,
+            0.1765,
+            0.1255
+          ],
+          "alpha": 1,
+          "hex": "#1E2D20"
+        },
+        "$type": "color"
+      },
+      "exceeded": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9333,
+            0.5255,
+            0.4392
+          ],
+          "alpha": 1,
+          "hex": "#EE8670"
+        },
+        "$type": "color"
+      },
+      "exceeded-background": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.2118,
+            0.1294,
+            0.1098
+          ],
+          "alpha": 1,
+          "hex": "#36211C"
+        },
+        "$type": "color"
+      },
+      "minimum-left": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1843,
+            0.2902,
+            0.4314
+          ],
+          "alpha": 1,
+          "hex": "#2F4A6E"
+        },
+        "$type": "color"
+      },
+      "selected-day": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9294,
+            0.902,
+            0.8275
+          ],
+          "alpha": 1,
+          "hex": "#EDE6D3"
+        },
+        "$type": "color"
+      },
+      "missed": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.4157,
+            0.6353,
+            0.9333
+          ],
+          "alpha": 1,
+          "hex": "#6AA2EE"
+        },
+        "$type": "color",
+        "$description": "Arc of a past day that stayed under 98% of its goal. Its length shows the share reached."
+      },
+      "missed-background": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1059,
+            0.149,
+            0.2196
+          ],
+          "alpha": 1,
+          "hex": "#1B2638"
+        },
+        "$type": "color",
+        "$description": "Background of a past day that stayed under 98% of its goal."
+      },
+      "exceeded-logged": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.5294,
+            0.298,
+            0.251
+          ],
+          "alpha": 1,
+          "hex": "#874C40"
+        },
+        "$type": "color",
+        "$description": "Share already logged, goal exceeded (food sheet bars)."
+      },
+      "in-progress-logged": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.2078,
+            0.3529,
+            0.549
+          ],
+          "alpha": 1,
+          "hex": "#355A8C"
+        },
+        "$type": "color",
+        "$description": "Share already logged, goal not reached (food sheet bars)."
+      },
+      "reached-logged": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.2941,
+            0.4196,
+            0.2824
+          ],
+          "alpha": 1,
+          "hex": "#4B6B48"
+        },
+        "$type": "color",
+        "$description": "Share already logged, goal reached (food sheet bars)."
+      }
+    },
+    "camera": {
+      "accent": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8314,
+            0.6471,
+            0.2824
+          ],
+          "alpha": 1,
+          "hex": "#D4A548"
+        },
+        "$type": "color",
+        "$description": "Viewfinder corners and scan line. Same value in both themes."
+      },
+      "background": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1059,
+            0.102,
+            0.0902
+          ],
+          "alpha": 1,
+          "hex": "#1B1A17"
+        },
+        "$type": "color",
+        "$description": "Camera chrome: round buttons over the camera. Same value in both themes."
+      },
+      "button": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9686,
+            0.9451,
+            0.8784
+          ],
+          "alpha": 0.18,
+          "hex": "#F7F1E0"
+        },
+        "$type": "color",
+        "$description": "Button over the camera: washi at 18 % on the camera feed, label role/camera/text. Same value in both themes."
+      },
+      "text": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9686,
+            0.9451,
+            0.8784
+          ],
+          "alpha": 1,
+          "hex": "#F7F1E0"
+        },
+        "$type": "color",
+        "$description": "Text and icons over the camera. Same value in both themes."
+      },
+      "text-secondary": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.7412,
+            0.7059,
+            0.6118
+          ],
+          "alpha": 1,
+          "hex": "#BDB49C"
+        },
+        "$type": "color",
+        "$description": "Secondary text over the camera, under the scanner title. Same value in both themes."
+      }
+    }
+  }
+}

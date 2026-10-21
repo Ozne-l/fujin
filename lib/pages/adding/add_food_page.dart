@@ -74,31 +74,31 @@ class AddFoodPage extends HookConsumerWidget {
     }
 
     return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Offstage(
-              offstage: !searching,
-              child: TickerMode(
-                enabled: searching,
-                child: ExcludeFocus(
-                  excluding: !searching,
-                  child: SearchView(
-                    key: ValueKey(scanned.value),
-                    date: date,
-                    mfpMealName: mfpMealName,
-                    scan: scanned.value,
-                    onOpen: (draft, {barcode}) =>
-                        opened.value = (draft: draft, barcode: barcode),
-                    onScan: () => unawaited(openScanner()),
-                  ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Offstage(
+            offstage: !searching,
+            child: TickerMode(
+              enabled: searching,
+              child: ExcludeFocus(
+                excluding: !searching,
+                child: SearchView(
+                  key: ValueKey(scanned.value),
+                  date: date,
+                  mfpMealName: mfpMealName,
+                  scan: scanned.value,
+                  onOpen: (draft, {barcode}) =>
+                      opened.value = (draft: draft, barcode: barcode),
+                  onScan: () => unawaited(openScanner()),
                 ),
               ),
             ),
-            if (opened.value case (:final draft, :final barcode))
-              Positioned.fill(
+          ),
+          if (opened.value case (:final draft, :final barcode))
+            Positioned.fill(
+              child: SafeArea(
+                bottom: false,
                 child: FoodView(
                   key: ValueKey(draft),
                   initial: draft,
@@ -116,8 +116,8 @@ class AddFoodPage extends HookConsumerWidget {
                   onLeave: context.pop,
                 ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }

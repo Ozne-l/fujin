@@ -15,15 +15,15 @@ class DiaryMealCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final secondary = FujinText.inter13Regular.copyWith(
-      color: FujinColorRole.textSecondary,
+      color: context.colors.textSecondary,
     );
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
       padding: const EdgeInsets.all(FujinSpace.s5),
       decoration: BoxDecoration(
-        color: FujinColorRole.backgroundCard,
+        color: context.colors.backgroundCard,
         borderRadius: BorderRadius.circular(FujinRadius.card),
-        border: Border.all(color: FujinColorRole.borderCard),
+        border: Border.all(color: context.colors.borderCard),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -33,13 +33,13 @@ class DiaryMealCard extends StatelessWidget {
             leading: Text(
               meal.name,
               style: FujinText.inter16Medium.copyWith(
-                color: FujinColorRole.textPrimary,
+                color: context.colors.textPrimary,
               ),
             ),
             trailing: Text(
               context.intl.kilocalories(meal.kilocalories),
               style: FujinText.inter15Semibold.copyWith(
-                color: FujinColorRole.textPrimary,
+                color: context.colors.textPrimary,
               ),
             ),
           ),

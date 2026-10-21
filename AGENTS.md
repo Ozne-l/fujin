@@ -11,7 +11,7 @@ Run `flutter` and `dart` directly (Flutter 3.44.9, Dart 3.12.2).
 | After a pubspec change | `flutter pub get` |
 | After changing a `@MappableClass` / `@MappableEnum` | `dart run build_runner build` |
 | After editing `lib/l10n/app_fr.arb` | `flutter gen-l10n` |
-| After editing `design/tokens/fujin.tokens.json` | `dart run tool/generate_tokens.dart` |
+| After editing a file in `design/tokens/` | `dart run tool/generate_tokens.dart` |
 | Before handing work back | `dart analyze --fatal-infos` |
 | Before handing work back | `dart format lib test tool` |
 | Before handing work back | `flutter test` |
@@ -59,8 +59,10 @@ clients       package:ekklo_client, package:myfitnesspal_client
 | Table change | append a script to `schemaMigrations` | `lib/data/database/schema.dart` |
 | Repository (one per aggregate) | `lib/data/<aggregate>/` | `sent_link_repository.dart` |
 | User-facing text | `lib/l10n/app_fr.arb` (template, Figma wording) and `lib/l10n/app_en.arb` | `nothingNewTitle` |
-| Colour, size, text style | design tokens, then the generator | `FujinColorRole.textPrimary` |
+| Colour, size, text style | design tokens (light and dark), then the generator; colours read from the theme | `context.colors.textPrimary` |
 | Animation | `motor` preset in `lib/app/theme/fujin_motion.dart` | `FujinMotion.progress` |
+| Liquid glass look | the `FujinGlass` presets in `lib/app/theme/fujin_glass.dart` (`floating` for the plate and drops, `lens` for the tab lens, `control` for buttons, search fields and filters), matched to the owner's Instagram recordings ([ADR 0033](docs/adr/0033-liquid-glass-and-fade-through.md)); a glass control is a `FujinGlassButton` inside a `GlassLayer`; a text button, search field or filter takes a `GlassFill` with a `GlassFinish` (`clear`, `ink` or a tint), which the theme already gives every `FilledButton` and `OutlinedButton` (`FujinTheme.floatingButtonStyle` for a pinned ink button, `GlassSearchField` for a search field; `GlassBody` draws the glass of both `GlassFill` and `GlassSurface`, and `LensSwell` swells the lens of the tab bar, switch and segments) ([ADR 0036](docs/adr/0036-glass-on-buttons-search-and-filters.md)) | `FujinGlass.floating`, `GlassFill.style` |
+| List scrolling under a fixed header | `ScrollEdgeBlur` around the list (`cover` = what stays fixed over it), or an `EdgeBlur` behind a pinned header; never a `ShaderMask` over glass ([ADR 0037](docs/adr/0037-progressive-blur-under-fixed-headers.md)) | `ScrollEdgeBlur(cover: …)` |
 | Icon or image exported from Figma | `assets/icons/` (SVG, `currentColor`) or `assets/images/` with `2.0x/` to `4.0x/` variants | `volute.svg`, `seigaiha.png` |
 | App icon | the Figma component "Logo · Fūjin", rendered to `android/app/src/{main,dev}/res/mipmap-*/` (legacy icon and adaptive layers, `mipmap-anydpi-v26/ic_launcher.xml`) and `ios/Runner/Assets.xcassets/AppIcon{,-dev}.appiconset/` | `ic_launcher_foreground.png` |
 | Test helpers | `test/support/` | `fixtures.dart`, `fake_backends.dart` |

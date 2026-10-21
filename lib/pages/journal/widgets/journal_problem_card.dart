@@ -66,7 +66,7 @@ class JournalProblemCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
       padding: const EdgeInsets.all(FujinSpace.s5),
       decoration: BoxDecoration(
-        color: FujinColorRole.backgroundAlert,
+        color: context.colors.backgroundAlert,
         borderRadius: BorderRadius.circular(FujinRadius.stateCard),
       ),
       child: Column(
@@ -84,7 +84,7 @@ class JournalProblemCard extends StatelessWidget {
                 child: Text(
                   title,
                   style: FujinText.hina30.copyWith(
-                    color: FujinColorRole.textAlert,
+                    color: context.colors.textAlert,
                   ),
                 ),
               ),
@@ -97,20 +97,20 @@ class JournalProblemCard extends StatelessWidget {
               Text(
                 headline,
                 style: FujinText.inter15Medium.copyWith(
-                  color: FujinColorRole.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
               Text(
                 detail,
                 style: FujinText.inter13Regular.copyWith(
-                  color: FujinColorRole.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
             ],
           ),
           FilledButton(
             onPressed: onPressed,
-            style: FujinTheme.alertButtonStyle,
+            style: FujinTheme.alertButtonStyle(context.colors),
             child: Text(action),
           ),
         ],

@@ -18,7 +18,7 @@ class InfoBanner extends StatelessWidget {
     margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
     padding: const EdgeInsets.all(FujinSpace.s3),
     decoration: BoxDecoration(
-      color: FujinColorRole.backgroundInfo,
+      color: context.colors.backgroundInfo,
       borderRadius: BorderRadius.circular(FujinRadius.field),
     ),
     child: Row(
@@ -27,7 +27,7 @@ class InfoBanner extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: FujinSize.tile / 2,
-          backgroundColor: FujinColorRole.textInfo,
+          backgroundColor: context.colors.textInfo,
           child: icon,
         ),
         Expanded(
@@ -39,13 +39,13 @@ class InfoBanner extends StatelessWidget {
                 Text(
                   title,
                   style: FujinText.inter15Medium.copyWith(
-                    color: FujinColorRole.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                 ),
               Text(
                 detail,
                 style: FujinText.inter13Regular.copyWith(
-                  color: FujinColorRole.textInfo,
+                  color: context.colors.textInfo,
                 ),
               ),
             ],

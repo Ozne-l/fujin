@@ -26,8 +26,8 @@ class FujinSpinner extends StatelessWidget {
     child: ProgressRing(
       size: _tone.size,
       stroke: FujinStroke.spinner,
-      track: _tone.track,
-      arc: _tone.arc,
+      track: _tone.track(context.colors),
+      arc: _tone.arc(context.colors),
       progress: _sweep,
       cap: StrokeCap.butt,
       child: const SizedBox.shrink(),
@@ -36,29 +36,23 @@ class FujinSpinner extends StatelessWidget {
 }
 
 enum _SpinnerTone {
-  card(
-    size: FujinSize.spinner,
-    track: FujinColorRole.goalTrack,
-    arc: FujinColorRole.textLink,
-  ),
-  button(
-    size: FujinSize.spinnerSmall,
-    track: FujinColorRole.textDisabled,
-    arc: FujinColorRole.textSecondary,
-  ),
-  camera(
-    size: FujinSize.spinnerSmall,
-    track: FujinColor.usuzumi,
-    arc: FujinColor.washi,
-  );
+  card(FujinSize.spinner),
+  button(FujinSize.spinnerSmall),
+  camera(FujinSize.spinnerSmall);
 
-  const _SpinnerTone({
-    required this.size,
-    required this.track,
-    required this.arc,
-  });
+  const _SpinnerTone(this.size);
 
   final double size;
-  final Color track;
-  final Color arc;
+
+  Color track(FujinColors colors) => switch (this) {
+    card => colors.goalTrack,
+    button => colors.textDisabled,
+    camera => colors.cameraTextSecondary,
+  };
+
+  Color arc(FujinColors colors) => switch (this) {
+    card => colors.textLink,
+    button => colors.textSecondary,
+    camera => colors.cameraText,
+  };
 }

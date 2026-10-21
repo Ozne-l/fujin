@@ -25,7 +25,7 @@ class AddSectionLabel extends StatelessWidget {
           child: Text(
             label,
             style: FujinText.inter12Medium.copyWith(
-              color: FujinColorRole.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
         ),
@@ -33,7 +33,7 @@ class AddSectionLabel extends StatelessWidget {
           Text(
             trailing,
             style: FujinText.inter12Regular.copyWith(
-              color: FujinColorRole.textTertiary,
+              color: context.colors.textTertiary,
             ),
           ),
       ],

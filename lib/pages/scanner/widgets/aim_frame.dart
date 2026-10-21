@@ -27,7 +27,11 @@ class AimFrame extends StatelessWidget {
         children: [
           Positioned.fill(
             child: CustomPaint(
-              painter: _AimPainter(frame: frame, read: read),
+              painter: _AimPainter(
+                frame: frame,
+                read: read,
+                colors: context.colors,
+              ),
             ),
           ),
           Positioned(
@@ -41,7 +45,7 @@ class AimFrame extends StatelessWidget {
                   hint,
                   textAlign: TextAlign.center,
                   style: FujinText.inter15Medium.copyWith(
-                    color: FujinColor.washi,
+                    color: context.colors.cameraText,
                   ),
                 ),
                 if (busy) const FujinSpinner.camera(),
@@ -55,10 +59,15 @@ class AimFrame extends StatelessWidget {
 }
 
 class _AimPainter extends CustomPainter {
-  const _AimPainter({required this.frame, required this.read});
+  const _AimPainter({
+    required this.frame,
+    required this.read,
+    required this.colors,
+  });
 
   final Rect frame;
   final bool read;
+  final FujinColors colors;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -73,12 +82,12 @@ class _AimPainter extends CustomPainter {
           ),
         ),
       ),
-      Paint()..color = FujinColorRole.backgroundScrim,
+      Paint()..color = colors.backgroundScrim,
     );
     final corner = Paint()
       ..color = switch (read) {
-        true => FujinColor.kin,
-        false => FujinColorRole.backgroundPage,
+        true => colors.cameraAccent,
+        false => colors.cameraText,
       };
     final outer = frame.inflate(FujinStroke.aimCorner / 2);
     const arm = FujinSize.aimCorner;
@@ -108,12 +117,14 @@ class _AimPainter extends CustomPainter {
           ),
           const Radius.circular(FujinStroke.readLine / 2),
         ),
-        Paint()..color = FujinColor.kin,
+        Paint()..color = colors.cameraAccent,
       );
     }
   }
 
   @override
   bool shouldRepaint(_AimPainter oldDelegate) =>
-      frame != oldDelegate.frame || read != oldDelegate.read;
+      frame != oldDelegate.frame ||
+      read != oldDelegate.read ||
+      colors != oldDelegate.colors;
 }

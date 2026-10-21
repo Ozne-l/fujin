@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/pages/adding/add_shortcut.dart';
@@ -11,13 +12,35 @@ import 'package:fujin/pages/tabs/fujin_tab.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class TabShell extends ConsumerWidget {
+class TabShell extends HookConsumerWidget {
   const TabShell({required this.navigationShell, super.key});
 
   final StatefulNavigationShell navigationShell;
 
+  static const double _minimizeTravel = 24;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final minimized = useState(false);
+    final travel = useRef<double>(0);
+
+    bool onScroll(ScrollUpdateNotification notification) {
+      final metrics = notification.metrics;
+      final delta = notification.scrollDelta ?? 0;
+      if (metrics.axis != Axis.vertical || delta == 0) return false;
+      travel.value = switch (travel.value.sign == delta.sign) {
+        true => travel.value + delta,
+        false => delta,
+      };
+      minimized.value = switch (travel.value) {
+        _ when metrics.pixels <= metrics.minScrollExtent => false,
+        > _minimizeTravel => true,
+        < -_minimizeTravel => false,
+        _ => minimized.value,
+      };
+      return false;
+    }
+
     void onAdded(AddedFood added) {
       navigationShell.goBranch(FujinTab.journal.index);
       ref
@@ -56,13 +79,21 @@ class TabShell extends ConsumerWidget {
 
     return Scaffold(
       extendBody: true,
-      body: navigationShell,
+      body: NotificationListener<ScrollUpdateNotification>(
+        onNotification: onScroll,
+        child: navigationShell,
+      ),
       bottomNavigationBar: FloatingTabBar(
         selected: FujinTab.values[navigationShell.currentIndex],
-        onSelect: (tab) => navigationShell.goBranch(
-          tab.index,
-          initialLocation: tab.index == navigationShell.currentIndex,
-        ),
+        minimized: minimized.value,
+        onSelect: (tab) {
+          minimized.value = false;
+          travel.value = 0;
+          navigationShell.goBranch(
+            tab.index,
+            initialLocation: tab.index == navigationShell.currentIndex,
+          );
+        },
         onScan: canAdd ? () => unawaited(scan()) : null,
       ),
     );

@@ -12,6 +12,8 @@ import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/preferences/fujin_preferences.dart';
 import 'package:fujin/domain/goals/day_goal_state.dart';
 import 'package:fujin/pages/adding/add_search_notifier.dart';
+import 'package:fujin/pages/common/appearance_toggle.dart';
+import 'package:fujin/pages/common/day_picker_sheet.dart';
 import 'package:fujin/pages/common/gold_volute.dart';
 import 'package:fujin/pages/common/souffle_refresh.dart';
 import 'package:fujin/pages/journal/widgets/day_ring.dart';
@@ -29,6 +31,9 @@ import '../support/pump_fujin.dart';
 const _space = '\u202f';
 const _souffleStep = Duration(milliseconds: 500);
 const _dragFrame = Duration(milliseconds: 16);
+const _manyRows = 12;
+const _headerScroll = 150.0;
+const _pixel = 0.5;
 
 final Finder _souffleDisc = find.descendant(
   of: find.descendant(
@@ -115,6 +120,11 @@ Future<void> _tap(WidgetTester tester, Finder target) async {
   await tester.pumpAndSettle();
 }
 
+Future<void> _backToToday(WidgetTester tester) async {
+  await tester.tap(find.text("Aujourd'hui ›"));
+  await tester.pumpAndSettle();
+}
+
 final MfpFood _basmati = mfpFood(
   rice,
   description: 'Riz basmati',
@@ -130,12 +140,16 @@ FakeBackends _basmatiBackends() => FakeBackends(
   },
 );
 
-Future<void> _addBasmatiToLunch(WidgetTester tester) async {
+Future<void> _openBasmatiInLunch(WidgetTester tester) async {
   await _tap(tester, find.text('Ajouter un aliment').last);
   await tester.enterText(find.byType(TextField), 'riz basmati');
   await tester.pump(AddSearchNotifier.typingPause);
   await tester.pumpAndSettle();
   await _tap(tester, find.text('Riz basmati').first);
+}
+
+Future<void> _addBasmatiToLunch(WidgetTester tester) async {
+  await _openBasmatiInLunch(tester);
   await _tap(tester, find.text('Ajouter à MFP et Ekklo'));
 }
 
@@ -282,8 +296,8 @@ void main() {
   });
 
   testWidgets(
-    'brings the Souffle disc down with an Android pull and rests it above '
-    'the week band',
+    'brings the Souffle disc down with the pull and rests it above the week '
+    'band',
     (tester) async {
       _tallView(tester, size: const Size(1080, 2400), pixelRatio: 2);
       final backends = FakeBackends(
@@ -309,11 +323,12 @@ void main() {
         check(top).isGreaterThan(tops[index - 1]);
       }
 
-      for (var frame = 0; frame < 20; frame++) {
+      for (var frame = 0; frame < 30; frame++) {
         await gesture.moveBy(const Offset(0, 15));
         await tester.pump(_dragFrame);
       }
       await gesture.up();
+      await tester.pump(_dragFrame);
       await tester.pump(_souffleStep);
       await tester.pump(_souffleStep);
 
@@ -328,8 +343,39 @@ void main() {
       await tester.pump(_souffleStep);
       await tester.pump(_souffleStep);
     },
-    variant: TargetPlatformVariant.only(TargetPlatform.android),
   );
+
+  testWidgets('pins the day title on the line of the theme toggle with the '
+      'week band below it while the meals scroll under them', (tester) async {
+    await pumpFujin(
+      tester,
+      FakeBackends(
+        mealNames: [breakfast],
+        entries: [for (var row = 0; row < _manyRows; row++) entry('E-$row')],
+      ),
+    );
+    final title = find.text("Aujourd'hui");
+    final band = find.byType(WeekBand);
+    final gap = tester.getTopLeft(band).dy - tester.getBottomLeft(title).dy;
+
+    await tester.drag(find.text(breakfast), const Offset(0, -_headerScroll));
+    await tester.pumpAndSettle();
+
+    check(
+      tester.getCenter(title).dy,
+    ).isCloseTo(tester.getCenter(find.byType(AppearanceToggle)).dy, _pixel);
+    check(
+      tester.getTopLeft(band).dy - tester.getBottomLeft(title).dy,
+    ).isCloseTo(gap, _pixel);
+    final pinned = tester.getTopLeft(band);
+    final meal = tester.getTopLeft(find.text(breakfast));
+
+    await tester.drag(find.text(breakfast), const Offset(0, -_headerScroll));
+    await tester.pumpAndSettle();
+
+    check(tester.getTopLeft(band)).equals(pinned);
+    check(tester.getTopLeft(find.text(breakfast)).dy).isLessThan(meal.dy);
+  });
 
   testWidgets('does not say nothing is new when Ekklo stops answering', (
     tester,
@@ -445,8 +491,7 @@ void main() {
         _rich('3${_space}120 / 3${_space}000 kcal').evaluate(),
       ).length.equals(1);
 
-      await tester.tap(find.text("Aujourd'hui ›"));
-      await tester.pumpAndSettle();
+      await _backToToday(tester);
       check(find.text("Aujourd'hui").evaluate()).length.equals(1);
     });
 
@@ -543,13 +588,13 @@ void main() {
       await _swipeWeekBack(tester);
       await _swipeWeekBack(tester);
       await tester.pump(const Duration(minutes: 4));
-      await _tap(tester, find.text("Aujourd'hui ›"));
+      await _backToToday(tester);
       check(_diaryReads(backends, _mondayDate)).equals(mondayReads);
 
       await _swipeWeekBack(tester);
       await _swipeWeekBack(tester);
       await tester.pump(const Duration(minutes: 6));
-      await _tap(tester, find.text("Aujourd'hui ›"));
+      await _backToToday(tester);
       check(_diaryReads(backends, _mondayDate)).equals(mondayReads + 1);
     });
 
@@ -565,7 +610,7 @@ void main() {
       await _tap(tester, find.text('Journal'));
       await _swipeWeekBack(tester);
       await _swipeWeekBack(tester);
-      await _tap(tester, find.text("Aujourd'hui ›"));
+      await _backToToday(tester);
       check(_diaryReads(backends, _mondayDate)).equals(mondayReads);
     });
 
@@ -1037,6 +1082,31 @@ void main() {
       check(find.text('1/1 · Riz basmati').evaluate()).length.equals(1);
     });
 
+    testWidgets('shows the food on the day chosen in the fiche once the '
+        'Journal moves there', (tester) async {
+      _tallView(tester);
+      final backends = _basmatiBackends();
+      await pumpFujin(tester, backends);
+      await _openBasmatiInLunch(tester);
+      await _tap(tester, find.byIcon(Icons.calendar_today_outlined));
+      await _tap(
+        tester,
+        find.descendant(
+          of: find.byType(DayPickerSheet),
+          matching: find.text('6'),
+        ),
+      );
+      await _tap(tester, find.text('Ajouter à MFP et Ekklo'));
+
+      await tester.tap(find.text('6'));
+      await tester.pumpAndSettle();
+
+      check(
+        backends.entries.single,
+      ).has((entry) => entry.date, 'date').equals(DateTime.utc(2026, 10, 6));
+      check(find.text('1/1 · Riz basmati').evaluate()).length.equals(1);
+    });
+
     testWidgets('removes the food from both apps on Annuler', (tester) async {
       _tallView(tester);
       final backends = _basmatiBackends();
@@ -1061,7 +1131,7 @@ void main() {
       await pumpFujin(tester, backends, goals: _goals);
       await _tap(tester, find.text('4'));
       await _addBasmatiToLunch(tester);
-      await _tap(tester, find.text("Aujourd'hui ›"));
+      await _backToToday(tester);
       check(_ring(tester, '4').state).equals(DayGoalState.missed);
 
       await _tap(tester, find.text('Annuler'));

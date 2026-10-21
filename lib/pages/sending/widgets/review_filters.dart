@@ -33,6 +33,7 @@ class ReviewFilters extends StatelessWidget {
               onTap: chip.onSelected,
               borderRadius: BorderRadius.circular(FujinRadius.pill),
               child: StatusPill(
+                glass: true,
                 label: chip.label,
                 tone: switch (chip.selected) {
                   true => PillTone.dark,

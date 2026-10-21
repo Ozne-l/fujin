@@ -79,7 +79,7 @@ class SouffleRefresh extends HookWidget {
             ),
           ),
           Positioned(
-            top: 0,
+            top: MediaQuery.paddingOf(context).top,
             left: 0,
             right: 0,
             child: IgnorePointer(
@@ -139,10 +139,10 @@ class _SouffleDisc extends StatelessWidget {
       height: FujinSize.controlHeight,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: FujinColorRole.backgroundCard,
+        color: context.colors.backgroundCard,
         shape: BoxShape.circle,
-        border: Border.all(color: FujinColorRole.borderCard),
-        boxShadow: const [FujinTheme.floatingShadow],
+        border: Border.all(color: context.colors.borderCard),
+        boxShadow: [FujinTheme.floatingShadow(context.colors)],
       ),
       child: SingleMotionBuilder(
         motion: FujinMotion.of(context, FujinMotion.pill),

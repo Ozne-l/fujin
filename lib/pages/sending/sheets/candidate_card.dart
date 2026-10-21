@@ -27,8 +27,8 @@ class CandidateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = switch (selected) {
-      true => FujinColor.fujin,
-      false => FujinColorRole.borderCard,
+      true => context.colors.borderFocus,
+      false => context.colors.borderCard,
     };
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(FujinRadius.card),
@@ -38,7 +38,7 @@ class CandidateCard extends StatelessWidget {
       checked: selected,
       inMutuallyExclusiveGroup: true,
       child: Material(
-        color: FujinColorRole.backgroundCard,
+        color: context.colors.backgroundCard,
         shape: shape,
         clipBehavior: Clip.antiAlias,
         child: InkWell(
@@ -59,17 +59,19 @@ class CandidateCard extends StatelessWidget {
                   height: FujinSize.radio,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: FujinColorRole.backgroundCard,
+                    color: context.colors.backgroundCard,
                     shape: BoxShape.circle,
                     border: Border.all(color: accent, width: FujinStroke.radio),
                   ),
                   child: switch (selected) {
-                    true => const DecoratedBox(
+                    true => DecoratedBox(
                       decoration: BoxDecoration(
-                        color: FujinColor.fujin,
+                        color: context.colors.backgroundAccent,
                         shape: BoxShape.circle,
                       ),
-                      child: SizedBox.square(dimension: FujinSize.radioDot),
+                      child: const SizedBox.square(
+                        dimension: FujinSize.radioDot,
+                      ),
                     ),
                     false => null,
                   },

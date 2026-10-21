@@ -116,7 +116,9 @@ class ScannerPage extends HookConsumerWidget {
             ScanIcon.asset,
             width: FujinSize.pictogramIcon,
             height: FujinSize.pictogramIcon,
-            theme: SvgTheme(currentColor: PillTone.info.foreground),
+            theme: SvgTheme(
+              currentColor: PillTone.info.foreground(context.colors),
+            ),
             excludeFromSemantics: true,
           ),
           tone: PillTone.info,
@@ -164,9 +166,9 @@ class ScannerPage extends HookConsumerWidget {
         if (!didPop) notifier.aim();
       },
       child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: FujinSystemBars.onDark,
+        value: FujinSystemBars.camera(context.colors),
         child: Scaffold(
-          backgroundColor: FujinColorRole.backgroundDark,
+          backgroundColor: context.colors.cameraBackground,
           body: Stack(
             fit: StackFit.expand,
             children: [
@@ -207,7 +209,7 @@ class ScannerPage extends HookConsumerWidget {
                                   context.intl.scannerTitle,
                                   textAlign: TextAlign.center,
                                   style: FujinText.inter16Medium.copyWith(
-                                    color: FujinColor.washi,
+                                    color: context.colors.cameraText,
                                   ),
                                 ),
                                 Text(
@@ -217,7 +219,7 @@ class ScannerPage extends HookConsumerWidget {
                                   ),
                                   textAlign: TextAlign.center,
                                   style: FujinText.inter13Regular.copyWith(
-                                    color: FujinColorRole.textDisabled,
+                                    color: context.colors.cameraTextSecondary,
                                   ),
                                 ),
                               ],
@@ -244,8 +246,8 @@ class ScannerPage extends HookConsumerWidget {
                         ),
                         label: Text(context.intl.scannerTypeCode),
                         style: TextButton.styleFrom(
-                          backgroundColor: FujinColorRole.backgroundGlass,
-                          foregroundColor: FujinColor.washi,
+                          backgroundColor: context.colors.cameraButton,
+                          foregroundColor: context.colors.cameraText,
                         ),
                       ),
                     const SizedBox(height: FujinSize.cameraActionGap),

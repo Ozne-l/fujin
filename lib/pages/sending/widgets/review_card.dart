@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/sending/nutrient_deltas.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
@@ -11,6 +10,8 @@ import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
+import 'package:fujin/pages/common/glass_fill.dart';
+import 'package:fujin/pages/common/glass_finish.dart';
 import 'package:fujin/pages/common/status_pill.dart';
 import 'package:fujin/pages/sending/entry_choices.dart';
 import 'package:fujin/pages/sending/send_plan_notifier.dart';
@@ -42,9 +43,9 @@ class ReviewCard extends ConsumerWidget {
         FujinSpace.s1,
       ),
       decoration: BoxDecoration(
-        color: FujinColorRole.backgroundCard,
+        color: context.colors.backgroundCard,
         borderRadius: BorderRadius.circular(FujinRadius.card),
-        border: Border.all(color: FujinColorRole.borderCard),
+        border: Border.all(color: context.colors.borderCard),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -65,13 +66,13 @@ class ReviewCard extends ConsumerWidget {
                     ),
                   }.toUpperCase(),
                   style: FujinText.inter12Medium.copyWith(
-                    color: FujinColorRole.textTertiary,
+                    color: context.colors.textTertiary,
                   ),
                 ),
                 Text(
                   entry.food.description,
                   style: FujinText.inter16Medium.copyWith(
-                    color: FujinColorRole.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                 ),
                 Text(
@@ -80,7 +81,7 @@ class ReviewCard extends ConsumerWidget {
                     EntryText.energy(context.intl, entry),
                   ),
                   style: FujinText.inter13Regular.copyWith(
-                    color: FujinColorRole.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],
@@ -111,16 +112,24 @@ class ReviewCard extends ConsumerWidget {
                       if (_confirmable(planned.reason))
                         FilledButton(
                           onPressed: () => _confirm(context, ref),
-                          style: FilledButton.styleFrom(
-                            minimumSize: const Size(0, FujinSize.buttonCompact),
-                            tapTargetSize: MaterialTapTargetSize.padded,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: FujinSpace.s4,
-                            ),
-                            backgroundColor: FujinColor.fujin,
-                            foregroundColor: FujinColor.washi,
-                            textStyle: FujinText.inter14Medium,
-                          ).copyWith(overlayColor: FujinTheme.pressedOverlay),
+                          style:
+                              GlassFill.style(
+                                context.colors,
+                                GlassFinish.validated,
+                                rim: FujinStroke.glassTintRim,
+                              ).merge(
+                                FilledButton.styleFrom(
+                                  minimumSize: const Size(
+                                    0,
+                                    FujinSize.buttonCompact,
+                                  ),
+                                  tapTargetSize: MaterialTapTargetSize.padded,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: FujinSpace.s4,
+                                  ),
+                                  textStyle: FujinText.inter14Medium,
+                                ),
+                              ),
                           child: Text(context.intl.confirm),
                         ),
                     ],
@@ -193,7 +202,7 @@ class _Proposal extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(FujinSpace.s3),
       decoration: BoxDecoration(
-        color: FujinColorRole.backgroundPage,
+        color: context.colors.backgroundPage,
         borderRadius: BorderRadius.circular(FujinRadius.field),
       ),
       child: Column(
@@ -208,7 +217,7 @@ class _Proposal extends StatelessWidget {
                 child: Text(
                   title,
                   style: FujinText.inter14Medium.copyWith(
-                    color: FujinColorRole.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                 ),
               ),
@@ -219,7 +228,7 @@ class _Proposal extends StatelessWidget {
                   child: Text(
                     context.intl.change,
                     style: FujinText.inter13Medium.copyWith(
-                      color: FujinColorRole.textLink,
+                      color: context.colors.textLink,
                     ),
                   ),
                 ),
@@ -230,7 +239,7 @@ class _Proposal extends StatelessWidget {
             Text(
               detail,
               style: FujinText.inter12Regular.copyWith(
-                color: FujinColorRole.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
           if (deltas case final deltas?)

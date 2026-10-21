@@ -17,7 +17,7 @@ class SheetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: FujinColorRole.backgroundCard,
+    color: context.colors.backgroundCard,
     borderRadius: const BorderRadius.vertical(
       top: Radius.circular(FujinRadius.sheet),
     ),
@@ -45,7 +45,7 @@ class SheetCard extends StatelessWidget {
                   width: FujinSize.dragHandleWidth,
                   height: FujinSize.dragHandleHeight,
                   decoration: BoxDecoration(
-                    color: FujinColorRole.borderCard,
+                    color: context.colors.borderCard,
                     borderRadius: BorderRadius.circular(FujinRadius.bar),
                   ),
                 ),

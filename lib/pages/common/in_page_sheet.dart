@@ -13,7 +13,7 @@ class InPageSheet extends StatelessWidget {
     children: [
       GestureDetector(
         onTap: onDismiss,
-        child: const ColoredBox(color: FujinColorRole.backgroundScrim),
+        child: ColoredBox(color: context.colors.backgroundScrim),
       ),
       Align(alignment: Alignment.bottomCenter, child: child),
     ],

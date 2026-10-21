@@ -25,23 +25,23 @@ class SideRow extends StatelessWidget {
     final (status, color) = switch (state) {
       SideState.waiting => (
         context.intl.rowWaiting,
-        FujinColorRole.textSecondary,
+        context.colors.textSecondary,
       ),
       SideState.writing => (
         context.intl.addWriting,
-        FujinColorRole.textPrimary,
+        context.colors.textPrimary,
       ),
       SideState.written => (
         context.intl.addWrittenIn(meal),
-        FujinColorRole.textLink,
+        context.colors.textLink,
       ),
       SideState.failed => (
         context.intl.addNotWritten,
-        FujinColorRole.textAlert,
+        context.colors.textAlert,
       ),
       SideState.notSent => (
         context.intl.addNotSent,
-        FujinColorRole.textSecondary,
+        context.colors.textSecondary,
       ),
     };
     return SizedBox(
@@ -54,7 +54,7 @@ class SideRow extends StatelessWidget {
             child: Text(
               label,
               style: FujinText.inter15Medium.copyWith(
-                color: FujinColorRole.textPrimary,
+                color: context.colors.textPrimary,
               ),
             ),
           ),
@@ -62,19 +62,19 @@ class SideRow extends StatelessWidget {
           SizedBox.square(
             dimension: FujinSize.spinner,
             child: switch (state) {
-              SideState.waiting || SideState.notSent => const ProgressRing(
+              SideState.waiting || SideState.notSent => ProgressRing(
                 size: FujinSize.spinner,
                 stroke: FujinStroke.radio,
-                track: FujinColorRole.textDisabled,
-                child: SizedBox.shrink(),
+                track: context.colors.textDisabled,
+                child: const SizedBox.shrink(),
               ),
               SideState.writing => const FujinSpinner.card(),
-              SideState.written => const _Disc(
-                color: FujinColorRole.textLink,
+              SideState.written => _Disc(
+                color: context.colors.textLink,
                 icon: Icons.check,
               ),
-              SideState.failed => const _Disc(
-                color: FujinColorRole.textAlert,
+              SideState.failed => _Disc(
+                color: context.colors.textAlert,
                 icon: Icons.priority_high,
               ),
             },
@@ -97,7 +97,7 @@ class _Disc extends StatelessWidget {
     child: Icon(
       icon,
       size: FujinSize.stepIcon,
-      color: FujinColorRole.textOnDark,
+      color: context.colors.textOnDark,
     ),
   );
 }

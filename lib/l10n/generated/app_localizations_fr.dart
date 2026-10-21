@@ -1056,6 +1056,27 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ne me demande rien : aliments mémorisés,\npuis meilleur candidat, sinon aliment perso.';
 
   @override
+  String get settingsAppearance => 'APPARENCE';
+
+  @override
+  String get appearanceSystem => 'Système';
+
+  @override
+  String get appearanceLight => 'Clair';
+
+  @override
+  String get appearanceDark => 'Sombre';
+
+  @override
+  String get appearanceDetail => 'Système suit le réglage du téléphone.';
+
+  @override
+  String get appearanceToDark => 'Passer en thème sombre';
+
+  @override
+  String get appearanceToLight => 'Passer en thème clair';
+
+  @override
   String get settingsBackup => 'SAUVEGARDE';
 
   @override

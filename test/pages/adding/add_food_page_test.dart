@@ -11,6 +11,7 @@ import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/pages/adding/add_search_notifier.dart';
+import 'package:fujin/pages/adding/widgets/day_share_bar.dart';
 import 'package:fujin/pages/common/day_picker_sheet.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
@@ -443,6 +444,20 @@ void main() {
     _otherSkyrNames.forEach(_sees);
   });
 
+  testWidgets('says nothing matched only when no remembered food matches '
+      'either (A02b)', (tester) async {
+    final backends = _skyrBackends(_skyrInPots)..mfpSearches = {'skyr': []};
+    await pumpFujin(tester, backends, ownCopies: [_skyrInPotsCopy]);
+    await _openAdd(tester);
+
+    await _search(tester, 'skyr');
+
+    _sees('1 trouvé');
+    _sees(_skyrName);
+    check(find.text('Aucun résultat').evaluate()).isEmpty();
+    check(find.text('RÉSULTATS MYFITNESSPAL').evaluate()).isEmpty();
+  });
+
   testWidgets('comes back from a remembered food to the results it left '
       '(A02b)', (tester) async {
     final backends = _skyrBackends(_skyrInPots)
@@ -582,6 +597,30 @@ void main() {
     await _openOats(tester);
 
     _sees('Dépassera de 70 kcal');
+  });
+
+  testWidgets('fills the kilocalorie bar in green when the food reaches the '
+      'goal', (tester) async {
+    await pumpFujin(
+      tester,
+      _backends(),
+      goals: const Goals(kilocalories: 370),
+    );
+    await _openAdd(tester);
+    await _openOats(tester);
+
+    final fills = tester
+        .widgetList<ColoredBox>(
+          find.descendant(
+            of: find.byType(DayShareBar),
+            matching: find.byType(ColoredBox),
+          ),
+        )
+        .map((box) => box.color);
+    check(fills).deepEquals([
+      FujinColors.light.goalReached,
+      FujinColors.light.goalReachedLogged,
+    ]);
   });
 
   testWidgets('reconnects Ekklo from the fiche when its session expired', (
@@ -837,8 +876,8 @@ void main() {
     _sees('Octobre 2025');
     check(
       _dayColor(tester, '6'),
-    ).equals(FujinColorRole.textDisabled);
-    check(_dayColor(tester, '7')).equals(FujinColorRole.textPrimary);
+    ).equals(FujinColors.light.textDisabled);
+    check(_dayColor(tester, '7')).equals(FujinColors.light.textPrimary);
 
     await tester.tap(_dayInPicker('6'));
     await tester.pumpAndSettle();

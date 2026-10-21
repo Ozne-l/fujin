@@ -47,15 +47,15 @@ class MfpSignInPage extends HookConsumerWidget {
 
     final (dot, message) = switch (state) {
       MfpSignInFailed(failure: SignInFailure.refused) => (
-        FujinColorRole.textAlert,
+        context.colors.textAlert,
         context.intl.mfpSignInRefused,
       ),
       MfpSignInFailed(failure: SignInFailure.unreachable) => (
-        FujinColorRole.textAlert,
+        context.colors.textAlert,
         context.intl.mfpSignInUnreachable,
       ),
       MfpSignInIdle() || MfpSignInRunning() || MfpSignInDone() => (
-        FujinColor.kin,
+        context.colors.borderDivider,
         context.intl.mfpSignInHint,
       ),
     };
@@ -65,7 +65,7 @@ class MfpSignInPage extends HookConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ColoredBox(
-            color: FujinColorRole.backgroundCard,
+            color: context.colors.backgroundCard,
             child: SafeArea(
               bottom: false,
               child: Padding(
@@ -83,6 +83,7 @@ class MfpSignInPage extends HookConsumerWidget {
                         context,
                       ).closeButtonTooltip,
                       onPressed: () => context.pop(false),
+                      floating: true,
                     ),
                     Expanded(
                       child: Column(
@@ -91,13 +92,13 @@ class MfpSignInPage extends HookConsumerWidget {
                           Text(
                             context.intl.sourceMyFitnessPal,
                             style: FujinText.inter15Medium.copyWith(
-                              color: FujinColorRole.textPrimary,
+                              color: context.colors.textPrimary,
                             ),
                           ),
                           Text(
                             Config.mfpWebUri.host,
                             style: FujinText.inter12Regular.copyWith(
-                              color: FujinColorRole.textTertiary,
+                              color: context.colors.textTertiary,
                             ),
                           ),
                         ],
@@ -107,13 +108,14 @@ class MfpSignInPage extends HookConsumerWidget {
                       icon: Icons.refresh,
                       tooltip: context.intl.reload,
                       onPressed: () => unawaited(webView.value?.reload()),
+                      floating: true,
                     ),
                   ],
                 ),
               ),
             ),
           ),
-          const Divider(color: FujinColorRole.borderHairline),
+          Divider(color: context.colors.borderHairline),
           Expanded(
             child: Stack(
               children: [
@@ -158,7 +160,7 @@ class _Toast extends StatelessWidget {
       vertical: FujinSpace.s3,
     ),
     decoration: BoxDecoration(
-      color: FujinColorRole.backgroundDark,
+      color: context.colors.backgroundDark,
       borderRadius: BorderRadius.circular(FujinRadius.toast),
     ),
     child: Row(
@@ -173,7 +175,7 @@ class _Toast extends StatelessWidget {
           child: Text(
             message,
             style: FujinText.inter14Medium.copyWith(
-              color: FujinColorRole.textOnDark,
+              color: context.colors.textOnDark,
             ),
           ),
         ),

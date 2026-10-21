@@ -68,11 +68,11 @@ class _DayDetail extends StatelessWidget {
                   child: _Row(
                     label: const SizedBox.shrink(),
                     mfp: _Header(
-                      dot: FujinColorRole.sourceMfp,
+                      dot: context.colors.sourceMfp,
                       label: context.intl.sourceMyFitnessPal,
                     ),
                     ekklo: _Header(
-                      dot: FujinColorRole.sourceEkklo,
+                      dot: context.colors.sourceEkklo,
                       label: context.intl.sourceEkklo,
                     ),
                   ),
@@ -97,7 +97,7 @@ class _DayDetail extends StatelessWidget {
               Text(
                 notes.join('\n'),
                 style: FujinText.inter12Regular.copyWith(
-                  color: FujinColorRole.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
             if (SendLabel.of(context.intl, counts.toSend, counts.toUpdate)
@@ -135,12 +135,12 @@ class _NutrientRow extends StatelessWidget {
       Nutrient.carbohydrates ||
       Nutrient.fat ||
       Nutrient.fiber => FujinText.inter13Medium,
-    }.copyWith(color: FujinColorRole.textPrimary);
+    }.copyWith(color: context.colors.textPrimary);
     return _Row(
       label: Text(
         JournalText.name(context.intl, nutrient),
         style: FujinText.inter13Regular.copyWith(
-          color: FujinColorRole.textSecondary,
+          color: context.colors.textSecondary,
         ),
       ),
       mfp: Text(
@@ -174,7 +174,7 @@ class _Header extends StatelessWidget {
           label,
           overflow: TextOverflow.ellipsis,
           style: FujinText.inter12Medium.copyWith(
-            color: FujinColorRole.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ),
       ),

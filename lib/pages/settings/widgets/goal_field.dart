@@ -19,44 +19,47 @@ class GoalField extends StatelessWidget {
   final ValueChanged<String> onChanged;
 
   @override
-  Widget build(BuildContext context) => TextField(
-    cursorWidth: FujinTheme.cursorWidth,
-    controller: controller,
-    onChanged: onChanged,
-    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-    textInputAction: TextInputAction.next,
-    textAlign: TextAlign.end,
-    style: FujinText.inter16Regular.copyWith(
-      color: FujinColorRole.textPrimary,
-    ),
-    decoration: InputDecoration(
-      hintText: hint,
-      prefixIcon: Padding(
-        padding: const EdgeInsetsDirectional.only(
-          start: FujinSpace.s4,
-          end: FujinSpace.s2,
-        ),
-        child: Text(
-          label,
-          style: FujinText.inter15Medium.copyWith(
-            color: FujinColorRole.textPrimary,
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return TextField(
+      cursorWidth: FujinTheme.cursorWidth,
+      controller: controller,
+      onChanged: onChanged,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      textInputAction: TextInputAction.next,
+      textAlign: TextAlign.end,
+      style: FujinText.inter16Regular.copyWith(
+        color: colors.textPrimary,
+      ),
+      decoration: InputDecoration(
+        hintText: hint,
+        prefixIcon: Padding(
+          padding: const EdgeInsetsDirectional.only(
+            start: FujinSpace.s4,
+            end: FujinSpace.s2,
+          ),
+          child: Text(
+            label,
+            style: FujinText.inter15Medium.copyWith(
+              color: colors.textPrimary,
+            ),
           ),
         ),
-      ),
-      prefixIconConstraints: const BoxConstraints(),
-      suffixIcon: Padding(
-        padding: const EdgeInsetsDirectional.only(
-          start: FujinSpace.s2,
-          end: FujinSpace.s4,
-        ),
-        child: Text(
-          unit,
-          style: FujinText.inter14Regular.copyWith(
-            color: FujinColorRole.textSecondary,
+        prefixIconConstraints: const BoxConstraints(),
+        suffixIcon: Padding(
+          padding: const EdgeInsetsDirectional.only(
+            start: FujinSpace.s2,
+            end: FujinSpace.s4,
+          ),
+          child: Text(
+            unit,
+            style: FujinText.inter14Regular.copyWith(
+              color: colors.textSecondary,
+            ),
           ),
         ),
+        suffixIconConstraints: const BoxConstraints(),
       ),
-      suffixIconConstraints: const BoxConstraints(),
-    ),
-  );
+    );
+  }
 }

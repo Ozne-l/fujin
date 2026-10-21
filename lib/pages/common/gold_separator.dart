@@ -25,8 +25,8 @@ class _GoldRule extends StatelessWidget {
   const _GoldRule();
 
   @override
-  Widget build(BuildContext context) => const Divider(
-    color: FujinColorRole.borderDivider,
+  Widget build(BuildContext context) => Divider(
+    color: context.colors.borderDivider,
     thickness: FujinStroke.dayRing,
     height: FujinStroke.dayRing,
   );

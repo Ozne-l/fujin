@@ -32,12 +32,12 @@ class ScannerMessageSheet extends StatelessWidget {
         SheetPictogram(icon: icon, tone: tone),
         Text(
           title,
-          style: FujinText.hina24.copyWith(color: FujinColorRole.textPrimary),
+          style: FujinText.hina24.copyWith(color: context.colors.textPrimary),
         ),
         Text(
           detail,
           style: FujinText.inter15Regular.copyWith(
-            color: FujinColorRole.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ),
         const SizedBox(height: FujinSpace.s1),

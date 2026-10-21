@@ -12,7 +12,7 @@ class SkeletonBar extends StatelessWidget {
     width: width,
     height: height,
     decoration: BoxDecoration(
-      color: FujinColorRole.goalTrack,
+      color: context.colors.goalTrack,
       borderRadius: BorderRadius.circular(height / 2),
     ),
   );

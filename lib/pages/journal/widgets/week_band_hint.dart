@@ -13,16 +13,21 @@ class WeekBandHint extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      const Padding(
-        padding: EdgeInsetsDirectional.only(start: FujinSize.hintPointerInset),
+      Padding(
+        padding: const EdgeInsetsDirectional.only(
+          start: FujinSize.hintPointerInset,
+        ),
         child: CustomPaint(
-          size: Size(FujinSize.hintPointerWidth, FujinSize.hintPointerHeight),
-          painter: _Pointer(),
+          size: const Size(
+            FujinSize.hintPointerWidth,
+            FujinSize.hintPointerHeight,
+          ),
+          painter: _Pointer(context.colors.backgroundDark),
         ),
       ),
       DecoratedBox(
         decoration: BoxDecoration(
-          color: FujinColorRole.backgroundDark,
+          color: context.colors.backgroundDark,
           borderRadius: BorderRadius.circular(FujinRadius.hint),
         ),
         child: Padding(
@@ -40,14 +45,14 @@ class WeekBandHint extends StatelessWidget {
                 _arrowIcon,
                 width: FujinSize.hintIcon,
                 height: FujinSize.hintIcon,
-                theme: const SvgTheme(currentColor: FujinColorRole.textOnDark),
+                theme: SvgTheme(currentColor: context.colors.textOnDark),
                 excludeFromSemantics: true,
               ),
               Flexible(
                 child: Text(
                   context.intl.weekBandHint,
                   style: FujinText.inter13Medium.copyWith(
-                    color: FujinColorRole.textOnDark,
+                    color: context.colors.textOnDark,
                   ),
                 ),
               ),
@@ -60,7 +65,9 @@ class WeekBandHint extends StatelessWidget {
 }
 
 class _Pointer extends CustomPainter {
-  const _Pointer();
+  const _Pointer(this.color);
+
+  final Color color;
 
   @override
   void paint(Canvas canvas, Size size) => canvas.drawPath(
@@ -69,9 +76,9 @@ class _Pointer extends CustomPainter {
       ..lineTo(size.width / 2, 0)
       ..lineTo(size.width, size.height)
       ..close(),
-    Paint()..color = FujinColorRole.backgroundDark,
+    Paint()..color = color,
   );
 
   @override
-  bool shouldRepaint(_Pointer oldDelegate) => false;
+  bool shouldRepaint(_Pointer oldDelegate) => oldDelegate.color != color;
 }

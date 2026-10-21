@@ -1,18 +1,35 @@
 import 'dart:ui';
 
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/pages/common/glass_finish.dart';
 
 enum PillTone {
-  validated(FujinColorRole.backgroundSuccess, FujinColorRole.textLink),
-  attention(FujinColor.kinLight, FujinColorRole.textGold),
-  info(FujinColorRole.backgroundInfo, FujinColor.sora),
-  error(FujinColorRole.backgroundAlert, FujinColorRole.textAlert),
-  neutral(FujinColor.kinari, FujinColorRole.textPrimary),
-  muted(FujinColor.kinari, FujinColorRole.textSecondary),
-  dark(FujinColor.sumi, FujinColor.washi);
+  validated,
+  attention,
+  info,
+  error,
+  neutral,
+  muted,
+  dark;
 
-  const PillTone(this.background, this.foreground);
+  Color background(FujinColors colors) => switch (this) {
+    validated => colors.backgroundSuccess,
+    attention => colors.backgroundHighlight,
+    info => colors.backgroundInfo,
+    error => colors.backgroundAlert,
+    neutral || muted => colors.backgroundNeutral,
+    dark => colors.backgroundDark,
+  };
 
-  final Color background;
-  final Color foreground;
+  GlassFinish get glass => switch (this) {
+    validated => GlassFinish.validated,
+    attention => GlassFinish.attention,
+    info => GlassFinish.info,
+    error => GlassFinish.alert,
+    neutral => GlassFinish.clear,
+    muted => GlassFinish.muted,
+    dark => GlassFinish.ink,
+  };
+
+  Color foreground(FujinColors colors) => glass.foreground(colors);
 }

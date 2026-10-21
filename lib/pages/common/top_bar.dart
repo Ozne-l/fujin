@@ -17,7 +17,7 @@ class TopBar extends StatelessWidget {
         Text(
           title,
           style: FujinText.inter15Medium.copyWith(
-            color: FujinColorRole.textPrimary,
+            color: context.colors.textPrimary,
           ),
         ),
         PositionedDirectional(
@@ -26,6 +26,7 @@ class TopBar extends StatelessWidget {
             icon: Icons.chevron_left,
             tooltip: MaterialLocalizations.of(context).backButtonTooltip,
             onPressed: () => context.pop(),
+            floating: true,
           ),
         ),
       ],

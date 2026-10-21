@@ -24,8 +24,8 @@ class StormCard extends StatelessWidget {
   Widget build(BuildContext context) => GlyphCard(
     weather: FujinWeather.storm,
     title: title,
-    titleColor: FujinColorRole.textAlert,
-    background: FujinColorRole.backgroundAlert,
+    titleColor: context.colors.textAlert,
+    background: context.colors.backgroundAlert,
     padding: const EdgeInsets.all(FujinSpace.s5),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -38,20 +38,20 @@ class StormCard extends StatelessWidget {
             Text(
               reason,
               style: FujinText.inter15Medium.copyWith(
-                color: FujinColorRole.textPrimary,
+                color: context.colors.textPrimary,
               ),
             ),
             if (waiting case final waiting?)
               Text(
                 waiting,
                 style: FujinText.inter13Regular.copyWith(
-                  color: FujinColorRole.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
           ],
         ),
         FilledButton(
-          style: FujinTheme.alertButtonStyle,
+          style: FujinTheme.alertButtonStyle(context.colors),
           onPressed: onPressed,
           child: Text(action),
         ),

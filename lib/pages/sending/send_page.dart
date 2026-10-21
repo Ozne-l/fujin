@@ -50,22 +50,27 @@ class SendPage extends HookConsumerWidget {
       },
       child: Scaffold(
         body: SafeArea(
+          top: false,
           child: FadeThrough(
             child: switch ((sendState, planState)) {
-              (SendDone(:final report), _) => switch (report.mode) {
-                SendMode.reviewed => SentView(report: report),
-                SendMode.automatic => AutomaticSentView(report: report),
-              },
+              (SendDone(:final report), _) => _belowStatusBar(
+                switch (report.mode) {
+                  SendMode.reviewed => SentView(report: report),
+                  SendMode.automatic => AutomaticSentView(report: report),
+                },
+              ),
               (SendRunning(:final progress), SendPlanReady(:final plan)) =>
-                SendingView(plan: plan, progress: progress),
+                _belowStatusBar(SendingView(plan: plan, progress: progress)),
               (
                 SendFailed(:final progress, :final failure),
                 SendPlanReady(:final plan),
               ) =>
-                InterruptedView(
-                  plan: plan,
-                  progress: progress,
-                  failure: failure,
+                _belowStatusBar(
+                  InterruptedView(
+                    plan: plan,
+                    progress: progress,
+                    failure: failure,
+                  ),
                 ),
               (_, SendPlanSearching(:final plan)) => ReviewView(
                 plan: plan,
@@ -73,9 +78,11 @@ class SendPage extends HookConsumerWidget {
               ),
               (_, SendPlanReady(:final plan)) => ReviewView(plan: plan),
               (_, SendPlanFailed(:final plan, :final failure)) =>
-                PlanFailedView(
-                  plan: plan,
-                  failure: failure,
+                _belowStatusBar(
+                  PlanFailedView(
+                    plan: plan,
+                    failure: failure,
+                  ),
                 ),
             },
           ),
@@ -83,4 +90,10 @@ class SendPage extends HookConsumerWidget {
       ),
     );
   }
+
+  static Widget _belowStatusBar(Widget view) => SafeArea(
+    key: ValueKey(view.runtimeType),
+    bottom: false,
+    child: view,
+  );
 }

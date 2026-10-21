@@ -35,7 +35,7 @@ class WritePanel extends StatelessWidget {
     final meal = draft.mfpMealName;
     final children = switch (state) {
       AddWriteRunning(:final stage) => [
-        _title(context.intl.addingTitle),
+        _title(context.colors, context.intl.addingTitle),
         _Sides(
           mfp: switch (stage) {
             AddStage.mfp => SideState.writing,
@@ -50,12 +50,12 @@ class WritePanel extends StatelessWidget {
         FilledButton.icon(
           onPressed: null,
           style: FilledButton.styleFrom(
-            disabledForegroundColor: FujinColorRole.textSecondary,
+            disabledForegroundColor: context.colors.textSecondary,
           ),
           icon: const FujinSpinner.button(),
           label: Text(context.intl.addAdding),
         ),
-        _note(context.intl.addAddingNote, center: true),
+        _note(context.colors, context.intl.addAddingNote, center: true),
       ],
       AddWriteEkkloFailed(
         problem: ReadProblem.ekkloSessionExpired,
@@ -66,10 +66,14 @@ class WritePanel extends StatelessWidget {
             icon: Icon(Icons.lock_outline),
             tone: PillTone.error,
           ),
-          _source(context.intl.sourceEkklo, FujinColorRole.sourceEkklo),
-          _title(context.intl.addEkkloSessionTitle),
+          _source(
+            context.colors,
+            context.intl.sourceEkklo,
+            context.colors.sourceEkklo,
+          ),
+          _title(context.colors, context.intl.addEkkloSessionTitle),
           _Sides(mfp: SideState.written, ekklo: SideState.failed, meal: meal),
-          _note(context.intl.addEkkloFailedDetail),
+          _note(context.colors, context.intl.addEkkloFailedDetail),
           FilledButton(
             onPressed: switch (undoing) {
               true => null,
@@ -90,7 +94,7 @@ class WritePanel extends StatelessWidget {
           icon: Icon(Icons.warning_amber_rounded),
           tone: PillTone.error,
         ),
-        _title(switch (problem) {
+        _title(context.colors, switch (problem) {
           ReadProblem.ekkloUnavailable ||
           ReadProblem.unknown => context.intl.addEkkloNoReply,
           ReadProblem.offline ||
@@ -102,7 +106,7 @@ class WritePanel extends StatelessWidget {
           ),
         }),
         _Sides(mfp: SideState.written, ekklo: SideState.failed, meal: meal),
-        _note(context.intl.addEkkloFailedDetail),
+        _note(context.colors, context.intl.addEkkloFailedDetail),
         FilledButton.icon(
           onPressed: switch (undoing) {
             true => null,
@@ -124,9 +128,14 @@ class WritePanel extends StatelessWidget {
           icon: Icon(Icons.lock_outline),
           tone: PillTone.error,
         ),
-        _source(context.intl.sourceMyFitnessPal, FujinColorRole.sourceMfp),
-        _title(context.intl.addMfpSessionTitle),
+        _source(
+          context.colors,
+          context.intl.sourceMyFitnessPal,
+          context.colors.sourceMfp,
+        ),
+        _title(context.colors, context.intl.addMfpSessionTitle),
         _note(
+          context.colors,
           context.intl.addMfpSessionDetail(
             draft.food.description,
             EntryText.serving(context.intl, draft.entry),
@@ -145,9 +154,13 @@ class WritePanel extends StatelessWidget {
           icon: Icon(Icons.lock_outline),
           tone: PillTone.error,
         ),
-        _source(context.intl.sourceEkklo, FujinColorRole.sourceEkklo),
-        _title(context.intl.addEkkloSessionTitle),
-        _note(context.intl.addEkkloSessionDetail),
+        _source(
+          context.colors,
+          context.intl.sourceEkklo,
+          context.colors.sourceEkklo,
+        ),
+        _title(context.colors, context.intl.addEkkloSessionTitle),
+        _note(context.colors, context.intl.addEkkloSessionDetail),
         FilledButton(
           onPressed: () => actions.signIn(FujinRoute.ekkloSignIn),
           child: Text(context.intl.ekkloReconnect),
@@ -159,7 +172,7 @@ class WritePanel extends StatelessWidget {
           icon: Icon(Icons.warning_amber_rounded),
           tone: PillTone.error,
         ),
-        _title(switch (problem) {
+        _title(context.colors, switch (problem) {
           ReadProblem.mfpUnavailable ||
           ReadProblem.unknown => context.intl.addMfpNoReply,
           ReadProblem.offline ||
@@ -186,7 +199,7 @@ class WritePanel extends StatelessWidget {
             meal: meal,
           ),
         },
-        _note(context.intl.addMfpFailedDetail),
+        _note(context.colors, context.intl.addMfpFailedDetail),
         FilledButton.icon(
           onPressed: actions.retry,
           icon: const Icon(Icons.refresh),
@@ -203,30 +216,31 @@ class WritePanel extends StatelessWidget {
     return InPageSheet(child: SheetCard(children: children));
   }
 
-  static Widget _title(String text) => Text(
+  static Widget _title(FujinColors colors, String text) => Text(
     text,
-    style: FujinText.hina24.copyWith(color: FujinColorRole.textPrimary),
+    style: FujinText.hina24.copyWith(color: colors.textPrimary),
   );
 
-  static Widget _note(String text, {bool center = false}) => Text(
-    text,
-    textAlign: switch (center) {
-      true => TextAlign.center,
-      false => TextAlign.start,
-    },
-    style: FujinText.inter14Regular.copyWith(
-      color: FujinColorRole.textSecondary,
-    ),
-  );
+  static Widget _note(FujinColors colors, String text, {bool center = false}) =>
+      Text(
+        text,
+        textAlign: switch (center) {
+          true => TextAlign.center,
+          false => TextAlign.start,
+        },
+        style: FujinText.inter14Regular.copyWith(
+          color: colors.textSecondary,
+        ),
+      );
 
-  static Widget _source(String label, Color dot) => Row(
+  static Widget _source(FujinColors colors, String label, Color dot) => Row(
     spacing: FujinSpace.s2,
     children: [
       SourceDot(color: dot),
       Text(
         label,
         style: FujinText.inter12Medium.copyWith(
-          color: FujinColorRole.textSecondary,
+          color: colors.textSecondary,
         ),
       ),
     ],
@@ -245,21 +259,21 @@ class _Sides extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: FujinSpace.s4),
       decoration: BoxDecoration(
-        color: FujinColorRole.backgroundPage,
+        color: context.colors.backgroundPage,
         borderRadius: BorderRadius.circular(FujinRadius.field),
       ),
       child: Column(
         children: [
           SideRow(
             label: context.intl.sourceMyFitnessPal,
-            dot: FujinColorRole.sourceMfp,
+            dot: context.colors.sourceMfp,
             state: mfp,
             meal: meal,
           ),
           const Divider(height: FujinStroke.card, thickness: FujinStroke.card),
           SideRow(
             label: context.intl.sourceEkklo,
-            dot: FujinColorRole.sourceEkklo,
+            dot: context.colors.sourceEkklo,
             state: ekklo,
             meal: meal,
           ),

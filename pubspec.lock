@@ -847,6 +847,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.3"
+  progressive_blur:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: bb1fd7b4efc26c30d9b3834934c00addca473843
+      resolved-ref: bb1fd7b4efc26c30d9b3834934c00addca473843
+      url: "https://github.com/T-moz/progressive_blur.git"
+    source: git
+    version: "0.1.0"
   pub_semver:
     dependency: transitive
     description:

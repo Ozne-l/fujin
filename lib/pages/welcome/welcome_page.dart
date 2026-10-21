@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:fujin/app/fujin_route.dart';
+import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/accounts/connected_accounts.dart';
 import 'package:fujin/l10n/intl_context.dart';
@@ -69,21 +70,21 @@ class WelcomePage extends ConsumerWidget {
                             Text(
                               context.intl.appName,
                               style: FujinText.hina22.copyWith(
-                                color: FujinColorRole.textLink,
+                                color: context.colors.textLink,
                               ),
                             ),
                             const SizedBox(height: FujinSpace.s5),
                             Text(
                               context.intl.welcomeHeading,
                               style: FujinText.hina30.copyWith(
-                                color: FujinColorRole.textPrimary,
+                                color: context.colors.textPrimary,
                               ),
                             ),
                             const SizedBox(height: FujinSpace.s6),
                             Text(
                               context.intl.welcomeIntro,
                               style: FujinText.inter15Regular.copyWith(
-                                color: FujinColorRole.textSecondary,
+                                color: context.colors.textSecondary,
                               ),
                             ),
                           ],
@@ -93,7 +94,7 @@ class WelcomePage extends ConsumerWidget {
                       _AccountCard(
                         name: context.intl.sourceMyFitnessPal,
                         role: context.intl.mfpAccountRole,
-                        dot: FujinColorRole.sourceMfp,
+                        dot: context.colors.sourceMfp,
                         connected: accounts?.mfp,
                         onSignIn: () => unawaited(signIn(FujinRoute.mfpSignIn)),
                       ),
@@ -104,7 +105,7 @@ class WelcomePage extends ConsumerWidget {
                       _AccountCard(
                         name: context.intl.sourceEkklo,
                         role: context.intl.ekkloAccountRole,
-                        dot: FujinColorRole.sourceEkklo,
+                        dot: context.colors.sourceEkklo,
                         connected: accounts?.ekklo,
                         onSignIn: () =>
                             unawaited(signIn(FujinRoute.ekkloSignIn)),
@@ -114,7 +115,7 @@ class WelcomePage extends ConsumerWidget {
                         context.intl.credentialsStayOnPhone,
                         textAlign: TextAlign.center,
                         style: FujinText.inter13Regular.copyWith(
-                          color: FujinColorRole.textTertiary,
+                          color: context.colors.textTertiary,
                         ),
                       ),
                     ],
@@ -128,6 +129,7 @@ class WelcomePage extends ConsumerWidget {
                     FujinSpace.s4,
                   ),
                   child: FilledButton(
+                    style: FujinTheme.floatingButtonStyle(context.colors),
                     onPressed: proceed,
                     child: Text(context.intl.continueAction),
                   ),
@@ -164,9 +166,9 @@ class _AccountCard extends StatelessWidget {
         vertical: FujinSpace.s4,
       ),
       decoration: BoxDecoration(
-        color: FujinColorRole.backgroundCard,
+        color: context.colors.backgroundCard,
         borderRadius: BorderRadius.circular(FujinRadius.card),
-        border: Border.all(color: FujinColorRole.borderCard),
+        border: Border.all(color: context.colors.borderCard),
       ),
       child: SizedBox(
         height: FujinSize.buttonMedium,
@@ -183,7 +185,7 @@ class _AccountCard extends StatelessWidget {
                   Text(
                     name,
                     style: FujinText.inter16Medium.copyWith(
-                      color: FujinColorRole.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                   Text(
@@ -192,7 +194,7 @@ class _AccountCard extends StatelessWidget {
                       false || null => role,
                     },
                     style: FujinText.inter13Regular.copyWith(
-                      color: FujinColorRole.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],

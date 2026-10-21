@@ -187,13 +187,13 @@ class _Panel extends StatelessWidget {
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: FujinColorRole.backgroundCard,
+        color: context.colors.backgroundCard,
         borderRadius: radius,
-        boxShadow: const [FujinTheme.floatingShadow],
+        boxShadow: [FujinTheme.floatingShadow(context.colors)],
       ),
       foregroundDecoration: BoxDecoration(
         borderRadius: radius,
-        border: Border.all(color: FujinColorRole.borderCard),
+        border: Border.all(color: context.colors.borderCard),
       ),
       child: Material(
         type: MaterialType.transparency,
@@ -227,8 +227,8 @@ class _Item extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = switch (selected) {
-      true => FujinColorRole.textLink,
-      false => FujinColorRole.textPrimary,
+      true => context.colors.textLink,
+      false => context.colors.textPrimary,
     };
     return Semantics(
       button: true,
@@ -239,8 +239,8 @@ class _Item extends StatelessWidget {
         child: DecoratedBox(
           decoration: BoxDecoration(
             border: switch (separated) {
-              true => const Border(
-                top: BorderSide(color: FujinColorRole.borderHairline),
+              true => Border(
+                top: BorderSide(color: context.colors.borderHairline),
               ),
               false => null,
             },
@@ -263,8 +263,8 @@ class _Item extends StatelessWidget {
                     CheckIcon.asset,
                     width: FujinSize.menuChevron,
                     height: FujinSize.menuChevron,
-                    theme: const SvgTheme(
-                      currentColor: FujinColorRole.textLink,
+                    theme: SvgTheme(
+                      currentColor: context.colors.textLink,
                     ),
                     excludeFromSemantics: true,
                   ),

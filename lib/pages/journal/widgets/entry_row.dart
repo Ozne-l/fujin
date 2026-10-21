@@ -27,13 +27,13 @@ class EntryRow extends StatelessWidget {
           leading: Text(
             entry.food.description,
             style: FujinText.inter15Medium.copyWith(
-              color: FujinColorRole.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           trailing: Text(
             EntryText.energy(context.intl, entry),
             style: FujinText.inter15Semibold.copyWith(
-              color: FujinColorRole.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
         ),
@@ -45,13 +45,13 @@ class EntryRow extends StatelessWidget {
               Text(
                 EntryText.brandedServing(context.intl, entry),
                 style: FujinText.inter13Regular.copyWith(
-                  color: FujinColorRole.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               Text(
                 detail,
                 style: FujinText.inter12Medium.copyWith(
-                  color: FujinColorRole.textTertiary,
+                  color: context.colors.textTertiary,
                 ),
               ),
             ],
