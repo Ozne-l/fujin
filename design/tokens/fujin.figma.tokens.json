@@ -7,12 +7,12 @@
     },
     "hai": {
       "$type": "color",
-      "$value": "#6F6857",
+      "$value": "#645E4F",
       "$description": "Secondary text."
     },
     "hai-light": {
       "$type": "color",
-      "$value": "#8A826C",
+      "$value": "#736C5A",
       "$description": "Tertiary text, goal denominators (\"/ 160\")."
     },
     "usuzumi": {
@@ -67,8 +67,13 @@
     },
     "kin-dark": {
       "$type": "color",
-      "$value": "#8C6418",
-      "$description": "Readable gold: the only gold allowed for text."
+      "$value": "#855F17",
+      "$description": "Readable gold, for text. On an attention glass control, kin-deep."
+    },
+    "kin-deep": {
+      "$type": "color",
+      "$value": "#795615",
+      "$description": "Deep gold: text and icons on an attention glass control, where the gold tint lowers the contrast (ADR 0042)."
     },
     "shu": {
       "$type": "color",
@@ -79,6 +84,11 @@
       "$type": "color",
       "$value": "#F4DDD6",
       "$description": "Light vermilion background."
+    },
+    "shu-dark": {
+      "$type": "color",
+      "$value": "#9E3322",
+      "$description": "Dark vermilion: text and icons on an alert glass control, where the vermilion tint lowers the contrast (ADR 0042)."
     },
     "mfp": {
       "$type": "color",
@@ -106,6 +116,26 @@
     "mfp-light": {
       "$type": "color",
       "$value": "#DCE6F7"
+    },
+    "fujin-pale": {
+      "$type": "color",
+      "$value": "#A1B59E",
+      "$description": "Pale Fūjin green: share already logged in a progress bar."
+    },
+    "mfp-pale": {
+      "$type": "color",
+      "$value": "#9ABBE6",
+      "$description": "Pale MyFitnessPal blue: share already logged in a progress bar."
+    },
+    "seigaiha": {
+      "$type": "color",
+      "$value": "#ECE4CF",
+      "$description": "Wave lines of the seigaiha pattern on washi."
+    },
+    "shu-pale": {
+      "$type": "color",
+      "$value": "#DCA597",
+      "$description": "Pale vermilion: share already logged in a progress bar."
     }
   },
   "space": {
@@ -140,6 +170,16 @@
     }
   },
   "radius": {
+    "state-card": {
+      "$type": "dimension",
+      "$value": "28px",
+      "$description": "Storm state card of the Journal (offline, session expired, service down)."
+    },
+    "menu": {
+      "$type": "dimension",
+      "$value": "12px",
+      "$description": "Menu button."
+    },
     "bar": {
       "$type": "dimension",
       "$value": "2px"
@@ -170,10 +210,30 @@
       "$value": "16px",
       "$description": "Toasts and snackbars."
     },
+    "hint": {
+      "$type": "dimension",
+      "$value": "12px",
+      "$description": "Swipe hint bubble under the Journal week band."
+    },
     "tile": {
       "$type": "dimension",
       "$value": "10px",
       "$description": "Icon tiles of the sent summary."
+    },
+    "logo": {
+      "$type": "dimension",
+      "$value": "36px",
+      "$description": "The Fūjin logo on the splash screen."
+    },
+    "aim-frame": {
+      "$type": "dimension",
+      "$value": "12px",
+      "$description": "Aiming frame on the scanner camera."
+    },
+    "key": {
+      "$type": "dimension",
+      "$value": "8px",
+      "$description": "Keys of the numeric keypad."
     }
   },
   "stroke": {
@@ -211,12 +271,47 @@
       "$type": "dimension",
       "$value": "1.5px",
       "$description": "Focused input field."
+    },
+    "spinner": {
+      "$type": "dimension",
+      "$value": "2.5px",
+      "$description": "Arc of the loading spinner."
+    },
+    "gold-rule": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "Short gold rule under the splash tagline."
+    },
+    "aim-corner": {
+      "$type": "dimension",
+      "$value": "4px",
+      "$description": "Corners of the aiming frame on the scanner camera."
+    },
+    "read-line": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "Gold reading line across the aiming frame."
     }
   },
   "size": {
     "screen-margin": {
       "$type": "dimension",
       "$value": "16px"
+    },
+    "spinner": {
+      "$type": "dimension",
+      "$value": "22px",
+      "$description": "Loading spinner."
+    },
+    "spinner-small": {
+      "$type": "dimension",
+      "$value": "18px",
+      "$description": "Loading spinner inside a button or a row."
+    },
+    "field": {
+      "$type": "dimension",
+      "$value": "52px",
+      "$description": "Height of the serving field and the suggestion rows."
     },
     "text-inset": {
       "$type": "dimension",
@@ -250,14 +345,294 @@
       "$type": "dimension",
       "$value": "26px"
     },
+    "week-band": {
+      "$type": "dimension",
+      "$value": "64px",
+      "$description": "Height of the Journal week band: weekday label and day ring."
+    },
+    "band-fade": {
+      "$type": "dimension",
+      "$value": "28px",
+      "$description": "Fade over the half days at both ends of the Journal week band."
+    },
+    "band-nudge": {
+      "$type": "dimension",
+      "$value": "44px",
+      "$description": "How far the Journal week band slides towards past weeks when it shows its swipe hint."
+    },
+    "hint-icon": {
+      "$type": "dimension",
+      "$value": "18px",
+      "$description": "Arrow in the swipe hint bubble under the Journal week band."
+    },
+    "hint-padding-vertical": {
+      "$type": "dimension",
+      "$value": "10px",
+      "$description": "Top and bottom padding of the swipe hint bubble."
+    },
+    "hint-padding-end": {
+      "$type": "dimension",
+      "$value": "14px",
+      "$description": "Padding after the text of the swipe hint bubble."
+    },
+    "hint-pointer-width": {
+      "$type": "dimension",
+      "$value": "14px",
+      "$description": "Width of the triangle on top of the swipe hint bubble."
+    },
+    "hint-pointer-height": {
+      "$type": "dimension",
+      "$value": "8px",
+      "$description": "Height of the triangle on top of the swipe hint bubble."
+    },
+    "hint-pointer-inset": {
+      "$type": "dimension",
+      "$value": "26px",
+      "$description": "Distance from the start of the swipe hint bubble to its triangle."
+    },
+    "macro-ring-dash": {
+      "$type": "dimension",
+      "$value": "3px",
+      "$description": "Dash of the circle around a nutrient without a goal."
+    },
+    "macro-ring-dash-gap": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "Gap between the dashes of the circle around a nutrient without a goal."
+    },
+    "skeleton-line": {
+      "$type": "dimension",
+      "$value": "10px",
+      "$description": "Height of a text line placeholder while the Journal loads."
+    },
+    "skeleton-macro": {
+      "$type": "dimension",
+      "$value": "8px",
+      "$description": "Height of a nutrient label placeholder while the Journal loads."
+    },
+    "skeleton-title": {
+      "$type": "dimension",
+      "$value": "12px",
+      "$description": "Height of a meal name placeholder while the Journal loads."
+    },
+    "skeleton-pill": {
+      "$type": "dimension",
+      "$value": "22px",
+      "$description": "Height of a status pill placeholder while the Journal loads."
+    },
+    "skeleton-wide": {
+      "$type": "dimension",
+      "$value": "200px",
+      "$description": "Width of the long summary line placeholder."
+    },
+    "skeleton-medium": {
+      "$type": "dimension",
+      "$value": "140px",
+      "$description": "Width of the short summary line placeholder."
+    },
+    "skeleton-macro-width": {
+      "$type": "dimension",
+      "$value": "50px",
+      "$description": "Width of a nutrient label placeholder."
+    },
+    "skeleton-meal-title": {
+      "$type": "dimension",
+      "$value": "120px",
+      "$description": "Width of a meal name placeholder."
+    },
+    "skeleton-meal-detail": {
+      "$type": "dimension",
+      "$value": "180px",
+      "$description": "Width of a meal detail placeholder."
+    },
+    "skeleton-pill-width": {
+      "$type": "dimension",
+      "$value": "80px",
+      "$description": "Width of a status pill placeholder."
+    },
     "touch-target": {
       "$type": "dimension",
       "$value": "48px",
       "$description": "Minimum touch target for every interactive element (48 dp)."
     },
+    "tab-bar": {
+      "$type": "dimension",
+      "$value": "68px",
+      "$description": "Height of the floating tab bar, and side of the round Scanner button."
+    },
+    "tab": {
+      "$type": "dimension",
+      "$value": "56px",
+      "$description": "Height of one tab inside the tab plate."
+    },
+    "tab-plate-inset": {
+      "$type": "dimension",
+      "$value": "6px",
+      "$description": "Padding between the tab plate and its tabs."
+    },
+    "row-chevron": {
+      "$type": "dimension",
+      "$value": "20px",
+      "$description": "Chevron at the end of a list row."
+    },
+    "meal-arrow": {
+      "$type": "dimension",
+      "$value": "18px",
+      "$description": "Arrow between a MyFitnessPal meal and its Ekklo meal."
+    },
+    "menu-chevron": {
+      "$type": "dimension",
+      "$value": "14px",
+      "$description": "Chevron inside a menu button."
+    },
+    "menu-width": {
+      "$type": "dimension",
+      "$value": "140px",
+      "$description": "Width of a menu button."
+    },
+    "control-height": {
+      "$type": "dimension",
+      "$value": "40px",
+      "$description": "Height of a segmented control and of a menu button."
+    },
+    "control-note-gap": {
+      "$type": "dimension",
+      "$value": "10px",
+      "$description": "Gap between a segmented control and the note under it in a card."
+    },
+    "switch-width": {
+      "$type": "dimension",
+      "$value": "63px",
+      "$description": "Width of the track of a switch, as the iOS 26 switch (Figma component \"Interrupteur\")."
+    },
+    "switch-height": {
+      "$type": "dimension",
+      "$value": "28px",
+      "$description": "Height of the track of a switch, as the iOS 26 switch."
+    },
+    "switch-thumb-width": {
+      "$type": "dimension",
+      "$value": "37px",
+      "$description": "Width of the stadium thumb of a switch, 2 inside the track."
+    },
+    "switch-thumb-height": {
+      "$type": "dimension",
+      "$value": "24px",
+      "$description": "Height of the stadium thumb of a switch, 2 inside the track."
+    },
+    "switch-lens-width": {
+      "$type": "dimension",
+      "$value": "58px",
+      "$description": "Width of the glass lens the thumb of a switch becomes while held."
+    },
+    "switch-lens-height": {
+      "$type": "dimension",
+      "$value": "37px",
+      "$description": "Height of the glass lens the thumb of a switch becomes while held, past the track above and below."
+    },
+    "search-field": {
+      "$type": "dimension",
+      "$value": "44px",
+      "$description": "Height of a search field in a page."
+    },
+    "weight-field": {
+      "$type": "dimension",
+      "$value": "120px",
+      "$description": "Width of the weight field of a remembered unit."
+    },
+    "goal-field-gap": {
+      "$type": "dimension",
+      "$value": "10px",
+      "$description": "Gap between two goal fields."
+    },
+    "pictogram": {
+      "$type": "dimension",
+      "$value": "52px",
+      "$description": "Round pictogram heading a confirmation sheet."
+    },
+    "pictogram-icon": {
+      "$type": "dimension",
+      "$value": "36px",
+      "$description": "Icon inside the round pictogram of a confirmation sheet."
+    },
+    "tab-gap": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "Gap between two tabs inside the tab plate."
+    },
+    "scan-icon": {
+      "$type": "dimension",
+      "$value": "26px",
+      "$description": "Scan icon in the Scanner button."
+    },
+    "appearance-toggle": {
+      "$type": "dimension",
+      "$value": "40px",
+      "$description": "Side of the glass drop of the day/night toggle, centred in a 48 touch target."
+    },
+    "appearance-toggle-icon": {
+      "$type": "dimension",
+      "$value": "20px",
+      "$description": "Moon or sun icon in the day/night toggle."
+    },
+    "aim-frame-width": {
+      "$type": "dimension",
+      "$value": "300px",
+      "$description": "Width of the aiming frame on the scanner camera."
+    },
+    "aim-frame-height": {
+      "$type": "dimension",
+      "$value": "190px",
+      "$description": "Height of the aiming frame on the scanner camera."
+    },
+    "aim-frame-top": {
+      "$type": "dimension",
+      "$value": "186px",
+      "$description": "Distance from the top safe edge to the aiming frame on the scanner camera."
+    },
+    "camera-action-gap": {
+      "$type": "dimension",
+      "$value": "68px",
+      "$description": "Gap between the Saisir le code button and the bottom safe edge of the scanner camera."
+    },
+    "aim-corner": {
+      "$type": "dimension",
+      "$value": "30px",
+      "$description": "Length of each arm of an aiming frame corner."
+    },
+    "floating-shadow-blur": {
+      "$type": "dimension",
+      "$value": "20px",
+      "$description": "Blur radius of the floating glass drop shadow."
+    },
+    "floating-shadow-offset": {
+      "$type": "dimension",
+      "$value": "6px",
+      "$description": "Vertical offset of the floating glass drop shadow."
+    },
+    "floating-shadow-small-blur": {
+      "$type": "dimension",
+      "$value": "8px",
+      "$description": "Blur radius of the drop shadow of a small glass button (the day/night toggle)."
+    },
+    "floating-shadow-small-offset": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "Vertical offset of the drop shadow of a small glass button (the day/night toggle)."
+    },
+    "scroll-edge-fade": {
+      "$type": "dimension",
+      "$value": "32px",
+      "$description": "Where a list scrolls under a fixed header, the length over which the progressive blur and the page wash fade out below the header."
+    },
     "button-medium": {
       "$type": "dimension",
       "$value": "48px"
+    },
+    "button-compact": {
+      "$type": "dimension",
+      "$value": "32px",
+      "$description": "Visible height of a compact button, inside a 48 px touch zone."
     },
     "pill": {
       "$type": "dimension",
@@ -271,6 +646,39 @@
       "$type": "dimension",
       "$value": "252px",
       "$description": "Seigaiha band at the bottom of welcome screens."
+    },
+    "motif-band-splash": {
+      "$type": "dimension",
+      "$value": "180px",
+      "$description": "Seigaiha band at the bottom of the splash screen."
+    },
+    "logo": {
+      "$type": "dimension",
+      "$value": "160px",
+      "$description": "The Fūjin logo on the splash screen."
+    },
+    "logo-shadow-blur": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "logo-shadow-offset": {
+      "$type": "dimension",
+      "$value": "8px"
+    },
+    "splash-title-gap": {
+      "$type": "dimension",
+      "$value": "36px",
+      "$description": "From the splash logo to the app name."
+    },
+    "splash-rule-gap": {
+      "$type": "dimension",
+      "$value": "58px",
+      "$description": "From the splash tagline to the gold rule."
+    },
+    "gold-rule-width": {
+      "$type": "dimension",
+      "$value": "48px",
+      "$description": "Short gold rule under the splash tagline."
     },
     "glyph-card": {
       "$type": "dimension",
@@ -403,6 +811,11 @@
         "$type": "color",
         "$value": "{color.matcha}"
       },
+      "highlight": {
+        "$type": "color",
+        "$value": "{color.kin-light}",
+        "$description": "Light gold behind what needs the owner: the Ekklo food to choose (04d) and values that moved in MyFitnessPal (06e)."
+      },
       "scrim": {
         "$type": "color",
         "$value": "#1B1A1780",
@@ -411,7 +824,69 @@
       "dark": {
         "$type": "color",
         "$value": "{color.sumi}",
-        "$description": "Background of camera screens and dark pills."
+        "$description": "Sumi, the inverted surface: snack bars, hints and tooltips, dark pills, the chosen serving."
+      },
+      "glass": {
+        "$type": "color",
+        "$value": "#FFFCF440",
+        "$description": "Kinu at 25% over the refracted backdrop: the tint of clear glass, on the tab plate, the Scanner button, clear glass buttons, search fields and filters."
+      },
+      "glass-ink": {
+        "$type": "color",
+        "$value": "#1B1A17E6",
+        "$description": "Sumi at 90% over the refracted backdrop: the primary button and the chosen filter."
+      },
+      "lens-reflection": {
+        "$type": "color",
+        "$value": "#1B1A1759",
+        "$description": "Reflection along the top and bottom edges inside the glass lens over a held switch, fading towards the middle."
+      },
+      "glass-lens": {
+        "$type": "color",
+        "$value": "#0000000F",
+        "$description": "Black at 6%, the tint of the glass lens that swells under the finger on the tab plate."
+      },
+      "glass-glow": {
+        "$type": "color",
+        "$value": "#FFFFFF80",
+        "$description": "White at 50%, the light that grows under the finger inside a pressed glass button."
+      },
+      "tab-active": {
+        "$type": "color",
+        "$value": "#DCE8D5CC",
+        "$description": "Matcha at 80% behind the active tab."
+      },
+      "scroll-fade": {
+        "$type": "color",
+        "$value": "#F7F1E08C",
+        "$description": "Washi at 55%, the inner end of the fades over the half days at both ends of the Journal week band. The other end is the same colour at 0%."
+      },
+      "pressed": {
+        "$type": "color",
+        "$value": "#1B1A170F",
+        "$description": "Sumi at 6%, the ink wash under a pressed, hovered or focused surface."
+      },
+      "accent": {
+        "$type": "color",
+        "$value": "{color.fujin}",
+        "$description": "Accent fill: progress, checkbox and switch on, done step, green button, verified dot."
+      },
+      "neutral": {
+        "$type": "color",
+        "$value": "{color.kinari}",
+        "$description": "Neutral fills: neutral chips, switch off, segmented control, clear button, skeletons, offline banner."
+      }
+    },
+    "shadow": {
+      "floating": {
+        "$type": "color",
+        "$value": "#1B1A171F",
+        "$description": "Drop shadow of floating glass: the tab plate, the Scanner button and the day/night toggle."
+      },
+      "logo": {
+        "$type": "color",
+        "$value": "#1B1A171A",
+        "$description": "Drop shadow of the Fūjin logo on the splash screen."
       }
     },
     "border": {
@@ -426,6 +901,26 @@
       "divider": {
         "$type": "color",
         "$value": "{color.kin}"
+      },
+      "alert": {
+        "$type": "color",
+        "$value": "{color.shu}",
+        "$description": "Field in error, danger outline button."
+      },
+      "control": {
+        "$type": "color",
+        "$value": "{color.usuzumi}",
+        "$description": "Unselected radio, sheet handle, dashed empty ring, offline banner outline."
+      },
+      "focus": {
+        "$type": "color",
+        "$value": "{color.fujin}",
+        "$description": "Focused field, selected radio, selected candidate."
+      },
+      "warning": {
+        "$type": "color",
+        "$value": "{color.kin}",
+        "$description": "Gold outline of an item to review (Ekklo match to choose)."
       }
     },
     "text": {
@@ -443,7 +938,8 @@
       },
       "disabled": {
         "$type": "color",
-        "$value": "{color.usuzumi}"
+        "$value": "{color.usuzumi}",
+        "$description": "Upcoming dates, disabled labels."
       },
       "link": {
         "$type": "color",
@@ -459,7 +955,53 @@
       },
       "on-dark": {
         "$type": "color",
-        "$value": "{color.kinu}"
+        "$value": "{color.kinu}",
+        "$description": "Text and icons on role/background/dark or role/goal/selected-day. Inverted in the dark theme."
+      },
+      "on-dark-secondary": {
+        "$type": "color",
+        "$value": "{color.usuzumi}",
+        "$description": "Secondary text on role/background/dark: the detail line of a snack bar. Inverted in the dark theme."
+      },
+      "info": {
+        "$type": "color",
+        "$value": "{color.sora}",
+        "$description": "Information text and icons."
+      },
+      "glass-link": {
+        "$type": "color",
+        "$value": "{color.fujin}",
+        "$description": "Text and icons on a validated glass control: text.link in light, lighter in dark, where the glass lifts the tint behind it (ADR 0041)."
+      },
+      "glass-gold": {
+        "$type": "color",
+        "$value": "{color.kin-deep}",
+        "$description": "Text and icons on an attention glass control: deeper than text.gold in light, so it keeps 4.5:1 on the gold tint (ADR 0042); lighter in dark, where the glass lifts the tint behind it (ADR 0041)."
+      },
+      "glass-info": {
+        "$type": "color",
+        "$value": "{color.sora}",
+        "$description": "Text and icons on an info glass control: text.info in light, lighter in dark, where the glass lifts the tint behind it (ADR 0041)."
+      },
+      "glass-alert": {
+        "$type": "color",
+        "$value": "{color.shu-dark}",
+        "$description": "Text and icons on an alert glass control: darker than text.alert in light, so it keeps 4.5:1 on the vermilion tint (ADR 0042); lighter in dark, where the glass lifts the tint behind it (ADR 0041)."
+      },
+      "glass-secondary": {
+        "$type": "color",
+        "$value": "{color.hai}",
+        "$description": "Text and icons on a muted glass control: text.secondary in light, lighter in dark, where the glass lifts the tint behind it (ADR 0041)."
+      },
+      "on-accent": {
+        "$type": "color",
+        "$value": "{color.kinu}",
+        "$description": "Text and icons on an accent, source or goal fill."
+      },
+      "on-dark-accent": {
+        "$type": "color",
+        "$value": "{color.kin}",
+        "$description": "Action label on role/background/dark (snackbar « Annuler »)."
       }
     },
     "button": {
@@ -548,6 +1090,48 @@
         "$type": "color",
         "$value": "{color.mfp-light}",
         "$description": "Background of a past day that stayed under 98% of its goal."
+      },
+      "exceeded-logged": {
+        "$type": "color",
+        "$value": "{color.shu-pale}",
+        "$description": "Share already logged, goal exceeded (food sheet bars)."
+      },
+      "in-progress-logged": {
+        "$type": "color",
+        "$value": "{color.mfp-pale}",
+        "$description": "Share already logged, goal not reached (food sheet bars)."
+      },
+      "reached-logged": {
+        "$type": "color",
+        "$value": "{color.fujin-pale}",
+        "$description": "Share already logged, goal reached (food sheet bars)."
+      }
+    },
+    "camera": {
+      "accent": {
+        "$type": "color",
+        "$value": "{color.kin}",
+        "$description": "Viewfinder corners and scan line. Same value in both themes."
+      },
+      "background": {
+        "$type": "color",
+        "$value": "{color.sumi}",
+        "$description": "Camera chrome: round buttons over the camera. Same value in both themes."
+      },
+      "button": {
+        "$type": "color",
+        "$value": "#F7F1E02E",
+        "$description": "Button over the camera: washi at 18 % on the camera feed, label role/camera/text. Same value in both themes."
+      },
+      "text": {
+        "$type": "color",
+        "$value": "{color.washi}",
+        "$description": "Text and icons over the camera. Same value in both themes."
+      },
+      "text-secondary": {
+        "$type": "color",
+        "$value": "{color.usuzumi}",
+        "$description": "Secondary text over the camera, under the scanner title. Same value in both themes."
       }
     }
   },

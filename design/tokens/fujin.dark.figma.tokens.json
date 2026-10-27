@@ -1,0 +1,348 @@
+{
+  "role": {
+    "background": {
+      "page": {
+        "$type": "color",
+        "$value": "#171613"
+      },
+      "card": {
+        "$type": "color",
+        "$value": "#22201C"
+      },
+      "info": {
+        "$type": "color",
+        "$value": "#1B2830"
+      },
+      "alert": {
+        "$type": "color",
+        "$value": "#36211C"
+      },
+      "success": {
+        "$type": "color",
+        "$value": "#1E2D20"
+      },
+      "highlight": {
+        "$type": "color",
+        "$value": "#322919",
+        "$description": "Light gold behind what needs the owner: the Ekklo food to choose (04d) and values that moved in MyFitnessPal (06e)."
+      },
+      "scrim": {
+        "$type": "color",
+        "$value": "#00000080",
+        "$description": "Modal scrim under sheets, at 50% opacity."
+      },
+      "dark": {
+        "$type": "color",
+        "$value": "#EDE6D3",
+        "$description": "Cream, the inverted surface in dark: snack bars, hints and tooltips, dark pills, the chosen serving."
+      },
+      "glass": {
+        "$type": "color",
+        "$value": "#2B292573",
+        "$description": "#2B2925 at 45% over the refracted backdrop: the tint of clear glass, on the tab plate, the Scanner button, clear glass buttons, search fields and filters."
+      },
+      "glass-ink": {
+        "$type": "color",
+        "$value": "#EDE6D3E6",
+        "$description": "Cream at 90% over the refracted backdrop: the primary button and the chosen filter."
+      },
+      "lens-reflection": {
+        "$type": "color",
+        "$value": "#FFFFFF59",
+        "$description": "Reflection along the top and bottom edges inside the glass lens over a held switch, fading towards the middle."
+      },
+      "glass-lens": {
+        "$type": "color",
+        "$value": "#FFFFFF29",
+        "$description": "White at 16%, the tint of the glass lens that swells under the finger on the tab plate."
+      },
+      "glass-glow": {
+        "$type": "color",
+        "$value": "#FFFFFF33",
+        "$description": "White at 20%, the light that grows under the finger inside a pressed glass button."
+      },
+      "tab-active": {
+        "$type": "color",
+        "$value": "#2F4B31D9",
+        "$description": "#2F4B31 at 85% behind the active tab."
+      },
+      "scroll-fade": {
+        "$type": "color",
+        "$value": "#1716138C",
+        "$description": "Washi at 55%, the inner end of the fades over the half days at both ends of the Journal week band. The other end is the same colour at 0%."
+      },
+      "pressed": {
+        "$type": "color",
+        "$value": "#F7F1E014",
+        "$description": "#F7F1E0 at 8%, the light wash under a pressed, hovered or focused surface."
+      },
+      "accent": {
+        "$type": "color",
+        "$value": "#8FC38B",
+        "$description": "Accent fill: progress, checkbox and switch on, done step, green button, verified dot."
+      },
+      "neutral": {
+        "$type": "color",
+        "$value": "#34312A",
+        "$description": "Neutral fills: neutral chips, switch off, segmented control, clear button, skeletons, offline banner."
+      }
+    },
+    "shadow": {
+      "floating": {
+        "$type": "color",
+        "$value": "#0000005C",
+        "$description": "Drop shadow of floating glass: the tab plate and the Scanner button."
+      },
+      "logo": {
+        "$type": "color",
+        "$value": "#0000004C",
+        "$description": "Drop shadow of the Fūjin logo on the splash screen."
+      }
+    },
+    "border": {
+      "card": {
+        "$type": "color",
+        "$value": "#36332C"
+      },
+      "hairline": {
+        "$type": "color",
+        "$value": "#2E2B25"
+      },
+      "divider": {
+        "$type": "color",
+        "$value": "#9C7B3A"
+      },
+      "alert": {
+        "$type": "color",
+        "$value": "#EE8670",
+        "$description": "Field in error, danger outline button."
+      },
+      "control": {
+        "$type": "color",
+        "$value": "#5E584B",
+        "$description": "Unselected radio, sheet handle, dashed empty ring, offline banner outline."
+      },
+      "focus": {
+        "$type": "color",
+        "$value": "#8FC38B",
+        "$description": "Focused field, selected radio, selected candidate."
+      },
+      "warning": {
+        "$type": "color",
+        "$value": "#C49A45",
+        "$description": "Gold outline of an item to review (Ekklo match to choose)."
+      }
+    },
+    "text": {
+      "primary": {
+        "$type": "color",
+        "$value": "#F0E9D8"
+      },
+      "secondary": {
+        "$type": "color",
+        "$value": "#BDB49C"
+      },
+      "tertiary": {
+        "$type": "color",
+        "$value": "#A0987F"
+      },
+      "disabled": {
+        "$type": "color",
+        "$value": "#6B6556",
+        "$description": "Upcoming dates, disabled labels."
+      },
+      "link": {
+        "$type": "color",
+        "$value": "#8FC38B"
+      },
+      "gold": {
+        "$type": "color",
+        "$value": "#D9AE57"
+      },
+      "alert": {
+        "$type": "color",
+        "$value": "#EE8670"
+      },
+      "on-dark": {
+        "$type": "color",
+        "$value": "#1B1A17",
+        "$description": "Text and icons on role/background/dark or role/goal/selected-day. Inverted in the dark theme."
+      },
+      "on-dark-secondary": {
+        "$type": "color",
+        "$value": "#6B6556",
+        "$description": "Secondary text on role/background/dark: the detail line of a snack bar. Inverted in the dark theme."
+      },
+      "info": {
+        "$type": "color",
+        "$value": "#8FB7CC",
+        "$description": "Information text and icons."
+      },
+      "glass-link": {
+        "$type": "color",
+        "$value": "#B1D5AE",
+        "$description": "Text and icons on a validated glass control: text.link in light, lighter in dark, where the glass lifts the tint behind it (ADR 0041)."
+      },
+      "glass-gold": {
+        "$type": "color",
+        "$value": "#E5C78B",
+        "$description": "Text and icons on an attention glass control: deeper than text.gold in light, so it keeps 4.5:1 on the gold tint (ADR 0042); lighter in dark, where the glass lifts the tint behind it (ADR 0041)."
+      },
+      "glass-info": {
+        "$type": "color",
+        "$value": "#B2CEDC",
+        "$description": "Text and icons on an info glass control: text.info in light, lighter in dark, where the glass lifts the tint behind it (ADR 0041)."
+      },
+      "glass-alert": {
+        "$type": "color",
+        "$value": "#F6BEB2",
+        "$description": "Text and icons on an alert glass control: darker than text.alert in light, so it keeps 4.5:1 on the vermilion tint (ADR 0042); lighter in dark, where the glass lifts the tint behind it (ADR 0041)."
+      },
+      "glass-secondary": {
+        "$type": "color",
+        "$value": "#C9C2AE",
+        "$description": "Text and icons on a muted glass control: text.secondary in light, lighter in dark, where the glass lifts the tint behind it (ADR 0041)."
+      },
+      "on-accent": {
+        "$type": "color",
+        "$value": "#13210F",
+        "$description": "Text and icons on an accent, source or goal fill."
+      },
+      "on-dark-accent": {
+        "$type": "color",
+        "$value": "#7A5714",
+        "$description": "Action label on role/background/dark (snackbar « Annuler »)."
+      }
+    },
+    "button": {
+      "primary-background": {
+        "$type": "color",
+        "$value": "#EDE6D3"
+      },
+      "primary-text": {
+        "$type": "color",
+        "$value": "#1B1A17"
+      },
+      "disabled-background": {
+        "$type": "color",
+        "$value": "#2E2B25"
+      },
+      "disabled-text": {
+        "$type": "color",
+        "$value": "#7C7563"
+      },
+      "alert-background": {
+        "$type": "color",
+        "$value": "#B23A26"
+      },
+      "alert-text": {
+        "$type": "color",
+        "$value": "#FFFCF4"
+      }
+    },
+    "source": {
+      "mfp": {
+        "$type": "color",
+        "$value": "#6AA2EE"
+      },
+      "ekklo": {
+        "$type": "color",
+        "$value": "#A98BE6"
+      },
+      "ekklo-background": {
+        "$type": "color",
+        "$value": "#2A2338"
+      },
+      "ekklo-text": {
+        "$type": "color",
+        "$value": "#C5B0F2"
+      }
+    },
+    "goal": {
+      "track": {
+        "$type": "color",
+        "$value": "#36332C"
+      },
+      "in-progress": {
+        "$type": "color",
+        "$value": "#6AA2EE"
+      },
+      "reached": {
+        "$type": "color",
+        "$value": "#8FC38B"
+      },
+      "reached-background": {
+        "$type": "color",
+        "$value": "#1E2D20"
+      },
+      "exceeded": {
+        "$type": "color",
+        "$value": "#EE8670"
+      },
+      "exceeded-background": {
+        "$type": "color",
+        "$value": "#36211C"
+      },
+      "minimum-left": {
+        "$type": "color",
+        "$value": "#2F4A6E"
+      },
+      "selected-day": {
+        "$type": "color",
+        "$value": "#EDE6D3"
+      },
+      "missed": {
+        "$type": "color",
+        "$value": "#6AA2EE",
+        "$description": "Arc of a past day that stayed under 98% of its goal. Its length shows the share reached."
+      },
+      "missed-background": {
+        "$type": "color",
+        "$value": "#1B2638",
+        "$description": "Background of a past day that stayed under 98% of its goal."
+      },
+      "exceeded-logged": {
+        "$type": "color",
+        "$value": "#874C40",
+        "$description": "Share already logged, goal exceeded (food sheet bars)."
+      },
+      "in-progress-logged": {
+        "$type": "color",
+        "$value": "#355A8C",
+        "$description": "Share already logged, goal not reached (food sheet bars)."
+      },
+      "reached-logged": {
+        "$type": "color",
+        "$value": "#4B6B48",
+        "$description": "Share already logged, goal reached (food sheet bars)."
+      }
+    },
+    "camera": {
+      "accent": {
+        "$type": "color",
+        "$value": "#D4A548",
+        "$description": "Viewfinder corners and scan line. Same value in both themes."
+      },
+      "background": {
+        "$type": "color",
+        "$value": "#1B1A17",
+        "$description": "Camera chrome: round buttons over the camera. Same value in both themes."
+      },
+      "button": {
+        "$type": "color",
+        "$value": "#F7F1E02E",
+        "$description": "Button over the camera: washi at 18 % on the camera feed, label role/camera/text. Same value in both themes."
+      },
+      "text": {
+        "$type": "color",
+        "$value": "#F7F1E0",
+        "$description": "Text and icons over the camera. Same value in both themes."
+      },
+      "text-secondary": {
+        "$type": "color",
+        "$value": "#BDB49C",
+        "$description": "Secondary text over the camera, under the scanner title. Same value in both themes."
+      }
+    }
+  }
+}

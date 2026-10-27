@@ -7,6 +7,13 @@
           "fujin.figma.tokens.json"
         ]
       }
+    },
+    "Fūjin · Sombre": {
+      "modes": {
+        "Dark": [
+          "fujin.dark.figma.tokens.json"
+        ]
+      }
     }
   }
 }
