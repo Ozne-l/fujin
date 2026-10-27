@@ -14,6 +14,9 @@ class GlassLayer extends ConsumerWidget {
         true => child,
         false => LiquidGlassLayer(
           settings: FujinGlass.floating(Theme.of(context).brightness),
+          defaultAppearance: FujinGlass.appearance(
+            Theme.of(context).brightness,
+          ),
           child: LiquidGlassBlendGroup(blend: FujinGlass.blend, child: child),
         ),
       };

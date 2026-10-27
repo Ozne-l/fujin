@@ -116,7 +116,6 @@ class ReviewCard extends ConsumerWidget {
                               GlassFill.style(
                                 context.colors,
                                 GlassFinish.validated,
-                                rim: FujinStroke.glassTintRim,
                               ).merge(
                                 FilledButton.styleFrom(
                                   minimumSize: const Size(

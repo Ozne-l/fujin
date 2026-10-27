@@ -31,8 +31,6 @@ class GlassSurface extends ConsumerWidget {
       reduced: FujinGlass.reduced(context, ref),
       opaque: colors.backgroundCard,
       fill: colors.backgroundGlass,
-      highlight: colors.borderGlassHighlight,
-      shade: colors.borderGlassShade,
       glow: switch (glows) {
         true => GlassTouchGlow.underTint,
         false => GlassTouchGlow.none,

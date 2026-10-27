@@ -19,12 +19,12 @@
       "$value": {
         "colorSpace": "srgb",
         "components": [
-          0.4353,
-          0.4078,
-          0.3412
+          0.3922,
+          0.3686,
+          0.3098
         ],
         "alpha": 1,
-        "hex": "#6F6857"
+        "hex": "#645E4F"
       },
       "$description": "Secondary text.",
       "$type": "color"
@@ -187,14 +187,28 @@
       "$value": {
         "colorSpace": "srgb",
         "components": [
-          0.549,
-          0.3922,
-          0.0941
+          0.5216,
+          0.3725,
+          0.0902
         ],
         "alpha": 1,
-        "hex": "#8C6418"
+        "hex": "#855F17"
       },
-      "$description": "Readable gold: the only gold allowed for text.",
+      "$description": "Readable gold, for text. On an attention glass control, kin-deep.",
+      "$type": "color"
+    },
+    "kin-deep": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.4745,
+          0.3373,
+          0.0824
+        ],
+        "alpha": 1,
+        "hex": "#795615"
+      },
+      "$description": "Deep gold: text and icons on an attention glass control, where the gold tint lowers the contrast (ADR 0042).",
       "$type": "color"
     },
     "shu": {
@@ -223,6 +237,20 @@
         "hex": "#F4DDD6"
       },
       "$description": "Light vermilion background.",
+      "$type": "color"
+    },
+    "shu-dark": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.6196,
+          0.2,
+          0.1333
+        ],
+        "alpha": 1,
+        "hex": "#9E3322"
+      },
+      "$description": "Dark vermilion: text and icons on an alert glass control, where the vermilion tint lowers the contrast (ADR 0042).",
       "$type": "color"
     },
     "mfp": {
@@ -544,14 +572,6 @@
         "value": 1.5,
         "unit": "px"
       },
-      "$type": "dimension"
-    },
-    "glass-tint-rim": {
-      "$value": {
-        "value": 1.5,
-        "unit": "px"
-      },
-      "$description": "Rim of a tinted glass button inside a card (Confirmer).",
       "$type": "dimension"
     },
     "macro-ring": {
@@ -1121,14 +1141,6 @@
       "$description": "Length of each arm of an aiming frame corner.",
       "$type": "dimension"
     },
-    "glass-blur": {
-      "$value": {
-        "value": 12,
-        "unit": "px"
-      },
-      "$description": "Backdrop blur sigma standing in for the Figma glass effect, which has no Flutter equivalent.",
-      "$type": "dimension"
-    },
     "floating-shadow-blur": {
       "$value": {
         "value": 20,
@@ -1159,14 +1171,6 @@
         "unit": "px"
       },
       "$description": "Vertical offset of the drop shadow of a small glass button (the day/night toggle).",
-      "$type": "dimension"
-    },
-    "scroll-fade": {
-      "$value": {
-        "value": 110,
-        "unit": "px"
-      },
-      "$description": "Height of the fade at the bottom of a tab screen, behind the tab bar.",
       "$type": "dimension"
     },
     "scroll-edge-fade": {
@@ -1498,7 +1502,7 @@
       },
       "dark": {
         "$value": "{color.sumi}",
-        "$description": "Background of camera screens and dark pills.",
+        "$description": "Sumi, the inverted surface: snack bars, hints and tooltips, dark pills, the chosen serving.",
         "$type": "color"
       },
       "glass": {
@@ -1512,7 +1516,7 @@
           "alpha": 0.25,
           "hex": "#FFFCF4"
         },
-        "$description": "Kinu at 25% over the refracted backdrop: the tab plate and the Scanner button.",
+        "$description": "Kinu at 25% over the refracted backdrop: the tint of clear glass, on the tab plate, the Scanner button, clear glass buttons, search fields and filters.",
         "$type": "color"
       },
       "glass-ink": {
@@ -1596,7 +1600,7 @@
           "alpha": 0.55,
           "hex": "#F7F1E0"
         },
-        "$description": "Washi at 55%, the end of the fade content scrolls into under the tab bar.",
+        "$description": "Washi at 55%, the inner end of the fades over the half days at both ends of the Journal week band. The other end is the same colour at 0%.",
         "$type": "color"
       },
       "pressed": {
@@ -1686,76 +1690,6 @@
         "$value": "{color.kin}",
         "$description": "Gold outline of an item to review (Ekklo match to choose).",
         "$type": "color"
-      },
-      "glass-highlight": {
-        "$value": {
-          "colorSpace": "srgb",
-          "components": [
-            1,
-            1,
-            1
-          ],
-          "alpha": 0.9,
-          "hex": "#FFFFFF"
-        },
-        "$type": "color",
-        "$description": "Lit edge of liquid glass: 1 px inside gradient stroke (top-left and bottom-right) on the tab plate and the glass buttons."
-      },
-      "glass-shade": {
-        "$value": {
-          "colorSpace": "srgb",
-          "components": [
-            1,
-            1,
-            1
-          ],
-          "alpha": 0.12,
-          "hex": "#FFFFFF"
-        },
-        "$type": "color",
-        "$description": "Middle stop of the liquid glass edge gradient (shaded sides)."
-      },
-      "glass-ink-highlight": {
-        "$value": {
-          "colorSpace": "srgb",
-          "components": [
-            1,
-            1,
-            1
-          ],
-          "alpha": 0.35,
-          "hex": "#FFFFFF"
-        },
-        "$type": "color",
-        "$description": "Lit edge of ink glass, the primary button colour at 90%: outer stops of its 1 px inside gradient stroke."
-      },
-      "glass-ink-shade": {
-        "$value": {
-          "colorSpace": "srgb",
-          "components": [
-            1,
-            1,
-            1
-          ],
-          "alpha": 0.05,
-          "hex": "#FFFFFF"
-        },
-        "$type": "color",
-        "$description": "Middle stop of the ink glass edge gradient (shaded sides)."
-      },
-      "lens-edge": {
-        "$value": {
-          "colorSpace": "srgb",
-          "components": [
-            0.10588,
-            0.10196,
-            0.0902
-          ],
-          "alpha": 0.3,
-          "hex": "#1B1A17"
-        },
-        "$type": "color",
-        "$description": "Outline of the glass lens over a held switch: 1 px gradient stroke, this colour at the top-left fading to glass-highlight at the bottom-right."
       }
     },
     "text": {
@@ -1773,6 +1707,7 @@
       },
       "disabled": {
         "$value": "{color.usuzumi}",
+        "$description": "Upcoming dates, disabled labels.",
         "$type": "color"
       },
       "link": {
@@ -1789,10 +1724,42 @@
       },
       "on-dark": {
         "$value": "{color.kinu}",
+        "$description": "Text and icons on role/background/dark or role/goal/selected-day. Inverted in the dark theme.",
+        "$type": "color"
+      },
+      "on-dark-secondary": {
+        "$value": "{color.usuzumi}",
+        "$description": "Secondary text on role/background/dark: the detail line of a snack bar. Inverted in the dark theme.",
         "$type": "color"
       },
       "info": {
         "$value": "{color.sora}",
+        "$description": "Information text and icons.",
+        "$type": "color"
+      },
+      "glass-link": {
+        "$value": "{color.fujin}",
+        "$description": "Text and icons on a validated glass control: text.link in light, lighter in dark, where the glass lifts the tint behind it (ADR 0041).",
+        "$type": "color"
+      },
+      "glass-gold": {
+        "$value": "{color.kin-deep}",
+        "$description": "Text and icons on an attention glass control: deeper than text.gold in light, so it keeps 4.5:1 on the gold tint (ADR 0042); lighter in dark, where the glass lifts the tint behind it (ADR 0041).",
+        "$type": "color"
+      },
+      "glass-info": {
+        "$value": "{color.sora}",
+        "$description": "Text and icons on an info glass control: text.info in light, lighter in dark, where the glass lifts the tint behind it (ADR 0041).",
+        "$type": "color"
+      },
+      "glass-alert": {
+        "$value": "{color.shu-dark}",
+        "$description": "Text and icons on an alert glass control: darker than text.alert in light, so it keeps 4.5:1 on the vermilion tint (ADR 0042); lighter in dark, where the glass lifts the tint behind it (ADR 0041).",
+        "$type": "color"
+      },
+      "glass-secondary": {
+        "$value": "{color.hai}",
+        "$description": "Text and icons on a muted glass control: text.secondary in light, lighter in dark, where the glass lifts the tint behind it (ADR 0041).",
         "$type": "color"
       },
       "on-accent": {

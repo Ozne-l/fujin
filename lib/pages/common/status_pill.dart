@@ -131,8 +131,12 @@ class StatusPill extends HookWidget {
     }
 
     final colors = context.colors;
+    Color textOf(PillTone tone) => switch (glass) {
+      false => tone.foreground(colors),
+      true => tone.glass.foreground(colors),
+    };
     return switch (firstTone) {
-      null => pill(tone.background(colors), tone.foreground(colors)),
+      null => pill(tone.background(colors), textOf(tone)),
       final first => MotionBuilder<Color>(
         motion: FujinMotion.of(context, FujinMotion.pill),
         converter: MotionConverter.colorRgb,
@@ -141,8 +145,8 @@ class StatusPill extends HookWidget {
         builder: (context, background, _) => MotionBuilder<Color>(
           motion: FujinMotion.of(context, FujinMotion.pill),
           converter: MotionConverter.colorRgb,
-          from: first.foreground(colors),
-          value: tone.foreground(colors),
+          from: textOf(first),
+          value: textOf(tone),
           builder: (context, foreground, _) => pill(background, foreground),
         ),
       ),

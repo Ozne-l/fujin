@@ -17,7 +17,6 @@ class GlassFill extends HookConsumerWidget {
     required this.child,
     this.floating = false,
     this.pressable = false,
-    this.rim = FujinStroke.card,
     super.key,
   });
 
@@ -25,7 +24,6 @@ class GlassFill extends HookConsumerWidget {
   final Widget child;
   final bool floating;
   final bool pressable;
-  final double rim;
 
   static const LiquidRoundedSuperellipse _shape = LiquidRoundedSuperellipse(
     borderRadius: FujinRadius.pill,
@@ -35,7 +33,6 @@ class GlassFill extends HookConsumerWidget {
     FujinColors colors,
     GlassFinish finish, {
     bool floating = false,
-    double rim = FujinStroke.card,
   }) {
     final foreground = WidgetStateProperty.resolveWith(
       (states) => switch (states.contains(WidgetState.disabled)) {
@@ -59,7 +56,6 @@ class GlassFill extends HookConsumerWidget {
           },
           floating: floating,
           pressable: enabled,
-          rim: rim,
           child: child ?? const SizedBox.shrink(),
         );
       },
@@ -95,9 +91,6 @@ class GlassFill extends HookConsumerWidget {
         reduced: reduced,
         opaque: Color.alphaBlend(fill, colors.backgroundCard),
         fill: fill,
-        highlight: blend((it) => it.rimHighlight(colors, brightness)),
-        shade: blend((it) => it.rimShade(colors, brightness)),
-        rim: rim,
         glow: switch (pressable) {
           true => GlassTouchGlow.overTint,
           false => GlassTouchGlow.none,

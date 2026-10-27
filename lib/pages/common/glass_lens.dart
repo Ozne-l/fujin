@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_glass.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
@@ -27,9 +27,11 @@ class GlassLens extends StatelessWidget {
           child: Transform.scale(
             scaleX: squash,
             child: LiquidGlass.withOwnLayer(
-              settings: FujinGlass.lens(
-                visibility: visibility,
+              settings: FujinGlass.lens,
+              appearance: FujinGlass.appearance(
+                Theme.of(context).brightness,
                 tint: context.colors.backgroundGlassLens,
+                visibility: visibility,
               ),
               shape: LiquidRoundedSuperellipse(borderRadius: rect.height / 2),
               child: const SizedBox.expand(),

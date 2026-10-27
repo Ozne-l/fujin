@@ -107,7 +107,7 @@
           "hex": "#EDE6D3"
         },
         "$type": "color",
-        "$description": "Background of camera screens and dark pills."
+        "$description": "Cream, the inverted surface in dark: snack bars, hints and tooltips, dark pills, the chosen serving."
       },
       "glass": {
         "$value": {
@@ -121,7 +121,7 @@
           "hex": "#2B2925"
         },
         "$type": "color",
-        "$description": "#2B2925 at 45% over the refracted backdrop: the tab plate and the Scanner button."
+        "$description": "#2B2925 at 45% over the refracted backdrop: the tint of clear glass, on the tab plate, the Scanner button, clear glass buttons, search fields and filters."
       },
       "glass-ink": {
         "$value": {
@@ -191,7 +191,7 @@
           "hex": "#2F4B31"
         },
         "$type": "color",
-        "$description": "Matcha at 80% behind the active tab."
+        "$description": "#2F4B31 at 85% behind the active tab."
       },
       "scroll-fade": {
         "$value": {
@@ -205,7 +205,7 @@
           "hex": "#171613"
         },
         "$type": "color",
-        "$description": "Washi at 55%, the end of the fade content scrolls into under the tab bar."
+        "$description": "Washi at 55%, the inner end of the fades over the half days at both ends of the Journal week band. The other end is the same colour at 0%."
       },
       "pressed": {
         "$value": {
@@ -219,7 +219,7 @@
           "hex": "#F7F1E0"
         },
         "$type": "color",
-        "$description": "Sumi at 6%, the ink wash under a pressed, hovered or focused surface."
+        "$description": "#F7F1E0 at 8%, the light wash under a pressed, hovered or focused surface."
       },
       "accent": {
         "$value": {
@@ -375,76 +375,6 @@
         },
         "$type": "color",
         "$description": "Gold outline of an item to review (Ekklo match to choose)."
-      },
-      "glass-highlight": {
-        "$value": {
-          "colorSpace": "srgb",
-          "components": [
-            1,
-            1,
-            1
-          ],
-          "alpha": 0.14,
-          "hex": "#FFFFFF"
-        },
-        "$type": "color",
-        "$description": "Lit edge of liquid glass: 1 px inside gradient stroke (top-left and bottom-right) on the tab plate and the glass buttons."
-      },
-      "glass-shade": {
-        "$value": {
-          "colorSpace": "srgb",
-          "components": [
-            1,
-            1,
-            1
-          ],
-          "alpha": 0.04,
-          "hex": "#FFFFFF"
-        },
-        "$type": "color",
-        "$description": "Middle stop of the liquid glass edge gradient (shaded sides)."
-      },
-      "glass-ink-highlight": {
-        "$value": {
-          "colorSpace": "srgb",
-          "components": [
-            1,
-            1,
-            1
-          ],
-          "alpha": 0.5,
-          "hex": "#FFFFFF"
-        },
-        "$type": "color",
-        "$description": "Lit edge of ink glass, the primary button colour at 90%: outer stops of its 1 px inside gradient stroke."
-      },
-      "glass-ink-shade": {
-        "$value": {
-          "colorSpace": "srgb",
-          "components": [
-            1,
-            1,
-            1
-          ],
-          "alpha": 0.05,
-          "hex": "#FFFFFF"
-        },
-        "$type": "color",
-        "$description": "Middle stop of the ink glass edge gradient (shaded sides)."
-      },
-      "lens-edge": {
-        "$value": {
-          "colorSpace": "srgb",
-          "components": [
-            1,
-            1,
-            1
-          ],
-          "alpha": 0.3,
-          "hex": "#FFFFFF"
-        },
-        "$type": "color",
-        "$description": "Outline of the glass lens over a held switch: 1 px gradient stroke, this colour at the top-left fading to glass-highlight at the bottom-right."
       }
     },
     "text": {
@@ -498,6 +428,7 @@
           "alpha": 1,
           "hex": "#6B6556"
         },
+        "$description": "Upcoming dates, disabled labels.",
         "$type": "color"
       },
       "link": {
@@ -550,6 +481,21 @@
           "alpha": 1,
           "hex": "#1B1A17"
         },
+        "$description": "Text and icons on role/background/dark or role/goal/selected-day. Inverted in the dark theme.",
+        "$type": "color"
+      },
+      "on-dark-secondary": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.4196,
+            0.3961,
+            0.3373
+          ],
+          "alpha": 1,
+          "hex": "#6B6556"
+        },
+        "$description": "Secondary text on role/background/dark: the detail line of a snack bar. Inverted in the dark theme.",
         "$type": "color"
       },
       "info": {
@@ -563,6 +509,77 @@
           "alpha": 1,
           "hex": "#8FB7CC"
         },
+        "$description": "Information text and icons.",
+        "$type": "color"
+      },
+      "glass-link": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6941,
+            0.8353,
+            0.6824
+          ],
+          "alpha": 1,
+          "hex": "#B1D5AE"
+        },
+        "$description": "Text and icons on a validated glass control: text.link in light, lighter in dark, where the glass lifts the tint behind it (ADR 0041).",
+        "$type": "color"
+      },
+      "glass-gold": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.898,
+            0.7804,
+            0.5451
+          ],
+          "alpha": 1,
+          "hex": "#E5C78B"
+        },
+        "$description": "Text and icons on an attention glass control: deeper than text.gold in light, so it keeps 4.5:1 on the gold tint (ADR 0042); lighter in dark, where the glass lifts the tint behind it (ADR 0041).",
+        "$type": "color"
+      },
+      "glass-info": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.698,
+            0.8078,
+            0.8627
+          ],
+          "alpha": 1,
+          "hex": "#B2CEDC"
+        },
+        "$description": "Text and icons on an info glass control: text.info in light, lighter in dark, where the glass lifts the tint behind it (ADR 0041).",
+        "$type": "color"
+      },
+      "glass-alert": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9647,
+            0.7451,
+            0.698
+          ],
+          "alpha": 1,
+          "hex": "#F6BEB2"
+        },
+        "$description": "Text and icons on an alert glass control: darker than text.alert in light, so it keeps 4.5:1 on the vermilion tint (ADR 0042); lighter in dark, where the glass lifts the tint behind it (ADR 0041).",
+        "$type": "color"
+      },
+      "glass-secondary": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.7882,
+            0.7608,
+            0.6824
+          ],
+          "alpha": 1,
+          "hex": "#C9C2AE"
+        },
+        "$description": "Text and icons on a muted glass control: text.secondary in light, lighter in dark, where the glass lifts the tint behind it (ADR 0041).",
         "$type": "color"
       },
       "on-accent": {
@@ -576,8 +593,8 @@
           "alpha": 1,
           "hex": "#13210F"
         },
-        "$type": "color",
-        "$description": "Text and icons on an accent, source or goal fill."
+        "$description": "Text and icons on an accent, source or goal fill.",
+        "$type": "color"
       },
       "on-dark-accent": {
         "$value": {
@@ -590,8 +607,8 @@
           "alpha": 1,
           "hex": "#7A5714"
         },
-        "$type": "color",
-        "$description": "Action label on role/background/dark (snackbar « Annuler »)."
+        "$description": "Action label on role/background/dark (snackbar « Annuler »).",
+        "$type": "color"
       }
     },
     "button": {

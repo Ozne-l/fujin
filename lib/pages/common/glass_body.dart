@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fujin/app/theme/fujin_glass.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/pages/common/glass_rim.dart';
 import 'package:fujin/pages/common/glass_shadow.dart';
 import 'package:fujin/pages/common/glass_touch_glow.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
@@ -12,10 +12,7 @@ class GlassBody extends StatelessWidget {
     required this.reduced,
     required this.opaque,
     required this.fill,
-    required this.highlight,
-    required this.shade,
     required this.child,
-    this.rim = FujinStroke.card,
     this.glow = GlassTouchGlow.none,
     this.pressable = false,
     this.overlay,
@@ -29,10 +26,7 @@ class GlassBody extends StatelessWidget {
     required this.reduced,
     required this.opaque,
     required this.fill,
-    required this.highlight,
-    required this.shade,
     required this.child,
-    this.rim = FujinStroke.card,
     this.glow = GlassTouchGlow.none,
     this.pressable = false,
     this.overlay,
@@ -45,9 +39,6 @@ class GlassBody extends StatelessWidget {
   final bool reduced;
   final Color opaque;
   final Color fill;
-  final Color highlight;
-  final Color shade;
-  final double rim;
   final GlassTouchGlow glow;
   final bool pressable;
   final Widget? overlay;
@@ -65,7 +56,7 @@ class GlassBody extends StatelessWidget {
         ),
         child: child,
       ),
-      false => _glass(colors),
+      false => _glass(colors, Theme.of(context).brightness),
     };
     final layered = switch (overlay) {
       null => body,
@@ -91,34 +82,28 @@ class GlassBody extends StatelessWidget {
     };
   }
 
-  Widget _glass(FujinColors colors) {
+  Widget _glass(FujinColors colors, Brightness brightness) {
     Widget glowing(Widget lit) => GlassGlowLayer(
       child: GlassGlow(glowColor: colors.backgroundGlassGlow, child: lit),
     );
-    final tinted = GlassRim(
-      shape: shape,
-      highlight: highlight,
-      shade: shade,
-      width: rim,
-      child: DecoratedBox(
-        decoration: ShapeDecoration(color: fill, shape: shape),
-        child: switch (glow) {
-          GlassTouchGlow.overTint => glowing(child),
-          GlassTouchGlow.none || GlassTouchGlow.underTint => child,
-        },
-      ),
-    );
     final lit = switch (glow) {
+      GlassTouchGlow.none => child,
+      GlassTouchGlow.overTint => glowing(child),
       GlassTouchGlow.underTint => ClipPath(
         clipper: ShapeBorderClipper(shape: shape),
-        child: glowing(tinted),
+        child: glowing(child),
       ),
-      GlassTouchGlow.none || GlassTouchGlow.overTint => tinted,
     };
+    final appearance = FujinGlass.appearance(brightness, tint: fill);
     return switch (_ownLayer) {
-      null => LiquidGlass.grouped(shape: shape, child: lit),
+      null => LiquidGlass.grouped(
+        shape: shape,
+        appearance: appearance,
+        child: lit,
+      ),
       final settings => LiquidGlass.withOwnLayer(
         settings: settings,
+        appearance: appearance,
         shape: shape,
         child: lit,
       ),

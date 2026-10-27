@@ -36,11 +36,13 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0030](0030-mfp-foods-shown-when-a-side-is-missing.md) | MyFitnessPal foods shown when Ekklo or the network is missing | Accepted |
 | [0031](0031-reduced-motion.md) | Reduced motion follows the phone setting | Accepted |
 | [0032](0032-text-contrast.md) | Text roles meet 4.5:1 on page and card | Accepted |
-| [0033](0033-liquid-glass-and-fade-through.md) | Liquid glass tab bar and fade-through navigation | Proposed (extended by 0036; top fade replaced by 0037) |
+| [0033](0033-liquid-glass-and-fade-through.md) | Liquid glass tab bar and fade-through navigation | Proposed (extended by 0036; top fade replaced by 0037; glass settings and rim superseded by 0041) |
 | [0034](0034-remembered-foods-in-the-add-search.md) | Remembered foods in the add search, and "Ajouter" on screen 19 | Accepted |
-| [0035](0035-dark-theme-and-appearance-setting.md) | Dark theme and the "Apparence" setting | Accepted |
-| [0036](0036-glass-on-buttons-search-and-filters.md) | Glass on buttons, the search field and filters | Proposed |
+| [0035](0035-dark-theme-and-appearance-setting.md) | Dark theme and the "Apparence" setting | Accepted (glass rim superseded by 0041) |
+| [0036](0036-glass-on-buttons-search-and-filters.md) | Glass on buttons, the search field and filters | Proposed (rims, fills and tinted text superseded by 0041) |
 | [0037](0037-progressive-blur-under-fixed-headers.md) | Progressive blur under fixed headers | Proposed |
 | [0038](0038-bouncing-scroll-on-every-platform.md) | Bouncing scroll on every platform | Proposed |
 | [0039](0039-app-version.md) | App version | Accepted |
 | [0040](0040-flutter-sdk-per-project.md) | Flutter SDK per project | Accepted |
+| [0041](0041-liquid-glass-renderer-1.0.md) | Liquid glass on liquid_glass_renderer 1.0 | Proposed |
+| [0042](0042-text-contrast-on-tinted-surfaces.md) | Text contrast on tinted surfaces | Accepted |

@@ -45,7 +45,7 @@ class SnackBarContent extends StatelessWidget {
               Text(
                 detail,
                 style: FujinText.inter12Regular.copyWith(
-                  color: colors.textDisabled,
+                  color: colors.textOnDarkSecondary,
                 ),
               ),
             ],

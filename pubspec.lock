@@ -209,6 +209,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.9"
+  data_assets:
+    dependency: transitive
+    description:
+      name: data_assets
+      sha256: "8bfdbf25ec8a0f4b5a3c993042c4ab9996ba354f0b03d40f4e360f3730d71cae"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.20.0"
   dbus:
     dependency: transitive
     description:
@@ -324,6 +332,19 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_gpu:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
+  flutter_gpu_shaders:
+    dependency: transitive
+    description:
+      name: flutter_gpu_shaders
+      sha256: "1e8c5438c24e79629f5688c7b5dfd2b7cf09b36b443a806bc8c083cd8c04644a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.2"
   flutter_hooks:
     dependency: "direct main"
     description:
@@ -640,11 +661,12 @@ packages:
   liquid_glass_renderer:
     dependency: "direct main"
     description:
-      name: liquid_glass_renderer
-      sha256: "789be157494b38cdef7607bb9b63e7fe3fab76fae16149e52fa313c2d858cb3f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.0-dev.4"
+      path: "packages/liquid_glass_renderer"
+      ref: c7ec9d22e4c458da5594c44c107738afb51fbd09
+      resolved-ref: c7ec9d22e4c458da5594c44c107738afb51fbd09
+      url: "https://github.com/Ozne-l/flutter_liquid_glass.git"
+    source: git
+    version: "1.0.0-dev.1"
   listen:
     dependency: transitive
     description:
@@ -1128,10 +1150,10 @@ packages:
     dependency: transitive
     description:
       name: vector_math
-      sha256: fa49e1674cb84acb900141714e6c6e1f9ae099827c24d141430ff6819db4e1bc
+      sha256: "92b9910f66ed1057fd4da7b040ae7c74cafacf885bdc81be496928d5049b032d"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.4"
+    version: "2.4.3"
   very_good_analysis:
     dependency: "direct dev"
     description:
@@ -1229,5 +1251,5 @@ packages:
     source: hosted
     version: "3.1.4"
 sdks:
-  dart: ">=3.12.2 <4.0.0"
+  dart: ">=3.13.0 <3.14.0"
   flutter: "3.47.7"

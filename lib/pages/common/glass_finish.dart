@@ -15,38 +15,26 @@ enum GlassFinish {
   Color foreground(FujinColors colors) => switch (this) {
     clear => colors.textPrimary,
     ink => colors.buttonPrimaryText,
-    validated => colors.textLink,
-    attention => colors.textGold,
-    info => colors.textInfo,
-    alert => colors.textAlert,
-    muted => colors.textSecondary,
+    validated => colors.textGlassLink,
+    attention => colors.textGlassGold,
+    info => colors.textGlassInfo,
+    alert => colors.textGlassAlert,
+    muted => colors.textGlassSecondary,
   };
 
   Color fill(FujinColors colors, Brightness brightness) => switch (this) {
     clear => colors.backgroundGlass,
     ink => colors.backgroundGlassInk,
-    muted => foreground(
-      colors,
-    ).withValues(alpha: FujinGlass.faintTint(brightness)),
-    validated || attention || info || alert => foreground(
-      colors,
-    ).withValues(alpha: FujinGlass.tint(brightness)),
-  };
-
-  Color rimHighlight(FujinColors colors, Brightness brightness) =>
-      switch (this) {
-        clear => colors.borderGlassHighlight,
-        ink => colors.borderGlassInkHighlight,
-        validated || attention || info || alert || muted => foreground(
-          colors,
-        ).withValues(alpha: FujinGlass.tintRimHighlight(brightness)),
-      };
-
-  Color rimShade(FujinColors colors, Brightness brightness) => switch (this) {
-    clear => colors.borderGlassShade,
-    ink => colors.borderGlassInkShade,
-    validated || attention || info || alert || muted => foreground(
-      colors,
-    ).withValues(alpha: FujinGlass.tintRimShade(brightness)),
+    muted => colors.textSecondary.withValues(
+      alpha: FujinGlass.faintTint(brightness),
+    ),
+    validated => colors.textLink.withValues(
+      alpha: FujinGlass.tint(brightness),
+    ),
+    attention => colors.textGold.withValues(
+      alpha: FujinGlass.tint(brightness),
+    ),
+    info => colors.textInfo.withValues(alpha: FujinGlass.tint(brightness)),
+    alert => colors.textAlert.withValues(alpha: FujinGlass.tint(brightness)),
   };
 }

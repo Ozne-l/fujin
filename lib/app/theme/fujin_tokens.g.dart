@@ -27,12 +27,7 @@ final class FujinColors extends ThemeExtension<FujinColors> {
     required this.borderControl,
     required this.borderDivider,
     required this.borderFocus,
-    required this.borderGlassHighlight,
-    required this.borderGlassInkHighlight,
-    required this.borderGlassInkShade,
-    required this.borderGlassShade,
     required this.borderHairline,
-    required this.borderLensEdge,
     required this.borderWarning,
     required this.buttonAlertBackground,
     required this.buttonAlertText,
@@ -66,12 +61,18 @@ final class FujinColors extends ThemeExtension<FujinColors> {
     required this.sourceMfp,
     required this.textAlert,
     required this.textDisabled,
+    required this.textGlassAlert,
+    required this.textGlassGold,
+    required this.textGlassInfo,
+    required this.textGlassLink,
+    required this.textGlassSecondary,
     required this.textGold,
     required this.textInfo,
     required this.textLink,
     required this.textOnAccent,
     required this.textOnDark,
     required this.textOnDarkAccent,
+    required this.textOnDarkSecondary,
     required this.textPrimary,
     required this.textSecondary,
     required this.textTertiary,
@@ -100,12 +101,7 @@ final class FujinColors extends ThemeExtension<FujinColors> {
   final Color borderControl;
   final Color borderDivider;
   final Color borderFocus;
-  final Color borderGlassHighlight;
-  final Color borderGlassInkHighlight;
-  final Color borderGlassInkShade;
-  final Color borderGlassShade;
   final Color borderHairline;
-  final Color borderLensEdge;
   final Color borderWarning;
   final Color buttonAlertBackground;
   final Color buttonAlertText;
@@ -139,12 +135,18 @@ final class FujinColors extends ThemeExtension<FujinColors> {
   final Color sourceMfp;
   final Color textAlert;
   final Color textDisabled;
+  final Color textGlassAlert;
+  final Color textGlassGold;
+  final Color textGlassInfo;
+  final Color textGlassLink;
+  final Color textGlassSecondary;
   final Color textGold;
   final Color textInfo;
   final Color textLink;
   final Color textOnAccent;
   final Color textOnDark;
   final Color textOnDarkAccent;
+  final Color textOnDarkSecondary;
   final Color textPrimary;
   final Color textSecondary;
   final Color textTertiary;
@@ -173,12 +175,7 @@ final class FujinColors extends ThemeExtension<FujinColors> {
     borderControl: Color(0xFFBDB49C),
     borderDivider: Color(0xFFD4A548),
     borderFocus: Color(0xFF2F5E34),
-    borderGlassHighlight: Color(0xE6FFFFFF),
-    borderGlassInkHighlight: Color(0x59FFFFFF),
-    borderGlassInkShade: Color(0x0DFFFFFF),
-    borderGlassShade: Color(0x1FFFFFFF),
     borderHairline: Color(0xFFE3DAC0),
-    borderLensEdge: Color(0x4D1B1A17),
     borderWarning: Color(0xFFD4A548),
     buttonAlertBackground: Color(0xFFB23A26),
     buttonAlertText: Color(0xFFFFFCF4),
@@ -212,14 +209,20 @@ final class FujinColors extends ThemeExtension<FujinColors> {
     sourceMfp: Color(0xFF1E6BD6),
     textAlert: Color(0xFFB23A26),
     textDisabled: Color(0xFFBDB49C),
-    textGold: Color(0xFF8C6418),
+    textGlassAlert: Color(0xFF9E3322),
+    textGlassGold: Color(0xFF795615),
+    textGlassInfo: Color(0xFF3F6A82),
+    textGlassLink: Color(0xFF2F5E34),
+    textGlassSecondary: Color(0xFF645E4F),
+    textGold: Color(0xFF855F17),
     textInfo: Color(0xFF3F6A82),
     textLink: Color(0xFF2F5E34),
     textOnAccent: Color(0xFFFFFCF4),
     textOnDark: Color(0xFFFFFCF4),
     textOnDarkAccent: Color(0xFFD4A548),
+    textOnDarkSecondary: Color(0xFFBDB49C),
     textPrimary: Color(0xFF1B1A17),
-    textSecondary: Color(0xFF6F6857),
+    textSecondary: Color(0xFF645E4F),
     textTertiary: Color(0xFF736C5A),
   );
 
@@ -247,12 +250,7 @@ final class FujinColors extends ThemeExtension<FujinColors> {
     borderControl: Color(0xFF5E584B),
     borderDivider: Color(0xFF9C7B3A),
     borderFocus: Color(0xFF8FC38B),
-    borderGlassHighlight: Color(0x24FFFFFF),
-    borderGlassInkHighlight: Color(0x80FFFFFF),
-    borderGlassInkShade: Color(0x0DFFFFFF),
-    borderGlassShade: Color(0x0AFFFFFF),
     borderHairline: Color(0xFF2E2B25),
-    borderLensEdge: Color(0x4DFFFFFF),
     borderWarning: Color(0xFFC49A45),
     buttonAlertBackground: Color(0xFFB23A26),
     buttonAlertText: Color(0xFFFFFCF4),
@@ -286,12 +284,18 @@ final class FujinColors extends ThemeExtension<FujinColors> {
     sourceMfp: Color(0xFF6AA2EE),
     textAlert: Color(0xFFEE8670),
     textDisabled: Color(0xFF6B6556),
+    textGlassAlert: Color(0xFFF6BEB2),
+    textGlassGold: Color(0xFFE5C78B),
+    textGlassInfo: Color(0xFFB2CEDC),
+    textGlassLink: Color(0xFFB1D5AE),
+    textGlassSecondary: Color(0xFFC9C2AE),
     textGold: Color(0xFFD9AE57),
     textInfo: Color(0xFF8FB7CC),
     textLink: Color(0xFF8FC38B),
     textOnAccent: Color(0xFF13210F),
     textOnDark: Color(0xFF1B1A17),
     textOnDarkAccent: Color(0xFF7A5714),
+    textOnDarkSecondary: Color(0xFF6B6556),
     textPrimary: Color(0xFFF0E9D8),
     textSecondary: Color(0xFFBDB49C),
     textTertiary: Color(0xFFA0987F),
@@ -322,12 +326,7 @@ final class FujinColors extends ThemeExtension<FujinColors> {
     Color? borderControl,
     Color? borderDivider,
     Color? borderFocus,
-    Color? borderGlassHighlight,
-    Color? borderGlassInkHighlight,
-    Color? borderGlassInkShade,
-    Color? borderGlassShade,
     Color? borderHairline,
-    Color? borderLensEdge,
     Color? borderWarning,
     Color? buttonAlertBackground,
     Color? buttonAlertText,
@@ -361,12 +360,18 @@ final class FujinColors extends ThemeExtension<FujinColors> {
     Color? sourceMfp,
     Color? textAlert,
     Color? textDisabled,
+    Color? textGlassAlert,
+    Color? textGlassGold,
+    Color? textGlassInfo,
+    Color? textGlassLink,
+    Color? textGlassSecondary,
     Color? textGold,
     Color? textInfo,
     Color? textLink,
     Color? textOnAccent,
     Color? textOnDark,
     Color? textOnDarkAccent,
+    Color? textOnDarkSecondary,
     Color? textPrimary,
     Color? textSecondary,
     Color? textTertiary,
@@ -395,13 +400,7 @@ final class FujinColors extends ThemeExtension<FujinColors> {
     borderControl: borderControl ?? this.borderControl,
     borderDivider: borderDivider ?? this.borderDivider,
     borderFocus: borderFocus ?? this.borderFocus,
-    borderGlassHighlight: borderGlassHighlight ?? this.borderGlassHighlight,
-    borderGlassInkHighlight:
-        borderGlassInkHighlight ?? this.borderGlassInkHighlight,
-    borderGlassInkShade: borderGlassInkShade ?? this.borderGlassInkShade,
-    borderGlassShade: borderGlassShade ?? this.borderGlassShade,
     borderHairline: borderHairline ?? this.borderHairline,
-    borderLensEdge: borderLensEdge ?? this.borderLensEdge,
     borderWarning: borderWarning ?? this.borderWarning,
     buttonAlertBackground: buttonAlertBackground ?? this.buttonAlertBackground,
     buttonAlertText: buttonAlertText ?? this.buttonAlertText,
@@ -438,12 +437,18 @@ final class FujinColors extends ThemeExtension<FujinColors> {
     sourceMfp: sourceMfp ?? this.sourceMfp,
     textAlert: textAlert ?? this.textAlert,
     textDisabled: textDisabled ?? this.textDisabled,
+    textGlassAlert: textGlassAlert ?? this.textGlassAlert,
+    textGlassGold: textGlassGold ?? this.textGlassGold,
+    textGlassInfo: textGlassInfo ?? this.textGlassInfo,
+    textGlassLink: textGlassLink ?? this.textGlassLink,
+    textGlassSecondary: textGlassSecondary ?? this.textGlassSecondary,
     textGold: textGold ?? this.textGold,
     textInfo: textInfo ?? this.textInfo,
     textLink: textLink ?? this.textLink,
     textOnAccent: textOnAccent ?? this.textOnAccent,
     textOnDark: textOnDark ?? this.textOnDark,
     textOnDarkAccent: textOnDarkAccent ?? this.textOnDarkAccent,
+    textOnDarkSecondary: textOnDarkSecondary ?? this.textOnDarkSecondary,
     textPrimary: textPrimary ?? this.textPrimary,
     textSecondary: textSecondary ?? this.textSecondary,
     textTertiary: textTertiary ?? this.textTertiary,
@@ -514,26 +519,8 @@ final class FujinColors extends ThemeExtension<FujinColors> {
       borderDivider:
           Color.lerp(borderDivider, other.borderDivider, t) ?? borderDivider,
       borderFocus: Color.lerp(borderFocus, other.borderFocus, t) ?? borderFocus,
-      borderGlassHighlight:
-          Color.lerp(borderGlassHighlight, other.borderGlassHighlight, t) ??
-          borderGlassHighlight,
-      borderGlassInkHighlight:
-          Color.lerp(
-            borderGlassInkHighlight,
-            other.borderGlassInkHighlight,
-            t,
-          ) ??
-          borderGlassInkHighlight,
-      borderGlassInkShade:
-          Color.lerp(borderGlassInkShade, other.borderGlassInkShade, t) ??
-          borderGlassInkShade,
-      borderGlassShade:
-          Color.lerp(borderGlassShade, other.borderGlassShade, t) ??
-          borderGlassShade,
       borderHairline:
           Color.lerp(borderHairline, other.borderHairline, t) ?? borderHairline,
-      borderLensEdge:
-          Color.lerp(borderLensEdge, other.borderLensEdge, t) ?? borderLensEdge,
       borderWarning:
           Color.lerp(borderWarning, other.borderWarning, t) ?? borderWarning,
       buttonAlertBackground:
@@ -618,6 +605,17 @@ final class FujinColors extends ThemeExtension<FujinColors> {
       textAlert: Color.lerp(textAlert, other.textAlert, t) ?? textAlert,
       textDisabled:
           Color.lerp(textDisabled, other.textDisabled, t) ?? textDisabled,
+      textGlassAlert:
+          Color.lerp(textGlassAlert, other.textGlassAlert, t) ?? textGlassAlert,
+      textGlassGold:
+          Color.lerp(textGlassGold, other.textGlassGold, t) ?? textGlassGold,
+      textGlassInfo:
+          Color.lerp(textGlassInfo, other.textGlassInfo, t) ?? textGlassInfo,
+      textGlassLink:
+          Color.lerp(textGlassLink, other.textGlassLink, t) ?? textGlassLink,
+      textGlassSecondary:
+          Color.lerp(textGlassSecondary, other.textGlassSecondary, t) ??
+          textGlassSecondary,
       textGold: Color.lerp(textGold, other.textGold, t) ?? textGold,
       textInfo: Color.lerp(textInfo, other.textInfo, t) ?? textInfo,
       textLink: Color.lerp(textLink, other.textLink, t) ?? textLink,
@@ -627,6 +625,9 @@ final class FujinColors extends ThemeExtension<FujinColors> {
       textOnDarkAccent:
           Color.lerp(textOnDarkAccent, other.textOnDarkAccent, t) ??
           textOnDarkAccent,
+      textOnDarkSecondary:
+          Color.lerp(textOnDarkSecondary, other.textOnDarkSecondary, t) ??
+          textOnDarkSecondary,
       textPrimary: Color.lerp(textPrimary, other.textPrimary, t) ?? textPrimary,
       textSecondary:
           Color.lerp(textSecondary, other.textSecondary, t) ?? textSecondary,
@@ -677,7 +678,6 @@ abstract final class FujinStroke {
   static const double dayRing = 1.5;
   static const double fieldError = 1.5;
   static const double fieldFocus = 1.5;
-  static const double glassTintRim = 1.5;
   static const double goldRule = 2;
   static const double icon = 1.75;
   static const double macroRing = 2;
@@ -715,7 +715,6 @@ abstract final class FujinSize {
   static const double floatingShadowOffset = 6;
   static const double floatingShadowSmallBlur = 8;
   static const double floatingShadowSmallOffset = 2;
-  static const double glassBlur = 12;
   static const double glyphCard = 56;
   static const double glyphHero = 72;
   static const double goalFieldGap = 10;
@@ -750,7 +749,6 @@ abstract final class FujinSize {
   static const double scanIcon = 26;
   static const double screenMargin = 16;
   static const double scrollEdgeFade = 32;
-  static const double scrollFade = 110;
   static const double searchField = 44;
   static const double searchIcon = 20;
   static const double skeletonLine = 10;

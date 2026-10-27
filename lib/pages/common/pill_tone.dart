@@ -31,5 +31,13 @@ enum PillTone {
     dark => GlassFinish.ink,
   };
 
-  Color foreground(FujinColors colors) => glass.foreground(colors);
+  Color foreground(FujinColors colors) => switch (this) {
+    validated => colors.textLink,
+    attention => colors.textGold,
+    info => colors.textInfo,
+    error => colors.textAlert,
+    neutral => colors.textPrimary,
+    muted => colors.textSecondary,
+    dark => colors.buttonPrimaryText,
+  };
 }
