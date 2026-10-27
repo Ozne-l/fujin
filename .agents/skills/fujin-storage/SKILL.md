@@ -87,7 +87,7 @@ The database runs synchronously on the UI isolate: the tables are tiny (a few hu
 13. **Back up `fujin.db` and nothing else.**
     Why: Memory and links are the owner's work and worth restoring; sessions and web view cookies must never leave the device. A whitelist keeps new files out by default (Android developers docs, developer.android.com, "Back up user data with Auto Backup").
     Example: `android/app/src/main/res/xml/data_extraction_rules.xml` (Android 12 and later, `cloud-backup` and `device-transfer`) and `android/app/src/main/res/xml/full_backup_content.xml` (older versions) both contain only `<include domain="file" path="fujin.db"/>`; `android/app/src/main/AndroidManifest.xml` points at both. `lib/main.dart` opens the file in `getApplicationSupportDirectory()`, which `path_provider` maps to the app's files directory on Android, the `file` domain.
-    Status: restore of a sideloaded build is not verified yet (`adb shell bmgr backupnow`, uninstall, reinstall).
+    Status: restore of a sideloaded build works on the owner's Pixel 8 (2026-10-26): after an uninstall and an `adb install`, `adb shell bmgr restore <set> dev.oznel.fujin.dev` (set from `adb shell bmgr list sets`) brought back `fujin.db` and nothing else, so both sessions are signed in again. A plain `adb install` does not restore on its own.
 
 14. **Keep Ekklo tokens and MyFitnessPal cookies in `flutter_secure_storage`, never in SQLite.**
     Why: they are credentials; secure storage is encrypted by the platform and sits outside the backup whitelist by construction.
