@@ -49,7 +49,7 @@ final class SendPlan with SendPlanMappable {
   ) => copyWith(
     entries: [
       for (final planned in entries)
-        planned.entryId == entryId ? change(planned) : planned,
+        if (planned.entryId == entryId) change(planned) else planned,
     ],
   );
 }

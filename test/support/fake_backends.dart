@@ -459,19 +459,20 @@ final class FakeBackends {
     EkkloDailyMealItem? updated;
     ekkloMeals = [
       for (final meal in ekkloMeals)
-        meal.id == mealId
-            ? meal.copyWith(
-                items: [
-                  for (final item in meal.items)
-                    item.id == itemId
-                        ? updated = item.copyWith(
-                            quantity: (body['quantity'] as num? ?? 0)
-                                .toDouble(),
-                          )
-                        : item,
-                ],
-              )
-            : meal,
+        if (meal.id == mealId)
+          meal.copyWith(
+            items: [
+              for (final item in meal.items)
+                if (item.id == itemId)
+                  updated = item.copyWith(
+                    quantity: (body['quantity'] as num? ?? 0).toDouble(),
+                  )
+                else
+                  item,
+            ],
+          )
+        else
+          meal,
     ];
     return switch (updated) {
       final item? => _json(item.toMap()),
@@ -483,14 +484,15 @@ final class FakeBackends {
     final (mealId, itemId) = _mealAndItem(request);
     ekkloMeals = [
       for (final meal in ekkloMeals)
-        meal.id == mealId
-            ? meal.copyWith(
-                items: [
-                  for (final item in meal.items)
-                    if (item.id != itemId) item,
-                ],
-              )
-            : meal,
+        if (meal.id == mealId)
+          meal.copyWith(
+            items: [
+              for (final item in meal.items)
+                if (item.id != itemId) item,
+            ],
+          )
+        else
+          meal,
     ];
     return http.Response('', 204);
   }

@@ -22,7 +22,7 @@ final class SendProgress with SendProgressMappable {
   SendProgress marking(int index, StepState state) => copyWith(
     steps: [
       for (final (position, step) in steps.indexed)
-        position == index ? step.copyWith(state: state) : step,
+        if (position == index) step.copyWith(state: state) else step,
     ],
   );
 }
