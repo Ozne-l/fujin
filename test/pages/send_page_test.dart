@@ -78,7 +78,7 @@ void main() {
 
     _sees('Envoi en cours');
     _sees(
-      "L'envoi va jusqu'au bout. Tu pourras revenir au journal juste après.",
+      'L’envoi va jusqu’au bout. Tu pourras revenir au journal juste après.',
     );
 
     gate.complete();
@@ -143,11 +143,11 @@ void main() {
     await _tap(tester, 'Envoyer 2 aliments vers Ekklo');
     await _tap(tester, 'Envoyer 2 aliments vers Ekklo');
     _sees('Envoi interrompu');
-    _sees("Ekklo a refusé l'envoi : Déjeuner.");
-    _sees("1 aliment attend. Rien n'est perdu.");
+    _sees('Ekklo a refusé l’envoi : Déjeuner.');
+    _sees('1 aliment attend. Rien n’est perdu.');
 
     backends.failingMeals.clear();
-    await _tap(tester, "Envoyer l'aliment restant");
+    await _tap(tester, 'Envoyer l’aliment restant');
     _sees('Envoi terminé');
     check(backends.ekkloItems).length.equals(2);
   });
@@ -276,7 +276,7 @@ void main() {
     await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
     await _tap(tester, 'Changer ›');
     await _tap(tester, 'Aliment perso');
-    await _tap(tester, "Créer l'aliment perso");
+    await _tap(tester, 'Créer l’aliment perso');
     _sees('→ Aliment perso à créer');
 
     await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
@@ -345,7 +345,7 @@ void main() {
       await _tap(tester, 'Envoyer 2 aliments vers Ekklo');
       _sees('Envoi terminé');
       _sees('Fūjin a envoyé 2 aliments vers Ekklo.');
-      _sees("Mode automatique : rien ne t'a été demandé.");
+      _sees('Mode automatique : rien ne t’a été demandé.');
       _sees('CHOIX FAITS SANS TOI (1)');
       _sees('→ Skyr nature 0 % · Isey (le plus proche)');
       check(find.text('1 à vérifier').evaluate()).isEmpty();
@@ -410,7 +410,7 @@ void main() {
       backends.ekkloReachable = false;
       await _tap(tester, 'Revoir');
       await _tap(tester, 'Aliment perso');
-      await _tap(tester, "Créer l'aliment perso");
+      await _tap(tester, 'Créer l’aliment perso');
       _sees('Pas de connexion internet.');
       _sees('Revoir');
       check(find.text('Mémorisé').evaluate()).isEmpty();
@@ -474,7 +474,7 @@ void main() {
 
       backends.failingMeals.clear();
       await _tap(tester, 'Envoyer les 2 aliments restants');
-      _sees("Mode automatique : rien ne t'a été demandé.");
+      _sees('Mode automatique : rien ne t’a été demandé.');
       check(backends.ekkloItems).length.equals(2);
     });
   });

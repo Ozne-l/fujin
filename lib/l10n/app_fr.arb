@@ -2,7 +2,7 @@
   "@@locale": "fr",
   "appName": "Fūjin",
   "devEnvironmentBanner": "DEV",
-  "journalToday": "Aujourd'hui",
+  "journalToday": "Aujourd’hui",
   "journalDay": "{date}",
   "@journalDay": {
     "placeholders": {
@@ -35,7 +35,7 @@
       "value": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}}
     }
   },
-  "ekkloProgress": "· {sent} {total, plural, =1{aliment sur 1} other{aliments sur {total}}} ›",
+  "ekkloProgress": "· {sent} {sent, plural, one{aliment} other{aliments}} sur {total} ›",
   "@ekkloProgress": {
     "placeholders": {
       "sent": {"type": "int"},
@@ -112,10 +112,10 @@
   },
   "macroUnknown": "n.c.",
   "nothingNewTitle": "Rien de nouveau",
-  "nothingNewDetail": "Modifié dans MyFitnessPal ? Synchronise l'app",
+  "nothingNewDetail": "Modifié dans MyFitnessPal ? Synchronise l’app",
   "disconnected": "Déconnecté",
   "mfpSessionExpired": "Ta session MyFitnessPal a expiré.",
-  "mfpSessionExpiredDetail": "Reconnecte-toi pour lire ton journal.\nRien n'est perdu.",
+  "mfpSessionExpiredDetail": "Reconnecte-toi pour lire ton journal.\nRien n’est perdu.",
   "ekkloSessionExpired": "Ta session Ekklo a expiré.",
   "ekkloSessionExpiredDetail": "Reconnecte-toi pour ajouter et envoyer. Ton journal MyFitnessPal reste lisible.",
   "readFailed": "Lecture impossible",
@@ -150,7 +150,7 @@
   "credentialsStayOnPhone": "Tes identifiants restent sur ce téléphone.",
   "continueAction": "Continuer",
   "reload": "Recharger",
-  "mfpSignInHint": "Connecte-toi comme d'habitude.\nCette page se fermera toute seule.",
+  "mfpSignInHint": "Connecte-toi comme d’habitude.\nCette page se fermera toute seule.",
   "mfpSignInRefused": "MyFitnessPal a refusé la session.\nConnecte-toi à nouveau sur cette page.",
   "mfpSignInUnreachable": "MyFitnessPal ne répond pas.\nVérifie ta connexion, puis recharge la page.",
   "sendTitle": "Envoi vers Ekklo",
@@ -330,7 +330,7 @@
       "energy": {"type": "String"}
     }
   },
-  "createOwnCopy": "Créer l'aliment perso",
+  "createOwnCopy": "Créer l’aliment perso",
   "chooseCandidate": "Choisir un candidat",
   "candidateBrandMatch": "{brand} · {match}",
   "@candidateBrandMatch": {
@@ -355,8 +355,8 @@
   },
   "sendingTitle": "Envoi en cours",
   "sendingDetail": "Les aliments partent vers Ekklo…",
-  "sendingNote": "D'abord les aliments perso, puis un envoi par repas.",
-  "sendingStay": "L'envoi va jusqu'au bout. Tu pourras revenir au journal juste après.",
+  "sendingNote": "D’abord les aliments perso, puis un envoi par repas.",
+  "sendingStay": "L’envoi va jusqu’au bout. Tu pourras revenir au journal juste après.",
   "stepOwnCopyDone": "Aliment perso créé",
   "stepOwnCopy": "Aliment perso",
   "stepOnTheWay": "{subject} · en route",
@@ -449,7 +449,7 @@
   },
   "listSeparator": ", ",
   "backToJournal": "Retour au journal",
-  "automaticSentNote": "Mode automatique : rien ne t'a été demandé.",
+  "automaticSentNote": "Mode automatique : rien ne t’a été demandé.",
   "unattendedChoices": "CHOIX FAITS SANS TOI ({count})",
   "@unattendedChoices": {
     "placeholders": {
@@ -467,58 +467,58 @@
   "unattendedOwnCopy": "→ aliment perso créé",
   "unattendedNote": "Ces choix ne sont pas mémorisés. « Revoir » permet\nde les garder pour les prochaines fois.",
   "review": "Revoir",
-  "keepFailed": "Choix non gardé : l'aliment perso n'a pas pu être créé dans Ekklo.",
+  "keepFailed": "Choix non gardé : l’aliment perso n’a pas pu être créé dans Ekklo.",
   "interruptedTitle": "Envoi interrompu",
-  "interruptedNetwork": "Plus de réseau pendant l'envoi : {step}.",
+  "interruptedNetwork": "Plus de réseau pendant l’envoi : {step}.",
   "@interruptedNetwork": {
     "placeholders": {
       "step": {"type": "String"}
     }
   },
-  "interruptedSession": "Ta session Ekklo a expiré pendant l'envoi : {step}.",
+  "interruptedSession": "Ta session Ekklo a expiré pendant l’envoi : {step}.",
   "@interruptedSession": {
     "placeholders": {
       "step": {"type": "String"}
     }
   },
-  "interruptedRefused": "Ekklo a refusé l'envoi : {step}.",
+  "interruptedRefused": "Ekklo a refusé l’envoi : {step}.",
   "@interruptedRefused": {
     "placeholders": {
       "step": {"type": "String"}
     }
   },
-  "interruptedOther": "L'envoi s'est arrêté : {step}.",
+  "interruptedOther": "L’envoi s’est arrêté : {step}.",
   "@interruptedOther": {
     "placeholders": {
       "step": {"type": "String"}
     }
   },
-  "interruptedDev": "Fūjin DEV n'écrit pas dans Ekklo : {step} n'est pas parti.",
+  "interruptedDev": "Fūjin DEV n’écrit pas dans Ekklo : {step} n’est pas parti.",
   "@interruptedDev": {
     "placeholders": {
       "step": {"type": "String"}
     }
   },
-  "interruptedWaiting": "{count} {count, plural, =1{aliment attend} other{aliments attendent}}. Rien n'est perdu.",
+  "interruptedWaiting": "{count} {count, plural, =1{aliment attend} other{aliments attendent}}. Rien n’est perdu.",
   "@interruptedWaiting": {
     "placeholders": {
       "count": {"type": "int"}
     }
   },
-  "sendRemaining": "Envoyer {count, plural, =1{l'aliment restant} other{les {count} aliments restants}}",
+  "sendRemaining": "Envoyer {count, plural, =1{l’aliment restant} other{les {count} aliments restants}}",
   "@sendRemaining": {
     "placeholders": {
       "count": {"type": "int"}
     }
   },
   "tryAgain": "Réessayer",
-  "interruptedNote": "Ce qui est coché est déjà dans Ekklo et y reste.\nFūjin n'enverra que ce qui manque.",
+  "interruptedNote": "Ce qui est coché est déjà dans Ekklo et y reste.\nFūjin n’enverra que ce qui manque.",
   "later": "Plus tard",
   "searchFailedTitle": "Recherche interrompue",
-  "searchFailedNetwork": "Plus de réseau pendant la recherche. Rien n'a été envoyé.",
-  "searchFailedOther": "Ekklo ne répond pas. Rien n'a été envoyé.",
-  "sendFailedNetwork": "Plus de réseau avant l'envoi. Rien n'a été envoyé.",
-  "sendFailedOther": "L'envoi n'a pas pu commencer. Rien n'a été envoyé.",
+  "searchFailedNetwork": "Plus de réseau pendant la recherche. Rien n’a été envoyé.",
+  "searchFailedOther": "Ekklo ne répond pas. Rien n’a été envoyé.",
+  "sendFailedNetwork": "Plus de réseau avant l’envoi. Rien n’a été envoyé.",
+  "sendFailedOther": "L’envoi n’a pas pu commencer. Rien n’a été envoyé.",
   "tabJournal": "Journal",
   "tabMemory": "Mémoire",
   "tabSettings": "Réglages",
@@ -578,7 +578,7 @@
   },
   "memoryForgetConfirm": "Oublier",
   "memoryMealsNote": "Un repas MyFitnessPal sans correspondance\ngarde son nom dans Ekklo.",
-  "memoryChangeSubtitle": "Choisis l'aliment Ekklo à retenir pour la suite.",
+  "memoryChangeSubtitle": "Choisis l’aliment Ekklo à retenir pour la suite.",
   "memoryEnergyPer": "{energy} · {portion}",
   "@memoryEnergyPer": {
     "placeholders": {"energy": {"type": "String"}, "portion": {"type": "String"}}
@@ -624,7 +624,7 @@
   "cancel": "Annuler",
   "signOutMfpTitle": "Te déconnecter de MyFitnessPal ?",
   "signOutMfpDetail": "Fūjin oublie ta session MyFitnessPal sur ce téléphone. Il faudra te reconnecter pour lire ton journal.",
-  "signOutEkkloTitle": "Te déconnecter d'Ekklo ?",
+  "signOutEkkloTitle": "Te déconnecter d’Ekklo ?",
   "signOutEkkloDetail": "Fūjin oublie ta session Ekklo sur ce téléphone. Il faudra te reconnecter pour envoyer vers Ekklo.",
   "clearSessionsTitle": "Effacer les sessions ?",
   "clearSessionsConfirm": "Fūjin oublie tes sessions MyFitnessPal et Ekklo sur ce téléphone. Il faudra te reconnecter aux deux comptes.",
@@ -644,10 +644,10 @@
     }
   },
   "importConfirm": "Importer et remplacer",
-  "backupUnreadable": "Fichier illisible, rien n'a changé",
+  "backupUnreadable": "Fichier illisible, rien n’a changé",
   "backupExported": "Sauvegarde exportée",
   "backupImported": "Sauvegarde importée",
-  "backupNotWritten": "Fichier non écrit, rien n'a changé",
+  "backupNotWritten": "Fichier non écrit, rien n’a changé",
   "goalsTitle": "Objectifs",
   "goalsHeading": "Tes objectifs",
   "goalsSubtitle": "Les mêmes chaque jour. Fūjin les compare\nà ton journal MyFitnessPal.",
@@ -689,14 +689,14 @@
   "save": "Enregistrer",
   "saved": "Enregistré",
   "goalsSavedTitle": "✓ Objectifs enregistrés",
-  "goalsSavedDetail": "Le Journal les affiche dès aujourd'hui.",
+  "goalsSavedDetail": "Le Journal les affiche dès aujourd’hui.",
   "journalMonth": "{date}",
   "@journalMonth": {
     "placeholders": {
       "date": {"type": "DateTime", "format": "LLLL"}
     }
   },
-  "backToToday": "Aujourd'hui ›",
+  "backToToday": "Aujourd’hui ›",
   "setGoals": "Définir mes objectifs ›",
   "weekBandDay": "{date}",
   "@weekBandDay": {
@@ -783,13 +783,13 @@
   "addUndone": "Ajout annulé",
   "addUndoneDetail": "Supprimé de MyFitnessPal et d’Ekklo",
   "addStillInMfp": "Encore dans MyFitnessPal",
-  "addStillInMfpDetail": "{food} retiré d'Ekklo seulement",
+  "addStillInMfpDetail": "{food} retiré d’Ekklo seulement",
   "@addStillInMfpDetail": {
     "placeholders": {"food": {"type": "String"}}
   },
   "addNotUndone": "Ajout non annulé",
   "undoAdd": "Annuler",
-  "journalLoading": "Lecture de MyFitnessPal\net d'Ekklo…",
+  "journalLoading": "Lecture de MyFitnessPal\net d’Ekklo…",
   "dayDetailTitle": "Détail du jour",
   "close": "Fermer",
   "dayDetailPending": "{count, plural, =1{1 aliment sur {total} n’est pas encore dans Ekklo.} other{{count} aliments sur {total} ne sont pas encore dans Ekklo.}}",
@@ -799,7 +799,7 @@
       "total": {"type": "int"}
     }
   },
-  "fiberNote": "MyFitnessPal ne donne pas toujours les fibres, d'où le ≥.",
+  "fiberNote": "MyFitnessPal ne donne pas toujours les fibres, d’où le ≥.",
   "offlineTitle": "Hors ligne",
   "offlineHeadline": "Pas de connexion internet.",
   "offlineDetail": "Fūjin réessaie dès que le réseau revient.",
@@ -1037,7 +1037,7 @@
   "addNotWritten": "Non écrit",
   "addEkkloFailedDetail": "L’entrée MyFitnessPal est gardée. Réessayer Ekklo n’écrit pas une deuxième fois dans MyFitnessPal.",
   "addRetryEkklo": "Réessayer Ekklo",
-  "addCancelMfpEntry": "Annuler l'entrée MFP",
+  "addCancelMfpEntry": "Annuler l’entrée MFP",
   "addMfpNoReply": "MyFitnessPal n’a pas répondu",
   "addNotSent": "Pas envoyé",
   "addMfpFailedDetail": "Rien n’a été écrit, ni dans MyFitnessPal ni dans Ekklo. Ta saisie est gardée.",
@@ -1064,7 +1064,7 @@
   "addMfpSessionSearchDetail": "Reconnecte-toi pour chercher. Ta recherche est gardée.",
   "addEkkloSessionTitle": "Session Ekklo expirée",
   "addEkkloSessionDetail": "MyFitnessPal reste connecté. Reconnecte Ekklo pour écrire des deux côtés ; ta saisie est gardée.",
-  "addScannedUnresolved": "MyFitnessPal connaît ce code-barres mais n'a pas de fiche pour cet aliment. Choisis-le dans la recherche.",
+  "addScannedUnresolved": "MyFitnessPal connaît ce code-barres mais n’a pas de fiche pour cet aliment. Choisis-le dans la recherche.",
   "scannerTitle": "Scanner un code-barres",
   "scannerContext": "{meal} · {date}",
   "@scannerContext": {
@@ -1105,7 +1105,7 @@
   "scannerUnverifiedDetail": "Saisi par un membre de MyFitnessPal. Vérifie que c’est bien ton paquet avant de continuer.",
   "scannerStoreCode": "Code magasin",
   "scannerStoreCodeDetail": "Les codes qui commencent par 02 ou 20 à 29 sont attribués par chaque enseigne : ce produit n’est peut-être pas le tien.",
-  "scannerThisProduct": "C'est bien ce produit",
+  "scannerThisProduct": "C’est bien ce produit",
   "scannerWrongProduct": "Pas le bon produit : chercher par texte",
   "scannerNameAndBrand": "{name}, {brand}",
   "@scannerNameAndBrand": {
@@ -1128,7 +1128,7 @@
   "scannerUnavailableDetail": "Le service code-barres de MyFitnessPal ne répond pas. La recherche par texte, elle, fonctionne.",
   "scannerRetryScan": "Réessayer le scan",
   "scannerOfflineTitle": "Pas de connexion",
-  "scannerFailedDetail": "Le code {code} n'a pas pu être cherché.",
+  "scannerFailedDetail": "Le code {code} n’a pas pu être cherché.",
   "@scannerFailedDetail": {
     "placeholders": {"code": {"type": "String"}}
   },
@@ -1136,8 +1136,8 @@
   "@scannerMfpSessionDetail": {
     "placeholders": {"code": {"type": "String"}}
   },
-  "scannerCameraRefusedTitle": "Pas d'accès à l'appareil photo",
-  "scannerCameraRefusedDetail": "Autorise l'appareil photo pour Fūjin dans les réglages du téléphone, ou saisis le code à la main.",
+  "scannerCameraRefusedTitle": "Pas d’accès à l’appareil photo",
+  "scannerCameraRefusedDetail": "Autorise l’appareil photo pour Fūjin dans les réglages du téléphone, ou saisis le code à la main.",
   "dayPickerTitle": "Choisir le jour",
   "dayPickerMonth": "{date}",
   "@dayPickerMonth": {

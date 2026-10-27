@@ -308,7 +308,7 @@ void main() {
     await tester.tap(find.textContaining('Ekklo : '));
     await tester.pumpAndSettle();
     await _tap(tester, 'Aliment perso');
-    await _tap(tester, "Créer l'aliment perso");
+    await _tap(tester, 'Créer l’aliment perso');
     await _tap(tester, 'Ajouter à MFP et Ekklo');
 
     check(_count('Oublier cet aliment')).equals(0);

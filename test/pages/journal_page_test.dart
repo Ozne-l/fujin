@@ -121,7 +121,7 @@ Future<void> _tap(WidgetTester tester, Finder target) async {
 }
 
 Future<void> _backToToday(WidgetTester tester) async {
-  await tester.tap(find.text("Aujourd'hui ›"));
+  await tester.tap(find.text('Aujourd’hui ›'));
   await tester.pumpAndSettle();
 }
 
@@ -354,7 +354,7 @@ void main() {
         entries: [for (var row = 0; row < _manyRows; row++) entry('E-$row')],
       ),
     );
-    final title = find.text("Aujourd'hui");
+    final title = find.text('Aujourd’hui');
     final band = find.byType(WeekBand);
     final gap = tester.getTopLeft(band).dy - tester.getBottomLeft(title).dy;
 
@@ -402,14 +402,14 @@ void main() {
     await pumpFujin(tester, backends, goals: _goals);
 
     check(
-      find.text("Lecture de MyFitnessPal\net d'Ekklo…").evaluate(),
+      find.text('Lecture de MyFitnessPal\net d’Ekklo…').evaluate(),
     ).length.equals(1);
     check(_button(tester, 'Envoyer vers Ekklo').onPressed).isNull();
 
     gate.complete();
     await tester.pumpAndSettle();
     check(
-      find.text("Lecture de MyFitnessPal\net d'Ekklo…").evaluate(),
+      find.text('Lecture de MyFitnessPal\net d’Ekklo…').evaluate(),
     ).isEmpty();
   });
 
@@ -492,7 +492,7 @@ void main() {
       ).length.equals(1);
 
       await _backToToday(tester);
-      check(find.text("Aujourd'hui").evaluate()).length.equals(1);
+      check(find.text('Aujourd’hui').evaluate()).length.equals(1);
     });
 
     testWidgets('shows a day of the shown week at once, then its new read', (
@@ -632,7 +632,7 @@ void main() {
       await tester.pump();
       check(find.text(_mfpNotResponding).evaluate()).length.equals(1);
       check(
-        find.text("Lecture de MyFitnessPal\net d'Ekklo…").evaluate(),
+        find.text('Lecture de MyFitnessPal\net d’Ekklo…').evaluate(),
       ).isEmpty();
 
       gate.complete();
@@ -682,7 +682,7 @@ void main() {
       await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
       await _swipeWeekBack(tester);
 
-      await tester.tap(find.text("Aujourd'hui ›"));
+      await tester.tap(find.text('Aujourd’hui ›'));
       await tester.pump();
 
       check(
@@ -770,7 +770,7 @@ void main() {
         find
             .text(
               '1 aliment sur 1 n’est pas encore dans Ekklo.\n'
-              "MyFitnessPal ne donne pas toujours les fibres, d'où le ≥.",
+              'MyFitnessPal ne donne pas toujours les fibres, d’où le ≥.',
             )
             .evaluate(),
       ).length.equals(1);
@@ -848,6 +848,25 @@ void main() {
 
     check(find.byType(FilledButton).evaluate()).isEmpty();
     check(_rich('0 kcal · 1 aliment sur 1 ›').evaluate()).length.equals(1);
+  });
+
+  testWidgets('agrees the Ekklo progress with the foods already sent', (
+    tester,
+  ) async {
+    await pumpFujin(
+      tester,
+      FakeBackends(
+        mealNames: [breakfast],
+        entries: [entry('E-1'), entry('E-2')],
+        ekkloMeals: [
+          meal('meal-1', [item('I-1')]),
+        ],
+      ),
+      links: [link('E-1', 'I-1')],
+      goals: _goals,
+    );
+
+    check(_rich('0 kcal · 1 aliment sur 2 ›').evaluate()).length.equals(1);
   });
 
   testWidgets('folds a meal all in Ekklo and unfolds it on touch', (
@@ -1154,7 +1173,7 @@ void main() {
       check(backends.entries).length.equals(1);
       check(find.text('Encore dans MyFitnessPal').evaluate()).length.equals(1);
       check(
-        find.text("Riz basmati retiré d'Ekklo seulement").evaluate(),
+        find.text('Riz basmati retiré d’Ekklo seulement').evaluate(),
       ).length.equals(1);
       check(find.text('0/1 dans Ekklo').evaluate()).length.equals(1);
 

@@ -15,7 +15,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get devEnvironmentBanner => 'DEV';
 
   @override
-  String get journalToday => 'Aujourd\'hui';
+  String get journalToday => 'Aujourd’hui';
 
   @override
   String journalDay(DateTime date) {
@@ -76,12 +76,12 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String ekkloProgress(int sent, int total) {
     String _temp0 = intl.Intl.pluralLogic(
-      total,
+      sent,
       locale: localeName,
-      other: 'aliments sur $total',
-      one: 'aliment sur 1',
+      other: 'aliments',
+      one: 'aliment',
     );
-    return '· $sent $_temp0 ›';
+    return '· $sent $_temp0 sur $total ›';
   }
 
   @override
@@ -199,7 +199,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get nothingNewDetail =>
-      'Modifié dans MyFitnessPal ? Synchronise l\'app';
+      'Modifié dans MyFitnessPal ? Synchronise l’app';
 
   @override
   String get disconnected => 'Déconnecté';
@@ -209,7 +209,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get mfpSessionExpiredDetail =>
-      'Reconnecte-toi pour lire ton journal.\nRien n\'est perdu.';
+      'Reconnecte-toi pour lire ton journal.\nRien n’est perdu.';
 
   @override
   String get ekkloSessionExpired => 'Ta session Ekklo a expiré.';
@@ -308,7 +308,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get mfpSignInHint =>
-      'Connecte-toi comme d\'habitude.\nCette page se fermera toute seule.';
+      'Connecte-toi comme d’habitude.\nCette page se fermera toute seule.';
 
   @override
   String get mfpSignInRefused =>
@@ -587,7 +587,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get createOwnCopy => 'Créer l\'aliment perso';
+  String get createOwnCopy => 'Créer l’aliment perso';
 
   @override
   String get chooseCandidate => 'Choisir un candidat';
@@ -615,11 +615,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get sendingNote =>
-      'D\'abord les aliments perso, puis un envoi par repas.';
+      'D’abord les aliments perso, puis un envoi par repas.';
 
   @override
   String get sendingStay =>
-      'L\'envoi va jusqu\'au bout. Tu pourras revenir au journal juste après.';
+      'L’envoi va jusqu’au bout. Tu pourras revenir au journal juste après.';
 
   @override
   String get stepOwnCopyDone => 'Aliment perso créé';
@@ -775,8 +775,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get backToJournal => 'Retour au journal';
 
   @override
-  String get automaticSentNote =>
-      'Mode automatique : rien ne t\'a été demandé.';
+  String get automaticSentNote => 'Mode automatique : rien ne t’a été demandé.';
 
   @override
   String unattendedChoices(int count) {
@@ -805,34 +804,34 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get keepFailed =>
-      'Choix non gardé : l\'aliment perso n\'a pas pu être créé dans Ekklo.';
+      'Choix non gardé : l’aliment perso n’a pas pu être créé dans Ekklo.';
 
   @override
   String get interruptedTitle => 'Envoi interrompu';
 
   @override
   String interruptedNetwork(String step) {
-    return 'Plus de réseau pendant l\'envoi : $step.';
+    return 'Plus de réseau pendant l’envoi : $step.';
   }
 
   @override
   String interruptedSession(String step) {
-    return 'Ta session Ekklo a expiré pendant l\'envoi : $step.';
+    return 'Ta session Ekklo a expiré pendant l’envoi : $step.';
   }
 
   @override
   String interruptedRefused(String step) {
-    return 'Ekklo a refusé l\'envoi : $step.';
+    return 'Ekklo a refusé l’envoi : $step.';
   }
 
   @override
   String interruptedOther(String step) {
-    return 'L\'envoi s\'est arrêté : $step.';
+    return 'L’envoi s’est arrêté : $step.';
   }
 
   @override
   String interruptedDev(String step) {
-    return 'Fūjin DEV n\'écrit pas dans Ekklo : $step n\'est pas parti.';
+    return 'Fūjin DEV n’écrit pas dans Ekklo : $step n’est pas parti.';
   }
 
   @override
@@ -843,7 +842,7 @@ class AppLocalizationsFr extends AppLocalizations {
       other: 'aliments attendent',
       one: 'aliment attend',
     );
-    return '$count $_temp0. Rien n\'est perdu.';
+    return '$count $_temp0. Rien n’est perdu.';
   }
 
   @override
@@ -852,7 +851,7 @@ class AppLocalizationsFr extends AppLocalizations {
       count,
       locale: localeName,
       other: 'les $count aliments restants',
-      one: 'l\'aliment restant',
+      one: 'l’aliment restant',
     );
     return 'Envoyer $_temp0';
   }
@@ -862,7 +861,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get interruptedNote =>
-      'Ce qui est coché est déjà dans Ekklo et y reste.\nFūjin n\'enverra que ce qui manque.';
+      'Ce qui est coché est déjà dans Ekklo et y reste.\nFūjin n’enverra que ce qui manque.';
 
   @override
   String get later => 'Plus tard';
@@ -872,18 +871,18 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get searchFailedNetwork =>
-      'Plus de réseau pendant la recherche. Rien n\'a été envoyé.';
+      'Plus de réseau pendant la recherche. Rien n’a été envoyé.';
 
   @override
-  String get searchFailedOther => 'Ekklo ne répond pas. Rien n\'a été envoyé.';
+  String get searchFailedOther => 'Ekklo ne répond pas. Rien n’a été envoyé.';
 
   @override
   String get sendFailedNetwork =>
-      'Plus de réseau avant l\'envoi. Rien n\'a été envoyé.';
+      'Plus de réseau avant l’envoi. Rien n’a été envoyé.';
 
   @override
   String get sendFailedOther =>
-      'L\'envoi n\'a pas pu commencer. Rien n\'a été envoyé.';
+      'L’envoi n’a pas pu commencer. Rien n’a été envoyé.';
 
   @override
   String get tabJournal => 'Journal';
@@ -1012,7 +1011,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get memoryChangeSubtitle =>
-      'Choisis l\'aliment Ekklo à retenir pour la suite.';
+      'Choisis l’aliment Ekklo à retenir pour la suite.';
 
   @override
   String memoryEnergyPer(String energy, String portion) {
@@ -1131,7 +1130,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Fūjin oublie ta session MyFitnessPal sur ce téléphone. Il faudra te reconnecter pour lire ton journal.';
 
   @override
-  String get signOutEkkloTitle => 'Te déconnecter d\'Ekklo ?';
+  String get signOutEkkloTitle => 'Te déconnecter d’Ekklo ?';
 
   @override
   String get signOutEkkloDetail =>
@@ -1179,7 +1178,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get importConfirm => 'Importer et remplacer';
 
   @override
-  String get backupUnreadable => 'Fichier illisible, rien n\'a changé';
+  String get backupUnreadable => 'Fichier illisible, rien n’a changé';
 
   @override
   String get backupExported => 'Sauvegarde exportée';
@@ -1188,7 +1187,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get backupImported => 'Sauvegarde importée';
 
   @override
-  String get backupNotWritten => 'Fichier non écrit, rien n\'a changé';
+  String get backupNotWritten => 'Fichier non écrit, rien n’a changé';
 
   @override
   String get goalsTitle => 'Objectifs';
@@ -1290,7 +1289,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get goalsSavedTitle => '✓ Objectifs enregistrés';
 
   @override
-  String get goalsSavedDetail => 'Le Journal les affiche dès aujourd\'hui.';
+  String get goalsSavedDetail => 'Le Journal les affiche dès aujourd’hui.';
 
   @override
   String journalMonth(DateTime date) {
@@ -1301,7 +1300,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get backToToday => 'Aujourd\'hui ›';
+  String get backToToday => 'Aujourd’hui ›';
 
   @override
   String get setGoals => 'Définir mes objectifs ›';
@@ -1469,7 +1468,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String addStillInMfpDetail(String food) {
-    return '$food retiré d\'Ekklo seulement';
+    return '$food retiré d’Ekklo seulement';
   }
 
   @override
@@ -1479,7 +1478,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get undoAdd => 'Annuler';
 
   @override
-  String get journalLoading => 'Lecture de MyFitnessPal\net d\'Ekklo…';
+  String get journalLoading => 'Lecture de MyFitnessPal\net d’Ekklo…';
 
   @override
   String get dayDetailTitle => 'Détail du jour';
@@ -1500,7 +1499,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get fiberNote =>
-      'MyFitnessPal ne donne pas toujours les fibres, d\'où le ≥.';
+      'MyFitnessPal ne donne pas toujours les fibres, d’où le ≥.';
 
   @override
   String get offlineTitle => 'Hors ligne';
@@ -1934,7 +1933,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get addRetryEkklo => 'Réessayer Ekklo';
 
   @override
-  String get addCancelMfpEntry => 'Annuler l\'entrée MFP';
+  String get addCancelMfpEntry => 'Annuler l’entrée MFP';
 
   @override
   String get addMfpNoReply => 'MyFitnessPal n’a pas répondu';
@@ -1999,7 +1998,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get addScannedUnresolved =>
-      'MyFitnessPal connaît ce code-barres mais n\'a pas de fiche pour cet aliment. Choisis-le dans la recherche.';
+      'MyFitnessPal connaît ce code-barres mais n’a pas de fiche pour cet aliment. Choisis-le dans la recherche.';
 
   @override
   String get scannerTitle => 'Scanner un code-barres';
@@ -2075,7 +2074,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Les codes qui commencent par 02 ou 20 à 29 sont attribués par chaque enseigne : ce produit n’est peut-être pas le tien.';
 
   @override
-  String get scannerThisProduct => 'C\'est bien ce produit';
+  String get scannerThisProduct => 'C’est bien ce produit';
 
   @override
   String get scannerWrongProduct => 'Pas le bon produit : chercher par texte';
@@ -2115,7 +2114,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String scannerFailedDetail(String code) {
-    return 'Le code $code n\'a pas pu être cherché.';
+    return 'Le code $code n’a pas pu être cherché.';
   }
 
   @override
@@ -2124,11 +2123,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get scannerCameraRefusedTitle => 'Pas d\'accès à l\'appareil photo';
+  String get scannerCameraRefusedTitle => 'Pas d’accès à l’appareil photo';
 
   @override
   String get scannerCameraRefusedDetail =>
-      'Autorise l\'appareil photo pour Fūjin dans les réglages du téléphone, ou saisis le code à la main.';
+      'Autorise l’appareil photo pour Fūjin dans les réglages du téléphone, ou saisis le code à la main.';
 
   @override
   String get dayPickerTitle => 'Choisir le jour';

@@ -50,7 +50,7 @@ const _unverifiedNote =
     'Saisi par un membre de MyFitnessPal. Vérifie que c’est bien ton paquet '
     'avant de continuer.';
 const _unresolvedBanner =
-    "MyFitnessPal connaît ce code-barres mais n'a pas de fiche pour cet "
+    'MyFitnessPal connaît ce code-barres mais n’a pas de fiche pour cet '
     'aliment. Choisis-le dans la recherche.';
 
 final MfpFood _oats = mfpFood(
@@ -240,7 +240,7 @@ void main() {
       await _openScanner(tester);
       await _tap(tester, find.byTooltip('Lampe'));
       await _read(tester, camera, _code);
-      await _tapText(tester, "C'est bien ce produit");
+      await _tapText(tester, 'C’est bien ce produit');
       camera.torch = false;
 
       await tester.binding.handlePopRoute();
@@ -271,7 +271,7 @@ void main() {
 
         await _openScanner(tester);
         await _read(tester, camera, _code);
-        await _tapText(tester, "C'est bien ce produit");
+        await _tapText(tester, 'C’est bien ce produit');
         _sees('Ajouter à $_dinner');
         check(SystemChrome.latestStyle).equals(_lightBars);
       },
@@ -305,7 +305,7 @@ void main() {
       await _openScanner(tester);
       await _read(tester, camera, _code);
 
-      await _tapText(tester, "C'est bien ce produit");
+      await _tapText(tester, 'C’est bien ce produit');
       _sees('Ajouter à $_dinner');
       _sees('EAN $_code');
       await _tapText(tester, _addToBoth);
@@ -617,7 +617,7 @@ void main() {
       await _read(tester, camera, _code);
 
       _sees('Pas de connexion');
-      _sees("Le code $_code n'a pas pu être cherché.");
+      _sees('Le code $_code n’a pas pu être cherché.');
       _sees(_searchByText);
       _sees('Réessayer le scan');
     });
@@ -632,9 +632,9 @@ void main() {
       camera.refuse();
       await tester.pumpAndSettle();
 
-      _sees("Pas d'accès à l'appareil photo");
+      _sees('Pas d’accès à l’appareil photo');
       _sees(
-        "Autorise l'appareil photo pour Fūjin dans les réglages du "
+        'Autorise l’appareil photo pour Fūjin dans les réglages du '
         'téléphone, ou saisis le code à la main.',
       );
       await _tapText(tester, 'Saisir le code');
@@ -663,7 +663,7 @@ void main() {
 
       await _openScanner(tester);
       await _read(tester, camera, _code);
-      await _tapText(tester, "C'est bien ce produit");
+      await _tapText(tester, 'C’est bien ce produit');
       await _tapText(tester, _addToBoth);
 
       check(_tabColor(tester, _journal)).equals(FujinColors.light.textLink);

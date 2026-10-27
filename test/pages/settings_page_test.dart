@@ -398,7 +398,7 @@ void main() {
     await _tap(tester, 'Réglages');
     await _tap(tester, 'Importer une sauvegarde');
 
-    check(_count("Fichier illisible, rien n'a changé")).equals(1);
+    check(_count('Fichier illisible, rien n’a changé')).equals(1);
     check(_count('Importer cette sauvegarde ?')).equals(0);
     check(_count('2 aliments et 2 repas')).equals(1);
   });

@@ -113,7 +113,7 @@ abstract class AppLocalizations {
   /// No description provided for @journalToday.
   ///
   /// In fr, this message translates to:
-  /// **'Aujourd\'hui'**
+  /// **'Aujourd’hui'**
   String get journalToday;
 
   /// No description provided for @journalDay.
@@ -161,7 +161,7 @@ abstract class AppLocalizations {
   /// No description provided for @ekkloProgress.
   ///
   /// In fr, this message translates to:
-  /// **'· {sent} {total, plural, =1{aliment sur 1} other{aliments sur {total}}} ›'**
+  /// **'· {sent} {sent, plural, one{aliment} other{aliments}} sur {total} ›'**
   String ekkloProgress(int sent, int total);
 
   /// No description provided for @sendFoods.
@@ -269,7 +269,7 @@ abstract class AppLocalizations {
   /// No description provided for @nothingNewDetail.
   ///
   /// In fr, this message translates to:
-  /// **'Modifié dans MyFitnessPal ? Synchronise l\'app'**
+  /// **'Modifié dans MyFitnessPal ? Synchronise l’app'**
   String get nothingNewDetail;
 
   /// No description provided for @disconnected.
@@ -287,7 +287,7 @@ abstract class AppLocalizations {
   /// No description provided for @mfpSessionExpiredDetail.
   ///
   /// In fr, this message translates to:
-  /// **'Reconnecte-toi pour lire ton journal.\nRien n\'est perdu.'**
+  /// **'Reconnecte-toi pour lire ton journal.\nRien n’est perdu.'**
   String get mfpSessionExpiredDetail;
 
   /// No description provided for @ekkloSessionExpired.
@@ -467,7 +467,7 @@ abstract class AppLocalizations {
   /// No description provided for @mfpSignInHint.
   ///
   /// In fr, this message translates to:
-  /// **'Connecte-toi comme d\'habitude.\nCette page se fermera toute seule.'**
+  /// **'Connecte-toi comme d’habitude.\nCette page se fermera toute seule.'**
   String get mfpSignInHint;
 
   /// No description provided for @mfpSignInRefused.
@@ -887,7 +887,7 @@ abstract class AppLocalizations {
   /// No description provided for @createOwnCopy.
   ///
   /// In fr, this message translates to:
-  /// **'Créer l\'aliment perso'**
+  /// **'Créer l’aliment perso'**
   String get createOwnCopy;
 
   /// No description provided for @chooseCandidate.
@@ -929,13 +929,13 @@ abstract class AppLocalizations {
   /// No description provided for @sendingNote.
   ///
   /// In fr, this message translates to:
-  /// **'D\'abord les aliments perso, puis un envoi par repas.'**
+  /// **'D’abord les aliments perso, puis un envoi par repas.'**
   String get sendingNote;
 
   /// No description provided for @sendingStay.
   ///
   /// In fr, this message translates to:
-  /// **'L\'envoi va jusqu\'au bout. Tu pourras revenir au journal juste après.'**
+  /// **'L’envoi va jusqu’au bout. Tu pourras revenir au journal juste après.'**
   String get sendingStay;
 
   /// No description provided for @stepOwnCopyDone.
@@ -1073,7 +1073,7 @@ abstract class AppLocalizations {
   /// No description provided for @automaticSentNote.
   ///
   /// In fr, this message translates to:
-  /// **'Mode automatique : rien ne t\'a été demandé.'**
+  /// **'Mode automatique : rien ne t’a été demandé.'**
   String get automaticSentNote;
 
   /// No description provided for @unattendedChoices.
@@ -1115,7 +1115,7 @@ abstract class AppLocalizations {
   /// No description provided for @keepFailed.
   ///
   /// In fr, this message translates to:
-  /// **'Choix non gardé : l\'aliment perso n\'a pas pu être créé dans Ekklo.'**
+  /// **'Choix non gardé : l’aliment perso n’a pas pu être créé dans Ekklo.'**
   String get keepFailed;
 
   /// No description provided for @interruptedTitle.
@@ -1127,43 +1127,43 @@ abstract class AppLocalizations {
   /// No description provided for @interruptedNetwork.
   ///
   /// In fr, this message translates to:
-  /// **'Plus de réseau pendant l\'envoi : {step}.'**
+  /// **'Plus de réseau pendant l’envoi : {step}.'**
   String interruptedNetwork(String step);
 
   /// No description provided for @interruptedSession.
   ///
   /// In fr, this message translates to:
-  /// **'Ta session Ekklo a expiré pendant l\'envoi : {step}.'**
+  /// **'Ta session Ekklo a expiré pendant l’envoi : {step}.'**
   String interruptedSession(String step);
 
   /// No description provided for @interruptedRefused.
   ///
   /// In fr, this message translates to:
-  /// **'Ekklo a refusé l\'envoi : {step}.'**
+  /// **'Ekklo a refusé l’envoi : {step}.'**
   String interruptedRefused(String step);
 
   /// No description provided for @interruptedOther.
   ///
   /// In fr, this message translates to:
-  /// **'L\'envoi s\'est arrêté : {step}.'**
+  /// **'L’envoi s’est arrêté : {step}.'**
   String interruptedOther(String step);
 
   /// No description provided for @interruptedDev.
   ///
   /// In fr, this message translates to:
-  /// **'Fūjin DEV n\'écrit pas dans Ekklo : {step} n\'est pas parti.'**
+  /// **'Fūjin DEV n’écrit pas dans Ekklo : {step} n’est pas parti.'**
   String interruptedDev(String step);
 
   /// No description provided for @interruptedWaiting.
   ///
   /// In fr, this message translates to:
-  /// **'{count} {count, plural, =1{aliment attend} other{aliments attendent}}. Rien n\'est perdu.'**
+  /// **'{count} {count, plural, =1{aliment attend} other{aliments attendent}}. Rien n’est perdu.'**
   String interruptedWaiting(int count);
 
   /// No description provided for @sendRemaining.
   ///
   /// In fr, this message translates to:
-  /// **'Envoyer {count, plural, =1{l\'aliment restant} other{les {count} aliments restants}}'**
+  /// **'Envoyer {count, plural, =1{l’aliment restant} other{les {count} aliments restants}}'**
   String sendRemaining(int count);
 
   /// No description provided for @tryAgain.
@@ -1175,7 +1175,7 @@ abstract class AppLocalizations {
   /// No description provided for @interruptedNote.
   ///
   /// In fr, this message translates to:
-  /// **'Ce qui est coché est déjà dans Ekklo et y reste.\nFūjin n\'enverra que ce qui manque.'**
+  /// **'Ce qui est coché est déjà dans Ekklo et y reste.\nFūjin n’enverra que ce qui manque.'**
   String get interruptedNote;
 
   /// No description provided for @later.
@@ -1193,25 +1193,25 @@ abstract class AppLocalizations {
   /// No description provided for @searchFailedNetwork.
   ///
   /// In fr, this message translates to:
-  /// **'Plus de réseau pendant la recherche. Rien n\'a été envoyé.'**
+  /// **'Plus de réseau pendant la recherche. Rien n’a été envoyé.'**
   String get searchFailedNetwork;
 
   /// No description provided for @searchFailedOther.
   ///
   /// In fr, this message translates to:
-  /// **'Ekklo ne répond pas. Rien n\'a été envoyé.'**
+  /// **'Ekklo ne répond pas. Rien n’a été envoyé.'**
   String get searchFailedOther;
 
   /// No description provided for @sendFailedNetwork.
   ///
   /// In fr, this message translates to:
-  /// **'Plus de réseau avant l\'envoi. Rien n\'a été envoyé.'**
+  /// **'Plus de réseau avant l’envoi. Rien n’a été envoyé.'**
   String get sendFailedNetwork;
 
   /// No description provided for @sendFailedOther.
   ///
   /// In fr, this message translates to:
-  /// **'L\'envoi n\'a pas pu commencer. Rien n\'a été envoyé.'**
+  /// **'L’envoi n’a pas pu commencer. Rien n’a été envoyé.'**
   String get sendFailedOther;
 
   /// No description provided for @tabJournal.
@@ -1391,7 +1391,7 @@ abstract class AppLocalizations {
   /// No description provided for @memoryChangeSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'Choisis l\'aliment Ekklo à retenir pour la suite.'**
+  /// **'Choisis l’aliment Ekklo à retenir pour la suite.'**
   String get memoryChangeSubtitle;
 
   /// No description provided for @memoryEnergyPer.
@@ -1595,7 +1595,7 @@ abstract class AppLocalizations {
   /// No description provided for @signOutEkkloTitle.
   ///
   /// In fr, this message translates to:
-  /// **'Te déconnecter d\'Ekklo ?'**
+  /// **'Te déconnecter d’Ekklo ?'**
   String get signOutEkkloTitle;
 
   /// No description provided for @signOutEkkloDetail.
@@ -1649,7 +1649,7 @@ abstract class AppLocalizations {
   /// No description provided for @backupUnreadable.
   ///
   /// In fr, this message translates to:
-  /// **'Fichier illisible, rien n\'a changé'**
+  /// **'Fichier illisible, rien n’a changé'**
   String get backupUnreadable;
 
   /// No description provided for @backupExported.
@@ -1667,7 +1667,7 @@ abstract class AppLocalizations {
   /// No description provided for @backupNotWritten.
   ///
   /// In fr, this message translates to:
-  /// **'Fichier non écrit, rien n\'a changé'**
+  /// **'Fichier non écrit, rien n’a changé'**
   String get backupNotWritten;
 
   /// No description provided for @goalsTitle.
@@ -1799,7 +1799,7 @@ abstract class AppLocalizations {
   /// No description provided for @goalsSavedDetail.
   ///
   /// In fr, this message translates to:
-  /// **'Le Journal les affiche dès aujourd\'hui.'**
+  /// **'Le Journal les affiche dès aujourd’hui.'**
   String get goalsSavedDetail;
 
   /// No description provided for @journalMonth.
@@ -1811,7 +1811,7 @@ abstract class AppLocalizations {
   /// No description provided for @backToToday.
   ///
   /// In fr, this message translates to:
-  /// **'Aujourd\'hui ›'**
+  /// **'Aujourd’hui ›'**
   String get backToToday;
 
   /// No description provided for @setGoals.
@@ -2009,7 +2009,7 @@ abstract class AppLocalizations {
   /// No description provided for @addStillInMfpDetail.
   ///
   /// In fr, this message translates to:
-  /// **'{food} retiré d\'Ekklo seulement'**
+  /// **'{food} retiré d’Ekklo seulement'**
   String addStillInMfpDetail(String food);
 
   /// No description provided for @addNotUndone.
@@ -2027,7 +2027,7 @@ abstract class AppLocalizations {
   /// No description provided for @journalLoading.
   ///
   /// In fr, this message translates to:
-  /// **'Lecture de MyFitnessPal\net d\'Ekklo…'**
+  /// **'Lecture de MyFitnessPal\net d’Ekklo…'**
   String get journalLoading;
 
   /// No description provided for @dayDetailTitle.
@@ -2051,7 +2051,7 @@ abstract class AppLocalizations {
   /// No description provided for @fiberNote.
   ///
   /// In fr, this message translates to:
-  /// **'MyFitnessPal ne donne pas toujours les fibres, d\'où le ≥.'**
+  /// **'MyFitnessPal ne donne pas toujours les fibres, d’où le ≥.'**
   String get fiberNote;
 
   /// No description provided for @offlineTitle.
@@ -2621,7 +2621,7 @@ abstract class AppLocalizations {
   /// No description provided for @addCancelMfpEntry.
   ///
   /// In fr, this message translates to:
-  /// **'Annuler l\'entrée MFP'**
+  /// **'Annuler l’entrée MFP'**
   String get addCancelMfpEntry;
 
   /// No description provided for @addMfpNoReply.
@@ -2698,7 +2698,7 @@ abstract class AppLocalizations {
   /// No description provided for @addScannedUnresolved.
   ///
   /// In fr, this message translates to:
-  /// **'MyFitnessPal connaît ce code-barres mais n\'a pas de fiche pour cet aliment. Choisis-le dans la recherche.'**
+  /// **'MyFitnessPal connaît ce code-barres mais n’a pas de fiche pour cet aliment. Choisis-le dans la recherche.'**
   String get addScannedUnresolved;
 
   /// No description provided for @scannerTitle.
@@ -2806,7 +2806,7 @@ abstract class AppLocalizations {
   /// No description provided for @scannerThisProduct.
   ///
   /// In fr, this message translates to:
-  /// **'C\'est bien ce produit'**
+  /// **'C’est bien ce produit'**
   String get scannerThisProduct;
 
   /// No description provided for @scannerWrongProduct.
@@ -2872,7 +2872,7 @@ abstract class AppLocalizations {
   /// No description provided for @scannerFailedDetail.
   ///
   /// In fr, this message translates to:
-  /// **'Le code {code} n\'a pas pu être cherché.'**
+  /// **'Le code {code} n’a pas pu être cherché.'**
   String scannerFailedDetail(String code);
 
   /// No description provided for @scannerMfpSessionDetail.
@@ -2884,13 +2884,13 @@ abstract class AppLocalizations {
   /// No description provided for @scannerCameraRefusedTitle.
   ///
   /// In fr, this message translates to:
-  /// **'Pas d\'accès à l\'appareil photo'**
+  /// **'Pas d’accès à l’appareil photo'**
   String get scannerCameraRefusedTitle;
 
   /// No description provided for @scannerCameraRefusedDetail.
   ///
   /// In fr, this message translates to:
-  /// **'Autorise l\'appareil photo pour Fūjin dans les réglages du téléphone, ou saisis le code à la main.'**
+  /// **'Autorise l’appareil photo pour Fūjin dans les réglages du téléphone, ou saisis le code à la main.'**
   String get scannerCameraRefusedDetail;
 
   /// No description provided for @dayPickerTitle.

@@ -276,7 +276,7 @@ void main() {
     _sees('Non écrit');
     check(backends.entries).length.equals(1);
 
-    await _tap(tester, "Annuler l'entrée MFP");
+    await _tap(tester, 'Annuler l’entrée MFP');
     check(backends.entries).isEmpty();
     _sees(_addToBoth);
   });
@@ -719,7 +719,7 @@ void main() {
     await _tap(tester, _addToBoth);
     backends.ekkloReachable = false;
 
-    await _tap(tester, "Annuler l'entrée MFP");
+    await _tap(tester, 'Annuler l’entrée MFP');
 
     _sees('Pas de connexion internet.');
     check(find.text('MyFitnessPal ne répond pas.').evaluate()).isEmpty();
@@ -761,7 +761,7 @@ void main() {
     await _openAdd(tester);
     await _openOats(tester);
     await _tap(tester, _addToBoth);
-    await _tap(tester, "Annuler l'entrée MFP");
+    await _tap(tester, 'Annuler l’entrée MFP');
 
     await tester.tap(find.byTooltip('Retour'));
     await tester.pumpAndSettle();
