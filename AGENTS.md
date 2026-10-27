@@ -4,7 +4,7 @@ Fūjin is a Flutter app, tested on Android with an iOS project ready, that copie
 
 ## Commands
 
-Run `flutter` and `dart` directly (Flutter 3.44.9, Dart 3.12.2).
+Run `flutter` and `dart` directly. The SDK is Fūjin's own, pinned in `.fvmrc` (and `flutter:` in `pubspec.yaml`) and put on the `PATH` by direnv (`.envrc`); `/usr/local/flutter` belongs to another project and is never changed from here ([ADR 0040](docs/adr/0040-flutter-sdk-per-project.md)). If `flutter --version` in the repo is not the `.fvmrc` version, the session was started outside a direnv shell: say so, do not work around it.
 
 | When | Command |
 | --- | --- |
@@ -94,7 +94,7 @@ Single-context: `GLOSSARY.md` and `docs/adr/` at the root. See `docs/agents/doma
 
 ## Agent harness (`.omp/`)
 
-- `.omp/extensions/dart-checks/`: when a turn ends after any `.dart` file under `lib/`, `test/` or `tool/` changed, runs `dart analyze --fatal-infos`, `dart format --set-exit-if-changed` on the changed files and `flutter test` on every test whose imports reach them, reports each result, and refuses to end the turn until all pass.
+- `.omp/extensions/dart-checks/`: when a turn ends after any `.dart` file under `lib/`, `test/` or `tool/` changed, runs through `direnv exec` (Fūjin's SDK) `dart analyze --fatal-infos`, `dart format --set-exit-if-changed` on the changed files and `flutter test` on every test whose imports reach them, reports each result, and refuses to end the turn until all pass.
 - `.omp/extensions/pair-programmer/`: pins `pi-pair-programmer`; run `bun install` in that folder once.
 - `.omp/WATCHDOG.yml`: an optional advisor that reviews each finished run against ADRs 0001, 0004, 0013 (repository per aggregate, pure domain functions, no duplication).
 

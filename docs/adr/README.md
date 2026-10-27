@@ -43,3 +43,4 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0037](0037-progressive-blur-under-fixed-headers.md) | Progressive blur under fixed headers | Proposed |
 | [0038](0038-bouncing-scroll-on-every-platform.md) | Bouncing scroll on every platform | Proposed |
 | [0039](0039-app-version.md) | App version | Accepted |
+| [0040](0040-flutter-sdk-per-project.md) | Flutter SDK per project | Accepted |

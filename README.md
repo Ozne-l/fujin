@@ -8,8 +8,8 @@
 
 A personal Flutter app that copies its owner's MyFitnessPal food diary into Ekklo, the nutrition app his coach follows.
 
-[![Flutter 3.44.9](https://img.shields.io/badge/Flutter-3.44.9-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
-[![Dart 3.12.2](https://img.shields.io/badge/Dart-3.12.2-0175C2?logo=dart&logoColor=white)](https://dart.dev)
+[![Flutter 3.47.7](https://img.shields.io/badge/Flutter-3.47.7-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
+[![Dart 3.13.5](https://img.shields.io/badge/Dart-3.13.5-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 ![Android: tested](https://img.shields.io/badge/Android-tested-2F5E34?logo=android&logoColor=white)
 ![iOS: project ready](https://img.shields.io/badge/iOS-project%20ready-8A8170?logo=apple&logoColor=white)
 ![Copy: French and English](https://img.shields.io/badge/copy-FR%20%C2%B7%20EN-2F5E34)
@@ -82,9 +82,12 @@ Adding a food goes the other way: one draft, written to MyFitnessPal first and t
 
 ## Getting started
 
-Requires the Flutter and Dart versions in the badges above, and an Android device or emulator.
+Requires the Flutter and Dart versions in the badges above, and an Android device or emulator. The repo pins its own SDK with fvm and puts it on the `PATH` with direnv ([ADR 0040](docs/adr/0040-flutter-sdk-per-project.md)):
 
 ```sh
+brew install fvm direnv   # then add `eval "$(direnv hook zsh)"` to ~/.zshrc
+fvm install
+direnv allow
 flutter pub get
 flutter test
 flutter run --flavor production

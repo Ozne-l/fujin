@@ -23,7 +23,10 @@ export default function dartChecks(pi: ExtensionAPI) {
 	};
 
 	const run = async ({ label, command, args }: Check): Promise<Outcome> => {
-		const result = await pi.exec(command, args, { cwd: root, signal: AbortSignal.timeout(checkTimeoutMs) });
+		const result = await pi.exec("direnv", ["exec", root, command, ...args], {
+			cwd: root,
+			signal: AbortSignal.timeout(checkTimeoutMs),
+		});
 		const output = `${result.stdout}\n${result.stderr}`.trim().split("\n").slice(-outputTailLines).join("\n");
 		const passed = result.code === 0 && !result.killed;
 		return { label, passed, detail: passed ? "" : `exit ${result.code}${result.killed ? " (killed)" : ""}\n${output}` };
