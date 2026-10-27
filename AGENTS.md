@@ -13,9 +13,12 @@ Run `flutter` and `dart` directly. The SDK is Fūjin's own, pinned in `.fvmrc` (
 | After editing `lib/l10n/app_fr.arb` | `flutter gen-l10n` |
 | After editing a file in `design/tokens/` | `dart run tool/generate_tokens.dart` |
 | Before handing work back | `dart analyze --fatal-infos` |
-| Before handing work back | `dart format lib test tool` |
+| Before handing work back | `dart format lib test tool integration_test test_driver` |
 | Before handing work back | `flutter test` |
 | Before a build for the owner's phone | raise `version` in `pubspec.yaml` ([ADR 0039](docs/adr/0039-app-version.md)), commit `chore(release): <version>` |
+| Before and after a change to the glass | `flutter drive --profile --no-dds --keep-app-running --flavor dev -d <phone> --driver=test_driver/glass_performance_driver.dart --target=integration_test/glass_performance_test.dart` |
+
+The glass benchmark installs over the owner's Fūjin DEV. Never drop `--keep-app-running`: without it `flutter drive` uninstalls the app when it ends, which wiped his Fūjin DEV data on 2026-10-26. Put his dev build back with `flutter build apk --debug --flavor dev` then `adb install -r build/app/outputs/flutter-apk/app-dev-debug.apk`, never `flutter install`, which uninstalls first and wipes his sessions and settings.
 
 Generated files (`*.mapper.dart`, `lib/l10n/generated/`, `lib/app/theme/fujin_tokens.g.dart`) are committed; regenerate, never hand-edit.
 
