@@ -464,9 +464,18 @@ class AddWriteFailedMapper extends SubClassMapperBase<AddWriteFailed> {
     'problem',
     _$problem,
   );
+  static bool _$blockedInDev(AddWriteFailed v) => v.blockedInDev;
+  static const Field<AddWriteFailed, bool> _f$blockedInDev = Field(
+    'blockedInDev',
+    _$blockedInDev,
+    key: r'blocked_in_dev',
+  );
 
   @override
-  final MappableFields<AddWriteFailed> fields = const {#problem: _f$problem};
+  final MappableFields<AddWriteFailed> fields = const {
+    #problem: _f$problem,
+    #blockedInDev: _f$blockedInDev,
+  };
   @override
   final bool ignoreNull = true;
 
@@ -479,7 +488,10 @@ class AddWriteFailedMapper extends SubClassMapperBase<AddWriteFailed> {
       AddWriteStateMapper.ensureInitialized();
 
   static AddWriteFailed _instantiate(DecodingData data) {
-    return AddWriteFailed(data.dec(_f$problem));
+    return AddWriteFailed(
+      data.dec(_f$problem),
+      blockedInDev: data.dec(_f$blockedInDev),
+    );
   }
 
   @override
@@ -545,7 +557,7 @@ extension AddWriteFailedValueCopy<$R, $Out>
 abstract class AddWriteFailedCopyWith<$R, $In extends AddWriteFailed, $Out>
     implements AddWriteStateCopyWith<$R, $In, $Out> {
   @override
-  $R call({ReadProblem? problem});
+  $R call({ReadProblem? problem, bool? blockedInDev});
   AddWriteFailedCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
   );
@@ -560,11 +572,17 @@ class _AddWriteFailedCopyWithImpl<$R, $Out>
   late final ClassMapperBase<AddWriteFailed> $mapper =
       AddWriteFailedMapper.ensureInitialized();
   @override
-  $R call({ReadProblem? problem}) =>
-      $apply(FieldCopyWithData({if (problem != null) #problem: problem}));
+  $R call({ReadProblem? problem, bool? blockedInDev}) => $apply(
+    FieldCopyWithData({
+      if (problem != null) #problem: problem,
+      if (blockedInDev != null) #blockedInDev: blockedInDev,
+    }),
+  );
   @override
-  AddWriteFailed $make(CopyWithData data) =>
-      AddWriteFailed(data.get(#problem, or: $value.problem));
+  AddWriteFailed $make(CopyWithData data) => AddWriteFailed(
+    data.get(#problem, or: $value.problem),
+    blockedInDev: data.get(#blockedInDev, or: $value.blockedInDev),
+  );
 
   @override
   AddWriteFailedCopyWith<$R2, AddWriteFailed, $Out2> $chain<$R2, $Out2>(

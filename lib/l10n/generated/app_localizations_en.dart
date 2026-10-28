@@ -2155,4 +2155,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String memoryMealMenu(String meal) {
     return 'Ekklo meal for $meal';
   }
+
+  @override
+  String get writeBlockedInDev =>
+      'Fūjin DEV writes to neither MyFitnessPal nor Ekklo: nothing changed.';
 }

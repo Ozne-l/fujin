@@ -7,6 +7,7 @@ import 'package:fujin/domain/adding/undo_outcome.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/pages/adding/add_write_state.dart';
+import 'package:fujin/pages/sending/send_failure.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final NotifierProvider<AddWriteNotifier, AddWriteState> addWriteProvider =
@@ -75,7 +76,12 @@ final class AddWriteNotifier extends Notifier<AddWriteState> {
     state = switch (outcome) {
       Added(:final added) => AddWriteDone(added),
       FoodChanged() => const AddWriteIdle(),
-      NotAdded(:final error) => AddWriteFailed(ReadProblem.of(error)),
+      NotAdded(:final error) => AddWriteFailed(
+        ReadProblem.of(error),
+        blockedInDev:
+            SendFailure.of(error, ref.read(appEnvironmentProvider)) ==
+            SendFailure.blockedInDev,
+      ),
       EkkloFailed(:final added, :final error) => AddWriteEkkloFailed(
         added,
         ReadProblem.of(error),

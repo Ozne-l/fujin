@@ -24,6 +24,9 @@ enum SendFailure {
         (EkkloNetworkException(:final method), AppEnvironment.dev)
             when !ReadOnlyHttpClient.reads(method) =>
           blockedInDev,
+        (MfpNetworkException(:final method), AppEnvironment.dev)
+            when !ReadOnlyHttpClient.reads(method) =>
+          blockedInDev,
         (EkkloNetworkException() || MfpNetworkException(), _) => network,
         (EkkloAuthException(), _) => ekkloSession,
         (MfpAuthException(), _) => mfpSession,

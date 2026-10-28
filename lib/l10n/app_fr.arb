@@ -1156,5 +1156,6 @@
   "memoryMealMenu": "Repas Ekklo pour {meal}",
   "@memoryMealMenu": {
     "placeholders": {"meal": {"type": "String"}}
-  }
+  },
+  "writeBlockedInDev": "Fūjin DEV n’écrit ni dans MyFitnessPal ni dans Ekklo : rien n’a changé."
 }

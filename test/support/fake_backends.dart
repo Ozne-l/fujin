@@ -202,21 +202,23 @@ final class FakeBackends {
     };
   });
 
-  Future<MyFitnessPalClient> mfp() async {
-    final client = mfpWith(InMemoryMfpSessionStore());
-    await client.signIn(_sessionCookies);
-    return client;
+  Future<MyFitnessPalClient> mfp({http.Client? client}) async {
+    final signedIn = mfpWith(InMemoryMfpSessionStore(), client: client);
+    await signedIn.signIn(_sessionCookies);
+    return signedIn;
   }
 
-  MyFitnessPalClient mfpWith(MfpSessionStore store) => MyFitnessPalClient(
-    httpClient: httpClient,
-    webUri: mfpWebUri,
-    apiUri: mfpApiUri,
-    syncUri: mfpSyncUri,
-    sessionStore: store,
-  );
+  MyFitnessPalClient mfpWith(MfpSessionStore store, {http.Client? client}) =>
+      MyFitnessPalClient(
+        httpClient: client ?? httpClient,
+        webUri: mfpWebUri,
+        apiUri: mfpApiUri,
+        syncUri: mfpSyncUri,
+        sessionStore: store,
+      );
 
-  Future<EkkloClient> ekklo() async => ekkloWith(await ekkloTokenStore());
+  Future<EkkloClient> ekklo({http.Client? client}) async =>
+      ekkloWith(await ekkloTokenStore(), client: client);
 
   Future<EkkloTokenStore> ekkloTokenStore() async {
     final store = InMemoryEkkloTokenStore();
@@ -224,11 +226,12 @@ final class FakeBackends {
     return store;
   }
 
-  EkkloClient ekkloWith(EkkloTokenStore store) => EkkloClient(
-    httpClient: httpClient,
-    baseUri: ekkloUri,
-    tokenStore: store,
-  );
+  EkkloClient ekkloWith(EkkloTokenStore store, {http.Client? client}) =>
+      EkkloClient(
+        httpClient: client ?? httpClient,
+        baseUri: ekkloUri,
+        tokenStore: store,
+      );
 
   static const dailyMealsPath = '/api/v1/nutritions/daily-meals';
   static const _diaryPath = '/v2/diary';

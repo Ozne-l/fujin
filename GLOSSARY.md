@@ -159,7 +159,7 @@ Codes from the Figma file "Fūjin · Maquettes", as used in the docs.
 | A05a–A05d | Ekklo correspondence for the add flow: the send flow's sheets 11, 12 and 13 on the planned entry of the draft |
 | A06a | "Ajout en cours": MyFitnessPal then Ekklo, the button locked until both answer. Code: `WritePanel` (`lib/pages/adding/widgets/write_panel.dart`), `AddWriteNotifier` (`lib/pages/adding/add_write_notifier.dart`) |
 | A06b | MyFitnessPal written, Ekklo failed: "Réessayer Ekklo" (never writes MyFitnessPal again) or "Annuler l’entrée MFP"; leaving returns the food to the Journal as "À envoyer". Code: `WritePanel` |
-| A06d | MyFitnessPal failed: nothing written, the entry kept, "Réessayer" or "Modifier la saisie". Code: `WritePanel` |
+| A06d | MyFitnessPal failed: nothing written, the entry kept, "Réessayer" or "Modifier la saisie". In Fūjin DEV, whose writes are stopped, the panel says "Fūjin DEV n’écrit ni dans MyFitnessPal ni dans Ekklo : rien n’a changé." with only "Modifier la saisie". Code: `WritePanel`, `AddWriteFailed.blockedInDev` |
 | A06e | The food changed version in MyFitnessPal since it was shown: values reloaded, what moved highlighted, "Confirmer et ajouter". Code: `FoodChangedBanner`, `AddFormNotifier.reload` |
 | A07a–A07c, A07f | Search states: "recherche…", "Aucun résultat" with shorter or unverified suggestions, "Pas de connexion" above the recents, "MyFitnessPal ne répond pas" with the status code. Code: `SearchView`, `AddStatePanel`, `OfflineCard` |
 | A07d, A07e | MyFitnessPal or Ekklo session expired while adding: the entry kept, "Se reconnecter", then the add runs again. Code: `WritePanel` |

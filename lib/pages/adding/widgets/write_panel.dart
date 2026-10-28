@@ -123,6 +123,18 @@ class WritePanel extends StatelessWidget {
           child: Text(context.intl.addCancelMfpEntry),
         ),
       ],
+      AddWriteFailed(blockedInDev: true) => [
+        const SheetPictogram(
+          icon: Icon(Icons.warning_amber_rounded),
+          tone: PillTone.error,
+        ),
+        _title(context.colors, context.intl.writeBlockedInDev),
+        _Sides(mfp: SideState.notSent, ekklo: SideState.notSent, meal: meal),
+        OutlinedButton(
+          onPressed: actions.dismiss,
+          child: Text(context.intl.addEditEntry),
+        ),
+      ],
       AddWriteFailed(problem: ReadProblem.mfpSessionExpired) => [
         const SheetPictogram(
           icon: Icon(Icons.lock_outline),

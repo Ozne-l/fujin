@@ -8,6 +8,7 @@ import 'package:fujin/data/backup/backup_files.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/goals/goals_repository.dart';
+import 'package:fujin/data/http/read_only_http_client.dart';
 import 'package:fujin/data/links/sent_link.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
@@ -42,6 +43,7 @@ Future<void> pumpFujin(
   FakeScanCamera? camera,
   List<BarcodeLink> barcodeLinks = const [],
   bool reduceTransparency = false,
+  AppEnvironment environment = AppEnvironment.production,
 }) async {
   tester.platformDispatcher.localesTestValue = const [Locale('fr')];
   addTearDown(tester.platformDispatcher.clearLocalesTestValue);
@@ -55,13 +57,21 @@ Future<void> pumpFujin(
   barcodeLinks.forEach(memoryRepository.saveBarcodeLink);
   links.forEach(SentLinkRepository(database).add);
   GoalsRepository(database).replace(goals);
-  final signedInMfp = mfp ?? await backends.mfp();
-  final signedInEkklo = ekklo ?? await backends.ekklo();
+  final httpClient = switch (environment) {
+    AppEnvironment.production => backends.httpClient,
+    AppEnvironment.dev => ReadOnlyHttpClient(
+      backends.httpClient,
+      ekkloBaseUri: ekkloUri,
+      mfpSyncUri: mfpSyncUri,
+    ),
+  };
+  final signedInMfp = mfp ?? await backends.mfp(client: httpClient);
+  final signedInEkklo = ekklo ?? await backends.ekklo(client: httpClient);
   final storedPreferences = preferences ?? await inMemoryPreferences();
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        appEnvironmentProvider.overrideWithValue(AppEnvironment.production),
+        appEnvironmentProvider.overrideWithValue(environment),
         databaseProvider.overrideWithValue(database),
         clockProvider.overrideWithValue(() => now),
         mfpClientProvider.overrideWithValue(signedInMfp),

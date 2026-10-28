@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:checks/checks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/fujin_app.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/router.dart';
@@ -261,6 +262,24 @@ void main() {
     await _tap(tester, 'Modifier la saisie');
     _sees(_addToBoth);
     _sees(_oatsName);
+  });
+
+  testWidgets('says Fūjin DEV writes nothing instead of offline, without '
+      'Réessayer', (tester) async {
+    final backends = _backends();
+    await pumpFujin(tester, backends, environment: AppEnvironment.dev);
+    await _openAdd(tester);
+    await _openOats(tester);
+
+    await _tap(tester, _addToBoth);
+
+    _sees(
+      'Fūjin DEV n’écrit ni dans MyFitnessPal ni dans Ekklo : rien n’a '
+      'changé.',
+    );
+    check(find.text('Pas de connexion internet.').evaluate()).isEmpty();
+    check(find.text('Réessayer').evaluate()).isEmpty();
+    check(backends.ekkloItems).isEmpty();
   });
 
   testWidgets('keeps the MyFitnessPal entry when Ekklo fails, and undoes it '

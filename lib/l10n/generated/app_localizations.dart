@@ -2928,6 +2928,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Repas Ekklo pour {meal}'**
   String memoryMealMenu(String meal);
+
+  /// No description provided for @writeBlockedInDev.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fūjin DEV n’écrit ni dans MyFitnessPal ni dans Ekklo : rien n’a changé.'**
+  String get writeBlockedInDev;
 }
 
 class _AppLocalizationsDelegate

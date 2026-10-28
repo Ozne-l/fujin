@@ -470,5 +470,6 @@
   "dayPickerDay": "{date}",
   "previousMonth": "Previous month",
   "nextMonth": "Next month",
-  "memoryMealMenu": "Ekklo meal for {meal}"
+  "memoryMealMenu": "Ekklo meal for {meal}",
+  "writeBlockedInDev": "Fūjin DEV writes to neither MyFitnessPal nor Ekklo: nothing changed."
 }

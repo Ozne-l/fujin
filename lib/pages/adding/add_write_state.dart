@@ -31,9 +31,10 @@ final class AddWriteDone extends AddWriteState with AddWriteDoneMappable {
 
 @MappableClass(discriminatorValue: 'failed')
 final class AddWriteFailed extends AddWriteState with AddWriteFailedMappable {
-  const AddWriteFailed(this.problem);
+  const AddWriteFailed(this.problem, {required this.blockedInDev});
 
   final ReadProblem problem;
+  final bool blockedInDev;
 }
 
 @MappableClass(discriminatorValue: 'ekklo_failed')
