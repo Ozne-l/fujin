@@ -4,7 +4,7 @@ Date: 2026-10-10
 
 ## Status
 
-Accepted. Implements the adding and undo parts of [0002](0002-write-ordering.md). The scanner (Figma section 03) and the search prefilled after a scan (02d) are built by [0027](0027-barcode-scanner.md). [0034](0034-remembered-foods-in-the-add-search.md) adds the remembered foods to the search and "Ajouter" to screen 19.
+Accepted. Implements the adding and undo parts of [0002](0002-write-ordering.md). The scanner (Figma section 03) and the search prefilled after a scan (02d) are built by [0027](0027-barcode-scanner.md). [0034](0034-remembered-foods-in-the-add-search.md) adds the remembered foods to the search and "Ajouter" to screen 19. [0043](0043-edit-and-delete-a-logged-food.md) moves the undo to `RemoveEntryService`, shared with the delete of a logged food.
 
 ## Context
 
@@ -40,15 +40,15 @@ Outcomes (`AddOutcome`, `lib/domain/adding/add_outcome.dart`): `Added`, `FoodCha
 - Every choice is remembered as in a reviewed send: the fiche is the review. The automatic mode ([0025](0025-automatic-mode.md)) does not apply to adding, and screen 05's "Retenir ce choix" switch is not offered.
 - The add flow returns an `AddedFood` (`lib/domain/adding/added_food.dart`: the planned entry with the MyFitnessPal entry id, and whether Ekklo was written) to the Journal, which shows K16.
 
-Undo (`AddFoodService.undo`), Ekklo first then MyFitnessPal ([0002](0002-write-ordering.md)):
+Undo (`RemoveEntryService.remove`, since [0043](0043-edit-and-delete-a-logged-food.md)), Ekklo first then MyFitnessPal ([0002](0002-write-ordering.md)):
 
 1. Read the day through `JournalService.readDay`, which checks both sessions and adopts an item an interrupted write left unlinked.
 2. If the entry is linked, remove its Ekklo item and drop the link.
 3. Remove the MyFitnessPal entry, unless the entry is no longer in the day.
 
-Outcomes (`UndoOutcome`, `lib/domain/adding/undo_outcome.dart`): `Undone` (K17), `StillInMfp(error)` when the Ekklo item is gone and the MyFitnessPal entry stayed (K18; the entry shows "À envoyer"), `NotUndone(error)` when nothing was removed. Undo is single-flight and safe to repeat: "Réessayer" on K18 calls it again with the same `AddedFood`, and step 2 has nothing left to do. Memory, own copies and recent foods are kept.
+Outcomes (`RemoveOutcome`, `lib/domain/editing/remove_outcome.dart`, since [0043](0043-edit-and-delete-a-logged-food.md)): `Removed` (K17), `StillInMfp(error)` when the Ekklo item is gone and the MyFitnessPal entry stayed (K18; the entry shows "À envoyer"), `NotRemoved(error)` when nothing was removed. Undo is single-flight and safe to repeat: "Réessayer" on K18 calls it again with the same entry id and date, and step 2 has nothing left to do. Memory, own copies and recent foods are kept.
 
-On the Journal (`JournalPage`, `UndoAddNotifier` in `lib/pages/journal/undo_add_notifier.dart`): K16 stays 8 s with "Annuler" and says "MyFitnessPal et Ekklo · <repas>", or "MyFitnessPal seulement · <repas>" when Ekklo was not written; `NotUndone` shows "Ajout non annulé" with the read problem and "Réessayer". The Journal re-reads the day after the add route returns and after every undo outcome.
+On the Journal (`JournalPage`, `RemoveEntryNotifier` in `lib/pages/journal/remove_entry_notifier.dart`, since [0043](0043-edit-and-delete-a-logged-food.md)): K16 stays 8 s with "Annuler" and says "MyFitnessPal et Ekklo · <repas>", or "MyFitnessPal seulement · <repas>" when Ekklo was not written; `NotRemoved` shows "Ajout non annulé" with the read problem and "Réessayer". The Journal re-reads the day after the add route returns and after every undo outcome.
 
 Recent foods (02a, "ajoutés depuis Fūjin"):
 

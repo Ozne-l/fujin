@@ -3,29 +3,22 @@ import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_test/flutter_test.dart'
     show group, setUp, tearDown, test;
 import 'package:fujin/data/database/fujin_database.dart';
-import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
-import 'package:fujin/data/recents/recent_food_repository.dart';
-import 'package:fujin/data/unattended/unattended_item_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
-import 'package:fujin/domain/adding/add_food_service.dart';
 import 'package:fujin/domain/adding/add_outcome.dart';
-import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/adding/ekklo_side.dart';
 import 'package:fujin/domain/adding/scan_outcome.dart';
-import 'package:fujin/domain/adding/undo_outcome.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
-import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/domain/sending/own_copy_renewal.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
-import 'package:fujin/domain/sending/send_service.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../../support/fake_backends.dart';
 import '../../support/fixtures.dart';
+import '../../support/write_services.dart';
 
 const _gratin = 'mfp-gratin';
 const _barcode = '3275760750398';
@@ -75,66 +68,20 @@ AddDraft _draft(
 
 void main() {
   late FujinDatabase database;
-  late SentLinkRepository links;
   late MemoryRepository memoryRepository;
   late FakeBackends backends;
   late DateTime clock;
 
-  Future<(JournalService, AddFoodService)> services({
-    EkkloClient? ekklo,
-  }) async {
-    final mfp = await backends.mfp();
-    final ekkloClient = ekklo ?? await backends.ekklo();
-    final unattended = UnattendedItemRepository(database);
-    final journal = JournalService(
-      mfp: mfp,
-      ekklo: ekkloClient,
-      links: links,
-      unattended: unattended,
-      memory: memoryRepository,
-      database: database,
-      clock: () => now,
-    );
-    return (
-      journal,
-      AddFoodService(
-        mfp: mfp,
-        ekklo: ekkloClient,
-        journal: journal,
-        sending: SendService(
-          journal: journal,
-          ekklo: ekkloClient,
-          memory: memoryRepository,
-          links: links,
-          unattended: unattended,
-          database: database,
-          clock: () => now,
-        ),
-        memory: memoryRepository,
-        links: links,
-        recents: RecentFoodRepository(database),
+  Future<WriteServices> writeServices({EkkloTokenStore? ekkloTokens}) =>
+      WriteServices.over(
+        backends,
+        database,
+        ekkloTokens: ekkloTokens,
         clock: () => clock,
-      ),
-    );
-  }
-
-  Future<AddOutcome> add(AddFoodService adding, AddDraft draft) async =>
-      adding.add(draft, await adding.plan(draft));
-
-  List<String> writes() => [
-    for (final request in backends.requests)
-      if (request.method != 'GET') '${request.method} ${request.url.host}',
-  ];
-
-  Future<EntryStatus?> statusOf(JournalService journal, String entryId) async =>
-      (await journal.readDay(day)).comparison.entries
-          .where((compared) => compared.entry.id == entryId)
-          .firstOrNull
-          ?.status;
+      );
 
   setUp(() {
     database = FujinDatabase.inMemory();
-    links = SentLinkRepository(database);
     memoryRepository = MemoryRepository(database);
     memory.matches.forEach(memoryRepository.saveFood);
     memory.units.forEach(memoryRepository.saveUnit);
@@ -149,11 +96,11 @@ void main() {
     test(
       'writes MyFitnessPal first, then Ekklo, and links the entry',
       () async {
-        final (journal, adding) = await services();
+        final services = await writeServices();
 
-        final outcome = await add(adding, _draft(_basmati));
+        final outcome = await services.add(_draft(_basmati));
 
-        check(writes()).deepEquals([
+        check(services.writes()).deepEquals([
           'POST ${mfpApiUri.host}',
           'POST ${ekkloUri.host}',
         ]);
@@ -168,18 +115,18 @@ void main() {
           ..has((it) => it.name, 'meal').equals(dejeuner)
           ..has((it) => it.items.single.foodId, 'food').equals(riceInEkklo)
           ..has((it) => it.items.single.quantity, 'grams').equals(150);
-        check(await statusOf(journal, added.entryId)).isA<InEkklo>();
+        check((await services.find(added.entryId, day))?.status).isA<InEkklo>();
       },
     );
 
     test('adds once when the button is tapped twice', () async {
-      final (_, adding) = await services();
+      final services = await writeServices();
       final draft = _draft(_basmati);
-      final planned = await adding.plan(draft);
+      final planned = await services.adding.plan(draft);
 
       await Future.wait([
-        adding.add(draft, planned),
-        adding.add(draft, planned),
+        services.adding.add(draft, planned),
+        services.adding.add(draft, planned),
       ]);
 
       check(backends.entries).length.equals(1);
@@ -194,24 +141,24 @@ void main() {
           nutrients: nutrients(kcal: 356, protein: 8.5, carbs: 78.5, fat: 0.9),
         );
         backends.mfpFoods = [changed];
-        final (_, adding) = await services();
+        final services = await writeServices();
 
-        final outcome = await add(adding, _draft(_basmati));
+        final outcome = await services.add(_draft(_basmati));
 
         check(outcome).isA<FoodChanged>()
           ..has((it) => it.before.version, 'before').equals('1')
           ..has((it) => it.after, 'after').equals(changed);
-        check(writes()).isEmpty();
-        check(adding.recents()).isEmpty();
+        check(services.writes()).isEmpty();
+        check(services.adding.recents()).isEmpty();
       },
     );
 
     test('checks the Ekklo session before writing MyFitnessPal', () async {
       final store = InMemoryEkkloTokenStore();
       await store.write(FakeBackends.staleEkkloTokens);
-      final (_, adding) = await services(ekklo: backends.ekkloWith(store));
+      final services = await writeServices(ekkloTokens: store);
 
-      final outcome = await add(adding, _draft(_basmati));
+      final outcome = await services.add(_draft(_basmati));
 
       check(outcome)
           .isA<NotAdded>()
@@ -222,16 +169,16 @@ void main() {
 
     test('writes nothing in Ekklo when MyFitnessPal refuses (06d)', () async {
       backends.mfpWritesFail = true;
-      final (_, adding) = await services();
+      final services = await writeServices();
 
-      final outcome = await add(adding, _draft(_basmati));
+      final outcome = await services.add(_draft(_basmati));
 
       check(outcome)
           .isA<NotAdded>()
           .has((it) => ReadProblem.of(it.error), 'problem')
           .equals(ReadProblem.mfpUnavailable);
       check(backends.ekkloMeals).isEmpty();
-      check(adding.recents()).isEmpty();
+      check(services.adding.recents()).isEmpty();
     });
 
     test(
@@ -239,16 +186,16 @@ void main() {
       '(06b)',
       () async {
         backends.failingMeals.add(dejeuner);
-        final (journal, adding) = await services();
+        final services = await writeServices();
 
-        final failed = await add(adding, _draft(_basmati));
+        final failed = await services.add(_draft(_basmati));
 
         final added = (failed as EkkloFailed).added;
         check(added.ekkloWritten).isFalse();
-        check(await statusOf(journal, added.entryId)).isA<ToSend>();
+        check((await services.find(added.entryId, day))?.status).isA<ToSend>();
 
         backends.failingMeals.clear();
-        final retried = await adding.retryEkklo(added);
+        final retried = await services.adding.retryEkklo(added);
 
         check(retried)
             .isA<Added>()
@@ -256,22 +203,24 @@ void main() {
             .isTrue();
         check(backends.entries).length.equals(1);
         check(backends.ekkloItems).length.equals(1);
-        check(await statusOf(journal, added.entryId)).isA<InEkklo>();
+        check((await services.find(added.entryId, day))?.status).isA<InEkklo>();
       },
     );
 
     test('never writes Ekklo twice after a lost reply', () async {
       backends.lostReplies.add(dejeuner);
-      final (journal, adding) = await services();
+      final services = await writeServices();
 
-      final failed = await add(adding, _draft(_basmati));
+      final failed = await services.add(_draft(_basmati));
       backends.lostReplies.clear();
-      final retried = await adding.retryEkklo((failed as EkkloFailed).added);
+      final retried = await services.adding.retryEkklo(
+        (failed as EkkloFailed).added,
+      );
 
       check(retried).isA<Added>();
       check(backends.ekkloItems).length.equals(1);
       check(
-        await statusOf(journal, failed.added.entryId),
+        (await services.find(failed.added.entryId, day))?.status,
       ).isA<InEkklo>();
     });
 
@@ -288,20 +237,20 @@ void main() {
             mfpFoodVersion: '1',
           ),
         );
-        final (_, adding) = await services();
+        final services = await writeServices();
         final draft = _draft(
           _gratinFood,
           serving: _gratinFood.servingSizes.single,
           servings: 1,
         );
-        final planned = await adding.plan(draft);
+        final planned = await services.adding.plan(draft);
 
         check(planned.choice)
             .isA<SendAsOwnCopy>()
             .has((it) => it.renewal, 'renewal')
             .equals(OwnCopyRenewal.foodChanged);
 
-        await adding.add(draft, planned);
+        await services.adding.add(draft, planned);
 
         check(backends.ekkloItems.single.foodId).not(
           (it) => it.equals('own-old'),
@@ -316,16 +265,16 @@ void main() {
       backends.ekkloSearches = {
         'skyr': [isey],
       };
-      final (_, adding) = await services();
+      final services = await writeServices();
       final draft = _draft(_skyr, servings: 2);
 
       check(
-        EkkloSide.of(await adding.plan(draft)),
+        EkkloSide.of(await services.adding.plan(draft)),
       ).equals(EkkloSide.foundAutomatically);
-      await add(adding, draft);
+      await services.add(draft);
 
       check(
-        EkkloSide.of(await adding.plan(draft)),
+        EkkloSide.of(await services.adding.plan(draft)),
       ).equals(EkkloSide.remembered);
       check(backends.ekkloItems.single)
         ..has((it) => it.foodId, 'food').equals(isey.id)
@@ -338,9 +287,11 @@ void main() {
       backends.ekkloSearches = {
         'skyr': [isey],
       };
-      final (_, adding) = await services();
+      final services = await writeServices();
 
-      final inPots = await adding.plan(_draft(_skyr, serving: _onePot));
+      final inPots = await services.adding.plan(
+        _draft(_skyr, serving: _onePot),
+      );
       final candidate = inPots.candidates.first;
 
       check({
@@ -352,7 +303,7 @@ void main() {
             _draft(_gratinFood, serving: _gratinFood.servingSizes.single),
           ),
         ])
-          name: EkkloSide.of(await adding.plan(draft)),
+          name: EkkloSide.of(await services.adding.plan(draft)),
         'pots': EkkloSide.of(inPots),
         'chosen': EkkloSide.of(inPots.choose(candidate).weighing(150)),
       }).deepEquals({
@@ -370,9 +321,11 @@ void main() {
         backends.ekkloSearches = {
           'skyr': [isey],
         };
-        final (_, adding) = await services();
+        final services = await writeServices();
 
-        final inPots = await adding.plan(_draft(_skyr, serving: _onePot));
+        final inPots = await services.adding.plan(
+          _draft(_skyr, serving: _onePot),
+        );
         final picked = inPots.choose(inPots.candidates.first);
 
         check(EkkloSide.of(picked)).equals(EkkloSide.toChoose);
@@ -386,13 +339,13 @@ void main() {
         backends.ekkloSearches = {
           'skyr': [isey],
         };
-        final (_, adding) = await services();
+        final services = await writeServices();
         final once = _draft(_skyr, serving: _onePot, servings: 1);
-        final planned = await adding.plan(once);
+        final planned = await services.adding.plan(once);
         final chosen = planned.choose(planned.candidates.first).weighing(150);
         final requests = backends.requests.length;
 
-        final twice = await adding.plan(
+        final twice = await services.adding.plan(
           once.copyWith(servings: 2),
           previous: chosen,
         );
@@ -410,83 +363,6 @@ void main() {
     );
   });
 
-  group('undo', () {
-    Future<(JournalService, AddFoodService, AddedFood)> added() async {
-      final (journal, adding) = await services();
-      final outcome = await add(adding, _draft(_basmati));
-      backends.requests.clear();
-      return (journal, adding, (outcome as Added).added);
-    }
-
-    test('removes the Ekklo item, then the MyFitnessPal entry', () async {
-      final (_, adding, food) = await added();
-
-      final outcome = await adding.undo(food);
-
-      check(outcome).isA<Undone>();
-      check(writes()).deepEquals([
-        'DELETE ${ekkloUri.host}',
-        'DELETE ${mfpApiUri.host}',
-      ]);
-      check(backends.entries).isEmpty();
-      check(backends.ekkloItems).isEmpty();
-      check(links.forDate(day)).isEmpty();
-    });
-
-    test(
-      'says the entry is still in MyFitnessPal and finishes on a retry (K18)',
-      () async {
-        final (journal, adding, food) = await added();
-        backends.mfpWritesFail = true;
-
-        final partial = await adding.undo(food);
-
-        check(partial).isA<StillInMfp>();
-        check(backends.ekkloItems).isEmpty();
-        check(await statusOf(journal, food.entryId)).isA<ToSend>();
-
-        backends.mfpWritesFail = false;
-        final retried = await adding.undo(food);
-
-        check(retried).isA<Undone>();
-        check(backends.entries).isEmpty();
-        check(
-          writes().where((write) => write == 'DELETE ${ekkloUri.host}'),
-        ).length.equals(1);
-      },
-    );
-
-    test('removes nothing when Ekklo cannot be reached', () async {
-      final (_, adding, food) = await added();
-      backends.ekkloReachable = false;
-
-      final outcome = await adding.undo(food);
-
-      check(outcome)
-          .isA<NotUndone>()
-          .has((it) => ReadProblem.of(it.error), 'problem')
-          .equals(ReadProblem.offline);
-      check(backends.entries).length.equals(1);
-      check(backends.ekkloItems).length.equals(1);
-    });
-
-    test(
-      'removes only the MyFitnessPal entry of a failed Ekklo half',
-      () async {
-        backends.failingMeals.add(dejeuner);
-        final (_, adding) = await services();
-        final failed = await add(adding, _draft(_basmati));
-        backends.requests.clear();
-
-        final outcome = await adding.undo((failed as EkkloFailed).added);
-
-        check(outcome).isA<Undone>();
-        check(writes()).deepEquals(['DELETE ${mfpApiUri.host}']);
-        check(backends.entries).isEmpty();
-      },
-    );
-  });
-
   group('finding a food', () {
     test('lists the MyFitnessPal results that can be logged', () async {
       final unverified = mfpFood('mfp-rice-2', verified: false);
@@ -494,13 +370,13 @@ void main() {
       backends.mfpSearches = {
         'riz basmati': [_basmati, unverified, withoutServing],
       };
-      final (_, adding) = await services();
+      final services = await writeServices();
 
       check(
-        await adding.search('riz basmati', verifiedOnly: true),
+        await services.adding.search('riz basmati', verifiedOnly: true),
       ).deepEquals([_basmati]);
       check(
-        await adding.search('riz basmati', verifiedOnly: false),
+        await services.adding.search('riz basmati', verifiedOnly: false),
       ).deepEquals([_basmati, unverified]);
     });
   });
@@ -513,9 +389,9 @@ void main() {
 
     test('offers the MyFitnessPal food of the code', () async {
       backends.mfpBarcodes = {_barcode: _basmati};
-      final (_, adding) = await services();
+      final services = await writeServices();
 
-      check(await adding.scan(_barcode)).isA<ScanFound>()
+      check(await services.adding.scan(_barcode)).isA<ScanFound>()
         ..has((it) => it.food, 'food').equals(_basmati)
         ..has((it) => it.remembered, 'remembered').isFalse();
     });
@@ -527,9 +403,9 @@ void main() {
         memoryRepository.saveBarcodeLink(
           const BarcodeLink(barcode: _barcode, mfpFoodId: skyr),
         );
-        final (_, adding) = await services();
+        final services = await writeServices();
 
-        check(await adding.scan(_barcode)).isA<ScanFound>()
+        check(await services.adding.scan(_barcode)).isA<ScanFound>()
           ..has((it) => it.food, 'food').equals(_skyr)
           ..has((it) => it.remembered, 'remembered').isTrue();
         check(syncs()).isEmpty();
@@ -541,9 +417,9 @@ void main() {
       memoryRepository.saveBarcodeLink(
         const BarcodeLink(barcode: _barcode, mfpFoodId: 'mfp-gone'),
       );
-      final (_, adding) = await services();
+      final services = await writeServices();
 
-      check(await adding.scan(_barcode)).isA<ScanFound>()
+      check(await services.adding.scan(_barcode)).isA<ScanFound>()
         ..has((it) => it.food, 'food').equals(_basmati)
         ..has((it) => it.remembered, 'remembered').isFalse();
     });
@@ -556,9 +432,9 @@ void main() {
           brand: 'Taureau Ailé',
         ),
       };
-      final (_, adding) = await services();
+      final services = await writeServices();
 
-      check(await adding.scan(_barcode)).isA<ScanUnresolved>()
+      check(await services.adding.scan(_barcode)).isA<ScanUnresolved>()
         ..has((it) => it.description, 'description').equals('Riz basmati')
         ..has((it) => it.brandName, 'brand').equals('Taureau Ailé');
     });
@@ -568,26 +444,26 @@ void main() {
       backends
         ..mfpFoods = [bare]
         ..mfpBarcodes = {_barcode: bare};
-      final (_, adding) = await services();
+      final services = await writeServices();
 
-      check(await adding.scan(_barcode)).isA<ScanUnresolved>();
+      check(await services.adding.scan(_barcode)).isA<ScanUnresolved>();
     });
 
     test('says when MyFitnessPal does not know the code', () async {
-      final (_, adding) = await services();
+      final services = await writeServices();
 
       check(
-        await adding.scan(_barcode),
+        await services.adding.scan(_barcode),
       ).isA<ScanUnknown>().has((it) => it.barcode, 'barcode').equals(_barcode);
     });
 
     test('links the code to the food once it is in MyFitnessPal', () async {
-      final (_, adding) = await services();
+      final services = await writeServices();
       final draft = _draft(_basmati);
 
-      await adding.add(
+      await services.adding.add(
         draft,
-        await adding.plan(draft),
+        await services.adding.plan(draft),
         barcodeToLink: _barcode,
       );
 
@@ -596,12 +472,12 @@ void main() {
 
     test('links nothing when MyFitnessPal refuses the add', () async {
       backends.mfpWritesFail = true;
-      final (_, adding) = await services();
+      final services = await writeServices();
       final draft = _draft(_basmati);
 
-      await adding.add(
+      await services.adding.add(
         draft,
-        await adding.plan(draft),
+        await services.adding.plan(draft),
         barcodeToLink: _barcode,
       );
 
@@ -611,26 +487,26 @@ void main() {
 
   group('recents', () {
     test('lists the foods added, newest first, once each', () async {
-      final (_, adding) = await services();
+      final services = await writeServices();
 
-      await add(adding, _draft(_basmati));
+      await services.add(_draft(_basmati));
       clock = now.add(const Duration(minutes: 1));
-      await add(adding, _draft(_skyr, serving: _onePot, servings: 2));
+      await services.add(_draft(_skyr, serving: _onePot, servings: 2));
       clock = now.add(const Duration(minutes: 2));
-      await add(adding, _draft(_basmati, servings: 2));
+      await services.add(_draft(_basmati, servings: 2));
 
       check([
-        for (final recent in adding.recents())
+        for (final recent in services.adding.recents())
           (recent.mfpFoodId, recent.servings),
       ]).deepEquals([(rice, 2.0), (skyr, 2.0)]);
     });
 
     test('reopens a recent food with its serving and portions', () async {
-      final (_, adding) = await services();
-      await add(adding, _draft(_skyr, serving: _onePot, servings: 2));
+      final services = await writeServices();
+      await services.add(_draft(_skyr, serving: _onePot, servings: 2));
 
-      final draft = await adding.reopen(
-        adding.recents().single,
+      final draft = await services.adding.reopen(
+        services.adding.recents().single,
         mfpMealName: breakfast,
         date: day,
       );
@@ -645,7 +521,7 @@ void main() {
 
   group('remembered foods', () {
     test('opens an own copy in its unit, one portion', () async {
-      final (_, adding) = await services();
+      final services = await writeServices();
       const skyrInPots = OwnCopy(
         mfpFoodId: skyr,
         mfpDescription: 'Skyr nature',
@@ -655,7 +531,7 @@ void main() {
       );
       memoryRepository.saveFood(skyrInPots);
 
-      final draft = await adding.openRemembered(
+      final draft = await services.adding.openRemembered(
         skyrInPots,
         mfpMealName: breakfast,
         date: day,
@@ -671,10 +547,10 @@ void main() {
     test(
       'opens a matched food in the serving it was last added with',
       () async {
-        final (_, adding) = await services();
-        await add(adding, _draft(_skyr, serving: _onePot, servings: 2));
+        final services = await writeServices();
+        await services.add(_draft(_skyr, serving: _onePot, servings: 2));
 
-        final draft = await adding.openRemembered(
+        final draft = await services.adding.openRemembered(
           const MatchedFood(
             mfpFoodId: skyr,
             mfpDescription: 'Skyr nature',
@@ -694,9 +570,9 @@ void main() {
     test(
       'opens a food without a served remembered unit on its first serving',
       () async {
-        final (_, adding) = await services();
+        final services = await writeServices();
 
-        final draft = await adding.openRemembered(
+        final draft = await services.adding.openRemembered(
           const MatchedFood(
             mfpFoodId: skyr,
             mfpDescription: 'Skyr nature',

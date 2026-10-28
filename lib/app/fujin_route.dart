@@ -14,6 +14,7 @@ enum FujinRoute {
   ekkloSignIn('/ekklo-sign-in'),
   send('/send/:${FujinRoute.dateParameter}'),
   addFood('/add/:${FujinRoute.dateParameter}'),
+  editFood('/edit/:${FujinRoute.dateParameter}'),
   scanner('/scan/:${FujinRoute.dateParameter}');
 
   const FujinRoute(this.path);
@@ -25,6 +26,7 @@ enum FujinRoute {
   static const unresolvedParameter = 'unresolved';
   static const foodParameter = 'food';
   static const unitParameter = 'unit';
+  static const entryParameter = 'entry';
   static const goalsSegment = 'goals';
 
   final String path;
@@ -35,6 +37,11 @@ enum FujinRoute {
   String forMeal(DateTime date, String meal) => Uri(
     path: forDate(date),
     queryParameters: {mealParameter: meal},
+  ).toString();
+
+  String forEntry(DateTime date, String entryId) => Uri(
+    path: forDate(date),
+    queryParameters: {entryParameter: entryId},
   ).toString();
 
   String forScanSearch(DateTime date, String meal, ScannerSearch search) => Uri(

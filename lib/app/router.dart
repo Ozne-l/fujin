@@ -3,6 +3,7 @@ import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/domain/accounts/connected_accounts.dart';
 import 'package:fujin/pages/adding/add_food_page.dart';
+import 'package:fujin/pages/adding/edit_food_page.dart';
 import 'package:fujin/pages/ekklo_sign_in/ekklo_sign_in_page.dart';
 import 'package:fujin/pages/journal/journal_page.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
@@ -132,6 +133,22 @@ final routerProvider = Provider<GoRouter>((ref) {
           _ => throw StateError(
             '${FujinRoute.addFood.path} needs ${FujinRoute.dateParameter} '
             'and ${FujinRoute.mealParameter}',
+          ),
+        },
+      ),
+      GoRoute(
+        path: FujinRoute.editFood.path,
+        builder: (context, state) => switch ((
+          state.pathParameters[FujinRoute.dateParameter],
+          state.uri.queryParameters[FujinRoute.entryParameter],
+        )) {
+          (final date?, final entryId?) => EditFoodPage(
+            date: SelectedDay.calendarDay(DateTime.parse(date)),
+            entryId: entryId,
+          ),
+          _ => throw StateError(
+            '${FujinRoute.editFood.path} needs ${FujinRoute.dateParameter} '
+            'and ${FujinRoute.entryParameter}',
           ),
         },
       ),

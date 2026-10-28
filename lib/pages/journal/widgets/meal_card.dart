@@ -4,25 +4,37 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
-import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/journal/journal_meal.dart';
 import 'package:fujin/domain/journal/status_counts.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
-import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
-import 'package:fujin/pages/journal/widgets/entry_row.dart';
+import 'package:fujin/pages/journal/widgets/meal_rows.dart';
 import 'package:fujin/pages/journal/widgets/split_line.dart';
 
 class MealCard extends HookWidget {
-  const MealCard({required this.meal, required this.onAdd, super.key});
+  const MealCard({
+    required this.meal,
+    required this.onAdd,
+    required this.groupTag,
+    required this.removable,
+    required this.onOpen,
+    required this.onRemove,
+    this.removedEntryId,
+    super.key,
+  });
 
   static const _plusIcon = 'assets/icons/plus.svg';
   static const _foodSeparator = ', ';
 
   final JournalMeal meal;
   final VoidCallback onAdd;
+  final Object groupTag;
+  final bool removable;
+  final String? removedEntryId;
+  final ValueChanged<ComparedEntry> onOpen;
+  final ValueChanged<ComparedEntry> onRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -138,21 +150,21 @@ class MealCard extends HookWidget {
             child: switch ((open, meal.entries)) {
               (true, [_, ...]) => Padding(
                 padding: const EdgeInsets.only(top: FujinSpace.s3),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  spacing: FujinSpace.s3,
-                  children: [
-                    for (final compared in meal.entries) ...[
-                      const Divider(),
-                      _EntryRow(compared, key: ValueKey(compared.entry)),
-                    ],
-                  ],
+                child: MealRows(
+                  entries: meal.entries,
+                  groupTag: groupTag,
+                  removable: removable,
+                  removedEntryId: removedEntryId,
+                  onOpen: onOpen,
+                  onRemove: onRemove,
                 ),
               ),
-              _ => const SizedBox(width: double.infinity),
+              _ => const SizedBox(
+                width: double.infinity,
+                height: FujinSpace.s3,
+              ),
             },
           ),
-          const SizedBox(height: FujinSpace.s3),
           const Divider(),
           Align(
             alignment: AlignmentDirectional.centerStart,
@@ -206,29 +218,4 @@ class MealCard extends HookWidget {
       (intl.mealToUpdate(update), PillTone.info),
     ],
   };
-}
-
-class _EntryRow extends StatelessWidget {
-  const _EntryRow(this.compared, {super.key});
-
-  final ComparedEntry compared;
-
-  @override
-  Widget build(BuildContext context) {
-    final entry = compared.entry;
-    final detail = switch (compared.status) {
-      ToUpdate(:final link) => EntryText.linkedServing(context.intl, link),
-      InEkklo() || ToSend() => EntryText.macros(context.intl, entry.nutrients),
-    };
-    final (label, tone, icon) = switch (compared.status) {
-      InEkklo() => (context.intl.statusInEkklo, PillTone.validated, null),
-      ToSend() => (context.intl.statusToSend, PillTone.attention, null),
-      ToUpdate() => (context.intl.statusToUpdate, PillTone.info, Icons.refresh),
-    };
-    return EntryRow(
-      entry: entry,
-      detail: detail,
-      pill: StatusPill(label: label, tone: tone, icon: icon),
-    );
-  }
 }

@@ -5,13 +5,13 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | # | Decision | Status |
 | --- | --- | --- |
 | [0001](0001-recompute-statuses-from-both-sides.md) | Recompute statuses from both sides, with a send-link registry and no queue | Accepted (own-copy expectation settled by 0018; unattended items added by 0025; updates reviewed on screen 10 by 0018) |
-| [0002](0002-write-ordering.md) | Write ordering for add, undo, send and own copies | Accepted (sending implemented by 0018, add and undo by 0026) |
+| [0002](0002-write-ordering.md) | Write ordering for add, undo, send and own copies | Accepted (sending implemented by 0018, add and undo by 0026, edit and delete by 0043) |
 | [0003](0003-refresh-on-foreground-and-pull.md) | Refresh on foreground return and pull to refresh | Accepted (pull indicator drawn by 0028; selection re-read added by 0029) |
 | [0004](0004-one-sqlite-file.md) | One SQLite file, schema and migrations | Accepted |
 | [0005](0005-backup.md) | Backup: Auto Backup whitelist, manual JSON file | Accepted (B implemented, C implemented by 0021) |
-| [0006](0006-riverpod-notifiers-as-presenters.md) | Riverpod notifiers as presenters | Accepted (undo notifier built by 0026, import and export by 0021) |
+| [0006](0006-riverpod-notifiers-as-presenters.md) | Riverpod notifiers as presenters | Accepted (undo and delete notifier built by 0026 and 0043, edit notifier by 0043, import and export by 0021) |
 | [0007](0007-dart-mappable-models.md) | dart_mappable models | Accepted |
-| [0008](0008-theme-from-design-tokens.md) | Theme from design tokens, motion with motor | Accepted, amended by 0035 (goal rings built by 0022, send progress by 0018; pill, sheet and snackbar motion built; reduced motion added by 0031; `hai-light` darkened by 0032) |
+| [0008](0008-theme-from-design-tokens.md) | Theme from design tokens, motion with motor | Accepted, amended by 0035 and 0043 (goal rings built by 0022, send progress by 0018; pill, sheet and snackbar motion built; reduced motion added by 0031; `hai-light` darkened by 0032) |
 | [0009](0009-french-only-copy.md) | French-only copy | Superseded by 0015 |
 | [0010](0010-go-router-navigation.md) | go_router navigation | Accepted (tab plans superseded by 0019) |
 | [0011](0011-sessions-in-secure-storage.md) | Sessions in secure storage | Accepted |
@@ -29,7 +29,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0023](0023-ui-flags-in-shared-preferences.md) | UI flags in shared preferences | Accepted (settings and `FujinPreferences.open` added by 0025) |
 | [0024](0024-splash-from-the-first-frame.md) | Splash from the first frame | Accepted |
 | [0025](0025-automatic-mode.md) | Automatic mode: unattended items instead of Memory, a setting in shared preferences | Accepted |
-| [0026](0026-adding-a-food.md) | Adding a food: one draft, the send flow's Ekklo half, undo | Accepted (scanner and 02d built by 0027; remembered foods added to the search, and "Ajouter" to screen 19, by 0034) |
+| [0026](0026-adding-a-food.md) | Adding a food: one draft, the send flow's Ekklo half, undo | Accepted (scanner and 02d built by 0027; remembered foods added to the search, and "Ajouter" to screen 19, by 0034; undo moved to `RemoveEntryService` by 0043) |
 | [0027](0027-barcode-scanner.md) | Barcode scanner: full-screen camera, barcode links in Memory, backup v2 | Accepted (built) |
 | [0028](0028-fujin-drawn-controls.md) | Fūjin-drawn controls instead of stock Material | Accepted (Android stretch under the pull replaced by the bounce in 0038) |
 | [0029](0029-journal-reads-held-for-display.md) | Journal reads held in memory for display, writes read live | Accepted |
@@ -46,3 +46,4 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0040](0040-flutter-sdk-per-project.md) | Flutter SDK per project | Accepted |
 | [0041](0041-liquid-glass-renderer-1.0.md) | Liquid glass on liquid_glass_renderer 1.0 | Proposed |
 | [0042](0042-text-contrast-on-tinted-surfaces.md) | Text contrast on tinted surfaces | Accepted |
+| [0043](0043-edit-and-delete-a-logged-food.md) | Edit and delete a logged food | Accepted |

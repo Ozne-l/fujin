@@ -941,6 +941,14 @@
       "$description": "Chevron at the end of a list row.",
       "$type": "dimension"
     },
+    "row-action-icon": {
+      "$value": {
+        "value": 20,
+        "unit": "px"
+      },
+      "$description": "Icon of the action a swiped Journal row uncovers.",
+      "$type": "dimension"
+    },
     "meal-arrow": {
       "$value": {
         "value": 18,

@@ -26,6 +26,7 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
 import '../support/in_memory_preferences.dart';
+import '../support/logged_journal.dart';
 import '../support/pump_fujin.dart';
 
 const _space = '\u202f';
@@ -1223,6 +1224,35 @@ void main() {
             )
             .evaluate(),
       ).length.equals(1);
+    });
+  });
+
+  group('editing a food', () {
+    testWidgets('says the edit was undone when another day is shown while '
+        'Annuler runs', (tester) async {
+      final backends = LoggedJournal.backends();
+      await LoggedJournal.pump(tester, backends);
+      await _tap(tester, find.text(LoggedJournal.basmati));
+      await tester.enterText(find.widgetWithText(TextField, 'Autre'), '2');
+      await tester.pumpAndSettle();
+      await _tap(tester, find.text('Enregistrer dans MFP et Ekklo'));
+      final gate = backends.mfpFoodGate = Completer<void>();
+
+      await tester.tap(find.text('Annuler'));
+      await tester.pump();
+      await tester.tap(find.text('6'));
+      await tester.pumpAndSettle();
+      gate.complete();
+      backends.mfpFoodGate = null;
+      await tester.pumpAndSettle();
+
+      check(
+        backends.entries
+            .where((entry) => entry.food.id == rice)
+            .single
+            .servings,
+      ).equals(1.5);
+      check(find.text('Riz basmati modifié').evaluate()).length.equals(1);
     });
   });
 }

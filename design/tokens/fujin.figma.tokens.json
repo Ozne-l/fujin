@@ -475,6 +475,11 @@
       "$value": "20px",
       "$description": "Chevron at the end of a list row."
     },
+    "row-action-icon": {
+      "$type": "dimension",
+      "$value": "20px",
+      "$description": "Icon of the action a swiped Journal row uncovers."
+    },
     "meal-arrow": {
       "$type": "dimension",
       "$value": "18px",

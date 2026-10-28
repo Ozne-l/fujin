@@ -8,10 +8,12 @@ import 'package:fujin/domain/adding/meal_of_the_hour.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
+import 'package:fujin/pages/journal/entry_removal.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
 import 'package:fujin/pages/journal/journal_snack_bar.dart';
+import 'package:fujin/pages/journal/removal_reason.dart';
+import 'package:fujin/pages/journal/remove_entry_notifier.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
-import 'package:fujin/pages/journal/undo_add_notifier.dart';
 import 'package:fujin/pages/memory/memory_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -47,7 +49,7 @@ abstract final class AddShortcut {
 
   static void added(BuildContext context, WidgetRef ref, AddedFood added) {
     final day = SelectedDay.calendarDay(added.entry.date);
-    final undo = ref.read(undoAddProvider.notifier);
+    final remover = ref.read(removeEntryProvider.notifier);
     ref
       ..invalidate(memoryProvider)
       ..invalidate(mfpDiaryProvider(day))
@@ -55,7 +57,15 @@ abstract final class AddShortcut {
     JournalSnackBar.added(
       context,
       added,
-      onUndo: () => unawaited(undo.undo(added)),
+      onUndo: () => unawaited(
+        remover.remove(
+          EntryRemoval(
+            entryId: added.entryId,
+            entry: added.entry,
+            reason: RemovalReason.undoAdd,
+          ),
+        ),
+      ),
     );
   }
 }

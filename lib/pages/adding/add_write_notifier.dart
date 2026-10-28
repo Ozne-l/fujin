@@ -3,7 +3,7 @@ import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_outcome.dart';
 import 'package:fujin/domain/adding/add_stage.dart';
 import 'package:fujin/domain/adding/added_food.dart';
-import 'package:fujin/domain/adding/undo_outcome.dart';
+import 'package:fujin/domain/editing/remove_outcome.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/pages/adding/add_write_state.dart';
@@ -47,15 +47,20 @@ final class AddWriteNotifier extends Notifier<AddWriteState> {
     _settle(await ref.read(addFoodServiceProvider).retryEkklo(added));
   }
 
-  Future<UndoOutcome?> undo() async {
+  Future<RemoveOutcome?> undo() async {
     if (_busy) return null;
     if (state case final AddWriteEkkloFailed failed) {
       state = failed.copyWith(undoing: true);
-      final outcome = await ref.read(addFoodServiceProvider).undo(failed.added);
+      final outcome = await ref
+          .read(removeEntryServiceProvider)
+          .remove(
+            entryId: failed.added.entryId,
+            date: failed.added.entry.date,
+          );
       if (ref.mounted) {
         state = switch (outcome) {
-          Undone() => const AddWriteIdle(),
-          StillInMfp() || NotUndone() => failed,
+          Removed() => const AddWriteIdle(),
+          StillInMfp() || NotRemoved() => failed,
         };
       }
       return outcome;

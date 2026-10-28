@@ -5,6 +5,8 @@ import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/fujin_spinner.dart';
+import 'package:fujin/pages/common/glass_fill.dart';
+import 'package:fujin/pages/common/glass_finish.dart';
 
 class SheetFrame extends HookWidget {
   const SheetFrame({
@@ -24,6 +26,7 @@ class SheetFrame extends HookWidget {
     this.onSecondary,
     this.onSkip,
     this.skipLabel,
+    this.primaryFinish,
     this.busy = false,
     super.key,
   });
@@ -46,6 +49,7 @@ class SheetFrame extends HookWidget {
   final VoidCallback? onSecondary;
   final VoidCallback? onSkip;
   final String? skipLabel;
+  final GlassFinish? primaryFinish;
   final bool busy;
 
   static Future<void> show(
@@ -186,6 +190,13 @@ class SheetFrame extends HookWidget {
                     label: Text(primaryLabel),
                   ),
                   false => FilledButton(
+                    style: switch (primaryFinish) {
+                      final finish? => GlassFill.style(
+                        context.colors,
+                        finish,
+                      ),
+                      null => null,
+                    },
                     onPressed: onPrimary,
                     child: Text(primaryLabel),
                   ),

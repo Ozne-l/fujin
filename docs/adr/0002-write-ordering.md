@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Accepted. Sending is implemented as described in [0018](0018-send-flow.md), adding a food and undo as described in [0026](0026-adding-a-food.md).
+Accepted. Sending is implemented as described in [0018](0018-send-flow.md), adding a food and undo as described in [0026](0026-adding-a-food.md), editing and deleting a logged food as described in [0043](0043-edit-and-delete-a-logged-food.md).
 
 ## Context
 
@@ -20,7 +20,7 @@ Client capabilities (from `~/Dev/myfitnesspal_client` and `~/Dev/ekklo_client`):
 - Own copies: before reusing an own copy, re-read the MyFitnessPal food with `foods.byId` and compare its `version` with the one stored in Memory (`OwnCopy.mfpFoodVersion`, `lib/data/memory/remembered_food.dart`). A different version means the copy is stale (screen 06e).
 - The anti-bot block from MyFitnessPal (K14) is out of v1. K15 is the generic MyFitnessPal error banner.
 
-Each write use case gets one service in `lib/domain/` and one notifier ([0006](0006-riverpod-notifiers-as-presenters.md)). Sending is `SendService` (`lib/domain/sending/send_service.dart`) with `SendNotifier` (`lib/pages/sending/send_notifier.dart`); adding a food and its undo are `AddFoodService` (`lib/domain/adding/add_food_service.dart`).
+Each write use case gets one service in `lib/domain/` and one notifier ([0006](0006-riverpod-notifiers-as-presenters.md)). Sending is `SendService` (`lib/domain/sending/send_service.dart`) with `SendNotifier` (`lib/pages/sending/send_notifier.dart`); adding a food is `AddFoodService` (`lib/domain/adding/add_food_service.dart`) with `AddWriteNotifier`; its undo and the delete of a logged food are `RemoveEntryService` (`lib/domain/editing/remove_entry_service.dart`) with `RemoveEntryNotifier`, and the edit is `EditEntryService` with `EditWriteNotifier` ([0043](0043-edit-and-delete-a-logged-food.md)).
 
 ## Consequences
 

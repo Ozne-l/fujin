@@ -11,6 +11,7 @@ import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/adding/food_view_mode.dart';
 import 'package:fujin/pages/adding/widgets/food_view.dart';
 import 'package:fujin/pages/common/in_page_sheet.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
@@ -67,8 +68,10 @@ class ScannerPage extends HookConsumerWidget {
             key: ValueKey(draft),
             initial: draft,
             barcode: barcode,
+            mode: AddingFood(
+              onLeave: (added) => context.pop(ScannerAdded(added)),
+            ),
             onBack: () => opened.value = null,
-            onLeave: (added) => context.pop(ScannerAdded(added)),
           ),
         ),
       );

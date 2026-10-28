@@ -17,6 +17,7 @@ class MealDateRow extends StatelessWidget {
     required this.date,
     required this.onMeal,
     required this.onDate,
+    this.lastDay,
     super.key,
   });
 
@@ -31,6 +32,7 @@ class MealDateRow extends StatelessWidget {
   final DateTime date;
   final ValueChanged<String> onMeal;
   final ValueChanged<DateTime> onDate;
+  final DateTime? lastDay;
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +76,7 @@ class MealDateRow extends StatelessWidget {
                   builder: (context) => DayPickerSheet(
                     selected: date,
                     first: date.subtract(_pickerSpan),
-                    last: date.add(_pickerSpan),
+                    last: lastDay ?? date.add(_pickerSpan),
                     onPicked: onDate,
                   ),
                 ),

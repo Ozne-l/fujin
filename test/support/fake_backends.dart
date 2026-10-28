@@ -43,6 +43,8 @@ final class FakeBackends {
   Map<String, List<MfpFood>> mfpSearches;
   Map<String, MfpFood> mfpBarcodes;
   bool mfpWritesFail = false;
+  bool mfpRemoveFails = false;
+  bool ekkloItemWritesFail = false;
   final failingMeals = <String>{};
   final lostReplies = <String>{};
   var _nextId = 0;
@@ -349,7 +351,7 @@ final class FakeBackends {
   }
 
   http.Response _removeEntry(http.Request request) {
-    if (mfpWritesFail) return http.Response('', 500);
+    if (mfpWritesFail || mfpRemoveFails) return http.Response('', 500);
     final id = request.url.pathSegments.last;
     entries = [
       for (final entry in entries)
@@ -436,12 +438,20 @@ final class FakeBackends {
           foodId: draft.foodId,
         ),
     ];
-    final existing = ekkloMeals.where((meal) => meal.name == name).firstOrNull;
+    final date = DateTime.parse(body['date'] as String? ?? '');
+    final existing = ekkloMeals
+        .where(
+          (meal) =>
+              meal.name == name &&
+              (meal.date.year, meal.date.month, meal.date.day) ==
+                  (date.year, date.month, date.day),
+        )
+        .firstOrNull;
     final updated = switch (existing) {
       final meal? => meal.copyWith(items: [...meal.items, ...items]),
       null => EkkloDailyMeal(
         id: _id('meal'),
-        date: DateTime.parse(body['date'] as String? ?? ''),
+        date: date,
         name: name,
         revision: 1,
         items: items,
@@ -457,6 +467,7 @@ final class FakeBackends {
   }
 
   http.Response _updateQuantity(http.Request request) {
+    if (ekkloItemWritesFail) return http.Response('', 500);
     final (mealId, itemId) = _mealAndItem(request);
     final body = jsonDecode(request.body) as Map<String, Object?>;
     EkkloDailyMealItem? updated;
@@ -484,6 +495,7 @@ final class FakeBackends {
   }
 
   http.Response _removeItem(http.Request request) {
+    if (ekkloItemWritesFail) return http.Response('', 500);
     final (mealId, itemId) = _mealAndItem(request);
     ekkloMeals = [
       for (final meal in ekkloMeals)

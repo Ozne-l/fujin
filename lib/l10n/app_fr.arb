@@ -1157,5 +1157,148 @@
   "@memoryMealMenu": {
     "placeholders": {"meal": {"type": "String"}}
   },
+  "editFoodTitle": "Modifier l’aliment",
+  "editFoodSubtitle": "{meal} · {date}",
+  "@editFoodSubtitle": {
+    "placeholders": {
+      "meal": {"type": "String"},
+      "date": {"type": "DateTime", "format": "MMMMEEEEd"}
+    }
+  },
+  "editSaveBoth": "Enregistrer dans MFP et Ekklo",
+  "editSaveMfpOnly": "Enregistrer dans MFP",
+  "editDeleteBoth": "Supprimer de MFP et Ekklo",
+  "editDeleteMfpOnly": "Supprimer de MFP",
+  "editEkkloAmount": "Ekklo : {name}, {from} → {to}",
+  "@editEkkloAmount": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "from": {"type": "String"},
+      "to": {"type": "String"}
+    }
+  },
+  "editEkkloAlready": "déjà dans Ekklo",
+  "editEkkloQuantity": "même aliment, quantité mise à jour",
+  "editEkkloMeal": "repas : {from} → {to}",
+  "@editEkkloMeal": {
+    "placeholders": {
+      "from": {"type": "String"},
+      "to": {"type": "String"}
+    }
+  },
+  "editEkkloDay": "jour : {from} → {to}",
+  "@editEkkloDay": {
+    "placeholders": {
+      "from": {"type": "DateTime", "format": "MMMd"},
+      "to": {"type": "DateTime", "format": "MMMd"}
+    }
+  },
+  "editNotInEkklo": "Pas encore dans Ekklo",
+  "editNextSend": "le prochain envoi prendra {amount}",
+  "@editNextSend": {
+    "placeholders": {"amount": {"type": "String"}}
+  },
+  "editEkkloReplaced": "Ekklo : {before} remplacé par {after}, {amount}",
+  "@editEkkloReplaced": {
+    "placeholders": {
+      "before": {"type": "String"},
+      "after": {"type": "String"},
+      "amount": {"type": "String"}
+    }
+  },
+  "editEkkloReplacedUnnamed": "Ekklo : remplacé par {after}, {amount}",
+  "@editEkkloReplacedUnnamed": {
+    "placeholders": {
+      "after": {"type": "String"},
+      "amount": {"type": "String"}
+    }
+  },
+  "editOffline": "Hors ligne : modifier ou supprimer attendra le réseau.",
+  "editMfpSessionExpired": "Session MyFitnessPal expirée : modifier ou supprimer attendra la reconnexion.",
+  "editEkkloSessionExpired": "Session Ekklo expirée : modifier ou supprimer attendra la reconnexion.",
+  "editFoodUnreadable": "MyFitnessPal ne donne plus cet aliment : Fūjin ne peut pas le modifier. Tu peux toujours le supprimer depuis le Journal.",
+  "editServingMissing": "Cette portion n’existe plus pour cet aliment dans MyFitnessPal : Fūjin ne peut pas le modifier. Tu peux toujours le supprimer depuis le Journal.",
+  "editOldEntryKept": "{food} en double dans MyFitnessPal",
+  "@editOldEntryKept": {
+    "placeholders": {"food": {"type": "String"}}
+  },
+  "editOldEntryKeptDetail": "L’ancienne entrée n’a pas pu être retirée.",
+  "rowDelete": "Supprimer",
+  "deleteFoodTitle": "Supprimer {food} ?",
+  "@deleteFoodTitle": {
+    "placeholders": {"food": {"type": "String"}}
+  },
+  "deleteFoodDetail": "{serving}, {kcal} · {meal}, {date}. Il sera retiré d’Ekklo, puis de MyFitnessPal.",
+  "@deleteFoodDetail": {
+    "placeholders": {
+      "serving": {"type": "String"},
+      "kcal": {"type": "String"},
+      "meal": {"type": "String"},
+      "date": {"type": "DateTime", "format": "MMMMEEEEd"}
+    }
+  },
+  "deleteFoodDetailMfpOnly": "{serving}, {kcal} · {meal}, {date}. Pas encore dans Ekklo : il sera retiré de MyFitnessPal seulement.",
+  "@deleteFoodDetailMfpOnly": {
+    "placeholders": {
+      "serving": {"type": "String"},
+      "kcal": {"type": "String"},
+      "meal": {"type": "String"},
+      "date": {"type": "DateTime", "format": "MMMMEEEEd"}
+    }
+  },
+  "deleteKeep": "Garder",
+  "foodDeleted": "{food} supprimé",
+  "@foodDeleted": {
+    "placeholders": {"food": {"type": "String"}}
+  },
+  "foodDeletedDetail": "Retiré d’Ekklo et de MyFitnessPal · {meal}",
+  "@foodDeletedDetail": {
+    "placeholders": {"meal": {"type": "String"}}
+  },
+  "foodDeletedMfpOnlyDetail": "Retiré de MyFitnessPal seulement · {meal}",
+  "@foodDeletedMfpOnlyDetail": {
+    "placeholders": {"meal": {"type": "String"}}
+  },
+  "foodNotDeleted": "{food} non supprimé",
+  "@foodNotDeleted": {
+    "placeholders": {"food": {"type": "String"}}
+  },
+  "foodNotDeletedDetail": "Rien n’a changé dans MyFitnessPal ni dans Ekklo.",
+  "foodEdited": "{food} modifié",
+  "@foodEdited": {
+    "placeholders": {"food": {"type": "String"}}
+  },
+  "foodEditedDetail": "MyFitnessPal et Ekklo · {serving}",
+  "@foodEditedDetail": {
+    "placeholders": {"serving": {"type": "String"}}
+  },
+  "foodEditedMfpOnlyDetail": "MyFitnessPal seulement · {serving}",
+  "@foodEditedMfpOnlyDetail": {
+    "placeholders": {"serving": {"type": "String"}}
+  },
+  "foodMoved": "{food} déplacé",
+  "@foodMoved": {
+    "placeholders": {"food": {"type": "String"}}
+  },
+  "foodMovedToMealDetail": "MyFitnessPal et Ekklo · {meal}",
+  "@foodMovedToMealDetail": {
+    "placeholders": {"meal": {"type": "String"}}
+  },
+  "foodMovedToDayDetail": "{meal}, {date}",
+  "@foodMovedToDayDetail": {
+    "placeholders": {
+      "meal": {"type": "String"},
+      "date": {"type": "DateTime", "format": "MMMMd"}
+    }
+  },
+  "foodMovedSee": "Voir",
+  "ekkloNotUpdated": "Ekklo pas mis à jour",
+  "ekkloNotUpdatedDetail": "{food} y reste à {serving}",
+  "@ekkloNotUpdatedDetail": {
+    "placeholders": {
+      "food": {"type": "String"},
+      "serving": {"type": "String"}
+    }
+  },
   "writeBlockedInDev": "Fūjin DEV n’écrit ni dans MyFitnessPal ni dans Ekklo : rien n’a changé."
 }

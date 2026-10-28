@@ -745,6 +745,7 @@ abstract final class FujinSize {
   static const double pillSmall = 20;
   static const double radio = 20;
   static const double radioDot = 10;
+  static const double rowActionIcon = 20;
   static const double rowChevron = 20;
   static const double scanIcon = 26;
   static const double screenMargin = 16;

@@ -1,5 +1,4 @@
 import 'package:ekklo_client/ekklo_client.dart';
-import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
@@ -13,14 +12,7 @@ import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/adding/remembered_serving.dart';
 import 'package:fujin/domain/adding/rescale_planned.dart';
 import 'package:fujin/domain/adding/scan_outcome.dart';
-import 'package:fujin/domain/adding/undo_outcome.dart';
-import 'package:fujin/domain/comparison/entry_status.dart';
-import 'package:fujin/domain/journal/journal_day.dart';
-import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
-import 'package:fujin/domain/sending/send_interruption.dart';
-import 'package:fujin/domain/sending/send_mode.dart';
-import 'package:fujin/domain/sending/send_plan.dart';
 import 'package:fujin/domain/sending/send_service.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -28,25 +20,20 @@ final class AddFoodService {
   AddFoodService({
     required this._mfp,
     required this._ekklo,
-    required this._journal,
     required this._sending,
     required this._memory,
-    required this._links,
     required this._recents,
     required this._clock,
   });
 
   final MyFitnessPalClient _mfp;
   final EkkloClient _ekklo;
-  final JournalService _journal;
   final SendService _sending;
   final MemoryRepository _memory;
-  final SentLinkRepository _links;
   final RecentFoodRepository _recents;
   final DateTime Function() _clock;
 
   Future<AddOutcome>? _writing;
-  Future<UndoOutcome>? _undoing;
 
   Future<List<MfpFood>> search(
     String query, {
@@ -172,9 +159,6 @@ final class AddFoodService {
   Future<AddOutcome> retryEkklo(AddedFood added) =>
       _writing ??= _toEkklo(added).whenComplete(() => _writing = null);
 
-  Future<UndoOutcome> undo(AddedFood added) =>
-      _undoing ??= _undo(added).whenComplete(() => _undoing = null);
-
   Future<AddOutcome> _add(
     AddDraft draft,
     PlannedEntry planned,
@@ -221,57 +205,9 @@ final class AddFoodService {
     return _toEkklo(added);
   }
 
-  Future<AddOutcome> _toEkklo(AddedFood added) async {
-    try {
-      await _sending.send(
-        SendPlan(date: added.entry.date, entries: [added.planned]),
-        mode: SendMode.reviewed,
-        onProgress: (_) {},
-      );
-    } on SendInterruption catch (interruption) {
-      return EkkloFailed(added, interruption.cause);
-    } on Object catch (error) {
-      return EkkloFailed(added, error);
-    }
-    return switch (_links
-        .forDate(added.entry.date)
-        .any((link) => link.mfpEntryId == added.entryId)) {
-      true => Added(added.copyWith(ekkloWritten: true)),
-      false => EkkloFailed(
-        added,
-        StateError('Entry ${added.entryId} is not in the diary read'),
-      ),
-    };
-  }
-
-  Future<UndoOutcome> _undo(AddedFood added) async {
-    final JournalDay day;
-    try {
-      day = await _journal.readDay(added.entry.date);
-    } on Object catch (error) {
-      return NotUndone(error);
-    }
-    final status = day.comparison.entries
-        .where((compared) => compared.entry.id == added.entryId)
-        .firstOrNull
-        ?.status;
-    if (status case InEkklo(:final link) || ToUpdate(:final link)) {
-      try {
-        await _ekklo.meals.removeItem(
-          mealId: link.ekkloMealId,
-          itemId: link.ekkloItemId,
-        );
-      } on Object catch (error) {
-        return NotUndone(error);
-      }
-      _links.replace(dropped: [link], adopted: const []);
-    }
-    if (status == null) return const Undone();
-    try {
-      await _mfp.diary.remove(added.entryId);
-    } on Object catch (error) {
-      return StillInMfp(error);
-    }
-    return const Undone();
-  }
+  Future<AddOutcome> _toEkklo(AddedFood added) async =>
+      switch (await _sending.sendOne(added.planned)) {
+        null => Added(added.copyWith(ekkloWritten: true)),
+        final error => EkkloFailed(added, error),
+      };
 }

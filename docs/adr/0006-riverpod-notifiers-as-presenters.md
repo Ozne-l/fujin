@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Accepted. The screens with state follow it: the Journal, the sign-ins, sending, adding, Mémoire and Réglages. The write notifiers planned below exist: undo (`UndoAddNotifier`, [0026](0026-adding-a-food.md)), import and export (`BackupNotifier`, [0021](0021-backup-file.md)).
+Accepted. The screens with state follow it: the Journal, the sign-ins, sending, adding, Mémoire and Réglages. The write notifiers planned below exist: undo and delete (`RemoveEntryNotifier`, [0026](0026-adding-a-food.md), [0043](0043-edit-and-delete-a-logged-food.md)), edit (`EditWriteNotifier`, [0043](0043-edit-and-delete-a-logged-food.md)), import and export (`BackupNotifier`, [0021](0021-backup-file.md)).
 
 ## Context
 

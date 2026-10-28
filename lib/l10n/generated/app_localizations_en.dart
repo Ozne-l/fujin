@@ -2157,6 +2157,212 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get editFoodTitle => 'Edit food';
+
+  @override
+  String editFoodSubtitle(String meal, DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMEEEEd(
+      localeName,
+    );
+    final String dateString = dateDateFormat.format(date);
+
+    return '$meal · $dateString';
+  }
+
+  @override
+  String get editSaveBoth => 'Save to MFP and Ekklo';
+
+  @override
+  String get editSaveMfpOnly => 'Save to MFP';
+
+  @override
+  String get editDeleteBoth => 'Delete from MFP and Ekklo';
+
+  @override
+  String get editDeleteMfpOnly => 'Delete from MFP';
+
+  @override
+  String editEkkloAmount(String name, String from, String to) {
+    return 'Ekklo: $name, $from → $to';
+  }
+
+  @override
+  String get editEkkloAlready => 'already in Ekklo';
+
+  @override
+  String get editEkkloQuantity => 'same food, quantity updated';
+
+  @override
+  String editEkkloMeal(String from, String to) {
+    return 'meal: $from → $to';
+  }
+
+  @override
+  String editEkkloDay(DateTime from, DateTime to) {
+    final intl.DateFormat fromDateFormat = intl.DateFormat.MMMd(localeName);
+    final String fromString = fromDateFormat.format(from);
+    final intl.DateFormat toDateFormat = intl.DateFormat.MMMd(localeName);
+    final String toString = toDateFormat.format(to);
+
+    return 'day: $fromString → $toString';
+  }
+
+  @override
+  String get editNotInEkklo => 'Not in Ekklo yet';
+
+  @override
+  String editNextSend(String amount) {
+    return 'the next send will take $amount';
+  }
+
+  @override
+  String editEkkloReplaced(String before, String after, String amount) {
+    return 'Ekklo: $before replaced by $after, $amount';
+  }
+
+  @override
+  String editEkkloReplacedUnnamed(String after, String amount) {
+    return 'Ekklo: replaced by $after, $amount';
+  }
+
+  @override
+  String get editOffline =>
+      'Offline: editing or deleting will wait for the network.';
+
+  @override
+  String get editMfpSessionExpired =>
+      'MyFitnessPal session expired: editing or deleting will wait until you sign in again.';
+
+  @override
+  String get editEkkloSessionExpired =>
+      'Ekklo session expired: editing or deleting will wait until you sign in again.';
+
+  @override
+  String get editFoodUnreadable =>
+      'MyFitnessPal no longer serves this food: Fūjin cannot edit it. You can still delete it from the Journal.';
+
+  @override
+  String get editServingMissing =>
+      'This serving no longer exists for this food in MyFitnessPal: Fūjin cannot edit it. You can still delete it from the Journal.';
+
+  @override
+  String editOldEntryKept(String food) {
+    return '$food twice in MyFitnessPal';
+  }
+
+  @override
+  String get editOldEntryKeptDetail => 'The old entry could not be removed.';
+
+  @override
+  String get rowDelete => 'Delete';
+
+  @override
+  String deleteFoodTitle(String food) {
+    return 'Delete $food?';
+  }
+
+  @override
+  String deleteFoodDetail(
+    String serving,
+    String kcal,
+    String meal,
+    DateTime date,
+  ) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMEEEEd(
+      localeName,
+    );
+    final String dateString = dateDateFormat.format(date);
+
+    return '$serving, $kcal · $meal, $dateString. It will be removed from Ekklo, then from MyFitnessPal.';
+  }
+
+  @override
+  String deleteFoodDetailMfpOnly(
+    String serving,
+    String kcal,
+    String meal,
+    DateTime date,
+  ) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMEEEEd(
+      localeName,
+    );
+    final String dateString = dateDateFormat.format(date);
+
+    return '$serving, $kcal · $meal, $dateString. Not in Ekklo yet: it will be removed from MyFitnessPal only.';
+  }
+
+  @override
+  String get deleteKeep => 'Keep';
+
+  @override
+  String foodDeleted(String food) {
+    return '$food deleted';
+  }
+
+  @override
+  String foodDeletedDetail(String meal) {
+    return 'Removed from Ekklo and MyFitnessPal · $meal';
+  }
+
+  @override
+  String foodDeletedMfpOnlyDetail(String meal) {
+    return 'Removed from MyFitnessPal only · $meal';
+  }
+
+  @override
+  String foodNotDeleted(String food) {
+    return '$food not deleted';
+  }
+
+  @override
+  String get foodNotDeletedDetail =>
+      'Nothing changed in MyFitnessPal or in Ekklo.';
+
+  @override
+  String foodEdited(String food) {
+    return '$food edited';
+  }
+
+  @override
+  String foodEditedDetail(String serving) {
+    return 'MyFitnessPal and Ekklo · $serving';
+  }
+
+  @override
+  String foodEditedMfpOnlyDetail(String serving) {
+    return 'MyFitnessPal only · $serving';
+  }
+
+  @override
+  String foodMoved(String food) {
+    return '$food moved';
+  }
+
+  @override
+  String foodMovedToMealDetail(String meal) {
+    return 'MyFitnessPal and Ekklo · $meal';
+  }
+
+  @override
+  String foodMovedToDayDetail(String meal, DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$meal, $dateString';
+  }
+
+  @override
+  String get foodMovedSee => 'See';
+
+  @override
+  String get ekkloNotUpdated => 'Ekklo not updated';
+
+  @override
+  String ekkloNotUpdatedDetail(String food, String serving) {
+    return '$food stays at $serving there';
+  }
+
+  @override
   String get writeBlockedInDev =>
       'Fūjin DEV writes to neither MyFitnessPal nor Ekklo: nothing changed.';
 }

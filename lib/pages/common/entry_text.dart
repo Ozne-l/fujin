@@ -22,14 +22,15 @@ abstract final class EntryText {
     final brand => intl.brandedServingLine(brand, serving),
   };
 
-  static String linkedServing(AppLocalizations intl, SentLink link) =>
-      intl.inEkkloAs(
-        intl.servingLine(
-          link.mfpServings,
-          link.mfpServingValue,
-          link.mfpServingUnit,
-        ),
+  static String linkServing(AppLocalizations intl, SentLink link) =>
+      intl.servingLine(
+        link.mfpServings,
+        link.mfpServingValue,
+        link.mfpServingUnit,
       );
+
+  static String linkedServing(AppLocalizations intl, SentLink link) =>
+      intl.inEkkloAs(linkServing(intl, link));
 
   static String energy(AppLocalizations intl, MfpFoodEntry entry) =>
       intl.kilocalories(entry.nutrients.energy?.kilocalories ?? 0);

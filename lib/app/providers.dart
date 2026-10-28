@@ -21,6 +21,8 @@ import 'package:fujin/data/unattended/unattended_item_repository.dart';
 import 'package:fujin/domain/accounts/accounts_service.dart';
 import 'package:fujin/domain/adding/add_food_service.dart';
 import 'package:fujin/domain/backup/backup_service.dart';
+import 'package:fujin/domain/editing/edit_entry_service.dart';
+import 'package:fujin/domain/editing/remove_entry_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/memory/memory_service.dart';
 import 'package:fujin/domain/sending/send_service.dart';
@@ -196,11 +198,27 @@ final addFoodServiceProvider = Provider<AddFoodService>(
   (ref) => AddFoodService(
     mfp: ref.watch(mfpClientProvider),
     ekklo: ref.watch(ekkloClientProvider),
+    sending: ref.watch(sendServiceProvider),
+    memory: ref.watch(memoryRepositoryProvider),
+    recents: ref.watch(recentFoodRepositoryProvider),
+    clock: ref.watch(clockProvider),
+  ),
+);
+
+final removeEntryServiceProvider = Provider<RemoveEntryService>(
+  (ref) => RemoveEntryService(
+    mfp: ref.watch(mfpClientProvider),
+    journal: ref.watch(journalServiceProvider),
+    sending: ref.watch(sendServiceProvider),
+  ),
+);
+
+final editEntryServiceProvider = Provider<EditEntryService>(
+  (ref) => EditEntryService(
+    mfp: ref.watch(mfpClientProvider),
+    ekklo: ref.watch(ekkloClientProvider),
     journal: ref.watch(journalServiceProvider),
     sending: ref.watch(sendServiceProvider),
     memory: ref.watch(memoryRepositoryProvider),
-    links: ref.watch(sentLinkRepositoryProvider),
-    recents: ref.watch(recentFoodRepositoryProvider),
-    clock: ref.watch(clockProvider),
   ),
 );

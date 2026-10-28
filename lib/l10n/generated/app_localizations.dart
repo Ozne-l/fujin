@@ -2929,6 +2929,262 @@ abstract class AppLocalizations {
   /// **'Repas Ekklo pour {meal}'**
   String memoryMealMenu(String meal);
 
+  /// No description provided for @editFoodTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier l’aliment'**
+  String get editFoodTitle;
+
+  /// No description provided for @editFoodSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'{meal} · {date}'**
+  String editFoodSubtitle(String meal, DateTime date);
+
+  /// No description provided for @editSaveBoth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer dans MFP et Ekklo'**
+  String get editSaveBoth;
+
+  /// No description provided for @editSaveMfpOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer dans MFP'**
+  String get editSaveMfpOnly;
+
+  /// No description provided for @editDeleteBoth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer de MFP et Ekklo'**
+  String get editDeleteBoth;
+
+  /// No description provided for @editDeleteMfpOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer de MFP'**
+  String get editDeleteMfpOnly;
+
+  /// No description provided for @editEkkloAmount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ekklo : {name}, {from} → {to}'**
+  String editEkkloAmount(String name, String from, String to);
+
+  /// No description provided for @editEkkloAlready.
+  ///
+  /// In fr, this message translates to:
+  /// **'déjà dans Ekklo'**
+  String get editEkkloAlready;
+
+  /// No description provided for @editEkkloQuantity.
+  ///
+  /// In fr, this message translates to:
+  /// **'même aliment, quantité mise à jour'**
+  String get editEkkloQuantity;
+
+  /// No description provided for @editEkkloMeal.
+  ///
+  /// In fr, this message translates to:
+  /// **'repas : {from} → {to}'**
+  String editEkkloMeal(String from, String to);
+
+  /// No description provided for @editEkkloDay.
+  ///
+  /// In fr, this message translates to:
+  /// **'jour : {from} → {to}'**
+  String editEkkloDay(DateTime from, DateTime to);
+
+  /// No description provided for @editNotInEkklo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas encore dans Ekklo'**
+  String get editNotInEkklo;
+
+  /// No description provided for @editNextSend.
+  ///
+  /// In fr, this message translates to:
+  /// **'le prochain envoi prendra {amount}'**
+  String editNextSend(String amount);
+
+  /// No description provided for @editEkkloReplaced.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ekklo : {before} remplacé par {after}, {amount}'**
+  String editEkkloReplaced(String before, String after, String amount);
+
+  /// No description provided for @editEkkloReplacedUnnamed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ekklo : remplacé par {after}, {amount}'**
+  String editEkkloReplacedUnnamed(String after, String amount);
+
+  /// No description provided for @editOffline.
+  ///
+  /// In fr, this message translates to:
+  /// **'Hors ligne : modifier ou supprimer attendra le réseau.'**
+  String get editOffline;
+
+  /// No description provided for @editMfpSessionExpired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Session MyFitnessPal expirée : modifier ou supprimer attendra la reconnexion.'**
+  String get editMfpSessionExpired;
+
+  /// No description provided for @editEkkloSessionExpired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Session Ekklo expirée : modifier ou supprimer attendra la reconnexion.'**
+  String get editEkkloSessionExpired;
+
+  /// No description provided for @editFoodUnreadable.
+  ///
+  /// In fr, this message translates to:
+  /// **'MyFitnessPal ne donne plus cet aliment : Fūjin ne peut pas le modifier. Tu peux toujours le supprimer depuis le Journal.'**
+  String get editFoodUnreadable;
+
+  /// No description provided for @editServingMissing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette portion n’existe plus pour cet aliment dans MyFitnessPal : Fūjin ne peut pas le modifier. Tu peux toujours le supprimer depuis le Journal.'**
+  String get editServingMissing;
+
+  /// No description provided for @editOldEntryKept.
+  ///
+  /// In fr, this message translates to:
+  /// **'{food} en double dans MyFitnessPal'**
+  String editOldEntryKept(String food);
+
+  /// No description provided for @editOldEntryKeptDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'L’ancienne entrée n’a pas pu être retirée.'**
+  String get editOldEntryKeptDetail;
+
+  /// No description provided for @rowDelete.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer'**
+  String get rowDelete;
+
+  /// No description provided for @deleteFoodTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer {food} ?'**
+  String deleteFoodTitle(String food);
+
+  /// No description provided for @deleteFoodDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'{serving}, {kcal} · {meal}, {date}. Il sera retiré d’Ekklo, puis de MyFitnessPal.'**
+  String deleteFoodDetail(
+    String serving,
+    String kcal,
+    String meal,
+    DateTime date,
+  );
+
+  /// No description provided for @deleteFoodDetailMfpOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'{serving}, {kcal} · {meal}, {date}. Pas encore dans Ekklo : il sera retiré de MyFitnessPal seulement.'**
+  String deleteFoodDetailMfpOnly(
+    String serving,
+    String kcal,
+    String meal,
+    DateTime date,
+  );
+
+  /// No description provided for @deleteKeep.
+  ///
+  /// In fr, this message translates to:
+  /// **'Garder'**
+  String get deleteKeep;
+
+  /// No description provided for @foodDeleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'{food} supprimé'**
+  String foodDeleted(String food);
+
+  /// No description provided for @foodDeletedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retiré d’Ekklo et de MyFitnessPal · {meal}'**
+  String foodDeletedDetail(String meal);
+
+  /// No description provided for @foodDeletedMfpOnlyDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retiré de MyFitnessPal seulement · {meal}'**
+  String foodDeletedMfpOnlyDetail(String meal);
+
+  /// No description provided for @foodNotDeleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'{food} non supprimé'**
+  String foodNotDeleted(String food);
+
+  /// No description provided for @foodNotDeletedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rien n’a changé dans MyFitnessPal ni dans Ekklo.'**
+  String get foodNotDeletedDetail;
+
+  /// No description provided for @foodEdited.
+  ///
+  /// In fr, this message translates to:
+  /// **'{food} modifié'**
+  String foodEdited(String food);
+
+  /// No description provided for @foodEditedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'MyFitnessPal et Ekklo · {serving}'**
+  String foodEditedDetail(String serving);
+
+  /// No description provided for @foodEditedMfpOnlyDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'MyFitnessPal seulement · {serving}'**
+  String foodEditedMfpOnlyDetail(String serving);
+
+  /// No description provided for @foodMoved.
+  ///
+  /// In fr, this message translates to:
+  /// **'{food} déplacé'**
+  String foodMoved(String food);
+
+  /// No description provided for @foodMovedToMealDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'MyFitnessPal et Ekklo · {meal}'**
+  String foodMovedToMealDetail(String meal);
+
+  /// No description provided for @foodMovedToDayDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'{meal}, {date}'**
+  String foodMovedToDayDetail(String meal, DateTime date);
+
+  /// No description provided for @foodMovedSee.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir'**
+  String get foodMovedSee;
+
+  /// No description provided for @ekkloNotUpdated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ekklo pas mis à jour'**
+  String get ekkloNotUpdated;
+
+  /// No description provided for @ekkloNotUpdatedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'{food} y reste à {serving}'**
+  String ekkloNotUpdatedDetail(String food, String serving);
+
   /// No description provided for @writeBlockedInDev.
   ///
   /// In fr, this message translates to:

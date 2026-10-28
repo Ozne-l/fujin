@@ -6,6 +6,7 @@ import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/pages/adding/add_search_notifier.dart';
+import 'package:fujin/pages/adding/food_view_mode.dart';
 import 'package:fujin/pages/adding/widgets/food_view.dart';
 import 'package:fujin/pages/adding/widgets/search_view.dart';
 import 'package:fujin/pages/memory/memory_notifier.dart';
@@ -103,7 +104,10 @@ class AddFoodPage extends HookConsumerWidget {
                   key: ValueKey(draft),
                   initial: draft,
                   barcode: barcode,
-                  barcodeToLink: scanned.value?.barcode,
+                  mode: AddingFood(
+                    onLeave: context.pop,
+                    barcodeToLink: scanned.value?.barcode,
+                  ),
                   onBack: switch (mfpFoodId) {
                     null => () {
                       ref
@@ -113,7 +117,6 @@ class AddFoodPage extends HookConsumerWidget {
                     },
                     _ => context.pop,
                   },
-                  onLeave: context.pop,
                 ),
               ),
             ),

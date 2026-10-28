@@ -16,6 +16,7 @@ class EkkloSummaryCard extends StatelessWidget {
     required this.onTap,
     required this.onRetry,
     required this.onSignIn,
+    this.summary,
     super.key,
   });
 
@@ -24,6 +25,7 @@ class EkkloSummaryCard extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onRetry;
   final VoidCallback onSignIn;
+  final (String, String)? summary;
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +68,8 @@ class EkkloSummaryCard extends StatelessWidget {
       ),
     };
     final (title, detail) = switch ((planned, problem)) {
-      (final planned?, _) => AddText.ekkloSummary(context.intl, planned),
+      (final planned?, _) =>
+        summary ?? AddText.ekkloSummary(context.intl, planned),
       (null, final problem?) => (
         JournalText.problemHeadline(context.intl, problem),
         switch (problem) {

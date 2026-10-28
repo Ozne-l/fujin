@@ -33,6 +33,11 @@ abstract final class FujinMotion {
     Duration(milliseconds: 250),
     Curves.easeOutCubic,
   );
+  static const CurvedMotion rowRemoval = CurvedMotion(
+    Duration(milliseconds: 250),
+    Curves.easeOutCubic,
+  );
+  static const Duration rowRemovalStagger = Duration(milliseconds: 70);
   static const Motion bandNudge = CupertinoMotion(
     duration: Duration(milliseconds: 300),
   );

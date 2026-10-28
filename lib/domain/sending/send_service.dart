@@ -125,6 +125,34 @@ final class SendService {
     );
   }
 
+  Future<Object?> sendOne(PlannedEntry planned) async {
+    try {
+      await send(
+        SendPlan(date: planned.entry.date, entries: [planned]),
+        mode: SendMode.reviewed,
+        onProgress: (_) {},
+      );
+    } on SendInterruption catch (interruption) {
+      return interruption.cause;
+    } on Object catch (error) {
+      return error;
+    }
+    return switch (_links
+        .forDate(planned.entry.date)
+        .any((link) => link.mfpEntryId == planned.entryId)) {
+      true => null,
+      false => StateError('Entry ${planned.entryId} is not linked'),
+    };
+  }
+
+  Future<void> removeLinked(SentLink link) async {
+    await _ekklo.meals.removeItem(
+      mealId: link.ekkloMealId,
+      itemId: link.ekkloItemId,
+    );
+    _links.replace(dropped: [link], adopted: const []);
+  }
+
   Future<List<EkkloCandidate>> search(
     PlannedEntry planned,
     String query,
@@ -444,13 +472,7 @@ final class SendService {
     ];
     final attended = _recordUnattended(mode, expected);
     for (final planned in entries) {
-      if (planned.replacing case final SentLink link) {
-        await _ekklo.meals.removeItem(
-          mealId: link.ekkloMealId,
-          itemId: link.ekkloItemId,
-        );
-        _links.replace(dropped: [link], adopted: const []);
-      }
+      if (planned.replacing case final SentLink link) await removeLinked(link);
     }
     final known = {
       for (final meal in before)
