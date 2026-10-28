@@ -18,8 +18,9 @@ Future<void> showMyDaySheet(
   required Goals? goals,
 }) => SheetFrame.show(
   context,
-  builder: (_) =>
-      _MyDay(subtitle: subtitle, entry: entry, day: day, goals: goals),
+  builder: (_) => SheetFrame.handled(
+    _MyDay(subtitle: subtitle, entry: entry, day: day, goals: goals),
+  ),
 );
 
 class _MyDay extends StatelessWidget {

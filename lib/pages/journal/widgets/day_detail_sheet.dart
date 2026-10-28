@@ -17,7 +17,8 @@ Future<void> showDayDetailSheet(
   required VoidCallback onSend,
 }) => SheetFrame.show(
   context,
-  builder: (context) => _DayDetail(day: day, onSend: onSend),
+  builder: (context) =>
+      SheetFrame.handled(_DayDetail(day: day, onSend: onSend)),
 );
 
 class _DayDetail extends StatelessWidget {

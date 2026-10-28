@@ -12,11 +12,6 @@ abstract final class FujinTheme {
     textStyle: FujinText.inter15Semibold,
   );
 
-  static const _dragHandleSize = Size(
-    FujinSize.dragHandleWidth,
-    FujinSize.dragHandleHeight,
-  );
-
   static ThemeData light() => _build(FujinColors.light);
 
   static ThemeData dark() => _build(FujinColors.dark);
@@ -191,8 +186,6 @@ abstract final class FujinTheme {
         elevation: 0,
         modalElevation: 0,
         clipBehavior: Clip.antiAlias,
-        dragHandleColor: colors.borderControl,
-        dragHandleSize: _dragHandleSize,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(FujinRadius.sheet),

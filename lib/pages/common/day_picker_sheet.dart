@@ -9,6 +9,7 @@ import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/day_pill.dart';
 import 'package:fujin/pages/common/fujin_icon_button.dart';
 import 'package:fujin/pages/common/gold_separator.dart';
+import 'package:fujin/pages/common/sheet_frame.dart';
 import 'package:fujin/pages/common/title_text.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -46,94 +47,96 @@ class DayPickerSheet extends HookConsumerWidget {
       onPicked(day);
     }
 
-    return Semantics(
-      scopesRoute: true,
-      namesRoute: true,
-      explicitChildNodes: true,
-      label: context.intl.dayPickerTitle,
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            FujinSize.textInset,
-            0,
-            FujinSize.textInset,
-            FujinSpace.s3,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: FujinSpace.s4,
-            children: [
-              Row(
-                spacing: FujinSpace.s2,
-                children: [
-                  Expanded(
-                    child: Text(
-                      TitleText.capitalized(
-                        context.intl.dayPickerMonth(_monthOf(shown.value)),
-                      ),
-                      style: FujinText.hina24.copyWith(
-                        color: context.colors.textPrimary,
+    return SheetFrame.handled(
+      Semantics(
+        scopesRoute: true,
+        namesRoute: true,
+        explicitChildNodes: true,
+        label: context.intl.dayPickerTitle,
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              FujinSize.textInset,
+              0,
+              FujinSize.textInset,
+              FujinSpace.s3,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: FujinSpace.s4,
+              children: [
+                Row(
+                  spacing: FujinSpace.s2,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        TitleText.capitalized(
+                          context.intl.dayPickerMonth(_monthOf(shown.value)),
+                        ),
+                        style: FujinText.hina24.copyWith(
+                          color: context.colors.textPrimary,
+                        ),
                       ),
                     ),
-                  ),
-                  _Turn(
-                    visible: shown.value > 0,
-                    icon: Icons.chevron_left,
-                    tooltip: context.intl.previousMonth,
-                    onPressed: () => turnTo(shown.value - 1),
-                  ),
-                  _Turn(
-                    visible: shown.value < months - 1,
-                    icon: Icons.chevron_right,
-                    tooltip: context.intl.nextMonth,
-                    onPressed: () => turnTo(shown.value + 1),
-                  ),
-                ],
-              ),
-              const GoldSeparator(volute: true),
-              Column(
-                spacing: FujinSpace.s2,
-                children: [
-                  Row(
-                    children: [
-                      for (final day in CalendarWeek.daysOf(today))
-                        Expanded(
-                          child: Text(
-                            context.intl.weekdayShort(day),
-                            textAlign: TextAlign.center,
-                            style: FujinText.inter11Medium.copyWith(
-                              color: context.colors.textTertiary,
+                    _Turn(
+                      visible: shown.value > 0,
+                      icon: Icons.chevron_left,
+                      tooltip: context.intl.previousMonth,
+                      onPressed: () => turnTo(shown.value - 1),
+                    ),
+                    _Turn(
+                      visible: shown.value < months - 1,
+                      icon: Icons.chevron_right,
+                      tooltip: context.intl.nextMonth,
+                      onPressed: () => turnTo(shown.value + 1),
+                    ),
+                  ],
+                ),
+                const GoldSeparator(volute: true),
+                Column(
+                  spacing: FujinSpace.s2,
+                  children: [
+                    Row(
+                      children: [
+                        for (final day in CalendarWeek.daysOf(today))
+                          Expanded(
+                            child: Text(
+                              context.intl.weekdayShort(day),
+                              textAlign: TextAlign.center,
+                              style: FujinText.inter11Medium.copyWith(
+                                color: context.colors.textTertiary,
+                              ),
                             ),
                           ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: _rows * FujinSize.touchTarget,
+                      child: PageView.builder(
+                        controller: controller,
+                        itemCount: months,
+                        onPageChanged: (page) => shown.value = page,
+                        itemBuilder: (context, page) => _Month(
+                          month: _monthOf(page),
+                          selected: selected,
+                          today: today,
+                          first: first,
+                          last: last,
+                          onPick: pick,
                         ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: _rows * FujinSize.touchTarget,
-                    child: PageView.builder(
-                      controller: controller,
-                      itemCount: months,
-                      onPageChanged: (page) => shown.value = page,
-                      itemBuilder: (context, page) => _Month(
-                        month: _monthOf(page),
-                        selected: selected,
-                        today: today,
-                        first: first,
-                        last: last,
-                        onPick: pick,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              if (!today.isBefore(first) && !today.isAfter(last))
-                TextButton(
-                  onPressed: () => pick(today),
-                  child: Text(context.intl.journalToday),
+                  ],
                 ),
-            ],
+                if (!today.isBefore(first) && !today.isAfter(last))
+                  TextButton(
+                    onPressed: () => pick(today),
+                    child: Text(context.intl.journalToday),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
