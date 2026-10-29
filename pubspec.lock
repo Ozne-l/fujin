@@ -669,12 +669,11 @@ packages:
   liquid_glass_renderer:
     dependency: "direct main"
     description:
-      path: "packages/liquid_glass_renderer"
-      ref: c7ec9d22e4c458da5594c44c107738afb51fbd09
-      resolved-ref: c7ec9d22e4c458da5594c44c107738afb51fbd09
-      url: "https://github.com/Ozne-l/flutter_liquid_glass.git"
-    source: git
-    version: "1.0.0-dev.1"
+      name: liquid_glass_renderer
+      sha256: "5a57a498fffd29eb8373695346ae423e4d3879edf72335db57d0e31ff74ae54f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0-dev.2"
   listen:
     dependency: transitive
     description:

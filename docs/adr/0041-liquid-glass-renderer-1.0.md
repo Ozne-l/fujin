@@ -14,7 +14,7 @@ On the owner's Pixel 8 (Mali GPU, Vulkan) the 1.0 filled each shape's whole boun
 
 ## Decision
 
-- `liquid_glass_renderer` comes from the owner's fork, `Ozne-l/flutter_liquid_glass`, pinned to commit `c7ec9d22e4c458da5594c44c107738afb51fbd09`: `1.0.0-dev.1` plus the Mali fix. It goes back to a pub.dev version, pinned exactly, once a release carries the fix.
+- `liquid_glass_renderer` is pinned exactly to `1.0.0-dev.2` on pub.dev, the first release that carries the Mali fix (#246). Until then it came from the owner's fork, `Ozne-l/flutter_liquid_glass`, at commit `c7ec9d22e4c458da5594c44c107738afb51fbd09`: `1.0.0-dev.1` plus that fix.
 - Flutter GPU is turned on in the app, not on the machine: `io.flutter.embedding.android.EnableFlutterGPU` in `AndroidManifest.xml`, `FLTEnableFlutterGPU` in `Info.plist`. Without it, or without Impeller, the package falls back to its `FakeGlass`.
 - Every glass shape takes the package's iOS 27 regular appearance for the theme's brightness, not the phone's, so the day/night toggle in "Sombre" on a light phone gets the dark wash: `FujinGlass.appearance(brightness, tint:, visibility:)`, the `defaultAppearance` of `GlassLayer` and the appearance of each own-layer shape. A finish's fill ([0036](0036-glass-on-buttons-search-and-filters.md): `backgroundGlass`, `backgroundGlassInk`, the tints) is that appearance's `tint`; the fill painted above the glass is gone. The package's "appearance" is not the Apparence setting of the glossary.
 - The rim is the package's: a glint on the top and bottom walls, a dark contour outside the silhouette, an inner shadow under the top wall, the light fixed from above. `GlassRim` is deleted, with what only fed it (`GlassFinish.rimHighlight` and `rimShade`, `FujinGlass.tintRimHighlight` and `tintRimShade`, the rim parameters of `GlassBody` and `GlassFill`) and the tokens `border/glass-highlight`, `border/glass-shade`, `border/glass-ink-highlight`, `border/glass-ink-shade`, `border/lens-edge` (both themes) and `stroke/glass-tint-rim`. Ink and tinted controls lose their white and coloured rims; "Confirmer" loses its 1.5 rim. The glint takes the colour of what is behind the glass. The green active-tab pill is not glass and still has no rim.
@@ -47,7 +47,7 @@ On the owner's Pixel 8 (Mali GPU, Vulkan) the 1.0 filled each shape's whole boun
   | settings switch | 8.6 → 9.5 | 11.2 → 13.4 | 2 → 3 |
 
   The settings switch's average and p90 are outside the 0.2's run-to-run range (8.3–8.6 and 10.9–12.0). The two sides were measured on different days, and the owner chose not to measure them again side by side; the migration is kept with this cost.
-- Fūjin builds against a fork until upstream releases the fix; each package update means moving the fork onto it.
+- `1.0.0-dev.2` also reworks how the glass is drawn (blurs cropped to each glass, a low-resolution geometry matte, shadow bounds on pixel buckets). The frame times above and the presets' look were measured on the fork's `1.0.0-dev.1`; the glass benchmark has not run on `1.0.0-dev.2`.
 - The package bounds Dart to `>=3.13.0 <3.14.0`, so the next Dart upgrade waits for it.
 - A debug build warns of three to five independent backdrop copies in a frame; this is the cost above, not an error.
 - A control's colour on screen is the tint through the appearance's wash, no longer the token over what is behind. Measured on Pixel 8 screenshots (2026-10-26, Journal and send review on fake data), the median colour of each face against its text role, with the 0.2 estimated as the fill laid over the colour around the control:

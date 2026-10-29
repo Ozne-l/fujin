@@ -27,11 +27,7 @@ dependencies:
   hooks_riverpod: ^3.4.3
   http: ^1.6.0
   intl: any
-  liquid_glass_renderer:
-    git:
-      url: https://github.com/Ozne-l/flutter_liquid_glass.git
-      ref: c7ec9d22e4c458da5594c44c107738afb51fbd09
-      path: packages/liquid_glass_renderer
+  liquid_glass_renderer: 1.0.0-dev.2
   mobile_scanner: ^7.4.2
   motor: ^1.1.0
   myfitnesspal_client:
