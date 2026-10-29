@@ -8,7 +8,23 @@ The words below have one meaning in Fūjin's code, docs and conversations. Frenc
 
 **Day.** A calendar date with no time zone, stored as midnight UTC in memory and as `YYYY-MM-DD` in SQLite. The selected day defaults to today. A week runs Monday to Sunday. Code: `SelectedDay`, `selectedDayProvider`, `todayProvider` (`lib/pages/journal/selected_day.dart`); `CalendarWeek` (`lib/domain/journal/calendar_week.dart`); `CalendarDateHook` (`lib/data/database/calendar_date_hook.dart`).
 
-**Entry (MyFitnessPal).** One food logged in a MyFitnessPal meal: food, servings, serving size, nutrients, and an entry id that changes whenever the entry is edited in MyFitnessPal. Entries without an id cannot be linked. Code: `MfpFoodEntry` from `package:myfitnesspal_client`.
+**Entry.** Fūjin's own record of one food logged on a day, in a meal: a Food, one of its serving sizes and a number of servings, as in MyFitnessPal. Its grams are derived from the serving size when its weight is known, never stored. Each connected app may hold its own copy of it, a MyFitnessPal entry or an Ekklo item, tied to it by a link. Not built yet: it comes with the connector model, and until then "entry" in the definitions below still means a MyFitnessPal entry. Not "log" or "record".
+
+**Food.** Fūjin's own food: its name, serving sizes and nutrients, copied from the catalogue it came from, so that it can be logged with no connector. Not built yet. Not "product".
+
+**Reference.** The tie from a Food to the same food in one catalogue: a base catalogue id, a MyFitnessPal food id and version, or an Ekklo food or own copy. Once built, Memory's remembered foods become references. Not built yet.
+
+**Catalogue.** A source of foods to log: the base catalogue, always there, and the catalogue a connector unlocks (MyFitnessPal; Ekklo brings none). Which base catalogue is not decided.
+
+**Meal.** One of Fūjin's own meals of a day, from a list that starts as the owner's MyFitnessPal meals. Each connector maps Fūjin's meals to its own through meal mappings. Not built yet: today a meal is a MyFitnessPal meal, mapped to an Ekklo meal.
+
+**Connector.** Fūjin's link to one external app: MyFitnessPal, Ekklo, later Hevy. Connecting one unlocks what that app brings (its catalogue, its diary, its chat); Fūjin works with none connected. Not "integration".
+
+**Role.** How a connector takes part in one domain (food, later workouts): two-way, where an add, edit or deletion made in that app changes Fūjin's entries on the next read, or receive-only, where a change made there only changes that app's status. Set per connector and domain in a setting, from the roles that connector can do; at most one two-way connector per domain. A change applies from the next read and rewrites nothing. Not built yet. Not "mode", which is the automatic mode, or "direction".
+
+**Bridge.** Carrying data from one connected app to another through Fūjin: MyFitnessPal entries to Ekklo items today, later Hevy workouts. Not "sync", which is kept for Fūjin's own data across devices.
+
+**MyFitnessPal entry.** One food logged in a MyFitnessPal meal: food, servings, serving size, nutrients, and an entry id that changes whenever the entry is edited in MyFitnessPal. Entries without an id cannot be linked. Code: `MfpFoodEntry` from `package:myfitnesspal_client`.
 
 **Item (Ekklo).** One food inside an Ekklo meal: Ekklo food id, quantity, quantity type (grams or portion), creation date. Ekklo stores no free text on it, so Fūjin cannot tag it. Code: `EkkloDailyMealItem` inside `EkkloDailyMeal` from `package:ekklo_client`.
 
@@ -32,7 +48,7 @@ The words below have one meaning in Fūjin's code, docs and conversations. Frenc
 
 **Relink.** Moving an orphan link to the new id of an edited entry when the orphan's Ekklo item still matches what the edited entry expects: the old link is dropped and a new one adopted, and the entry stays "Dans Ekklo". Code: the `(true, _)` case of the orphan pass in `compareDay` (`adopt(..., replacing: link)`).
 
-**Status.** Where an entry stands, recomputed on every read: "Dans Ekklo" (`InEkklo`, carries its link), "À envoyer" (`ToSend`), "À mettre à jour" (`ToUpdate`, carries the orphan link, or the link of an entry with an unattended item whose item Memory no longer expects, and an `UpdateKind`: `quantityOnly` when the Ekklo meal is unchanged, `mealChanged` otherwise). Code: sealed `EntryStatus` (`lib/domain/comparison/entry_status.dart`), `UpdateKind` (`lib/domain/comparison/update_kind.dart`).
+**Status.** Where an entry stands, recomputed on every read: "Dans Ekklo" (`InEkklo`, carries its link), "À envoyer" (`ToSend`), "À mettre à jour" (`ToUpdate`, carries the orphan link, or the link of an entry with an unattended item whose item Memory no longer expects, and an `UpdateKind`: `quantityOnly` when the Ekklo meal is unchanged, `mealChanged` otherwise). Code: sealed `EntryStatus` (`lib/domain/comparison/entry_status.dart`), `UpdateKind` (`lib/domain/comparison/update_kind.dart`). With the connector model (not built, ADR 0044) each connector gives an entry its own status: Ekklo adds to remove, for an entry deleted in Fūjin or in MyFitnessPal whose item is still in Ekklo, removed by the next reviewed send; MyFitnessPal is pending while an entry waits to be written there, the only MyFitnessPal status the Journal shows.
 
 **Expected item.** The Ekklo item Memory predicts for an entry: Ekklo meal name, Ekklo food id, quantity rounded to 0.1, quantity type. Null when Memory lacks the food, the meal mapping, or the grams of a non-gram unit. Matches an item within 0.1. Code: `ExpectedItem.forEntry` and `ExpectedItem.matches` (`lib/domain/comparison/expected_item.dart`).
 
