@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart'
     show group, setUp, tearDown, test;
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
-import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/unattended/unattended_item_repository.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/journal/fetch.dart';
@@ -16,6 +15,7 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../../support/fake_backends.dart';
 import '../../support/fixtures.dart';
+import '../../support/repositories.dart';
 
 void main() {
   late FujinDatabase database;
@@ -28,7 +28,7 @@ void main() {
     ekklo: ekklo ?? await backends.ekklo(),
     links: links,
     unattended: unattended,
-    memory: MemoryRepository(database),
+    memory: memoryOf(database),
     database: database,
     clock: () => now,
   );
@@ -51,7 +51,7 @@ void main() {
     database = FujinDatabase.inMemory();
     links = SentLinkRepository(database);
     unattended = UnattendedItemRepository(database);
-    final repository = MemoryRepository(database);
+    final repository = memoryOf(database);
     memory.matches.forEach(repository.saveFood);
     memory.units.forEach(repository.saveUnit);
     memory.meals.forEach(repository.saveMeal);

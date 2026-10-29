@@ -1,4 +1,5 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/data/foods/food_repository.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
@@ -22,6 +23,7 @@ final class AddFoodService {
     required this._ekklo,
     required this._sending,
     required this._memory,
+    required this._foods,
     required this._recents,
     required this._clock,
   });
@@ -30,6 +32,7 @@ final class AddFoodService {
   final EkkloClient _ekklo;
   final SendService _sending;
   final MemoryRepository _memory;
+  final FoodRepository _foods;
   final RecentFoodRepository _recents;
   final DateTime Function() _clock;
 
@@ -43,7 +46,7 @@ final class AddFoodService {
       query,
       verifiedOnly: verifiedOnly,
     ))
-      if (food.servingSizes.isNotEmpty) food,
+      if (food.servingSizes.isNotEmpty) _filled(food),
   ];
 
   Future<MfpBarcodeResult> byBarcode(String barcode) async =>
@@ -55,6 +58,7 @@ final class AddFoodService {
             description: food.description,
             brandName: food.brandName,
           ),
+        MfpBarcodeFound(:final food) => MfpBarcodeFound(barcode, _filled(food)),
         final result => result,
       };
 
@@ -62,7 +66,7 @@ final class AddFoodService {
     if (_memory.barcodeFood(barcode) case final foodId?) {
       if (await _mfp.foods.byId(foodId) case final food?
           when food.servingSizes.isNotEmpty) {
-        return ScanFound(barcode, food, remembered: true);
+        return ScanFound(barcode, _filled(food), remembered: true);
       }
     }
     return switch (await byBarcode(barcode)) {
@@ -121,7 +125,7 @@ final class AddFoodService {
     required DateTime date,
     required (MfpServingSize?, double) Function(MfpFood food) serving,
   }) async => switch (await _mfp.foods.byId(mfpFoodId)) {
-    final food? => switch (serving(food)) {
+    final food? => switch (serving(_filled(food))) {
       (final servingSize, final servings) => AddDraft.of(
         food,
         mfpMealName: mfpMealName,
@@ -188,6 +192,7 @@ final class AddFoodService {
     }
     final entry = draft.entry.copyWith(id: entryId);
     _recents.record(RecentFood.forEntry(entry, addedAt: _clock()));
+    _foods.fill(draft.food);
     if (barcodeToLink case final barcode?) {
       _memory.saveBarcodeLink(
         BarcodeLink(barcode: barcode, mfpFoodId: draft.food.id),
@@ -203,6 +208,11 @@ final class AddFoodService {
     );
     onStage?.call(AddStage.ekklo);
     return _toEkklo(added);
+  }
+
+  MfpFood _filled(MfpFood food) {
+    _foods.fill(food);
+    return food;
   }
 
   Future<AddOutcome> _toEkklo(AddedFood added) async =>

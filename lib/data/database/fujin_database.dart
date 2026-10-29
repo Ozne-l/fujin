@@ -1,3 +1,4 @@
+import 'package:fujin/data/database/fujin_id.dart';
 import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/database/schema.dart';
 import 'package:sqlite3/sqlite3.dart';
@@ -6,7 +7,12 @@ final class FujinDatabase {
   FujinDatabase._(this._db) {
     _db
       ..execute('PRAGMA journal_mode = DELETE')
-      ..execute('PRAGMA foreign_keys = ON');
+      ..execute('PRAGMA foreign_keys = ON')
+      ..createFunction(
+        functionName: FujinId.sqlFunction,
+        function: (_) => FujinId.at(DateTime.timestamp()),
+        argumentCount: const AllowedArgumentCount(0),
+      );
     _migrate();
   }
 

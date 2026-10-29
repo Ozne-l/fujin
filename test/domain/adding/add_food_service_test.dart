@@ -3,6 +3,10 @@ import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_test/flutter_test.dart'
     show group, setUp, tearDown, test;
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/foods/food.dart';
+import 'package:fujin/data/foods/food_nutrients.dart';
+import 'package:fujin/data/foods/food_reference.dart';
+import 'package:fujin/data/foods/food_repository.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
@@ -18,6 +22,7 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../../support/fake_backends.dart';
 import '../../support/fixtures.dart';
+import '../../support/repositories.dart';
 import '../../support/write_services.dart';
 
 const _gratin = 'mfp-gratin';
@@ -82,7 +87,7 @@ void main() {
 
   setUp(() {
     database = FujinDatabase.inMemory();
-    memoryRepository = MemoryRepository(database);
+    memoryRepository = memoryOf(database);
     memory.matches.forEach(memoryRepository.saveFood);
     memory.units.forEach(memoryRepository.saveUnit);
     memory.meals.forEach(memoryRepository.saveMeal);
@@ -591,5 +596,82 @@ void main() {
             .equals(_hundredGrams);
       },
     );
+
+    group('fill', () {
+      late FoodRepository foods;
+      final remembered = memory.matches.firstWhere(
+        (food) => food.mfpFoodId == rice,
+      );
+      final changedBasmati = _basmati.copyWith(
+        servingSizes: const [_onePot],
+        nutrients: nutrients(kcal: 360, protein: 9, carbs: 78, fat: 1),
+      );
+
+      setUp(() => foods = foodsOf(database));
+
+      Food rememberedFood() =>
+          foods.foods().firstWhere((food) => food.id == foods.foodOfMfp(rice));
+
+      List<(int, double, String)> liveServings() => [
+        for (final serving in foods.servings())
+          if (serving.deletedAt == null)
+            (serving.position, serving.value, serving.unit),
+      ];
+
+      List<String?> mfpVersions() => [
+        for (final reference in foods.references())
+          if (reference is MfpReference && reference.externalId == rice)
+            reference.version,
+      ];
+
+      Future<void> open(WriteServices services) => services.adding
+          .openRemembered(remembered, mfpMealName: lunch, date: day);
+
+      test('their servings and nutrients from the first MyFitnessPal read, '
+          'not from later reads of the same version', () async {
+        final services = await writeServices();
+
+        check(rememberedFood())
+          ..has((food) => food.name, 'name').equals(remembered.mfpDescription)
+          ..has(
+            (food) => food.nutrients,
+            'nutrients',
+          ).equals(const FoodNutrients());
+        check(foods.servings()).isEmpty();
+
+        await open(services);
+        final filled = rememberedFood();
+        backends.mfpFoods = [changedBasmati];
+        await open(services);
+
+        check(filled)
+          ..has((food) => food.name, 'name').equals(_basmati.description)
+          ..has((food) => food.brand, 'brand').equals(_basmati.brandName)
+          ..has(
+            (food) => food.nutrients,
+            'nutrients',
+          ).equals(FoodNutrients.ofMfp(_basmati.nutrients));
+        check(rememberedFood()).equals(filled);
+        check(
+          liveServings(),
+        ).deepEquals([(0, _hundredGrams.value, _hundredGrams.unit)]);
+        check(mfpVersions()).deepEquals([_basmati.version]);
+      });
+
+      test('them again from a newer MyFitnessPal version', () async {
+        final services = await writeServices();
+        await open(services);
+        backends.mfpFoods = [changedBasmati.copyWith(version: '3')];
+
+        await open(services);
+
+        check(rememberedFood().nutrients).equals(
+          FoodNutrients.ofMfp(changedBasmati.nutrients),
+        );
+        check(liveServings()).deepEquals([(0, _onePot.value, _onePot.unit)]);
+        check(foods.servings()).length.equals(2);
+        check(mfpVersions()).deepEquals(['3']);
+      });
+    });
   });
 }

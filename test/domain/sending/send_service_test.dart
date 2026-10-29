@@ -24,6 +24,7 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../../support/fake_backends.dart';
 import '../../support/fixtures.dart';
+import '../../support/repositories.dart';
 
 const _gratin = 'mfp-gratin';
 const _gratinName = 'Gratin dauphinois maison';
@@ -85,7 +86,7 @@ void main() {
   setUp(() {
     database = FujinDatabase.inMemory();
     links = SentLinkRepository(database);
-    memoryRepository = MemoryRepository(database);
+    memoryRepository = memoryOf(database);
     memory.matches.forEach(memoryRepository.saveFood);
     memory.units.forEach(memoryRepository.saveUnit);
     memory.meals.forEach(memoryRepository.saveMeal);

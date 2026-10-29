@@ -1,4 +1,5 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/data/foods/food_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/rescale_planned.dart';
@@ -21,6 +22,7 @@ final class EditEntryService {
     required this._journal,
     required this._sending,
     required this._memory,
+    required this._foods,
   });
 
   final MyFitnessPalClient _mfp;
@@ -28,12 +30,14 @@ final class EditEntryService {
   final JournalService _journal;
   final SendService _sending;
   final MemoryRepository _memory;
+  final FoodRepository _foods;
 
   Future<EditOutcome>? _writing;
 
   Future<EditOpening> open(MfpFoodEntry entry) async {
     final food = await _mfp.foods.byId(entry.food.id);
     if (food == null) return const FoodUnreadable();
+    _foods.fill(food);
     final serving = food.servingSizes
         .where(
           (serving) =>

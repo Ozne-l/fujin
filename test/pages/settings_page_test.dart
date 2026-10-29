@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/backup/backup.dart';
-import 'package:fujin/data/backup/backup_codec.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/preferences/fujin_preferences.dart';
 import 'package:fujin/pages/common/fujin_switch.dart';
@@ -22,6 +21,7 @@ import '../support/phone_brightness.dart';
 import '../support/pump_fujin.dart';
 
 const _space = '\u202f';
+const _versionWithMemory = 2;
 const _scrolledPast = 120.0;
 const _width = 800.0;
 const _shortHeight = 900.0;
@@ -349,8 +349,9 @@ void main() {
   testWidgets('shows the date and counts of a backup before replacing '
       'everything with it', (tester) async {
     final files = FakeBackupFiles()
-      ..picked = BackupCodec.encode(
-        Backup(
+      ..picked = utf8.encode(
+        BackupV2(
+          version: _versionWithMemory,
           exportedAt: DateTime(day.year, day.month, day.day, 12),
           matches: [memory.matches.first],
           ownCopies: const [],
@@ -359,7 +360,7 @@ void main() {
           links: [link('E-1', 'I-1')],
           barcodeLinks: const [],
           goals: const Goals(kilocalories: 2500),
-        ),
+        ).toJson(),
       );
     await pumpFujin(
       tester,
