@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Accepted. Sending is implemented as described in [0018](0018-send-flow.md), adding a food and undo as described in [0026](0026-adding-a-food.md), editing and deleting a logged food as described in [0043](0043-edit-and-delete-a-logged-food.md).
+Accepted. Sending is implemented as described in [0018](0018-send-flow.md), adding a food and undo as described in [0026](0026-adding-a-food.md), editing and deleting a logged food as described in [0043](0043-edit-and-delete-a-logged-food.md). [0044](0044-connector-model.md) writes Fūjin's database before both services, and writes MyFitnessPal and Ekklo in the background after an add.
 
 ## Context
 

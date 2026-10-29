@@ -4,7 +4,7 @@ Date: 2026-10-10
 
 ## Status
 
-Accepted. Implements the adding and undo parts of [0002](0002-write-ordering.md). The scanner (Figma section 03) and the search prefilled after a scan (02d) are built by [0027](0027-barcode-scanner.md). [0034](0034-remembered-foods-in-the-add-search.md) adds the remembered foods to the search and "Ajouter" to screen 19. [0043](0043-edit-and-delete-a-logged-food.md) moves the undo to `RemoveEntryService`, shared with the delete of a logged food.
+Accepted. Implements the adding and undo parts of [0002](0002-write-ordering.md). The scanner (Figma section 03) and the search prefilled after a scan (02d) are built by [0027](0027-barcode-scanner.md). [0034](0034-remembered-foods-in-the-add-search.md) adds the remembered foods to the search and "Ajouter" to screen 19. [0043](0043-edit-and-delete-a-logged-food.md) moves the undo to `RemoveEntryService`, shared with the delete of a logged food. [0044](0044-connector-model.md) saves the entry first and closes the fiche at once, MyFitnessPal and Ekklo being written in the background.
 
 ## Context
 

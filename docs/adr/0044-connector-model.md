@@ -1,0 +1,62 @@
+# 44. Connector model: Fūjin's entry at the centre
+
+Date: 2026-10-29
+
+## Status
+
+Accepted, not built. Extends [0001](0001-recompute-statuses-from-both-sides.md) from one bridge to every connector, amends [0002](0002-write-ordering.md) (Fūjin's database is written first), [0004](0004-one-sqlite-file.md) (a second, cache file; ids and stamps on owned rows), [0021](0021-backup-file.md) (version 3), [0026](0026-adding-a-food.md) (the add fiche closes at once), [0029](0029-journal-reads-held-for-display.md) (the Journal shows Fūjin's entries) and [0043](0043-edit-and-delete-a-logged-food.md) (known foods are logged and edited offline). The design note `docs/notes/connector-model.md` holds the owner's answers, the planned schema and the migration steps.
+
+## Context
+
+Fūjin keeps no diary of its own. Every table in `lib/data/database/schema.dart` but `goals` is keyed by a MyFitnessPal id or name (`memory_food.mfp_food_id`, `memory_meal.mfp_meal_name`, `sent_link.mfp_entry_id`, `unattended_item.mfp_entry_id`, `recent_food.mfp_food_id`, `memory_barcode.mfp_food_id`) and names the direction in its columns (`mfp_*` to `ekklo_*`). The Journal is the MyFitnessPal diary, and Ekklo receives it.
+
+The owner plans two more bridges, a workout bridge between Hevy and Ekklo and a client for his coach's Ekklo chat, and later a Fūjin that works with no external app, where each connected app unlocks a bridge. Data stays on one Android phone until then; the owner is the only user during the bridge phases. Fūjin's local data is small (ten remembered foods or fewer, by the owner's estimate on 2026-10-29), so the model can change now at little cost.
+
+Facts that shape the decision: a MyFitnessPal entry (`MfpFoodEntry` in `myfitnesspal_client`) carries an id, date, meal, servings, serving size, food and nutrients, and no creation or edit time; its id changes on every edit ([0001](0001-recompute-statuses-from-both-sides.md)). An Ekklo item has no free field. `ekklo_client` has no chat or workout resources yet. Hevy has a public API for Pro accounts with workout change events since a date.
+
+## Decision
+
+Storage:
+
+- Local-first. `fujin.db` is the source of truth; screens read it and writes land in it first, with or without network. A server, when one comes (a second device, or standalone for other users), is a sync layer behind the repositories, not a replacement for SQLite.
+- A second SQLite file, `fujin-cache.db`, holds what an external app can give again: the Ekklo chat, and later any read worth keeping across restarts. It is outside the backup file and outside the Auto Backup whitelist ([0005](0005-backup.md)), and can be deleted at any time. No transaction spans the two files.
+- Every row Fūjin owns gets a Fūjin id (UUIDv7), `updated_at`, and a soft delete (`deleted_at`).
+
+Model ([`GLOSSARY.md`](../../GLOSSARY.md): Entry, Food, Reference, Catalogue, Meal, Connector, Role, Bridge):
+
+- The Entry is Fūjin's own record of a food logged on a day: a Food, one of its serving sizes and a number of servings, in a Meal. Grams are derived from the serving size, never stored.
+- A Food keeps its own name, serving sizes and nutrients, copied from its catalogue, and one Reference per catalogue that knows it: base catalogue, MyFitnessPal (food id and version), Ekklo (matched food or own copy). Memory is the references, the meal mappings and the unit weights.
+- Fūjin has its own meal list, starting from the owner's MyFitnessPal meals; each connector maps Fūjin's meals to its own.
+- Catalogues: a base catalogue, always present and chosen when standalone is built (proposal: Ciqual inside the app, Open Food Facts online), and the catalogue a connector unlocks: MyFitnessPal does, Ekklo does not.
+
+Connectors:
+
+- A connector takes part in each domain (food, later workouts) with a Role: two-way, where an add, edit or deletion made in that app changes Fūjin's entries on the next read, or receive-only, where a change made there only changes that app's status. The owner sets the role per connector and domain in a setting, from the roles the connector can do. At most one two-way connector per domain; the data allows more. A change applies from the next read and rewrites nothing.
+- Food today: MyFitnessPal two-way, Ekklo receive-only.
+- The rules of [0001](0001-recompute-statuses-from-both-sides.md) hold for every connector: statuses are never stored but recomputed on each read from Fūjin's entries, that app's day and the links between them; there is no queue. Each link records what was written to that app, so a later change on either side shows as a status. Adoption, relink and drop run on each connector's side.
+- An entry that a two-way connector holds and Fūjin does not is copied into Fūjin on the read, with its Food created or found through its reference.
+- An entry deleted in a two-way connector is soft-deleted in Fūjin; a receive-only connector still holding it shows it "to remove", and the next reviewed send removes it there.
+- When an entry changed both in Fūjin and in a two-way connector since the last write, Fūjin's unwritten change wins and is written; a message tells the owner the app's edit was replaced. MyFitnessPal gives no edit time to decide otherwise.
+
+Writes:
+
+- Adding a food from Fūjin with network: the entry is saved, the fiche closes at once, then MyFitnessPal and Ekklo are written in the background, in the order of [0002](0002-write-ordering.md). The fiche stays the review of the Ekklo side, as in [0026](0026-adding-a-food.md). Until each write lands the row shows that app as pending; a failure shows as that app's status and a snackbar with "Réessayer".
+- Offline, a food Fūjin already knows (a recent, a remembered food, a catalogue on the phone) is logged, edited or deleted in Fūjin. MyFitnessPal is written by itself when the network comes back. Ekklo is written by itself only for an entry whose Ekklo side is remembered ("Mémorisé"); every other entry waits for "Envoyer vers Ekklo" and its review. Searching for a food Fūjin does not know needs the network.
+- The Journal shows a MyFitnessPal status only while an entry waits to be written there; the look goes through Figma before it is built.
+
+Migration and backup:
+
+- One migration builds the new tables from the current ones. Past days are copied into Fūjin the first time each is read, by the two-way rule above; there is no bulk read of MyFitnessPal. Send links and unattended items wait in their tables and become links of the day's new entries on that first read, through adoption.
+- The backup file moves to version 3. Versions 1 and 2 still import, converted by the migration's rules. Import still replaces and never merges.
+
+Deferred: the base catalogue; the workout flow between Hevy and Ekklo, and the chat, each in its own design built on this connector contract; a server and sync; users other than the owner.
+
+## Consequences
+
+- Fūjin works with any set of connectors, including none, without a second model to keep; disconnecting an app leaves the entries in Fūjin.
+- The Journal shows entries from `fujin.db` at once; the held reads of [0029](0029-journal-reads-held-for-display.md) keep serving the comparison with each app, not the display of the entries.
+- Logging no longer waits on the network for known foods. A pending write is an entry without a matching link, so nothing new tracks what is owed.
+- Every table, `compareDay`, the send flow, the add, edit and delete flows, the backup codec and their tests change. The tests keep their shape: real SQLite, doubles at the HTTP edge only ([0012](0012-test-doubles-at-process-edges.md)).
+- An edit made in the MyFitnessPal app while Fūjin holds an unwritten change of the same entry is lost, with a message.
+- A deletion made by mistake in MyFitnessPal reaches Ekklo only through a reviewed send.
+- Rows Fūjin owns can be synced later without a second migration of their identity: ids are Fūjin's, and every change and deletion has a time.

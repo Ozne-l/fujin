@@ -4,7 +4,7 @@ Date: 2026-10-13
 
 ## Status
 
-Accepted.
+Accepted. [0044](0044-connector-model.md) shows the Journal's entries from Fūjin's database; held reads keep serving the comparison with each app.
 
 ## Context
 

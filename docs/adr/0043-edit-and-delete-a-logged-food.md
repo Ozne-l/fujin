@@ -4,7 +4,7 @@ Date: 2026-10-28
 
 ## Status
 
-Accepted. Extends [0002](0002-write-ordering.md) to the edit and the delete of a logged food, moves the undo of [0026](0026-adding-a-food.md) to `RemoveEntryService`, and amends [0008](0008-theme-from-design-tokens.md) for the swipe's package motion. The design note `docs/notes/edit-and-delete-a-logged-food.md` holds the write plan, the halfway states and the owner's answers.
+Accepted. Extends [0002](0002-write-ordering.md) to the edit and the delete of a logged food, moves the undo of [0026](0026-adding-a-food.md) to `RemoveEntryService`, and amends [0008](0008-theme-from-design-tokens.md) for the swipe's package motion. The design note `docs/notes/edit-and-delete-a-logged-food.md` holds the write plan, the halfway states and the owner's answers. [0044](0044-connector-model.md) lets known foods be logged, edited and deleted offline, each app catching up when the network is back.
 
 ## Context
 
