@@ -1,5 +1,6 @@
 import 'package:fujin/data/database/fujin_database.dart';
-import 'package:fujin/data/database/fujin_table.dart';
+import 'package:fujin/data/foods/food_repository.dart';
+import 'package:fujin/data/meals/meal_repository.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/meal_mapping.dart';
 import 'package:fujin/data/memory/memory.dart';
@@ -7,104 +8,73 @@ import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
 
 final class MemoryRepository {
-  const MemoryRepository(this._database);
+  const MemoryRepository({
+    required this._database,
+    required this._foods,
+    required this._meals,
+  });
 
   final FujinDatabase _database;
+  final FoodRepository _foods;
+  final MealRepository _meals;
 
   Memory load() => Memory(
-    matches: [
-      for (final row in _database.select(
-        'SELECT * FROM memory_food ORDER BY mfp_description',
-      ))
-        MatchedFoodMapper.fromMap(row),
-    ],
-    ownCopies: [
-      for (final row in _database.select(
-        'SELECT * FROM memory_own_copy ORDER BY mfp_description, mfp_unit',
-      ))
-        OwnCopyMapper.fromMap(row),
-    ],
-    units: [
-      for (final row in _database.select(
-        'SELECT * FROM memory_unit ORDER BY mfp_food_id, mfp_unit',
-      ))
-        RememberedUnitMapper.fromMap(row),
-    ],
-    meals: [
-      for (final row in _database.select(
-        'SELECT * FROM memory_meal ORDER BY mfp_meal_name',
-      ))
-        MealMappingMapper.fromMap(row),
-    ],
-    barcodeLinks: [
-      for (final row in _database.select(
-        'SELECT * FROM memory_barcode ORDER BY barcode',
-      ))
-        BarcodeLinkMapper.fromMap(row),
-    ],
+    matches: _foods.matches(),
+    ownCopies: _foods.ownCopies(),
+    units: _foods.rememberedUnits(),
+    meals: _meals.mappings(),
+    barcodeLinks: _foods.barcodeLinks(),
   );
 
-  String? barcodeFood(String barcode) => switch (_database.select(
-    'SELECT * FROM memory_barcode WHERE barcode = ?',
-    [barcode],
-  )) {
-    [final row] => BarcodeLinkMapper.fromMap(row).mfpFoodId,
-    _ => null,
-  };
+  String? barcodeFood(String barcode) => _foods.barcodeFood(barcode);
 
-  void saveBarcodeLink(BarcodeLink link) => _database.upsert(
-    FujinTable.memoryBarcode,
-    link.toMap(),
-    key: const [_barcode],
+  void saveBarcodeLink(BarcodeLink link) => _database.transaction(
+    () => _foods.linkBarcode(link.barcode, _foods.mfpFood(link.mfpFoodId)),
   );
 
   void saveFood(RememberedFood food) => _database.transaction(() {
+    final foodId = _foods.mfpFood(food.mfpFoodId, name: food.mfpDescription);
     switch (food) {
       case OwnCopy():
-        _database
-          ..execute('DELETE FROM memory_food WHERE mfp_food_id = ?', [
-            food.mfpFoodId,
-          ])
-          ..upsert(
-            FujinTable.memoryOwnCopy,
-            food.toMap(),
-            key: const [_mfpFoodId, _mfpUnit],
-          );
+        _foods.ownCopy(
+          foodId,
+          ekkloFoodId: food.ekkloFoodId,
+          name: food.ekkloFoodName,
+          unit: food.mfpUnit,
+          version: food.mfpFoodVersion,
+        );
       case MatchedFood():
-        _database
-          ..execute('DELETE FROM memory_own_copy WHERE mfp_food_id = ?', [
-            food.mfpFoodId,
-          ])
-          ..upsert(
-            FujinTable.memoryFood,
-            food.toMap(),
-            key: const [_mfpFoodId],
-          );
+        _foods.match(
+          foodId,
+          ekkloFoodId: food.ekkloFoodId,
+          name: food.ekkloFoodName,
+        );
     }
   });
 
-  void forget(RememberedFood food) => switch (food) {
-    OwnCopy() => _database.execute(
-      'DELETE FROM memory_own_copy WHERE mfp_food_id = ? AND mfp_unit = ?',
-      [food.mfpFoodId, food.mfpUnit],
+  void forget(RememberedFood food) {
+    if (_foods.foodOfMfp(food.mfpFoodId) case final foodId?) {
+      switch (food) {
+        case OwnCopy():
+          _foods.forgetOwnCopy(foodId, food.mfpUnit);
+        case MatchedFood():
+          _foods.forgetMatch(foodId);
+      }
+    }
+  }
+
+  void saveUnit(RememberedUnit unit) => switch (_foods.foodOfMfp(
+    unit.mfpFoodId,
+  )) {
+    final foodId? when _foods.isMatched(foodId) => _foods.saveUnit(
+      foodId,
+      unit.mfpUnit,
+      unit.grams,
     ),
-    MatchedFood() => _database.execute(
-      'DELETE FROM memory_food WHERE mfp_food_id = ?',
-      [food.mfpFoodId],
-    ),
+    _ => throw StateError('a unit weight needs a matched food'),
   };
 
-  void saveUnit(RememberedUnit unit) => _database.upsert(
-    FujinTable.memoryUnit,
-    unit.toMap(),
-    key: const [_mfpFoodId, _mfpUnit],
-  );
-
-  void saveMeal(MealMapping meal) => _database.upsert(
-    FujinTable.memoryMeal,
-    meal.toMap(),
-    key: const [_mfpMealName],
-  );
+  void saveMeal(MealMapping meal) => _meals.map(meal);
 
   void remember({
     required Iterable<MealMapping> meals,
@@ -117,26 +87,17 @@ final class MemoryRepository {
   });
 
   void clear() => _database.transaction(() {
-    _database
-      ..execute('DELETE FROM memory_unit')
-      ..execute('DELETE FROM memory_food')
-      ..execute('DELETE FROM memory_own_copy')
-      ..execute('DELETE FROM memory_meal')
-      ..execute('DELETE FROM memory_barcode');
+    _foods.forgetMemory();
+    _meals.forgetEkkloMappings();
   });
 
-  void replace(Memory memory) => _database.transaction(() {
-    clear();
+  void restore(Memory memory) => _database.transaction(() {
     remember(
-      meals: memory.meals,
+      meals: [...memory.meals]
+        ..sort((a, b) => a.mfpMealName.compareTo(b.mfpMealName)),
       foods: [...memory.matches, ...memory.ownCopies],
       units: memory.units,
     );
     memory.barcodeLinks.forEach(saveBarcodeLink);
   });
-
-  static const _mfpFoodId = 'mfp_food_id';
-  static const _mfpUnit = 'mfp_unit';
-  static const _mfpMealName = 'mfp_meal_name';
-  static const _barcode = 'barcode';
 }

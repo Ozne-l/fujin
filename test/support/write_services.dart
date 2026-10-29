@@ -1,8 +1,6 @@
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
-import 'package:fujin/data/memory/memory_repository.dart';
-import 'package:fujin/data/recents/recent_food_repository.dart';
 import 'package:fujin/data/unattended/unattended_item_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_food_service.dart';
@@ -18,6 +16,7 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import 'fake_backends.dart';
 import 'fixtures.dart';
+import 'repositories.dart';
 
 final class WriteServices {
   WriteServices._(
@@ -46,7 +45,7 @@ final class WriteServices {
       client: httpClient,
     );
     final links = SentLinkRepository(database);
-    final memoryRepository = MemoryRepository(database);
+    final memoryRepository = memoryOf(database);
     final unattended = UnattendedItemRepository(database);
     final journal = JournalService(
       mfp: mfp,
@@ -75,7 +74,8 @@ final class WriteServices {
         ekklo: ekklo,
         sending: sending,
         memory: memoryRepository,
-        recents: RecentFoodRepository(database),
+        foods: foodsOf(database),
+        recents: recentsOf(database),
         clock: clock ?? () => now,
       ),
       RemoveEntryService(mfp: mfp, journal: journal, sending: sending),
@@ -85,6 +85,7 @@ final class WriteServices {
         journal: journal,
         sending: sending,
         memory: memoryRepository,
+        foods: foodsOf(database),
       ),
     );
   }

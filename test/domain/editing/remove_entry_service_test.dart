@@ -1,7 +1,6 @@
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart' show setUp, tearDown, test;
 import 'package:fujin/data/database/fujin_database.dart';
-import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_outcome.dart';
 import 'package:fujin/domain/adding/added_food.dart';
@@ -13,6 +12,7 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../../support/fake_backends.dart';
 import '../../support/fixtures.dart';
+import '../../support/repositories.dart';
 import '../../support/write_services.dart';
 
 final MfpFood _basmati = mfpFood(
@@ -39,7 +39,7 @@ void main() {
 
   setUp(() {
     database = FujinDatabase.inMemory();
-    final memoryRepository = MemoryRepository(database);
+    final memoryRepository = memoryOf(database);
     memory.matches.forEach(memoryRepository.saveFood);
     memory.units.forEach(memoryRepository.saveUnit);
     memory.meals.forEach(memoryRepository.saveMeal);

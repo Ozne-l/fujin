@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart'
 import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/http/read_only_http_client.dart';
-import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_outcome.dart';
 import 'package:fujin/domain/adding/added_food.dart';
@@ -17,6 +16,7 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../../support/fake_backends.dart';
 import '../../support/fixtures.dart';
+import '../../support/repositories.dart';
 import '../../support/write_services.dart';
 
 const _hundredGrams = MfpServingSize(
@@ -51,7 +51,7 @@ void main() {
 
   setUp(() {
     database = FujinDatabase.inMemory();
-    final memoryRepository = MemoryRepository(database);
+    final memoryRepository = memoryOf(database);
     memory.matches.forEach(memoryRepository.saveFood);
     memory.units.forEach(memoryRepository.saveUnit);
     memory.meals.forEach(memoryRepository.saveMeal);

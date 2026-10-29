@@ -7,12 +7,10 @@ import 'package:fujin/app/providers.dart';
 import 'package:fujin/data/backup/backup_files.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/goals/goals.dart';
-import 'package:fujin/data/goals/goals_repository.dart';
 import 'package:fujin/data/http/read_only_http_client.dart';
 import 'package:fujin/data/links/sent_link.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
-import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
 import 'package:fujin/pages/scanner/scan_camera.dart';
@@ -25,6 +23,7 @@ import 'fake_backup_files.dart';
 import 'fake_scan_camera.dart';
 import 'fixtures.dart';
 import 'in_memory_preferences.dart';
+import 'repositories.dart';
 
 const appVersion = '0.1.0';
 
@@ -49,14 +48,14 @@ Future<void> pumpFujin(
   addTearDown(tester.platformDispatcher.clearLocalesTestValue);
   final database = FujinDatabase.inMemory();
   addTearDown(database.close);
-  final memoryRepository = MemoryRepository(database);
+  final memoryRepository = memoryOf(database);
   memory.matches.forEach(memoryRepository.saveFood);
   memory.meals.forEach(memoryRepository.saveMeal);
   ownCopies.forEach(memoryRepository.saveFood);
   units.forEach(memoryRepository.saveUnit);
   barcodeLinks.forEach(memoryRepository.saveBarcodeLink);
   links.forEach(SentLinkRepository(database).add);
-  GoalsRepository(database).replace(goals);
+  goalsOf(database).replace(goals);
   final httpClient = switch (environment) {
     AppEnvironment.production => backends.httpClient,
     AppEnvironment.dev => ReadOnlyHttpClient(

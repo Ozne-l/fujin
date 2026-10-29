@@ -15,12 +15,9 @@ class BackupMapper extends ClassMapperBase<Backup> {
   static BackupMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = BackupMapper._());
-      MatchedFoodMapper.ensureInitialized();
-      OwnCopyMapper.ensureInitialized();
-      RememberedUnitMapper.ensureInitialized();
-      MealMappingMapper.ensureInitialized();
+      BackupV3Mapper.ensureInitialized();
+      BackupV2Mapper.ensureInitialized();
       SentLinkMapper.ensureInitialized();
-      BarcodeLinkMapper.ensureInitialized();
       GoalsMapper.ensureInitialized();
     }
     return _instance!;
@@ -35,35 +32,10 @@ class BackupMapper extends ClassMapperBase<Backup> {
     _$exportedAt,
     key: r'exported_at',
   );
-  static List<MatchedFood> _$matches(Backup v) => v.matches;
-  static const Field<Backup, List<MatchedFood>> _f$matches = Field(
-    'matches',
-    _$matches,
-  );
-  static List<OwnCopy> _$ownCopies(Backup v) => v.ownCopies;
-  static const Field<Backup, List<OwnCopy>> _f$ownCopies = Field(
-    'ownCopies',
-    _$ownCopies,
-    key: r'own_copies',
-  );
-  static List<RememberedUnit> _$units(Backup v) => v.units;
-  static const Field<Backup, List<RememberedUnit>> _f$units = Field(
-    'units',
-    _$units,
-  );
-  static List<MealMapping> _$meals(Backup v) => v.meals;
-  static const Field<Backup, List<MealMapping>> _f$meals = Field(
-    'meals',
-    _$meals,
-  );
   static List<SentLink> _$links(Backup v) => v.links;
   static const Field<Backup, List<SentLink>> _f$links = Field('links', _$links);
-  static List<BarcodeLink> _$barcodeLinks(Backup v) => v.barcodeLinks;
-  static const Field<Backup, List<BarcodeLink>> _f$barcodeLinks = Field(
-    'barcodeLinks',
-    _$barcodeLinks,
-    key: r'barcode_links',
-  );
+  static int _$version(Backup v) => v.version;
+  static const Field<Backup, int> _f$version = Field('version', _$version);
   static Goals? _$goals(Backup v) => v.goals;
   static const Field<Backup, Goals> _f$goals = Field(
     'goals',
@@ -77,43 +49,20 @@ class BackupMapper extends ClassMapperBase<Backup> {
     opt: true,
     def: Backup.formatName,
   );
-  static int _$version(Backup v) => v.version;
-  static const Field<Backup, int> _f$version = Field(
-    'version',
-    _$version,
-    opt: true,
-    def: Backup.currentVersion,
-  );
 
   @override
   final MappableFields<Backup> fields = const {
     #exportedAt: _f$exportedAt,
-    #matches: _f$matches,
-    #ownCopies: _f$ownCopies,
-    #units: _f$units,
-    #meals: _f$meals,
     #links: _f$links,
-    #barcodeLinks: _f$barcodeLinks,
+    #version: _f$version,
     #goals: _f$goals,
     #format: _f$format,
-    #version: _f$version,
   };
   @override
   final bool ignoreNull = true;
 
   static Backup _instantiate(DecodingData data) {
-    return Backup(
-      exportedAt: data.dec(_f$exportedAt),
-      matches: data.dec(_f$matches),
-      ownCopies: data.dec(_f$ownCopies),
-      units: data.dec(_f$units),
-      meals: data.dec(_f$meals),
-      links: data.dec(_f$links),
-      barcodeLinks: data.dec(_f$barcodeLinks),
-      goals: data.dec(_f$goals),
-      format: data.dec(_f$format),
-      version: data.dec(_f$version),
-    );
+    throw MapperException.missingConstructor('Backup');
   }
 
   @override
@@ -129,39 +78,561 @@ class BackupMapper extends ClassMapperBase<Backup> {
 }
 
 mixin BackupMappable {
-  String toJson() {
-    return BackupMapper.ensureInitialized().encodeJson<Backup>(this as Backup);
-  }
-
-  Map<String, dynamic> toMap() {
-    return BackupMapper.ensureInitialized().encodeMap<Backup>(this as Backup);
-  }
-
-  BackupCopyWith<Backup, Backup, Backup> get copyWith =>
-      _BackupCopyWithImpl<Backup, Backup>(this as Backup, $identity, $identity);
-  @override
-  String toString() {
-    return BackupMapper.ensureInitialized().stringifyValue(this as Backup);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return BackupMapper.ensureInitialized().equalsValue(this as Backup, other);
-  }
-
-  @override
-  int get hashCode {
-    return BackupMapper.ensureInitialized().hashValue(this as Backup);
-  }
-}
-
-extension BackupValueCopy<$R, $Out> on ObjectCopyWith<$R, Backup, $Out> {
-  BackupCopyWith<$R, Backup, $Out> get $asBackup =>
-      $base.as((v, t, t2) => _BackupCopyWithImpl<$R, $Out>(v, t, t2));
+  String toJson();
+  Map<String, dynamic> toMap();
+  BackupCopyWith<Backup, Backup, Backup> get copyWith;
 }
 
 abstract class BackupCopyWith<$R, $In extends Backup, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
+  ListCopyWith<$R, SentLink, SentLinkCopyWith<$R, SentLink, SentLink>>
+  get links;
+  GoalsCopyWith<$R, Goals, Goals>? get goals;
+  $R call({
+    DateTime? exportedAt,
+    List<SentLink>? links,
+    int? version,
+    Goals? goals,
+    String? format,
+  });
+  BackupCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class BackupV3Mapper extends ClassMapperBase<BackupV3> {
+  BackupV3Mapper._();
+
+  static BackupV3Mapper? _instance;
+  static BackupV3Mapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = BackupV3Mapper._());
+      BackupMapper.ensureInitialized();
+      SentLinkMapper.ensureInitialized();
+      FoodMapper.ensureInitialized();
+      FoodServingMapper.ensureInitialized();
+      FoodUnitMapper.ensureInitialized();
+      FoodReferenceMapper.ensureInitialized();
+      FoodBarcodeMapper.ensureInitialized();
+      MealMapper.ensureInitialized();
+      ConnectorMealMapper.ensureInitialized();
+      GoalsMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'BackupV3';
+
+  static DateTime _$exportedAt(BackupV3 v) => v.exportedAt;
+  static const Field<BackupV3, DateTime> _f$exportedAt = Field(
+    'exportedAt',
+    _$exportedAt,
+    key: r'exported_at',
+  );
+  static List<SentLink> _$links(BackupV3 v) => v.links;
+  static const Field<BackupV3, List<SentLink>> _f$links = Field(
+    'links',
+    _$links,
+  );
+  static List<Food> _$foods(BackupV3 v) => v.foods;
+  static const Field<BackupV3, List<Food>> _f$foods = Field('foods', _$foods);
+  static List<FoodServing> _$foodServings(BackupV3 v) => v.foodServings;
+  static const Field<BackupV3, List<FoodServing>> _f$foodServings = Field(
+    'foodServings',
+    _$foodServings,
+    key: r'food_servings',
+  );
+  static List<FoodUnit> _$foodUnits(BackupV3 v) => v.foodUnits;
+  static const Field<BackupV3, List<FoodUnit>> _f$foodUnits = Field(
+    'foodUnits',
+    _$foodUnits,
+    key: r'food_units',
+  );
+  static List<FoodReference> _$foodReferences(BackupV3 v) => v.foodReferences;
+  static const Field<BackupV3, List<FoodReference>> _f$foodReferences = Field(
+    'foodReferences',
+    _$foodReferences,
+    key: r'food_references',
+  );
+  static List<FoodBarcode> _$barcodeLinks(BackupV3 v) => v.barcodeLinks;
+  static const Field<BackupV3, List<FoodBarcode>> _f$barcodeLinks = Field(
+    'barcodeLinks',
+    _$barcodeLinks,
+    key: r'barcode_links',
+  );
+  static List<Meal> _$meals(BackupV3 v) => v.meals;
+  static const Field<BackupV3, List<Meal>> _f$meals = Field('meals', _$meals);
+  static List<ConnectorMeal> _$mealMappings(BackupV3 v) => v.mealMappings;
+  static const Field<BackupV3, List<ConnectorMeal>> _f$mealMappings = Field(
+    'mealMappings',
+    _$mealMappings,
+    key: r'meal_mappings',
+  );
+  static Goals? _$goals(BackupV3 v) => v.goals;
+  static const Field<BackupV3, Goals> _f$goals = Field(
+    'goals',
+    _$goals,
+    opt: true,
+  );
+  static String _$format(BackupV3 v) => v.format;
+  static const Field<BackupV3, String> _f$format = Field(
+    'format',
+    _$format,
+    opt: true,
+    def: Backup.formatName,
+  );
+  static int _$version(BackupV3 v) => v.version;
+  static const Field<BackupV3, int> _f$version = Field(
+    'version',
+    _$version,
+    opt: true,
+    def: BackupV3.currentVersion,
+  );
+
+  @override
+  final MappableFields<BackupV3> fields = const {
+    #exportedAt: _f$exportedAt,
+    #links: _f$links,
+    #foods: _f$foods,
+    #foodServings: _f$foodServings,
+    #foodUnits: _f$foodUnits,
+    #foodReferences: _f$foodReferences,
+    #barcodeLinks: _f$barcodeLinks,
+    #meals: _f$meals,
+    #mealMappings: _f$mealMappings,
+    #goals: _f$goals,
+    #format: _f$format,
+    #version: _f$version,
+  };
+  @override
+  final bool ignoreNull = true;
+
+  static BackupV3 _instantiate(DecodingData data) {
+    return BackupV3(
+      exportedAt: data.dec(_f$exportedAt),
+      links: data.dec(_f$links),
+      foods: data.dec(_f$foods),
+      foodServings: data.dec(_f$foodServings),
+      foodUnits: data.dec(_f$foodUnits),
+      foodReferences: data.dec(_f$foodReferences),
+      barcodeLinks: data.dec(_f$barcodeLinks),
+      meals: data.dec(_f$meals),
+      mealMappings: data.dec(_f$mealMappings),
+      goals: data.dec(_f$goals),
+      format: data.dec(_f$format),
+      version: data.dec(_f$version),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static BackupV3 fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<BackupV3>(map);
+  }
+
+  static BackupV3 fromJson(String json) {
+    return ensureInitialized().decodeJson<BackupV3>(json);
+  }
+}
+
+mixin BackupV3Mappable {
+  String toJson() {
+    return BackupV3Mapper.ensureInitialized().encodeJson<BackupV3>(
+      this as BackupV3,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return BackupV3Mapper.ensureInitialized().encodeMap<BackupV3>(
+      this as BackupV3,
+    );
+  }
+
+  BackupV3CopyWith<BackupV3, BackupV3, BackupV3> get copyWith =>
+      _BackupV3CopyWithImpl<BackupV3, BackupV3>(
+        this as BackupV3,
+        $identity,
+        $identity,
+      );
+  @override
+  String toString() {
+    return BackupV3Mapper.ensureInitialized().stringifyValue(this as BackupV3);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return BackupV3Mapper.ensureInitialized().equalsValue(
+      this as BackupV3,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return BackupV3Mapper.ensureInitialized().hashValue(this as BackupV3);
+  }
+}
+
+extension BackupV3ValueCopy<$R, $Out> on ObjectCopyWith<$R, BackupV3, $Out> {
+  BackupV3CopyWith<$R, BackupV3, $Out> get $asBackupV3 =>
+      $base.as((v, t, t2) => _BackupV3CopyWithImpl<$R, $Out>(v, t, t2));
+}
+
+abstract class BackupV3CopyWith<$R, $In extends BackupV3, $Out>
+    implements BackupCopyWith<$R, $In, $Out> {
+  @override
+  ListCopyWith<$R, SentLink, SentLinkCopyWith<$R, SentLink, SentLink>>
+  get links;
+  ListCopyWith<$R, Food, FoodCopyWith<$R, Food, Food>> get foods;
+  ListCopyWith<
+    $R,
+    FoodServing,
+    FoodServingCopyWith<$R, FoodServing, FoodServing>
+  >
+  get foodServings;
+  ListCopyWith<$R, FoodUnit, FoodUnitCopyWith<$R, FoodUnit, FoodUnit>>
+  get foodUnits;
+  ListCopyWith<
+    $R,
+    FoodReference,
+    FoodReferenceCopyWith<$R, FoodReference, FoodReference>
+  >
+  get foodReferences;
+  ListCopyWith<
+    $R,
+    FoodBarcode,
+    FoodBarcodeCopyWith<$R, FoodBarcode, FoodBarcode>
+  >
+  get barcodeLinks;
+  ListCopyWith<$R, Meal, MealCopyWith<$R, Meal, Meal>> get meals;
+  ListCopyWith<
+    $R,
+    ConnectorMeal,
+    ConnectorMealCopyWith<$R, ConnectorMeal, ConnectorMeal>
+  >
+  get mealMappings;
+  @override
+  GoalsCopyWith<$R, Goals, Goals>? get goals;
+  @override
+  $R call({
+    DateTime? exportedAt,
+    List<SentLink>? links,
+    List<Food>? foods,
+    List<FoodServing>? foodServings,
+    List<FoodUnit>? foodUnits,
+    List<FoodReference>? foodReferences,
+    List<FoodBarcode>? barcodeLinks,
+    List<Meal>? meals,
+    List<ConnectorMeal>? mealMappings,
+    Goals? goals,
+    String? format,
+    int? version,
+  });
+  BackupV3CopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _BackupV3CopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, BackupV3, $Out>
+    implements BackupV3CopyWith<$R, BackupV3, $Out> {
+  _BackupV3CopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<BackupV3> $mapper =
+      BackupV3Mapper.ensureInitialized();
+  @override
+  ListCopyWith<$R, SentLink, SentLinkCopyWith<$R, SentLink, SentLink>>
+  get links => ListCopyWith(
+    $value.links,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(links: v),
+  );
+  @override
+  ListCopyWith<$R, Food, FoodCopyWith<$R, Food, Food>> get foods =>
+      ListCopyWith(
+        $value.foods,
+        (v, t) => v.copyWith.$chain(t),
+        (v) => call(foods: v),
+      );
+  @override
+  ListCopyWith<
+    $R,
+    FoodServing,
+    FoodServingCopyWith<$R, FoodServing, FoodServing>
+  >
+  get foodServings => ListCopyWith(
+    $value.foodServings,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(foodServings: v),
+  );
+  @override
+  ListCopyWith<$R, FoodUnit, FoodUnitCopyWith<$R, FoodUnit, FoodUnit>>
+  get foodUnits => ListCopyWith(
+    $value.foodUnits,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(foodUnits: v),
+  );
+  @override
+  ListCopyWith<
+    $R,
+    FoodReference,
+    FoodReferenceCopyWith<$R, FoodReference, FoodReference>
+  >
+  get foodReferences => ListCopyWith(
+    $value.foodReferences,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(foodReferences: v),
+  );
+  @override
+  ListCopyWith<
+    $R,
+    FoodBarcode,
+    FoodBarcodeCopyWith<$R, FoodBarcode, FoodBarcode>
+  >
+  get barcodeLinks => ListCopyWith(
+    $value.barcodeLinks,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(barcodeLinks: v),
+  );
+  @override
+  ListCopyWith<$R, Meal, MealCopyWith<$R, Meal, Meal>> get meals =>
+      ListCopyWith(
+        $value.meals,
+        (v, t) => v.copyWith.$chain(t),
+        (v) => call(meals: v),
+      );
+  @override
+  ListCopyWith<
+    $R,
+    ConnectorMeal,
+    ConnectorMealCopyWith<$R, ConnectorMeal, ConnectorMeal>
+  >
+  get mealMappings => ListCopyWith(
+    $value.mealMappings,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(mealMappings: v),
+  );
+  @override
+  GoalsCopyWith<$R, Goals, Goals>? get goals =>
+      $value.goals?.copyWith.$chain((v) => call(goals: v));
+  @override
+  $R call({
+    DateTime? exportedAt,
+    List<SentLink>? links,
+    List<Food>? foods,
+    List<FoodServing>? foodServings,
+    List<FoodUnit>? foodUnits,
+    List<FoodReference>? foodReferences,
+    List<FoodBarcode>? barcodeLinks,
+    List<Meal>? meals,
+    List<ConnectorMeal>? mealMappings,
+    Object? goals = $none,
+    String? format,
+    int? version,
+  }) => $apply(
+    FieldCopyWithData({
+      if (exportedAt != null) #exportedAt: exportedAt,
+      if (links != null) #links: links,
+      if (foods != null) #foods: foods,
+      if (foodServings != null) #foodServings: foodServings,
+      if (foodUnits != null) #foodUnits: foodUnits,
+      if (foodReferences != null) #foodReferences: foodReferences,
+      if (barcodeLinks != null) #barcodeLinks: barcodeLinks,
+      if (meals != null) #meals: meals,
+      if (mealMappings != null) #mealMappings: mealMappings,
+      if (goals != $none) #goals: goals,
+      if (format != null) #format: format,
+      if (version != null) #version: version,
+    }),
+  );
+  @override
+  BackupV3 $make(CopyWithData data) => BackupV3(
+    exportedAt: data.get(#exportedAt, or: $value.exportedAt),
+    links: data.get(#links, or: $value.links),
+    foods: data.get(#foods, or: $value.foods),
+    foodServings: data.get(#foodServings, or: $value.foodServings),
+    foodUnits: data.get(#foodUnits, or: $value.foodUnits),
+    foodReferences: data.get(#foodReferences, or: $value.foodReferences),
+    barcodeLinks: data.get(#barcodeLinks, or: $value.barcodeLinks),
+    meals: data.get(#meals, or: $value.meals),
+    mealMappings: data.get(#mealMappings, or: $value.mealMappings),
+    goals: data.get(#goals, or: $value.goals),
+    format: data.get(#format, or: $value.format),
+    version: data.get(#version, or: $value.version),
+  );
+
+  @override
+  BackupV3CopyWith<$R2, BackupV3, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _BackupV3CopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
+class BackupV2Mapper extends ClassMapperBase<BackupV2> {
+  BackupV2Mapper._();
+
+  static BackupV2Mapper? _instance;
+  static BackupV2Mapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = BackupV2Mapper._());
+      BackupMapper.ensureInitialized();
+      SentLinkMapper.ensureInitialized();
+      MatchedFoodMapper.ensureInitialized();
+      OwnCopyMapper.ensureInitialized();
+      RememberedUnitMapper.ensureInitialized();
+      MealMappingMapper.ensureInitialized();
+      BarcodeLinkMapper.ensureInitialized();
+      GoalsMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'BackupV2';
+
+  static DateTime _$exportedAt(BackupV2 v) => v.exportedAt;
+  static const Field<BackupV2, DateTime> _f$exportedAt = Field(
+    'exportedAt',
+    _$exportedAt,
+    key: r'exported_at',
+  );
+  static List<SentLink> _$links(BackupV2 v) => v.links;
+  static const Field<BackupV2, List<SentLink>> _f$links = Field(
+    'links',
+    _$links,
+  );
+  static int _$version(BackupV2 v) => v.version;
+  static const Field<BackupV2, int> _f$version = Field('version', _$version);
+  static List<MatchedFood> _$matches(BackupV2 v) => v.matches;
+  static const Field<BackupV2, List<MatchedFood>> _f$matches = Field(
+    'matches',
+    _$matches,
+  );
+  static List<OwnCopy> _$ownCopies(BackupV2 v) => v.ownCopies;
+  static const Field<BackupV2, List<OwnCopy>> _f$ownCopies = Field(
+    'ownCopies',
+    _$ownCopies,
+    key: r'own_copies',
+  );
+  static List<RememberedUnit> _$units(BackupV2 v) => v.units;
+  static const Field<BackupV2, List<RememberedUnit>> _f$units = Field(
+    'units',
+    _$units,
+  );
+  static List<MealMapping> _$meals(BackupV2 v) => v.meals;
+  static const Field<BackupV2, List<MealMapping>> _f$meals = Field(
+    'meals',
+    _$meals,
+  );
+  static List<BarcodeLink> _$barcodeLinks(BackupV2 v) => v.barcodeLinks;
+  static const Field<BackupV2, List<BarcodeLink>> _f$barcodeLinks = Field(
+    'barcodeLinks',
+    _$barcodeLinks,
+    key: r'barcode_links',
+  );
+  static Goals? _$goals(BackupV2 v) => v.goals;
+  static const Field<BackupV2, Goals> _f$goals = Field(
+    'goals',
+    _$goals,
+    opt: true,
+  );
+  static String _$format(BackupV2 v) => v.format;
+  static const Field<BackupV2, String> _f$format = Field(
+    'format',
+    _$format,
+    opt: true,
+    def: Backup.formatName,
+  );
+
+  @override
+  final MappableFields<BackupV2> fields = const {
+    #exportedAt: _f$exportedAt,
+    #links: _f$links,
+    #version: _f$version,
+    #matches: _f$matches,
+    #ownCopies: _f$ownCopies,
+    #units: _f$units,
+    #meals: _f$meals,
+    #barcodeLinks: _f$barcodeLinks,
+    #goals: _f$goals,
+    #format: _f$format,
+  };
+  @override
+  final bool ignoreNull = true;
+
+  static BackupV2 _instantiate(DecodingData data) {
+    return BackupV2(
+      exportedAt: data.dec(_f$exportedAt),
+      links: data.dec(_f$links),
+      version: data.dec(_f$version),
+      matches: data.dec(_f$matches),
+      ownCopies: data.dec(_f$ownCopies),
+      units: data.dec(_f$units),
+      meals: data.dec(_f$meals),
+      barcodeLinks: data.dec(_f$barcodeLinks),
+      goals: data.dec(_f$goals),
+      format: data.dec(_f$format),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static BackupV2 fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<BackupV2>(map);
+  }
+
+  static BackupV2 fromJson(String json) {
+    return ensureInitialized().decodeJson<BackupV2>(json);
+  }
+}
+
+mixin BackupV2Mappable {
+  String toJson() {
+    return BackupV2Mapper.ensureInitialized().encodeJson<BackupV2>(
+      this as BackupV2,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return BackupV2Mapper.ensureInitialized().encodeMap<BackupV2>(
+      this as BackupV2,
+    );
+  }
+
+  BackupV2CopyWith<BackupV2, BackupV2, BackupV2> get copyWith =>
+      _BackupV2CopyWithImpl<BackupV2, BackupV2>(
+        this as BackupV2,
+        $identity,
+        $identity,
+      );
+  @override
+  String toString() {
+    return BackupV2Mapper.ensureInitialized().stringifyValue(this as BackupV2);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return BackupV2Mapper.ensureInitialized().equalsValue(
+      this as BackupV2,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return BackupV2Mapper.ensureInitialized().hashValue(this as BackupV2);
+  }
+}
+
+extension BackupV2ValueCopy<$R, $Out> on ObjectCopyWith<$R, BackupV2, $Out> {
+  BackupV2CopyWith<$R, BackupV2, $Out> get $asBackupV2 =>
+      $base.as((v, t, t2) => _BackupV2CopyWithImpl<$R, $Out>(v, t, t2));
+}
+
+abstract class BackupV2CopyWith<$R, $In extends BackupV2, $Out>
+    implements BackupCopyWith<$R, $In, $Out> {
+  @override
+  ListCopyWith<$R, SentLink, SentLinkCopyWith<$R, SentLink, SentLink>>
+  get links;
   ListCopyWith<
     $R,
     MatchedFood,
@@ -182,36 +653,45 @@ abstract class BackupCopyWith<$R, $In extends Backup, $Out>
     MealMappingCopyWith<$R, MealMapping, MealMapping>
   >
   get meals;
-  ListCopyWith<$R, SentLink, SentLinkCopyWith<$R, SentLink, SentLink>>
-  get links;
   ListCopyWith<
     $R,
     BarcodeLink,
     BarcodeLinkCopyWith<$R, BarcodeLink, BarcodeLink>
   >
   get barcodeLinks;
+  @override
   GoalsCopyWith<$R, Goals, Goals>? get goals;
+  @override
   $R call({
     DateTime? exportedAt,
+    List<SentLink>? links,
+    int? version,
     List<MatchedFood>? matches,
     List<OwnCopy>? ownCopies,
     List<RememberedUnit>? units,
     List<MealMapping>? meals,
-    List<SentLink>? links,
     List<BarcodeLink>? barcodeLinks,
     Goals? goals,
     String? format,
-    int? version,
   });
-  BackupCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+  BackupV2CopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class _BackupCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Backup, $Out>
-    implements BackupCopyWith<$R, Backup, $Out> {
-  _BackupCopyWithImpl(super.value, super.then, super.then2);
+class _BackupV2CopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, BackupV2, $Out>
+    implements BackupV2CopyWith<$R, BackupV2, $Out> {
+  _BackupV2CopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final ClassMapperBase<Backup> $mapper = BackupMapper.ensureInitialized();
+  late final ClassMapperBase<BackupV2> $mapper =
+      BackupV2Mapper.ensureInitialized();
+  @override
+  ListCopyWith<$R, SentLink, SentLinkCopyWith<$R, SentLink, SentLink>>
+  get links => ListCopyWith(
+    $value.links,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(links: v),
+  );
   @override
   ListCopyWith<
     $R,
@@ -253,13 +733,6 @@ class _BackupCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Backup, $Out>
     (v) => call(meals: v),
   );
   @override
-  ListCopyWith<$R, SentLink, SentLinkCopyWith<$R, SentLink, SentLink>>
-  get links => ListCopyWith(
-    $value.links,
-    (v, t) => v.copyWith.$chain(t),
-    (v) => call(links: v),
-  );
-  @override
   ListCopyWith<
     $R,
     BarcodeLink,
@@ -276,45 +749,46 @@ class _BackupCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Backup, $Out>
   @override
   $R call({
     DateTime? exportedAt,
+    List<SentLink>? links,
+    int? version,
     List<MatchedFood>? matches,
     List<OwnCopy>? ownCopies,
     List<RememberedUnit>? units,
     List<MealMapping>? meals,
-    List<SentLink>? links,
     List<BarcodeLink>? barcodeLinks,
     Object? goals = $none,
     String? format,
-    int? version,
   }) => $apply(
     FieldCopyWithData({
       if (exportedAt != null) #exportedAt: exportedAt,
+      if (links != null) #links: links,
+      if (version != null) #version: version,
       if (matches != null) #matches: matches,
       if (ownCopies != null) #ownCopies: ownCopies,
       if (units != null) #units: units,
       if (meals != null) #meals: meals,
-      if (links != null) #links: links,
       if (barcodeLinks != null) #barcodeLinks: barcodeLinks,
       if (goals != $none) #goals: goals,
       if (format != null) #format: format,
-      if (version != null) #version: version,
     }),
   );
   @override
-  Backup $make(CopyWithData data) => Backup(
+  BackupV2 $make(CopyWithData data) => BackupV2(
     exportedAt: data.get(#exportedAt, or: $value.exportedAt),
+    links: data.get(#links, or: $value.links),
+    version: data.get(#version, or: $value.version),
     matches: data.get(#matches, or: $value.matches),
     ownCopies: data.get(#ownCopies, or: $value.ownCopies),
     units: data.get(#units, or: $value.units),
     meals: data.get(#meals, or: $value.meals),
-    links: data.get(#links, or: $value.links),
     barcodeLinks: data.get(#barcodeLinks, or: $value.barcodeLinks),
     goals: data.get(#goals, or: $value.goals),
     format: data.get(#format, or: $value.format),
-    version: data.get(#version, or: $value.version),
   );
 
   @override
-  BackupCopyWith<$R2, Backup, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _BackupCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  BackupV2CopyWith<$R2, BackupV2, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _BackupV2CopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
