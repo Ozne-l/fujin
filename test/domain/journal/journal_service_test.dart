@@ -103,7 +103,7 @@ void main() {
         .equals('I-1');
     check(linkedItemOf('E-1')).equals('I-1');
     check(second.comparison.changes.addedEkkloLinks).isEmpty();
-    check(second.counts.inEkklo).equals(1);
+    check(second.counts().inEkklo).equals(1);
   });
 
   test('forgets the link of an item deleted in Ekklo', () async {
@@ -275,7 +275,7 @@ void main() {
       final read = journal.journalOf(day, diary: diary, meals: meals);
       check(read)
           .isA<BothSides>()
-          .has((read) => read.day.counts.inEkklo, 'in Ekklo')
+          .has((read) => read.day.counts().inEkklo, 'in Ekklo')
           .equals(1);
       check(entries.entries()).isEmpty();
 
