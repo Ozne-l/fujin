@@ -16,7 +16,6 @@ final class AddDraft with AddDraftMappable {
     required this.date,
   });
 
-  static const pendingEntryId = '';
   static const oneServing = 1.0;
   static const _unstoredId = '';
   static const _baseMultiplier = 1.0;
@@ -45,12 +44,32 @@ final class AddDraft with AddDraftMappable {
     null => null,
   };
 
+  static AddDraft? forEntry(LoggedEntry logged, MfpFood food) {
+    final entry = logged.entry;
+    return switch (food.servingSizes
+        .where(
+          (serving) =>
+              serving.unit == entry.servingUnit &&
+              serving.value == entry.servingValue,
+        )
+        .firstOrNull) {
+      final serving? => AddDraft(
+        food: food,
+        servingSize: serving,
+        servings: entry.servings,
+        mfpMealName: logged.mealName,
+        date: entry.date,
+      ),
+      null => null,
+    };
+  }
+
   LoggedEntry get entry {
     final written = mfpEntry;
     return LoggedEntry(
       entry: Entry.copyOf(
         written,
-        id: pendingEntryId,
+        id: _unstoredId,
         mealId: _unstoredId,
         foodId: _unstoredId,
         updatedAt: date,
@@ -62,7 +81,7 @@ final class AddDraft with AddDraftMappable {
       mfpLink: MfpLink.of(
         written,
         id: _unstoredId,
-        entryId: pendingEntryId,
+        entryId: _unstoredId,
         mfpEntryId: _unstoredId,
         updatedAt: date,
       ),
@@ -85,11 +104,6 @@ final class AddDraft with AddDraftMappable {
       food.nutrients ?? const MfpNutrients(),
       (servingSize.nutritionMultiplier ?? _baseMultiplier) * servings,
     ),
-  );
-
-  AddDraft withFood(MfpFood food) => copyWith(
-    food: food,
-    servingSize: _servingLike(food, servingSize) ?? servingSize,
   );
 
   static MfpServingSize? _servingLike(MfpFood food, MfpServingSize? like) =>

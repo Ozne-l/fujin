@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math';
 
 import 'package:checks/checks.dart';
@@ -7,7 +6,6 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/pages/common/row_action.dart';
-import 'package:fujin/pages/common/sheet_frame.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
@@ -21,13 +19,11 @@ const _sheetTitle = 'Supprimer Riz basmati ?';
 const _confirm = 'Supprimer de MFP et Ekklo';
 const _keep = 'Garder';
 const _confirmMfp = 'Supprimer de MFP';
-const _belowSheetTitle = 'Supprimer Skyr nature ?';
 const _mfpOnlyCopy =
     'Pas encore dans Ekklo : il sera retiré de MyFitnessPal seulement.';
 const _bothDetail = 'Retiré d’Ekklo et de MyFitnessPal · $lunch';
 const _slowDrag = Duration(seconds: 1);
-const _sheetMotion = Duration(seconds: 1);
-const _down = Offset(0, 500);
+const _mfpNotWritten = 'Pas écrit dans MyFitnessPal';
 
 FakeBackends _backends() => LoggedJournal.backends();
 
@@ -45,20 +41,6 @@ Future<void> _drag(WidgetTester tester, String row, double share) async {
   );
   await tester.pumpAndSettle();
 }
-
-Future<void> _settle(WidgetTester tester) async {
-  await tester.pump();
-  await tester.pump(_sheetMotion);
-}
-
-Iterable<bool> _sheetButtonsEnabled(WidgetTester tester) => tester
-    .widgetList<ButtonStyleButton>(
-      find.descendant(
-        of: find.byType(SheetFrame),
-        matching: find.bySubtype<ButtonStyleButton>(),
-      ),
-    )
-    .map((button) => button.enabled);
 
 Iterable<String> _deletes(FakeBackends backends) => [
   for (final request in backends.requests)
@@ -172,30 +154,8 @@ void main() {
     check(find.text(_bothDetail).evaluate()).length.equals(1);
   });
 
-  testWidgets('keeps the sheet with its buttons off while the removal runs', (
-    tester,
-  ) async {
-    final backends = _backends();
-    await _pump(tester, backends);
-    await _drag(tester, _row, 0.8);
-    final gate = backends.mealsGate = Completer<void>();
-
-    await tester.tap(find.text(_confirm));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
-
-    check(find.text(_sheetTitle).evaluate()).length.equals(1);
-    check(_sheetButtonsEnabled(tester)).every((it) => it.isFalse());
-
-    gate.complete();
-    backends.mealsGate = null;
-    await tester.pumpAndSettle();
-
-    check(find.text(_sheetTitle).evaluate()).isEmpty();
-  });
-
-  testWidgets('says the food stayed in MyFitnessPal when only Ekklo let go '
-      'of it, and finishes on Réessayer', (tester) async {
+  testWidgets('says the removal is not written in MyFitnessPal once Ekklo '
+      'let go of the food, and finishes it on Réessayer', (tester) async {
     final backends = _backends()..mfpRemoveFails = true;
     await _pump(tester, backends);
     await _drag(tester, _row, 0.8);
@@ -203,8 +163,12 @@ void main() {
     await tester.tap(find.text(_confirm));
     await tester.pumpAndSettle();
 
-    check(backends.ekkloItems).isEmpty();
-    check(find.text('Encore dans MyFitnessPal').evaluate()).length.equals(1);
+    check(backends.ekkloItems.map((item) => item.id)).not(
+      (it) => it.contains(LoggedJournal.basmatiItem),
+    );
+    check(find.text(_row).evaluate()).isEmpty();
+    check(find.text(_mfpNotWritten).evaluate()).length.equals(1);
+    check(find.text('$_row reste en attente').evaluate()).length.equals(1);
 
     backends.mfpRemoveFails = false;
     await tester.tap(find.text('Réessayer'));
@@ -213,67 +177,7 @@ void main() {
     check(
       backends.entries.map((entry) => entry.id),
     ).not((it) => it.contains(LoggedJournal.basmatiId));
-    check(find.text('Riz basmati supprimé').evaluate()).length.equals(1);
-    check(find.text(_bothDetail).evaluate()).length.equals(1);
-  });
-
-  testWidgets('stays open when dragged down while the removal runs, then '
-      'says the food was deleted', (tester) async {
-    final backends = _backends();
-    await _pump(tester, backends);
-    await _drag(tester, _row, 0.8);
-    final gate = backends.mealsGate = Completer<void>();
-
-    await tester.tap(find.text(_confirm));
-    await _settle(tester);
-    await tester.drag(find.text(_sheetTitle), _down);
-    await _settle(tester);
-
-    check(find.text(_sheetTitle).evaluate()).length.equals(1);
-
-    gate.complete();
-    backends.mealsGate = null;
-    await tester.pumpAndSettle();
-
-    check(find.text(_sheetTitle).evaluate()).isEmpty();
-    check(find.text('Riz basmati supprimé').evaluate()).length.equals(1);
-    check(find.text(_bothDetail).evaluate()).length.equals(1);
-  });
-
-  testWidgets('shows the sheet busy while another removal runs, and starts '
-      'none from it', (tester) async {
-    final backends = _backends()..mfpRemoveFails = true;
-    await _pump(tester, backends);
-    await _drag(tester, _row, 0.8);
-    await tester.tap(find.text(_confirm));
-    await tester.pumpAndSettle();
-    backends.mfpRemoveFails = false;
-    final gate = backends.mealsGate = Completer<void>();
-    await tester.tap(find.text('Réessayer'));
-    await _settle(tester);
-
-    await tester.timedDrag(
-      find.text(_below),
-      Offset(-_width(tester) * 0.8, 0),
-      _slowDrag,
-    );
-    await _settle(tester);
-    await tester.tap(find.text(_confirmMfp), warnIfMissed: false);
-    await _settle(tester);
-
-    check(find.text(_belowSheetTitle).evaluate()).length.equals(1);
-    check(_sheetButtonsEnabled(tester)).every((it) => it.isFalse());
-    check(_deletes(backends)).deepEquals([ekkloUri.host, mfpApiUri.host]);
-
-    gate.complete();
-    backends.mealsGate = null;
-    await _settle(tester);
-
-    check(find.text(_belowSheetTitle).evaluate()).length.equals(1);
-    check(_sheetButtonsEnabled(tester)).every((it) => it.isTrue());
-    check(
-      backends.entries.map((entry) => entry.id),
-    ).contains(LoggedJournal.skyrId);
+    check(find.text(_mfpNotWritten).evaluate()).isEmpty();
   });
 
   testWidgets('removes a food still to send from MyFitnessPal only, and says '
@@ -297,8 +201,8 @@ void main() {
     ).length.equals(1);
   });
 
-  testWidgets('keeps the row and says nothing changed when MyFitnessPal '
-      'refuses the removal', (tester) async {
+  testWidgets('removes the row at once and says MyFitnessPal is waiting '
+      'when it refuses the removal', (tester) async {
     final backends = _backends()..mfpRemoveFails = true;
     await _pump(tester, backends);
     await _drag(tester, _below, 0.8);
@@ -306,12 +210,13 @@ void main() {
     await tester.tap(find.text(_confirmMfp));
     await tester.pumpAndSettle();
 
-    check(find.text(_below).evaluate()).length.equals(1);
-    check(find.text('Skyr nature non supprimé').evaluate()).length.equals(1);
-    check(
-      find.text('Rien n’a changé dans MyFitnessPal ni dans Ekklo.').evaluate(),
-    ).length.equals(1);
+    check(find.text(_below).evaluate()).isEmpty();
+    check(find.text(_mfpNotWritten).evaluate()).length.equals(1);
+    check(find.text('$_below reste en attente').evaluate()).length.equals(1);
     check(find.text('Réessayer').evaluate()).length.equals(1);
+    check(
+      backends.entries.map((entry) => entry.id),
+    ).contains(LoggedJournal.skyrId);
   });
 
   testWidgets('slides the rows below a deleted food up into its place', (

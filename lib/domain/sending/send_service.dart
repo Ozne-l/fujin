@@ -1,6 +1,7 @@
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/entries/ekklo_link.dart';
+import 'package:fujin/data/entries/entry.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/entries/linked_item.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
@@ -38,7 +39,7 @@ typedef _Update = ({
   ExpectedItem expected,
 });
 typedef _Work = (SendStep step, Future<void> Function() run);
-typedef _Linked = ({String entryId, String ekkloMealId, String ekkloItemId});
+typedef _Linked = ({Entry sent, String ekkloMealId, String ekkloItemId});
 
 _OwnCopyKey _ownCopyKey(LoggedEntry entry) =>
     (entry.entry.foodId, entry.entry.servingUnit);
@@ -449,12 +450,13 @@ final class SendService {
     _database.transaction(() {
       switch (updated.id == item.ekkloItemId) {
         case true:
-          _entries.refreshLink(planned.entryId);
+          _entries.refreshLink(planned.entryId, sent: planned.entry.entry);
         case false:
           _entries.linkItem(
             planned.entryId,
             ekkloMealId: item.ekkloMealId,
             ekkloItemId: updated.id,
+            sent: planned.entry.entry,
           );
       }
       _entries.forgetExpectations(attended);
@@ -510,18 +512,19 @@ final class SendService {
           case final match?) {
         claimed.add(match.id);
         linked.add((
-          entryId: planned.entryId,
+          sent: planned.entry.entry,
           ekkloMealId: meal.id,
           ekkloItemId: match.id,
         ));
       }
     }
     _database.transaction(() {
-      for (final (:entryId, :ekkloMealId, :ekkloItemId) in linked) {
+      for (final (:sent, :ekkloMealId, :ekkloItemId) in linked) {
         _entries.linkItem(
-          entryId,
+          sent.id,
           ekkloMealId: ekkloMealId,
           ekkloItemId: ekkloItemId,
+          sent: sent,
         );
       }
       _entries.forgetExpectations(attended);

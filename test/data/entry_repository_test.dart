@@ -9,6 +9,7 @@ import 'package:fujin/data/entries/day_changes.dart';
 import 'package:fujin/data/entries/entry.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/entries/mfp_link.dart';
+import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/data/foods/food_reference.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/unattended/unattended_item_repository.dart';
@@ -93,13 +94,137 @@ void main() {
       ]).deepEquals(['e-3']);
       check(stored.deleted).single
         ..has((logged) => logged.entry.id, 'entry').equals('e-1')
-        ..has((logged) => logged.mfpLink, 'MyFitnessPal link').isNull()
+        ..has(
+          (logged) => logged.mfpLink?.mfpEntryId,
+          'MyFitnessPal entry',
+        ).equals('E-1')
         ..has(
           (logged) => logged.ekkloLink?.item?.ekkloItemId,
           'item',
         ).equals('I-1');
       check(entries.find('e-1')).isNull();
       check(entries.findByMfpEntryId('E-1')).isNull();
+    });
+  });
+
+  group('pending in MyFitnessPal', () {
+    test('lists an entry without a link, an edited entry and a deleted '
+        'linked entry, oldest first', () {
+      storeEntry(database, entry('E-3'), 'e-3');
+      storeEntry(database, entry('E-1'), 'e-1');
+      storeEntry(database, entry('E-2'), 'e-2');
+      storeEntry(database, entry('E-4'), 'e-4');
+      entries
+        ..unlinkMfp('e-1')
+        ..saveEntry(
+          entries.find('e-2')?.entry.copyWith(servings: 2) ?? _missing(),
+        )
+        ..remove('e-3');
+
+      final pending = entries.pendingMfp();
+
+      check([
+        for (final write in pending) write.logged.entry.id,
+      ]).deepEquals(['e-1', 'e-2', 'e-3']);
+      check(pending[0]).isA<MfpAdd>();
+      check(pending[1]).isA<MfpEdit>();
+      check(pending[2]).isA<MfpDeletion>();
+    });
+
+    test('does not list an entry restamped by a read with unchanged '
+        'values', () {
+      storeEntry(database, entry('E-1'), 'e-1');
+      time = now.add(const Duration(hours: 1));
+
+      entries.saveEntry(entries.find('e-1')?.entry ?? _missing());
+
+      check(entries.find('e-1')?.entry.updatedAt).equals(time);
+      check(entries.pendingMfp()).isEmpty();
+    });
+
+    test('agrees with MfpWrite.of on every listed and unlisted entry', () {
+      final lunchId = mealsOf(database).mfpMeal(lunch, id: 'meal-lunch');
+      final riceId = foodsOf(
+        database,
+      ).copiedMfpFood(rice, id: 'food-rice', name: rice, brand: null);
+      for (final id in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']) {
+        storeEntry(database, entry('E-$id'), id);
+      }
+      Entry stored(String id) => entries.find(id)?.entry ?? _missing();
+      entries
+        ..saveEntry(stored('b').copyWith(mealId: lunchId))
+        ..saveEntry(stored('c').copyWith(foodId: riceId))
+        ..saveEntry(
+          stored('d').copyWith(date: day.add(const Duration(days: 1))),
+        )
+        ..saveEntry(stored('e').copyWith(servings: 3))
+        ..saveEntry(stored('f').copyWith(servingValue: 50))
+        ..saveEntry(stored('g').copyWith(servingUnit: cup))
+        ..unlinkMfp('h')
+        ..remove('i')
+        ..unlinkMfp('j')
+        ..remove('j');
+
+      final listed = {
+        for (final write in entries.pendingMfp()) write.logged.entry.id,
+      };
+
+      check(listed).deepEquals({'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'});
+      for (final row in entries.entries()) {
+        final logged = entries.findAny(row.id);
+        check(
+              switch (logged) {
+                final logged? => MfpWrite.of(logged),
+                null => null,
+              },
+              because: row.id,
+            )
+            .has((write) => write != null, 'pending')
+            .equals(
+              listed.contains(row.id),
+            );
+      }
+    });
+
+    test('keeps the MyFitnessPal link of a removed entry', () {
+      storeEntry(database, entry('E-1'), 'e-1');
+
+      entries.remove('e-1');
+
+      check(entries.find('e-1')).isNull();
+      check(entries.findAny('e-1'))
+        ..has((logged) => logged?.entry.deletedAt, 'deleted at').equals(now)
+        ..has(
+          (logged) => logged?.mfpLink?.mfpEntryId,
+          'MyFitnessPal entry',
+        ).equals('E-1');
+      check(entries.heldMfpEntryIds(day)).deepEquals({'E-1'});
+    });
+
+    test("returns owed entries of the link's day, not the entry's", () {
+      final tomorrow = day.add(const Duration(days: 1));
+      storeEntry(database, entry('E-1'), 'e-1');
+      storeEntry(database, entry('E-2'), 'e-2');
+      storeEntry(database, entry('E-3'), 'e-3');
+      entries
+        ..saveEntry(
+          entries.find('e-1')?.entry.copyWith(date: tomorrow) ?? _missing(),
+        )
+        ..remove('e-2');
+
+      final today = entries.forDate(day);
+      final next = entries.forDate(tomorrow);
+
+      check([
+        for (final logged in today.entries) logged.entry.id,
+      ]).deepEquals(['e-3']);
+      check([
+        for (final logged in today.owed) logged.entry.id,
+      ]).deepEquals(['e-1', 'e-2']);
+      check([
+        for (final logged in next.entries) logged.entry.id,
+      ]).deepEquals(['e-1']);
+      check(next.owed).isEmpty();
     });
   });
 
@@ -205,9 +330,9 @@ void main() {
       entries.linkItem('e-copy', ekkloMealId: 'meal-1', ekkloItemId: 'I-1');
       final copy = entries.find('e-copy');
 
-      entries.save(
-        copy?.entry.copyWith(id: 'e-added') ?? _missing(),
+      entries.saveLink(
         copiedLink('e-added', 'E-1'),
+        entry: copy?.entry.copyWith(id: 'e-added') ?? _missing(),
       );
 
       check(entries.find('e-copy')).isNull();
@@ -229,10 +354,9 @@ void main() {
         ..linkItem('e-copy', ekkloMealId: 'meal-1', ekkloItemId: 'I-2');
       final original = entries.find('e-1');
 
-      entries.save(
-        original?.entry.copyWith(servings: 2) ?? _missing(),
-        copiedLink('e-1', 'E-2'),
-      );
+      entries
+        ..saveEntry(original?.entry.copyWith(servings: 2) ?? _missing())
+        ..saveLink(copiedLink('e-1', 'E-2').copyWith(servings: 2));
 
       check(entries.forDate(day).entries).single
         ..has((logged) => logged.entry.id, 'entry').equals('e-1')
@@ -261,9 +385,9 @@ void main() {
         ..linkItem('e-copy', ekkloMealId: 'meal-1', ekkloItemId: 'I-2');
       final original = entries.find('e-1');
 
-      entries.save(
-        original?.entry ?? _missing(),
+      entries.saveLink(
         copiedLink('e-1', 'E-2'),
+        entry: original?.entry ?? _missing(),
       );
 
       check(entries.find('e-1')?.ekkloLink)
@@ -319,9 +443,9 @@ void main() {
       entries.linkItem('e-1', ekkloMealId: 'meal-1', ekkloItemId: 'I-1');
       final original = entries.find('e-1');
       time = now.add(const Duration(hours: 1));
-      entries.save(
-        original?.entry.copyWith(servings: 2) ?? _missing(),
+      entries.saveLink(
         copiedLink('e-1', 'E-1'),
+        entry: original?.entry.copyWith(servings: 2) ?? _missing(),
       );
 
       check(

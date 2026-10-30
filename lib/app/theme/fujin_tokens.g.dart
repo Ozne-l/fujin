@@ -743,6 +743,7 @@ abstract final class FujinSize {
   static const double pictogramIcon = 36;
   static const double pill = 26;
   static const double pillSmall = 20;
+  static const double pillSmallIcon = 14;
   static const double radio = 20;
   static const double radioDot = 10;
   static const double rowActionIcon = 20;

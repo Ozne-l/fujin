@@ -2000,24 +2000,6 @@ abstract class AppLocalizations {
   /// **'Supprimé de MyFitnessPal et d’Ekklo'**
   String get addUndoneDetail;
 
-  /// No description provided for @addStillInMfp.
-  ///
-  /// In fr, this message translates to:
-  /// **'Encore dans MyFitnessPal'**
-  String get addStillInMfp;
-
-  /// No description provided for @addStillInMfpDetail.
-  ///
-  /// In fr, this message translates to:
-  /// **'{food} retiré d’Ekklo seulement'**
-  String addStillInMfpDetail(String food);
-
-  /// No description provided for @addNotUndone.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ajout non annulé'**
-  String get addNotUndone;
-
   /// No description provided for @undoAdd.
   ///
   /// In fr, this message translates to:
@@ -2516,12 +2498,6 @@ abstract class AppLocalizations {
   /// **'Choisir l’aliment Ekklo'**
   String get addChooseEkkloFood;
 
-  /// No description provided for @addConfirmAndAdd.
-  ///
-  /// In fr, this message translates to:
-  /// **'Confirmer et ajouter'**
-  String get addConfirmAndAdd;
-
   /// No description provided for @addDaySubtitle.
   ///
   /// In fr, this message translates to:
@@ -2564,90 +2540,6 @@ abstract class AppLocalizations {
   /// **'Sucres +{sugar} g, sodium +{sodium} mg.'**
   String addDayExtras(double sugar, double sodium);
 
-  /// No description provided for @addingTitle.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ajout en cours'**
-  String get addingTitle;
-
-  /// No description provided for @addWrittenIn.
-  ///
-  /// In fr, this message translates to:
-  /// **'Écrit dans {meal}'**
-  String addWrittenIn(String meal);
-
-  /// No description provided for @addWriting.
-  ///
-  /// In fr, this message translates to:
-  /// **'Écriture…'**
-  String get addWriting;
-
-  /// No description provided for @addAdding.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ajout en cours…'**
-  String get addAdding;
-
-  /// No description provided for @addAddingNote.
-  ///
-  /// In fr, this message translates to:
-  /// **'Le bouton reste bloqué jusqu’à la réponse des deux côtés : un double tap n’ajoute rien deux fois.'**
-  String get addAddingNote;
-
-  /// No description provided for @addEkkloNoReply.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ekklo n’a pas répondu'**
-  String get addEkkloNoReply;
-
-  /// No description provided for @addNotWritten.
-  ///
-  /// In fr, this message translates to:
-  /// **'Non écrit'**
-  String get addNotWritten;
-
-  /// No description provided for @addEkkloFailedDetail.
-  ///
-  /// In fr, this message translates to:
-  /// **'L’entrée MyFitnessPal est gardée. Réessayer Ekklo n’écrit pas une deuxième fois dans MyFitnessPal.'**
-  String get addEkkloFailedDetail;
-
-  /// No description provided for @addRetryEkklo.
-  ///
-  /// In fr, this message translates to:
-  /// **'Réessayer Ekklo'**
-  String get addRetryEkklo;
-
-  /// No description provided for @addCancelMfpEntry.
-  ///
-  /// In fr, this message translates to:
-  /// **'Annuler l’entrée MFP'**
-  String get addCancelMfpEntry;
-
-  /// No description provided for @addMfpNoReply.
-  ///
-  /// In fr, this message translates to:
-  /// **'MyFitnessPal n’a pas répondu'**
-  String get addMfpNoReply;
-
-  /// No description provided for @addNotSent.
-  ///
-  /// In fr, this message translates to:
-  /// **'Pas envoyé'**
-  String get addNotSent;
-
-  /// No description provided for @addMfpFailedDetail.
-  ///
-  /// In fr, this message translates to:
-  /// **'Rien n’a été écrit, ni dans MyFitnessPal ni dans Ekklo. Ta saisie est gardée.'**
-  String get addMfpFailedDetail;
-
-  /// No description provided for @addEditEntry.
-  ///
-  /// In fr, this message translates to:
-  /// **'Modifier la saisie'**
-  String get addEditEntry;
-
   /// No description provided for @addFoodChangedTitle.
   ///
   /// In fr, this message translates to:
@@ -2666,34 +2558,11 @@ abstract class AppLocalizations {
   /// **'Session MyFitnessPal expirée'**
   String get addMfpSessionTitle;
 
-  /// No description provided for @addMfpSessionDetail.
-  ///
-  /// In fr, this message translates to:
-  /// **'Reconnecte-toi pour ajouter. Ta saisie est gardée : {food}, {serving}, {meal} du {date}.'**
-  String addMfpSessionDetail(
-    String food,
-    String serving,
-    String meal,
-    DateTime date,
-  );
-
   /// No description provided for @addMfpSessionSearchDetail.
   ///
   /// In fr, this message translates to:
   /// **'Reconnecte-toi pour chercher. Ta recherche est gardée.'**
   String get addMfpSessionSearchDetail;
-
-  /// No description provided for @addEkkloSessionTitle.
-  ///
-  /// In fr, this message translates to:
-  /// **'Session Ekklo expirée'**
-  String get addEkkloSessionTitle;
-
-  /// No description provided for @addEkkloSessionDetail.
-  ///
-  /// In fr, this message translates to:
-  /// **'MyFitnessPal reste connecté. Reconnecte Ekklo pour écrire des deux côtés ; ta saisie est gardée.'**
-  String get addEkkloSessionDetail;
 
   /// No description provided for @addScannedUnresolved.
   ///
@@ -3049,18 +2918,6 @@ abstract class AppLocalizations {
   /// **'Cette portion n’existe plus pour cet aliment dans MyFitnessPal : Fūjin ne peut pas le modifier. Tu peux toujours le supprimer depuis le Journal.'**
   String get editServingMissing;
 
-  /// No description provided for @editOldEntryKept.
-  ///
-  /// In fr, this message translates to:
-  /// **'{food} en double dans MyFitnessPal'**
-  String editOldEntryKept(String food);
-
-  /// No description provided for @editOldEntryKeptDetail.
-  ///
-  /// In fr, this message translates to:
-  /// **'L’ancienne entrée n’a pas pu être retirée.'**
-  String get editOldEntryKeptDetail;
-
   /// No description provided for @rowDelete.
   ///
   /// In fr, this message translates to:
@@ -3119,18 +2976,6 @@ abstract class AppLocalizations {
   /// **'Retiré de MyFitnessPal seulement · {meal}'**
   String foodDeletedMfpOnlyDetail(String meal);
 
-  /// No description provided for @foodNotDeleted.
-  ///
-  /// In fr, this message translates to:
-  /// **'{food} non supprimé'**
-  String foodNotDeleted(String food);
-
-  /// No description provided for @foodNotDeletedDetail.
-  ///
-  /// In fr, this message translates to:
-  /// **'Rien n’a changé dans MyFitnessPal ni dans Ekklo.'**
-  String get foodNotDeletedDetail;
-
   /// No description provided for @foodEdited.
   ///
   /// In fr, this message translates to:
@@ -3179,11 +3024,35 @@ abstract class AppLocalizations {
   /// **'Ekklo pas mis à jour'**
   String get ekkloNotUpdated;
 
-  /// No description provided for @ekkloNotUpdatedDetail.
+  /// No description provided for @mfpNotWritten.
   ///
   /// In fr, this message translates to:
-  /// **'{food} y reste à {serving}'**
-  String ekkloNotUpdatedDetail(String food, String serving);
+  /// **'Pas écrit dans MyFitnessPal'**
+  String get mfpNotWritten;
+
+  /// No description provided for @foodStillPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'{food} reste en attente'**
+  String foodStillPending(String food);
+
+  /// No description provided for @foodsStillPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, other{{count} aliments restent en attente}}'**
+  String foodsStillPending(int count);
+
+  /// No description provided for @pillMfp.
+  ///
+  /// In fr, this message translates to:
+  /// **'MFP'**
+  String get pillMfp;
+
+  /// No description provided for @mfpPendingSemantics.
+  ///
+  /// In fr, this message translates to:
+  /// **'En attente de MyFitnessPal'**
+  String get mfpPendingSemantics;
 
   /// No description provided for @writeBlockedInDev.
   ///

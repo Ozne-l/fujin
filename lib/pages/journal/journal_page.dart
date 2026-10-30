@@ -12,9 +12,9 @@ import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/editing/edit_outcome.dart';
 import 'package:fujin/domain/journal/journal_read.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
+import 'package:fujin/domain/writing/writer_state.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/adding/add_shortcut.dart';
-import 'package:fujin/pages/adding/edit_write_notifier.dart';
 import 'package:fujin/pages/common/appearance_corner.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
@@ -24,6 +24,7 @@ import 'package:fujin/pages/common/scroll_extent_listener.dart';
 import 'package:fujin/pages/common/snack_bar_content.dart';
 import 'package:fujin/pages/common/snack_bar_glyph.dart';
 import 'package:fujin/pages/common/souffle_refresh.dart';
+import 'package:fujin/pages/journal/background_write_notifier.dart';
 import 'package:fujin/pages/journal/entry_removal.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
 import 'package:fujin/pages/journal/journal_snack_bar.dart';
@@ -76,7 +77,8 @@ class JournalPage extends HookConsumerWidget {
     useOnAppLifecycleStateChange((previous, current) {
       switch (current) {
         case AppLifecycleState.resumed:
-          unawaited(notifier.reload());
+          ref.read(backgroundWriteProvider.notifier).run();
+          unawaited(notifier.reload(thenWrite: false));
         case AppLifecycleState.detached ||
             AppLifecycleState.inactive ||
             AppLifecycleState.hidden ||
@@ -121,7 +123,7 @@ class JournalPage extends HookConsumerWidget {
     void reloadShown() => unawaited(
       ref
           .read(journalProvider(ref.read(selectedDayProvider)).notifier)
-          .reload(),
+          .reload(thenWrite: false),
     );
 
     void rereadDaysOf(Iterable<DateTime> dates) {
@@ -148,17 +150,28 @@ class JournalPage extends HookConsumerWidget {
           }
           rereadDayOf(removal.entry.entry.date);
           JournalSnackBar.removed(context, done);
-        case RemoveEntryFailed(:final removal) && final failed:
-          rereadDayOf(removal.entry.entry.date);
-          JournalSnackBar.removeFailed(
-            context,
-            failed,
-            onRetry: () => unawaited(
-              ref.read(removeEntryProvider.notifier).retry(failed),
-            ),
-          );
-        case RemoveEntryIdle() || RemoveEntryRunning():
+        case RemoveEntryIdle():
           break;
+      }
+    });
+
+    ref.listen(backgroundWriteProvider, (previous, next) {
+      if (previous case WriterRunning(current: final written?)) {
+        rereadDaysOf([
+          written.entry.date,
+          if (written.mfpLink case final link?) link.date,
+        ]);
+      }
+      if ((previous, next) case (
+        WriterRunning(),
+        WriterIdle(:final failures),
+      )) {
+        JournalSnackBar.notWritten(
+          context,
+          failures,
+          ref.read(appEnvironmentProvider),
+          onRetry: ref.read(backgroundWriteProvider.notifier).run,
+        );
       }
     });
 
@@ -182,13 +195,9 @@ class JournalPage extends HookConsumerWidget {
     }
 
     void settleEdit(EditOutcome outcome) {
-      Future<void> follow(
-        Future<EditOutcome?> Function(EditWriteNotifier writer) write,
-      ) async {
-        if (await write(ref.read(editWriteProvider.notifier)) case final next?
-            when context.mounted) {
-          settleEdit(next);
-        }
+      Future<void> follow(Future<EditOutcome> write) async {
+        final next = await write;
+        if (context.mounted) settleEdit(next);
       }
 
       switch (outcome) {
@@ -197,25 +206,12 @@ class JournalPage extends HookConsumerWidget {
           JournalSnackBar.edited(
             context,
             edited,
-            onUndo: () => unawaited(follow((writer) => writer.revert(edited))),
+            onUndo: () => unawaited(
+              follow(ref.read(editEntryServiceProvider).revert(edited)),
+            ),
             onSee: () => ref
                 .read(selectedDayProvider.notifier)
                 .select(edited.entry.entry.date),
-          );
-        case EkkloNotUpdated(:final edited):
-          rereadDaysOf([edited.original.entry.date, edited.entry.entry.date]);
-          JournalSnackBar.ekkloNotUpdated(
-            context,
-            edited,
-            onRetry: () =>
-                unawaited(follow((writer) => writer.retryEkklo(edited))),
-          );
-        case OldEntryKept(:final edited):
-          rereadDaysOf([edited.original.entry.date, edited.entry.entry.date]);
-          JournalSnackBar.oldEntryKept(
-            context,
-            edited,
-            onRetry: () => unawaited(follow((writer) => writer.finish(edited))),
           );
         case NotEdited(:final error):
           reloadShown();
@@ -224,11 +220,6 @@ class JournalPage extends HookConsumerWidget {
             error,
             ref.read(appEnvironmentProvider),
           );
-        case EditFoodChanged():
-          reloadShown();
-          ScaffoldMessenger.of(
-            context,
-          ).showProblem(context.intl, ReadProblem.unknown);
       }
     }
 

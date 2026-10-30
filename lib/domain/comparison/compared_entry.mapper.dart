@@ -17,6 +17,7 @@ class ComparedEntryMapper extends ClassMapperBase<ComparedEntry> {
       MapperContainer.globals.use(_instance = ComparedEntryMapper._());
       LoggedEntryMapper.ensureInitialized();
       EntryStatusMapper.ensureInitialized();
+      MfpStatusMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -41,12 +42,19 @@ class ComparedEntryMapper extends ClassMapperBase<ComparedEntry> {
     opt: true,
     def: true,
   );
+  static MfpStatus? _$mfp(ComparedEntry v) => v.mfp;
+  static const Field<ComparedEntry, MfpStatus> _f$mfp = Field(
+    'mfp',
+    _$mfp,
+    opt: true,
+  );
 
   @override
   final MappableFields<ComparedEntry> fields = const {
     #logged: _f$logged,
     #status: _f$status,
     #stored: _f$stored,
+    #mfp: _f$mfp,
   };
   @override
   final bool ignoreNull = true;
@@ -56,6 +64,7 @@ class ComparedEntryMapper extends ClassMapperBase<ComparedEntry> {
       data.dec(_f$logged),
       data.dec(_f$status),
       stored: data.dec(_f$stored),
+      mfp: data.dec(_f$mfp),
     );
   }
 
@@ -123,7 +132,13 @@ abstract class ComparedEntryCopyWith<$R, $In extends ComparedEntry, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get logged;
   EntryStatusCopyWith<$R, EntryStatus, EntryStatus> get status;
-  $R call({LoggedEntry? logged, EntryStatus? status, bool? stored});
+  MfpStatusCopyWith<$R, MfpStatus, MfpStatus>? get mfp;
+  $R call({
+    LoggedEntry? logged,
+    EntryStatus? status,
+    bool? stored,
+    MfpStatus? mfp,
+  });
   ComparedEntryCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -142,11 +157,20 @@ class _ComparedEntryCopyWithImpl<$R, $Out>
   EntryStatusCopyWith<$R, EntryStatus, EntryStatus> get status =>
       $value.status.copyWith.$chain((v) => call(status: v));
   @override
-  $R call({LoggedEntry? logged, EntryStatus? status, bool? stored}) => $apply(
+  MfpStatusCopyWith<$R, MfpStatus, MfpStatus>? get mfp =>
+      $value.mfp?.copyWith.$chain((v) => call(mfp: v));
+  @override
+  $R call({
+    LoggedEntry? logged,
+    EntryStatus? status,
+    bool? stored,
+    Object? mfp = $none,
+  }) => $apply(
     FieldCopyWithData({
       if (logged != null) #logged: logged,
       if (status != null) #status: status,
       if (stored != null) #stored: stored,
+      if (mfp != $none) #mfp: mfp,
     }),
   );
   @override
@@ -154,6 +178,7 @@ class _ComparedEntryCopyWithImpl<$R, $Out>
     data.get(#logged, or: $value.logged),
     data.get(#status, or: $value.status),
     stored: data.get(#stored, or: $value.stored),
+    mfp: data.get(#mfp, or: $value.mfp),
   );
 
   @override

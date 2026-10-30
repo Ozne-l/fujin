@@ -1464,17 +1464,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get addUndoneDetail => 'Supprimé de MyFitnessPal et d’Ekklo';
 
   @override
-  String get addStillInMfp => 'Encore dans MyFitnessPal';
-
-  @override
-  String addStillInMfpDetail(String food) {
-    return '$food retiré d’Ekklo seulement';
-  }
-
-  @override
-  String get addNotUndone => 'Ajout non annulé';
-
-  @override
   String get undoAdd => 'Annuler';
 
   @override
@@ -1858,9 +1847,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get addChooseEkkloFood => 'Choisir l’aliment Ekklo';
 
   @override
-  String get addConfirmAndAdd => 'Confirmer et ajouter';
-
-  @override
   String addDaySubtitle(String date, String food, String amount) {
     return '$date, avec $food, $amount';
   }
@@ -1902,53 +1888,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get addingTitle => 'Ajout en cours';
-
-  @override
-  String addWrittenIn(String meal) {
-    return 'Écrit dans $meal';
-  }
-
-  @override
-  String get addWriting => 'Écriture…';
-
-  @override
-  String get addAdding => 'Ajout en cours…';
-
-  @override
-  String get addAddingNote =>
-      'Le bouton reste bloqué jusqu’à la réponse des deux côtés : un double tap n’ajoute rien deux fois.';
-
-  @override
-  String get addEkkloNoReply => 'Ekklo n’a pas répondu';
-
-  @override
-  String get addNotWritten => 'Non écrit';
-
-  @override
-  String get addEkkloFailedDetail =>
-      'L’entrée MyFitnessPal est gardée. Réessayer Ekklo n’écrit pas une deuxième fois dans MyFitnessPal.';
-
-  @override
-  String get addRetryEkklo => 'Réessayer Ekklo';
-
-  @override
-  String get addCancelMfpEntry => 'Annuler l’entrée MFP';
-
-  @override
-  String get addMfpNoReply => 'MyFitnessPal n’a pas répondu';
-
-  @override
-  String get addNotSent => 'Pas envoyé';
-
-  @override
-  String get addMfpFailedDetail =>
-      'Rien n’a été écrit, ni dans MyFitnessPal ni dans Ekklo. Ta saisie est gardée.';
-
-  @override
-  String get addEditEntry => 'Modifier la saisie';
-
-  @override
   String get addFoodChangedTitle => 'Cet aliment a changé dans MyFitnessPal';
 
   @override
@@ -1973,28 +1912,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get addMfpSessionTitle => 'Session MyFitnessPal expirée';
 
   @override
-  String addMfpSessionDetail(
-    String food,
-    String serving,
-    String meal,
-    DateTime date,
-  ) {
-    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
-    final String dateString = dateDateFormat.format(date);
-
-    return 'Reconnecte-toi pour ajouter. Ta saisie est gardée : $food, $serving, $meal du $dateString.';
-  }
-
-  @override
   String get addMfpSessionSearchDetail =>
       'Reconnecte-toi pour chercher. Ta recherche est gardée.';
-
-  @override
-  String get addEkkloSessionTitle => 'Session Ekklo expirée';
-
-  @override
-  String get addEkkloSessionDetail =>
-      'MyFitnessPal reste connecté. Reconnecte Ekklo pour écrire des deux côtés ; ta saisie est gardée.';
 
   @override
   String get addScannedUnresolved =>
@@ -2251,15 +2170,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Cette portion n’existe plus pour cet aliment dans MyFitnessPal : Fūjin ne peut pas le modifier. Tu peux toujours le supprimer depuis le Journal.';
 
   @override
-  String editOldEntryKept(String food) {
-    return '$food en double dans MyFitnessPal';
-  }
-
-  @override
-  String get editOldEntryKeptDetail =>
-      'L’ancienne entrée n’a pas pu être retirée.';
-
-  @override
   String get rowDelete => 'Supprimer';
 
   @override
@@ -2316,15 +2226,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String foodNotDeleted(String food) {
-    return '$food non supprimé';
-  }
-
-  @override
-  String get foodNotDeletedDetail =>
-      'Rien n’a changé dans MyFitnessPal ni dans Ekklo.';
-
-  @override
   String foodEdited(String food) {
     return '$food modifié';
   }
@@ -2364,9 +2265,28 @@ class AppLocalizationsFr extends AppLocalizations {
   String get ekkloNotUpdated => 'Ekklo pas mis à jour';
 
   @override
-  String ekkloNotUpdatedDetail(String food, String serving) {
-    return '$food y reste à $serving';
+  String get mfpNotWritten => 'Pas écrit dans MyFitnessPal';
+
+  @override
+  String foodStillPending(String food) {
+    return '$food reste en attente';
   }
+
+  @override
+  String foodsStillPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count aliments restent en attente',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get pillMfp => 'MFP';
+
+  @override
+  String get mfpPendingSemantics => 'En attente de MyFitnessPal';
 
   @override
   String get writeBlockedInDev =>

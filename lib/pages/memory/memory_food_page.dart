@@ -37,6 +37,13 @@ class MemoryFoodPage extends HookConsumerWidget {
     final memory = ref.watch(memoryProvider);
     final notifier = ref.read(memoryProvider.notifier);
     final shown = useRef<RememberedFood?>(null);
+    final wroteAdd = useRef(false);
+    ref.listen(memoryProvider, (previous, next) {
+      if (wroteAdd.value && next.food(mfpFoodId, mfpUnit) == null) {
+        wroteAdd.value = false;
+        context.pop();
+      }
+    });
     final food = memory.food(mfpFoodId, mfpUnit) ?? shown.value;
     shown.value = food;
     if (food == null) return const Scaffold();
@@ -57,8 +64,11 @@ class MemoryFoodPage extends HookConsumerWidget {
       switch (added) {
         case final added?:
           AddShortcut.added(context, ref, added);
-          if (ref.read(memoryProvider).food(mfpFoodId, mfpUnit) case null) {
-            context.pop();
+          switch (ref.read(memoryProvider).food(mfpFoodId, mfpUnit)) {
+            case null:
+              context.pop();
+            case _:
+              wroteAdd.value = true;
           }
         case null:
           ref.invalidate(memoryProvider);

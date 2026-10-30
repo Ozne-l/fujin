@@ -37,11 +37,19 @@ class StoredDayMapper extends ClassMapperBase<StoredDay> {
     opt: true,
     def: const [],
   );
+  static List<LoggedEntry> _$owed(StoredDay v) => v.owed;
+  static const Field<StoredDay, List<LoggedEntry>> _f$owed = Field(
+    'owed',
+    _$owed,
+    opt: true,
+    def: const [],
+  );
 
   @override
   final MappableFields<StoredDay> fields = const {
     #entries: _f$entries,
     #deleted: _f$deleted,
+    #owed: _f$owed,
   };
   @override
   final bool ignoreNull = true;
@@ -50,6 +58,7 @@ class StoredDayMapper extends ClassMapperBase<StoredDay> {
     return StoredDay(
       entries: data.dec(_f$entries),
       deleted: data.dec(_f$deleted),
+      owed: data.dec(_f$owed),
     );
   }
 
@@ -124,7 +133,17 @@ abstract class StoredDayCopyWith<$R, $In extends StoredDay, $Out>
     LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry>
   >
   get deleted;
-  $R call({List<LoggedEntry>? entries, List<LoggedEntry>? deleted});
+  ListCopyWith<
+    $R,
+    LoggedEntry,
+    LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry>
+  >
+  get owed;
+  $R call({
+    List<LoggedEntry>? entries,
+    List<LoggedEntry>? deleted,
+    List<LoggedEntry>? owed,
+  });
   StoredDayCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -159,16 +178,33 @@ class _StoredDayCopyWithImpl<$R, $Out>
     (v) => call(deleted: v),
   );
   @override
-  $R call({List<LoggedEntry>? entries, List<LoggedEntry>? deleted}) => $apply(
+  ListCopyWith<
+    $R,
+    LoggedEntry,
+    LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry>
+  >
+  get owed => ListCopyWith(
+    $value.owed,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(owed: v),
+  );
+  @override
+  $R call({
+    List<LoggedEntry>? entries,
+    List<LoggedEntry>? deleted,
+    List<LoggedEntry>? owed,
+  }) => $apply(
     FieldCopyWithData({
       if (entries != null) #entries: entries,
       if (deleted != null) #deleted: deleted,
+      if (owed != null) #owed: owed,
     }),
   );
   @override
   StoredDay $make(CopyWithData data) => StoredDay(
     entries: data.get(#entries, or: $value.entries),
     deleted: data.get(#deleted, or: $value.deleted),
+    owed: data.get(#owed, or: $value.owed),
   );
 
   @override

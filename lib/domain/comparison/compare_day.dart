@@ -23,6 +23,7 @@ DayComparison compareDay({
   required Food? Function(String mfpFoodId) foodOf,
   required String? Function(String mfpMealName) mealOf,
   required DateTime now,
+  required DateTime diaryReadAt,
   required IdSource ids,
 }) => compareEkkloDay(
   compareMfpDay(
@@ -40,6 +41,7 @@ DayComparison compareDay({
     foodOf: foodOf,
     mealOf: mealOf,
     now: now,
+    readAt: diaryReadAt,
     ids: ids,
   ),
   meals: meals,

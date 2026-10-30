@@ -2,13 +2,10 @@ import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart' show setUp, tearDown, test;
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/entries/ekklo_link.dart';
+import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
-import 'package:fujin/domain/adding/add_outcome.dart';
 import 'package:fujin/domain/adding/added_food.dart';
-import 'package:fujin/domain/comparison/entry_status.dart';
-import 'package:fujin/domain/editing/edit_outcome.dart';
-import 'package:fujin/domain/editing/remove_outcome.dart';
-import 'package:fujin/domain/journal/read_problem.dart';
+import 'package:fujin/domain/writing/ekklo_job.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../../support/fake_backends.dart';
@@ -54,175 +51,90 @@ void main() {
 
   Future<(WriteServices, AddedFood)> added() async {
     final services = await WriteServices.over(backends, database);
-    final outcome = await services.add(_draft());
+    final food = await services.add(_draft());
+    await services.settle();
     backends.requests.clear();
-    return (services, (outcome as Added).added);
+    return (services, food);
   }
 
-  test('removes the Ekklo item, then the MyFitnessPal entry', () async {
+  test('soft-deletes the entry and owes its MyFitnessPal deletion', () async {
     final (services, food) = await added();
 
-    final outcome = await services.removing.remove(
-      entryId: food.entryId,
-      date: day,
-    );
+    final removed = services.removing.remove(food.entryId);
 
-    check(
-      outcome,
-    ).isA<Removed>().has((it) => it.ekkloRemoved, 'Ekklo removed').isTrue();
-    check(services.writes()).deepEquals([
-      'DELETE ${ekkloUri.host}',
-      'DELETE ${mfpApiUri.host}',
-    ]);
-    check(backends.entries).isEmpty();
-    check(backends.ekkloMeals.expand((meal) => meal.items)).isEmpty();
+    check(removed).isNotNull()
+      ..has((it) => it.entry.entry.id, 'entry').equals(food.entryId)
+      ..has((it) => it.ekkloRemoved, 'Ekklo removed').isTrue();
     check(services.entries.find(food.entryId)).isNull();
-    check(_liveEkkloLinks(services)).isEmpty();
-  });
+    check(services.entries.pendingMfp().single).isA<MfpDeletion>();
 
-  test('removes the Ekklo item of an entry to update', () async {
-    final (services, food) = await added();
-    backends.ekkloItemWritesFail = true;
-    final draft = _draft().copyWith(servings: 2);
-    final edit = await services.editing.save(
-      draft,
-      await services.adding.plan(draft),
-      entryId: food.entryId,
-      date: day,
-    );
-    final edited = (edit as EkkloNotUpdated).edited;
-    backends.ekkloItemWritesFail = false;
-    check(
-      (await services.find(edited.entryId, day))?.status,
-    ).isA<ToUpdate>();
-
-    final outcome = await services.removing.remove(
-      entryId: edited.entryId,
-      date: day,
-    );
-
-    check(
-      outcome,
-    ).isA<Removed>().has((it) => it.ekkloRemoved, 'Ekklo removed').isTrue();
-    check(backends.entries).isEmpty();
-    check(backends.ekkloMeals.expand((meal) => meal.items)).isEmpty();
-    check(services.entries.find(edited.entryId)).isNull();
-    check(_liveEkkloLinks(services)).isEmpty();
-  });
-
-  test('removes once when asked twice at the same time', () async {
-    final (services, food) = await added();
-
-    await Future.wait([
-      services.removing.remove(entryId: food.entryId, date: day),
-      services.removing.remove(entryId: food.entryId, date: day),
-    ]);
+    await services.settle();
 
     check(services.writes()).deepEquals([
       'DELETE ${ekkloUri.host}',
       'DELETE ${mfpApiUri.host}',
     ]);
+    check(backends.entries).isEmpty();
+    check(backends.ekkloItems).isEmpty();
+    check(services.entries.pendingMfp()).isEmpty();
+    check(_liveEkkloLinks(services)).isEmpty();
   });
 
-  test(
-    'leaves the entry to send when MyFitnessPal refuses, and a retry '
-    'removes only the MyFitnessPal entry',
-    () async {
-      final (services, food) = await added();
-      backends.mfpRemoveFails = true;
-
-      final partial = await services.removing.remove(
-        entryId: food.entryId,
-        date: day,
-      );
-
-      check(partial).isA<StillInMfp>();
-      check(backends.ekkloMeals.expand((meal) => meal.items)).isEmpty();
-      check(services.entries.find(food.entryId)).isNotNull();
-      check(_liveEkkloLinks(services)).isEmpty();
-      check(
-        (await services.find(food.entryId, day))?.status,
-      ).isA<ToSend>();
-
-      backends
-        ..mfpRemoveFails = false
-        ..requests.clear();
-      final retried = await services.removing.remove(
-        entryId: food.entryId,
-        date: day,
-      );
-
-      check(
-        retried,
-      ).isA<Removed>().has((it) => it.ekkloRemoved, 'Ekklo removed').isFalse();
-      check(services.writes()).deepEquals(['DELETE ${mfpApiUri.host}']);
-      check(backends.entries).isEmpty();
-      check(services.entries.find(food.entryId)).isNull();
-    },
-  );
-
-  test('removes nothing when Ekklo cannot be reached', () async {
+  test('holds the Ekklo removal of a linked item', () async {
     final (services, food) = await added();
+    final item = services.entries.find(food.entryId)?.ekkloLink?.item;
     backends.ekkloReachable = false;
 
-    final outcome = await services.removing.remove(
-      entryId: food.entryId,
-      date: day,
-    );
+    services.removing.remove(food.entryId);
+    await services.settle();
 
-    check(outcome)
-        .isA<NotRemoved>()
-        .has((it) => ReadProblem.of(it.error), 'problem')
-        .equals(ReadProblem.offline);
-    check(backends.entries).length.equals(1);
-    check(backends.ekkloMeals.expand((meal) => meal.items)).length.equals(1);
-  });
-
-  test('removes nothing when Ekklo refuses the item removal', () async {
-    final (services, food) = await added();
-    backends.ekkloItemWritesFail = true;
-
-    final outcome = await services.removing.remove(
-      entryId: food.entryId,
-      date: day,
-    );
-
-    check(outcome).isA<NotRemoved>();
-    check(services.writes()).deepEquals(['DELETE ${ekkloUri.host}']);
-    check(backends.entries).length.equals(1);
     check(
-      (await services.find(food.entryId, day))?.status,
-    ).isA<InEkklo>();
+      services.background.heldFor(food.entryId),
+    ).isA<EkkloRemoval>().has((it) => it.link.item, 'item').equals(item);
   });
 
   test('removes only the MyFitnessPal entry of a food not in Ekklo', () async {
     backends.failingMeals.add(dejeuner);
     final services = await WriteServices.over(backends, database);
-    final failed = await services.add(_draft());
+    final food = await services.add(_draft());
+    await services.settle();
     backends.requests.clear();
 
-    final outcome = await services.removing.remove(
-      entryId: (failed as EkkloFailed).added.entryId,
-      date: day,
-    );
+    final removed = services.removing.remove(food.entryId);
+    await services.settle();
 
-    check(
-      outcome,
-    ).isA<Removed>().has((it) => it.ekkloRemoved, 'Ekklo removed').isFalse();
+    check(removed?.ekkloRemoved).equals(false);
     check(services.writes()).deepEquals(['DELETE ${mfpApiUri.host}']);
     check(backends.entries).isEmpty();
   });
 
-  test('writes nothing for an entry already gone', () async {
+  test('forgets an unwritten add entirely', () async {
+    backends.mfpWritesFail = true;
+    final services = await WriteServices.over(backends, database);
+    final food = await services.add(_draft());
+    await services.settle();
+    backends
+      ..mfpWritesFail = false
+      ..requests.clear();
+
+    services.removing.remove(food.entryId);
+    await services.settle();
+
+    check(services.entries.pendingMfp()).isEmpty();
+    check(services.background.heldFor(food.entryId)).isNull();
+    check(services.background.state.failures).isEmpty();
+    check(services.writes()).isEmpty();
+    check(backends.entries).isEmpty();
+  });
+
+  test('returns nothing for an entry already gone', () async {
     final (services, food) = await added();
-    backends.entries = [];
+    services.removing.remove(food.entryId);
+    await services.settle();
+    backends.requests.clear();
 
-    final outcome = await services.removing.remove(
-      entryId: food.entryId,
-      date: day,
-    );
-
-    check(outcome).isA<Removed>();
+    check(services.removing.remove(food.entryId)).isNull();
+    await services.settle();
     check(services.writes()).isEmpty();
   });
 }

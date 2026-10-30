@@ -3,6 +3,7 @@ import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_id.dart';
 import 'package:fujin/data/entries/entry.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/entries/mfp_link.dart';
 import 'package:fujin/data/foods/food_repository.dart';
 import 'package:fujin/data/goals/goals_repository.dart';
@@ -48,13 +49,19 @@ String storeEntry(FujinDatabase database, MfpFoodEntry entry, String id) {
   final mealId = mealsOf(
     database,
   ).mfpMeal(entry.mealName, id: FujinId.at(now));
-  entriesOf(database).save(
-    Entry.copyOf(entry, id: id, mealId: mealId, foodId: foodId, updatedAt: now),
+  entriesOf(database).saveLink(
     MfpLink.of(
       entry,
       id: FujinId.at(now),
       entryId: id,
       mfpEntryId: entry.id ?? id,
+      updatedAt: now,
+    ),
+    entry: Entry.copyOf(
+      entry,
+      id: id,
+      mealId: mealId,
+      foodId: foodId,
       updatedAt: now,
     ),
   );
@@ -90,3 +97,14 @@ SendService sendingOver(
   database: database,
   clock: () => now,
 );
+
+extension EntriesByMfpId on EntryRepository {
+  LoggedEntry? findByMfpEntryId(String mfpEntryId) => switch ([
+    for (final link in mfpLinks())
+      if (link.mfpEntryId == mfpEntryId && link.deletedAt == null)
+        ?find(link.entryId),
+  ]) {
+    [final logged] => logged,
+    _ => null,
+  };
+}

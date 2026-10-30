@@ -46,6 +46,7 @@ DayComparison read(
     foodOf: knownFood,
     mealOf: knownMeal,
     now: now,
+    readAt: now,
     ids: ids,
   ),
   meals: [
@@ -88,6 +89,7 @@ void main() {
         foodOf: knownFood,
         mealOf: knownMeal,
         now: now,
+        readAt: now,
         ids: ids,
       );
 

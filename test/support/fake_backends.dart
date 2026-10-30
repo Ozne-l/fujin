@@ -57,6 +57,7 @@ final class FakeBackends {
   Completer<void>? mealsGate;
   Completer<void>? mfpSearchGate;
   Completer<void>? mfpFoodGate;
+  Completer<void>? mfpAddGate;
   final requests = <http.Request>[];
 
   static const ekkloEmail = 'owner@example.com';
@@ -84,6 +85,10 @@ final class FakeBackends {
       await gate.future;
     }
     if (mfpFoodGate case final gate? when request.url.path == _mfpFoods) {
+      await gate.future;
+    }
+    if (mfpAddGate case final gate?
+        when request.method == 'POST' && request.url.path == _diaryPath) {
       await gate.future;
     }
     return switch ((request.method, request.url.host, request.url.path)) {

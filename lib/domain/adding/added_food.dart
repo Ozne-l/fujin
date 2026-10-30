@@ -6,12 +6,13 @@ part 'added_food.mapper.dart';
 
 @MappableClass()
 final class AddedFood with AddedFoodMappable {
-  const AddedFood({required this.planned, required this.ekkloWritten});
+  const AddedFood({required this.planned});
 
   final PlannedEntry planned;
-  final bool ekkloWritten;
 
   String get entryId => planned.entryId;
 
   LoggedEntry get entry => planned.entry;
+
+  bool get toEkklo => planned.sends;
 }

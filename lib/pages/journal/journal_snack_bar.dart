@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/editing/edited_food.dart';
 import 'package:fujin/domain/sending/food_words.dart';
+import 'package:fujin/domain/writing/write_failure.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/snack_bar_content.dart';
 import 'package:fujin/pages/common/snack_bar_glyph.dart';
-import 'package:fujin/pages/journal/journal_text.dart';
 import 'package:fujin/pages/journal/removal_reason.dart';
 import 'package:fujin/pages/journal/remove_entry_state.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
+import 'package:fujin/pages/sending/send_failure.dart';
 
 abstract final class JournalSnackBar {
   static const undoWindow = Duration(seconds: 8);
@@ -35,7 +37,7 @@ abstract final class JournalSnackBar {
       content: SnackBarContent(
         glyph: SnackBarGlyph.done,
         title: context.intl.foodAdded(productName(entry)),
-        detail: switch (added.ekkloWritten) {
+        detail: switch (added.toEkklo) {
           true => context.intl.foodAddedBothSides(entry.mealName),
           false => context.intl.foodAddedMfpOnly(entry.mealName),
         },
@@ -69,46 +71,6 @@ abstract final class JournalSnackBar {
     );
   }
 
-  static void removeFailed(
-    BuildContext context,
-    RemoveEntryFailed failed, {
-    required VoidCallback onRetry,
-  }) {
-    final intl = context.intl;
-    final food = productName(failed.removal.entry);
-    final reason = switch (failed.blockedInDev) {
-      true => intl.writeBlockedInDev,
-      false => JournalText.problemHeadline(intl, failed.problem),
-    };
-    final (title, detail) = switch ((
-      failed.removedFromEkklo,
-      failed.removal.reason,
-    )) {
-      (true, _) => (intl.addStillInMfp, intl.addStillInMfpDetail(food)),
-      (false, RemovalReason.undoAdd) => (intl.addNotUndone, reason),
-      (false, RemovalReason.delete) => (
-        intl.foodNotDeleted(food),
-        switch (failed.blockedInDev) {
-          true => reason,
-          false => intl.foodNotDeletedDetail,
-        },
-      ),
-    };
-    show(
-      context,
-      duration: undoWindow,
-      content: SnackBarContent(
-        glyph: SnackBarGlyph.alert,
-        title: title,
-        detail: detail,
-        action: switch (failed.blockedInDev) {
-          true => null,
-          false => (intl.tryAgain, onRetry),
-        },
-      ),
-    );
-  }
-
   static void edited(
     BuildContext context,
     EditedFood edited, {
@@ -131,7 +93,7 @@ abstract final class JournalSnackBar {
       ),
       (true, false) => (
         intl.foodMoved(food),
-        switch (edited.ekkloWritten) {
+        switch (edited.toEkklo) {
           true => intl.foodMovedToMealDetail(entry.mealName),
           false => intl.foodAddedMfpOnly(entry.mealName),
         },
@@ -139,7 +101,7 @@ abstract final class JournalSnackBar {
       ),
       (true, true) => (
         intl.foodEdited(food),
-        switch (edited.ekkloWritten) {
+        switch (edited.toEkklo) {
           true => intl.foodEditedDetail(serving),
           false => intl.foodEditedMfpOnlyDetail(serving),
         },
@@ -158,50 +120,53 @@ abstract final class JournalSnackBar {
     );
   }
 
-  static void ekkloNotUpdated(
+  static void notWritten(
     BuildContext context,
-    EditedFood edited, {
+    List<WriteFailure> failures,
+    AppEnvironment environment, {
     required VoidCallback onRetry,
   }) {
     final intl = context.intl;
-    final kept = switch (edited.link?.item) {
-      final item? => EntryText.linkServing(intl, item),
-      null => EntryText.serving(intl, edited.original),
+    List<WriteFailure> shown(bool Function(WriteFailure failure) side) => [
+      for (final failure in failures)
+        if (side(failure) &&
+            SendFailure.of(failure.error, environment) != SendFailure.network)
+          failure,
+    ];
+    final mfp = shown((failure) => failure is MfpNotWritten);
+    final ekklo = shown((failure) => failure is EkkloNotWritten);
+    final notice = switch ((mfp, ekklo)) {
+      ([_, ...], _) => (intl.mfpNotWritten, mfp),
+      (_, [_, ...]) => (intl.ekkloNotUpdated, ekklo),
+      _ => null,
     };
-    _failed(
-      context,
-      title: intl.ekkloNotUpdated,
-      detail: intl.ekkloNotUpdatedDetail(productName(edited.entry), kept),
-      onRetry: onRetry,
-    );
+    if (notice case (final title, final reported)) {
+      final blocked = reported.every(
+        (failure) =>
+            SendFailure.of(failure.error, environment) ==
+            SendFailure.blockedInDev,
+      );
+      show(
+        context,
+        duration: undoWindow,
+        content: SnackBarContent(
+          glyph: SnackBarGlyph.alert,
+          title: title,
+          detail: switch ((blocked, reported)) {
+            (true, _) => intl.writeBlockedInDev,
+            (false, [final failure]) => intl.foodStillPending(
+              productName(failure.logged),
+            ),
+            (false, _) => intl.foodsStillPending(reported.length),
+          },
+          action: switch (blocked) {
+            true => null,
+            false => (intl.tryAgain, onRetry),
+          },
+        ),
+      );
+    }
   }
-
-  static void oldEntryKept(
-    BuildContext context,
-    EditedFood edited, {
-    required VoidCallback onRetry,
-  }) => _failed(
-    context,
-    title: context.intl.editOldEntryKept(productName(edited.entry)),
-    detail: context.intl.editOldEntryKeptDetail,
-    onRetry: onRetry,
-  );
-
-  static void _failed(
-    BuildContext context, {
-    required String title,
-    required String detail,
-    required VoidCallback onRetry,
-  }) => show(
-    context,
-    duration: undoWindow,
-    content: SnackBarContent(
-      glyph: SnackBarGlyph.alert,
-      title: title,
-      detail: detail,
-      action: (context.intl.tryAgain, onRetry),
-    ),
-  );
 
   static void show(
     BuildContext context, {
@@ -209,7 +174,7 @@ abstract final class JournalSnackBar {
     required Duration duration,
   }) {
     ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
+      ..clearSnackBars()
       ..showFujinSnackBar(
         SnackBar(duration: duration, padding: _padding, content: content),
       );

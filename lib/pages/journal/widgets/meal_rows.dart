@@ -7,12 +7,16 @@ import 'package:fujin/app/theme/instant_motion.dart';
 import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
+import 'package:fujin/domain/comparison/mfp_status.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
+import 'package:fujin/pages/journal/background_write_notifier.dart';
 import 'package:fujin/pages/journal/widgets/entry_row.dart';
 import 'package:fujin/pages/journal/widgets/swipe_row.dart';
+import 'package:fujin/pages/journal/writer_state_ids.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:motor/motor.dart';
 
 class MealRows extends HookWidget {
@@ -202,14 +206,19 @@ class _RenderMeasured extends RenderProxyBox {
   }
 }
 
-class _EntryRow extends StatelessWidget {
+class _EntryRow extends ConsumerWidget {
   const _EntryRow(this.compared);
 
   final ComparedEntry compared;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final entry = compared.logged;
+    final failed = ref.watch(
+      backgroundWriteProvider.select(
+        (state) => state.mfpFailedIds.contains(entry.entry.id),
+      ),
+    );
     final detail = switch (compared.status) {
       ToUpdate(link: EkkloLink(:final item?)) => EntryText.linkedServing(
         context.intl,
@@ -229,6 +238,10 @@ class _EntryRow extends StatelessWidget {
       entry: entry,
       detail: detail,
       pill: StatusPill(label: label, tone: tone, icon: icon),
+      mfp: switch (compared.mfp) {
+        MfpPending() when failed => const MfpFailed(),
+        final mfp => mfp,
+      },
     );
   }
 }

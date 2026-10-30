@@ -11,13 +11,14 @@ import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
-import 'package:fujin/domain/adding/add_outcome.dart';
 import 'package:fujin/domain/adding/ekklo_side.dart';
 import 'package:fujin/domain/adding/scan_outcome.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/domain/sending/own_copy_renewal.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
+import 'package:fujin/domain/writing/ekklo_job.dart';
+import 'package:fujin/domain/writing/write_failure.dart';
 import 'package:http/http.dart' as http;
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -100,20 +101,24 @@ void main() {
 
   group('adding', () {
     test(
-      'writes MyFitnessPal first, then Ekklo, and links the entry',
+      'stores the entry at once, then the writer writes MyFitnessPal, then '
+      'Ekklo, and links it',
       () async {
         final services = await writeServices();
 
-        final outcome = await services.add(_draft(_basmati));
+        final added = await services.add(_draft(_basmati));
+
+        check(added)
+          ..has((it) => it.toEkklo, 'to Ekklo').isTrue()
+          ..has((it) => it.entry.mealName, 'meal').equals(lunch)
+          ..has((it) => it.entry.mfpLink, 'link').isNull();
+
+        await services.settle();
 
         check(services.writes()).deepEquals([
           'POST ${mfpApiUri.host}',
           'POST ${ekkloUri.host}',
         ]);
-        final added = (outcome as Added).added;
-        check(added)
-          ..has((it) => it.ekkloWritten, 'Ekklo written').isTrue()
-          ..has((it) => it.entry.mealName, 'meal').equals(lunch);
         check(backends.entries.single)
           ..has((it) => it.servings, 'servings').equals(1.5)
           ..has((it) => it.id, 'id').equals(
@@ -127,113 +132,56 @@ void main() {
       },
     );
 
-    test('adds once when the button is tapped twice', () async {
-      final services = await writeServices();
-      final draft = _draft(_basmati);
-      final planned = await services.adding.plan(draft);
-
-      await Future.wait([
-        services.adding.add(draft, planned),
-        services.adding.add(draft, planned),
-      ]);
-
-      check(backends.entries).length.equals(1);
-      check(backends.ekkloItems).length.equals(1);
-    });
-
     test(
-      'writes nothing when the food changed in MyFitnessPal (06e)',
+      'writes nothing in Ekklo when MyFitnessPal refuses, and keeps the send',
       () async {
-        final changed = _basmati.copyWith(
-          version: '2',
-          nutrients: nutrients(kcal: 356, protein: 8.5, carbs: 78.5, fat: 0.9),
-        );
-        backends.mfpFoods = [changed];
+        backends.mfpWritesFail = true;
         final services = await writeServices();
 
-        final outcome = await services.add(_draft(_basmati));
+        final added = await services.add(_draft(_basmati));
+        await services.settle();
 
-        check(outcome).isA<FoodChanged>()
-          ..has((it) => it.before.version, 'before').equals('1')
-          ..has((it) => it.after, 'after').equals(changed);
-        check(services.writes()).isEmpty();
-        check(services.adding.recents()).isEmpty();
+        check(services.background.state.failures.single)
+            .isA<MfpNotWritten>()
+            .has((it) => ReadProblem.of(it.error), 'problem')
+            .equals(ReadProblem.mfpUnavailable);
+        check(
+          services.background.heldFor(added.entryId),
+        ).isA<EkkloSend>();
+        check(backends.ekkloMeals).isEmpty();
+        check(services.entries.find(added.entryId)?.mfpLink).isNull();
       },
     );
 
-    test('checks the Ekklo session before writing MyFitnessPal', () async {
-      final store = InMemoryEkkloTokenStore();
-      await store.write(FakeBackends.staleEkkloTokens);
-      final services = await writeServices(ekkloTokens: store);
-
-      final outcome = await services.add(_draft(_basmati));
-
-      check(outcome)
-          .isA<NotAdded>()
-          .has((it) => ReadProblem.of(it.error), 'problem')
-          .equals(ReadProblem.ekkloSessionExpired);
-      check(backends.entries).isEmpty();
-    });
-
-    test('writes nothing in Ekklo when MyFitnessPal refuses (06d)', () async {
-      backends.mfpWritesFail = true;
-      final services = await writeServices();
-
-      final outcome = await services.add(_draft(_basmati));
-
-      check(outcome)
-          .isA<NotAdded>()
-          .has((it) => ReadProblem.of(it.error), 'problem')
-          .equals(ReadProblem.mfpUnavailable);
-      check(backends.ekkloMeals).isEmpty();
-      check(services.adding.recents()).isEmpty();
-    });
-
     test(
-      'keeps the MyFitnessPal entry when Ekklo fails and retries Ekklo only '
-      '(06b)',
+      'keeps the MyFitnessPal entry when Ekklo fails and retries Ekklo only',
       () async {
         backends.failingMeals.add(dejeuner);
         final services = await writeServices();
 
-        final failed = await services.add(_draft(_basmati));
+        final added = await services.add(_draft(_basmati));
+        await services.settle();
 
-        final added = (failed as EkkloFailed).added;
-        check(added.ekkloWritten).isFalse();
+        check(
+          services.background.state.failures.single,
+        ).isA<EkkloNotWritten>();
         check((await services.find(added.entryId, day))?.status).isA<ToSend>();
 
         backends.failingMeals.clear();
-        final retried = await services.adding.retryEkklo(added);
+        backends.requests.clear();
+        await services.settle();
 
-        check(retried)
-            .isA<Added>()
-            .has((it) => it.added.ekkloWritten, 'Ekklo written')
-            .isTrue();
+        check(services.background.state.failures).isEmpty();
+        check(services.writes()).deepEquals(['POST ${ekkloUri.host}']);
         check(backends.entries).length.equals(1);
         check(backends.ekkloItems).length.equals(1);
         check((await services.find(added.entryId, day))?.status).isA<InEkklo>();
       },
     );
 
-    test('never writes Ekklo twice after a lost reply', () async {
-      backends.lostReplies.add(dejeuner);
-      final services = await writeServices();
-
-      final failed = await services.add(_draft(_basmati));
-      backends.lostReplies.clear();
-      final retried = await services.adding.retryEkklo(
-        (failed as EkkloFailed).added,
-      );
-
-      check(retried).isA<Added>();
-      check(backends.ekkloItems).length.equals(1);
-      check(
-        (await services.find(failed.added.entryId, day))?.status,
-      ).isA<InEkklo>();
-    });
-
     test(
-      'takes over the entry a read copied in while MyFitnessPal answered',
+      'adopts the row a read found while MyFitnessPal answered, without a '
+      'second entry',
       () async {
         final reading = _ReadingAfterAdd(backends.httpClient);
         final services = await WriteServices.over(
@@ -244,10 +192,11 @@ void main() {
         );
         reading.onAdded = () => services.journal.readDay(day);
 
-        final added = ((await services.add(_draft(_basmati))) as Added).added;
+        final added = await services.add(_draft(_basmati));
+        await services.settle();
 
         check(reading.onAdded).isNull();
-        check(services.entries.entries()).length.equals(2);
+        check(services.entries.entries()).length.equals(1);
         check(services.entries.forDate(day).entries.single)
           ..has((it) => it.entry.id, 'Fūjin id').equals(added.entryId)
           ..has(
@@ -255,6 +204,7 @@ void main() {
             'MyFitnessPal id',
           ).equals(backends.entries.single.id)
           ..has((it) => it.ekkloLink?.item, 'item').isNotNull();
+        check(backends.entries).length.equals(1);
         check(backends.ekkloItems).length.equals(1);
       },
     );
@@ -285,7 +235,8 @@ void main() {
             .has((it) => it.renewal, 'renewal')
             .equals(OwnCopyRenewal.foodChanged);
 
-        await services.adding.add(draft, planned);
+        services.adding.add(draft, planned);
+        await services.settle();
 
         check(backends.ekkloItems.single.foodId).not(
           (it) => it.equals('own-old'),
@@ -307,6 +258,7 @@ void main() {
         EkkloSide.of(await services.adding.plan(draft)),
       ).equals(EkkloSide.foundAutomatically);
       await services.add(draft);
+      await services.settle();
 
       check(
         EkkloSide.of(await services.adding.plan(draft)),
@@ -496,31 +448,16 @@ void main() {
       final services = await writeServices();
       final draft = _draft(_basmati);
 
-      await services.adding.add(
+      services.adding.add(
         draft,
         await services.adding.plan(draft),
         barcodeToLink: _barcode,
       );
+      await services.settle();
 
       check(memoryRepository.barcodeFood(_barcode)).equals(rice);
     });
 
-    test('links nothing when MyFitnessPal refuses the add', () async {
-      backends.mfpWritesFail = true;
-      final services = await writeServices();
-      final draft = _draft(_basmati);
-
-      await services.adding.add(
-        draft,
-        await services.adding.plan(draft),
-        barcodeToLink: _barcode,
-      );
-
-      check(memoryRepository.barcodeFood(_barcode)).isNull();
-    });
-  });
-
-  group('recents', () {
     test('lists the foods added, newest first, once each', () async {
       final services = await writeServices();
 

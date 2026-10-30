@@ -30,6 +30,7 @@ import 'package:fujin/domain/editing/remove_entry_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/memory/memory_service.dart';
 import 'package:fujin/domain/sending/send_service.dart';
+import 'package:fujin/domain/writing/background_writer.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
@@ -237,37 +238,44 @@ final entryWriterProvider = Provider<EntryWriter>(
   ),
 );
 
+final backgroundWriterProvider = Provider<BackgroundWriter>(
+  (ref) => BackgroundWriter(
+    mfp: ref.watch(mfpClientProvider),
+    sending: ref.watch(sendServiceProvider),
+    memory: ref.watch(memoryRepositoryProvider),
+    entries: ref.watch(entryRepositoryProvider),
+    writer: ref.watch(entryWriterProvider),
+  ),
+);
+
 final addFoodServiceProvider = Provider<AddFoodService>(
   (ref) => AddFoodService(
     mfp: ref.watch(mfpClientProvider),
-    ekklo: ref.watch(ekkloClientProvider),
     sending: ref.watch(sendServiceProvider),
     memory: ref.watch(memoryRepositoryProvider),
     foods: ref.watch(foodRepositoryProvider),
     recents: ref.watch(recentFoodRepositoryProvider),
     writer: ref.watch(entryWriterProvider),
+    background: ref.watch(backgroundWriterProvider),
     clock: ref.watch(clockProvider),
   ),
 );
 
 final removeEntryServiceProvider = Provider<RemoveEntryService>(
   (ref) => RemoveEntryService(
-    mfp: ref.watch(mfpClientProvider),
-    journal: ref.watch(journalServiceProvider),
-    sending: ref.watch(sendServiceProvider),
     entries: ref.watch(entryRepositoryProvider),
+    background: ref.watch(backgroundWriterProvider),
   ),
 );
 
 final editEntryServiceProvider = Provider<EditEntryService>(
   (ref) => EditEntryService(
     mfp: ref.watch(mfpClientProvider),
-    ekklo: ref.watch(ekkloClientProvider),
-    journal: ref.watch(journalServiceProvider),
     sending: ref.watch(sendServiceProvider),
     memory: ref.watch(memoryRepositoryProvider),
     foods: ref.watch(foodRepositoryProvider),
     entries: ref.watch(entryRepositoryProvider),
     writer: ref.watch(entryWriterProvider),
+    background: ref.watch(backgroundWriterProvider),
   ),
 );
