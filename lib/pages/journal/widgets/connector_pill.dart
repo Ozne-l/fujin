@@ -4,21 +4,39 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/connectors/connector.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/clock_icon.dart';
 import 'package:fujin/pages/common/pill_size.dart';
 import 'package:motor/motor.dart';
 
-class MfpPill extends StatelessWidget {
-  const MfpPill({required this.failed, super.key});
+class ConnectorPill extends StatelessWidget {
+  const ConnectorPill({
+    required this.connector,
+    required this.failed,
+    super.key,
+  });
 
   static const PillSize _size = PillSize.small;
 
+  final Connector connector;
   final bool failed;
 
   @override
   Widget build(BuildContext context) {
-    final color = context.colors.sourceMfp;
+    final intl = context.intl;
+    final (color, label, semantics) = switch (connector) {
+      Connector.mfp => (
+        context.colors.sourceMfp,
+        intl.pillMfp,
+        intl.mfpPendingSemantics,
+      ),
+      Connector.ekklo => (
+        context.colors.sourceEkklo,
+        intl.sourceEkklo,
+        intl.ekkloPendingSemantics,
+      ),
+    };
     final theme = SvgTheme(currentColor: color);
     final hand = SvgPicture.asset(
       ClockIcon.hand,
@@ -27,7 +45,7 @@ class MfpPill extends StatelessWidget {
       theme: theme,
     );
     return Semantics(
-      label: context.intl.mfpPendingSemantics,
+      label: semantics,
       child: ExcludeSemantics(
         child: Container(
           height: _size.height,
@@ -52,7 +70,7 @@ class MfpPill extends StatelessWidget {
                   switch (failed || FujinMotion.reduced(context)) {
                     true => hand,
                     false => SequenceMotionBuilder<int, double>(
-                      sequence: FujinMotion.mfpClockTurns,
+                      sequence: FujinMotion.clockTurns,
                       converter: MotionConverter.single,
                       builder: (context, turns, _, child) =>
                           Transform.rotate(angle: turns * 2 * pi, child: child),
@@ -61,10 +79,7 @@ class MfpPill extends StatelessWidget {
                   },
                 ],
               ),
-              Text(
-                context.intl.pillMfp,
-                style: _size.style.copyWith(color: color),
-              ),
+              Text(label, style: _size.style.copyWith(color: color)),
             ],
           ),
         ),

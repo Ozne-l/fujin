@@ -23,6 +23,4 @@ final class EditedFood with EditedFoodMappable {
   String get entryId => original.entry.id;
 
   LoggedEntry get entry => planned.entry;
-
-  bool get toEkklo => link?.item != null;
 }

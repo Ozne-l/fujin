@@ -18,13 +18,11 @@ final class RemoveEntryService {
     final logged = _entries.find(entryId);
     if (logged == null) return null;
     _background.drop(entryId);
-    final link = logged.ekkloLink;
-    final ekkloRemoved = link?.item != null;
-    if (link case final link? when ekkloRemoved) {
+    if (logged.ekkloLink case final link? when link.item != null) {
       _background.hold(entryId, EkkloRemoval(link));
     }
     _entries.remove(entryId);
     unawaited(_background.run());
-    return RemovedEntry(logged, ekkloRemoved: ekkloRemoved);
+    return RemovedEntry(logged);
   }
 }

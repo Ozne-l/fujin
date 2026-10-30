@@ -101,7 +101,7 @@ void main() {
         ]);
         final edited = (outcome as Edited).edited;
         check(edited)
-          ..has((it) => it.toEkklo, 'to Ekklo').isTrue()
+          ..has((it) => it.link?.item, 'Ekklo item').isNotNull()
           ..has((it) => it.entryId, 'entry id').equals(food.entryId);
         check(backends.entries.single)
           ..has((it) => it.id, 'id').equals(
@@ -180,7 +180,7 @@ void main() {
       ]);
       check(
         outcome,
-      ).isA<Edited>().has((it) => it.edited.toEkklo, 'to Ekklo').isFalse();
+      ).isA<Edited>().has((it) => it.edited.link?.item, 'Ekklo item').isNull();
     });
 
     test(

@@ -109,7 +109,7 @@ void main() {
         final added = await services.add(_draft(_basmati));
 
         check(added)
-          ..has((it) => it.toEkklo, 'to Ekklo').isTrue()
+          ..has((it) => it.planned.sends, 'sends').isTrue()
           ..has((it) => it.entry.mealName, 'meal').equals(lunch)
           ..has((it) => it.entry.mfpLink, 'link').isNull();
 

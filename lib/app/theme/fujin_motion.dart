@@ -19,10 +19,10 @@ abstract final class FujinMotion {
     loop: LoopMode.seamless,
   );
 
-  static const Motion mfpClockTurn = LinearMotion(Duration(seconds: 4));
-  static const mfpClockTurns = StepSequence<double>(
+  static const Motion clockTurn = LinearMotion(Duration(seconds: 4));
+  static const clockTurns = StepSequence<double>(
     [0, 1],
-    motion: mfpClockTurn,
+    motion: clockTurn,
     loop: LoopMode.seamless,
   );
 

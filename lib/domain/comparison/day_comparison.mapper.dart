@@ -17,6 +17,7 @@ class DayComparisonMapper extends ClassMapperBase<DayComparison> {
       MapperContainer.globals.use(_instance = DayComparisonMapper._());
       DayChangesMapper.ensureInitialized();
       ComparedEntryMapper.ensureInitialized();
+      LoggedEntryMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -36,11 +37,19 @@ class DayComparisonMapper extends ClassMapperBase<DayComparison> {
     opt: true,
     def: const [],
   );
+  static List<LoggedEntry> _$leaving(DayComparison v) => v.leaving;
+  static const Field<DayComparison, List<LoggedEntry>> _f$leaving = Field(
+    'leaving',
+    _$leaving,
+    opt: true,
+    def: const [],
+  );
 
   @override
   final MappableFields<DayComparison> fields = const {
     #changes: _f$changes,
     #entries: _f$entries,
+    #leaving: _f$leaving,
   };
   @override
   final bool ignoreNull = true;
@@ -49,6 +58,7 @@ class DayComparisonMapper extends ClassMapperBase<DayComparison> {
     return DayComparison(
       changes: data.dec(_f$changes),
       entries: data.dec(_f$entries),
+      leaving: data.dec(_f$leaving),
     );
   }
 
@@ -121,7 +131,17 @@ abstract class DayComparisonCopyWith<$R, $In extends DayComparison, $Out>
     ComparedEntryCopyWith<$R, ComparedEntry, ComparedEntry>
   >
   get entries;
-  $R call({DayChanges? changes, List<ComparedEntry>? entries});
+  ListCopyWith<
+    $R,
+    LoggedEntry,
+    LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry>
+  >
+  get leaving;
+  $R call({
+    DayChanges? changes,
+    List<ComparedEntry>? entries,
+    List<LoggedEntry>? leaving,
+  });
   DayComparisonCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -148,16 +168,33 @@ class _DayComparisonCopyWithImpl<$R, $Out>
     (v) => call(entries: v),
   );
   @override
-  $R call({DayChanges? changes, List<ComparedEntry>? entries}) => $apply(
+  ListCopyWith<
+    $R,
+    LoggedEntry,
+    LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry>
+  >
+  get leaving => ListCopyWith(
+    $value.leaving,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(leaving: v),
+  );
+  @override
+  $R call({
+    DayChanges? changes,
+    List<ComparedEntry>? entries,
+    List<LoggedEntry>? leaving,
+  }) => $apply(
     FieldCopyWithData({
       if (changes != null) #changes: changes,
       if (entries != null) #entries: entries,
+      if (leaving != null) #leaving: leaving,
     }),
   );
   @override
   DayComparison $make(CopyWithData data) => DayComparison(
     changes: data.get(#changes, or: $value.changes),
     entries: data.get(#entries, or: $value.entries),
+    leaving: data.get(#leaving, or: $value.leaving),
   );
 
   @override

@@ -11,6 +11,7 @@ import 'package:fujin/domain/comparison/compared_entry_lookup.dart';
 import 'package:fujin/domain/editing/edit_entry_service.dart';
 import 'package:fujin/domain/editing/remove_entry_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
+import 'package:fujin/domain/sending/send_service.dart';
 import 'package:fujin/domain/writing/background_writer.dart';
 import 'package:http/http.dart' as http;
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
@@ -24,6 +25,7 @@ final class WriteServices {
     this.backends,
     this.entries,
     this.journal,
+    this.sending,
     this.adding,
     this.removing,
     this.editing,
@@ -71,6 +73,7 @@ final class WriteServices {
       backends,
       entries,
       journal,
+      sending,
       AddFoodService(
         mfp: mfp,
         sending: sending,
@@ -98,6 +101,7 @@ final class WriteServices {
   final FakeBackends backends;
   final EntryRepository entries;
   final JournalService journal;
+  final SendService sending;
   final AddFoodService adding;
   final RemoveEntryService removing;
   final EditEntryService editing;

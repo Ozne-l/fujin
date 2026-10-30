@@ -1976,29 +1976,11 @@ abstract class AppLocalizations {
   /// **'{food} ajouté'**
   String foodAdded(String food);
 
-  /// No description provided for @foodAddedBothSides.
-  ///
-  /// In fr, this message translates to:
-  /// **'MyFitnessPal et Ekklo · {meal}'**
-  String foodAddedBothSides(String meal);
-
-  /// No description provided for @foodAddedMfpOnly.
-  ///
-  /// In fr, this message translates to:
-  /// **'MyFitnessPal seulement · {meal}'**
-  String foodAddedMfpOnly(String meal);
-
   /// No description provided for @addUndone.
   ///
   /// In fr, this message translates to:
   /// **'Ajout annulé'**
   String get addUndone;
-
-  /// No description provided for @addUndoneDetail.
-  ///
-  /// In fr, this message translates to:
-  /// **'Supprimé de MyFitnessPal et d’Ekklo'**
-  String get addUndoneDetail;
 
   /// No description provided for @undoAdd.
   ///
@@ -2964,47 +2946,17 @@ abstract class AppLocalizations {
   /// **'{food} supprimé'**
   String foodDeleted(String food);
 
-  /// No description provided for @foodDeletedDetail.
-  ///
-  /// In fr, this message translates to:
-  /// **'Retiré d’Ekklo et de MyFitnessPal · {meal}'**
-  String foodDeletedDetail(String meal);
-
-  /// No description provided for @foodDeletedMfpOnlyDetail.
-  ///
-  /// In fr, this message translates to:
-  /// **'Retiré de MyFitnessPal seulement · {meal}'**
-  String foodDeletedMfpOnlyDetail(String meal);
-
   /// No description provided for @foodEdited.
   ///
   /// In fr, this message translates to:
   /// **'{food} modifié'**
   String foodEdited(String food);
 
-  /// No description provided for @foodEditedDetail.
-  ///
-  /// In fr, this message translates to:
-  /// **'MyFitnessPal et Ekklo · {serving}'**
-  String foodEditedDetail(String serving);
-
-  /// No description provided for @foodEditedMfpOnlyDetail.
-  ///
-  /// In fr, this message translates to:
-  /// **'MyFitnessPal seulement · {serving}'**
-  String foodEditedMfpOnlyDetail(String serving);
-
   /// No description provided for @foodMoved.
   ///
   /// In fr, this message translates to:
   /// **'{food} déplacé'**
   String foodMoved(String food);
-
-  /// No description provided for @foodMovedToMealDetail.
-  ///
-  /// In fr, this message translates to:
-  /// **'MyFitnessPal et Ekklo · {meal}'**
-  String foodMovedToMealDetail(String meal);
 
   /// No description provided for @foodMovedToDayDetail.
   ///
@@ -3018,17 +2970,17 @@ abstract class AppLocalizations {
   /// **'Voir'**
   String get foodMovedSee;
 
-  /// No description provided for @ekkloNotUpdated.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ekklo pas mis à jour'**
-  String get ekkloNotUpdated;
-
   /// No description provided for @mfpNotWritten.
   ///
   /// In fr, this message translates to:
   /// **'Pas écrit dans MyFitnessPal'**
   String get mfpNotWritten;
+
+  /// No description provided for @ekkloNotWritten.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas écrit dans Ekklo'**
+  String get ekkloNotWritten;
 
   /// No description provided for @foodStillPending.
   ///
@@ -3053,6 +3005,18 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'En attente de MyFitnessPal'**
   String get mfpPendingSemantics;
+
+  /// No description provided for @ekkloPendingSemantics.
+  ///
+  /// In fr, this message translates to:
+  /// **'En attente d’Ekklo'**
+  String get ekkloPendingSemantics;
+
+  /// No description provided for @entryDeletedInFujin.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimé dans Fūjin'**
+  String get entryDeletedInFujin;
 
   /// No description provided for @writeBlockedInDev.
   ///

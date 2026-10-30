@@ -6,7 +6,6 @@ import 'package:fujin/domain/editing/edited_food.dart';
 import 'package:fujin/domain/sending/food_words.dart';
 import 'package:fujin/domain/writing/write_failure.dart';
 import 'package:fujin/l10n/intl_context.dart';
-import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/snack_bar_content.dart';
 import 'package:fujin/pages/common/snack_bar_glyph.dart';
@@ -37,10 +36,7 @@ abstract final class JournalSnackBar {
       content: SnackBarContent(
         glyph: SnackBarGlyph.done,
         title: context.intl.foodAdded(productName(entry)),
-        detail: switch (added.toEkklo) {
-          true => context.intl.foodAddedBothSides(entry.mealName),
-          false => context.intl.foodAddedMfpOnly(entry.mealName),
-        },
+        detail: entry.mealName,
         action: (context.intl.undoAdd, onUndo),
       ),
     );
@@ -53,15 +49,12 @@ abstract final class JournalSnackBar {
       RemovalReason.undoAdd => (
         SnackBarGlyph.undone,
         intl.addUndone,
-        intl.addUndoneDetail,
+        entry.mealName,
       ),
       RemovalReason.delete => (
         SnackBarGlyph.done,
         intl.foodDeleted(productName(entry)),
-        switch (done.ekkloRemoved) {
-          true => intl.foodDeletedDetail(entry.mealName),
-          false => intl.foodDeletedMfpOnlyDetail(entry.mealName),
-        },
+        entry.mealName,
       ),
     };
     show(
@@ -80,7 +73,6 @@ abstract final class JournalSnackBar {
     final intl = context.intl;
     final entry = edited.entry;
     final food = productName(entry);
-    final serving = EntryText.serving(intl, entry);
     final (title, detail, action) = switch ((
       SelectedDay.calendarDay(entry.entry.date) ==
           SelectedDay.calendarDay(edited.original.entry.date),
@@ -93,18 +85,12 @@ abstract final class JournalSnackBar {
       ),
       (true, false) => (
         intl.foodMoved(food),
-        switch (edited.toEkklo) {
-          true => intl.foodMovedToMealDetail(entry.mealName),
-          false => intl.foodAddedMfpOnly(entry.mealName),
-        },
+        entry.mealName,
         null,
       ),
       (true, true) => (
         intl.foodEdited(food),
-        switch (edited.toEkklo) {
-          true => intl.foodEditedDetail(serving),
-          false => intl.foodEditedMfpOnlyDetail(serving),
-        },
+        entry.mealName,
         (intl.undoAdd, onUndo),
       ),
     };
@@ -137,7 +123,7 @@ abstract final class JournalSnackBar {
     final ekklo = shown((failure) => failure is EkkloNotWritten);
     final notice = switch ((mfp, ekklo)) {
       ([_, ...], _) => (intl.mfpNotWritten, mfp),
-      (_, [_, ...]) => (intl.ekkloNotUpdated, ekklo),
+      (_, [_, ...]) => (intl.ekkloNotWritten, ekklo),
       _ => null,
     };
     if (notice case (final title, final reported)) {

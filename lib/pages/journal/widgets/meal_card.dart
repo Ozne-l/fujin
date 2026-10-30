@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/journal/journal_meal.dart';
 import 'package:fujin/domain/journal/status_counts.dart';
@@ -10,10 +11,13 @@ import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
+import 'package:fujin/pages/journal/background_write_notifier.dart';
 import 'package:fujin/pages/journal/widgets/meal_rows.dart';
 import 'package:fujin/pages/journal/widgets/split_line.dart';
+import 'package:fujin/pages/journal/writer_state_ids.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class MealCard extends HookWidget {
+class MealCard extends HookConsumerWidget {
   const MealCard({
     required this.meal,
     required this.onAdd,
@@ -37,7 +41,16 @@ class MealCard extends HookWidget {
   final ValueChanged<ComparedEntry> onRemove;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final removals = ref.watch(
+      backgroundWriteProvider.select((state) => state.ekkloRemovalIds),
+    );
+    final leaving = [
+      for (final logged in meal.leaving)
+        if (MfpWrite.of(logged) is MfpDeletion ||
+            removals.contains(logged.entry.id))
+          logged,
+    ];
     final counts = meal.counts;
     final settled = counts.total > 0 && counts.pending == 0;
     final toggled = useState<({bool settled, bool open})?>(null);
@@ -147,11 +160,12 @@ class MealCard extends HookWidget {
             duration: FujinMotion.mealFold.duration,
             curve: FujinMotion.mealFold.curve,
             alignment: Alignment.topCenter,
-            child: switch ((open, meal.entries)) {
+            child: switch ((open, [...meal.entries, ...leaving])) {
               (true, [_, ...]) => Padding(
                 padding: const EdgeInsets.only(top: FujinSpace.s3),
                 child: MealRows(
                   entries: meal.entries,
+                  leaving: leaving,
                   groupTag: groupTag,
                   removable: removable,
                   removedEntryId: removedEntryId,

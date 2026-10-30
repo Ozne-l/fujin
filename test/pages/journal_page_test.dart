@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/providers.dart';
+import 'package:fujin/data/connectors/connector.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/preferences/fujin_preferences.dart';
 import 'package:fujin/domain/goals/day_goal_state.dart';
@@ -16,9 +17,9 @@ import 'package:fujin/pages/common/appearance_toggle.dart';
 import 'package:fujin/pages/common/day_picker_sheet.dart';
 import 'package:fujin/pages/common/gold_volute.dart';
 import 'package:fujin/pages/common/souffle_refresh.dart';
+import 'package:fujin/pages/journal/widgets/connector_pill.dart';
 import 'package:fujin/pages/journal/widgets/day_ring.dart';
 import 'package:fujin/pages/journal/widgets/journal_header.dart';
-import 'package:fujin/pages/journal/widgets/mfp_pill.dart';
 import 'package:fujin/pages/journal/widgets/nutrient_ring.dart';
 import 'package:fujin/pages/journal/widgets/week_band.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -157,16 +158,39 @@ Future<void> _addBasmatiToLunch(WidgetTester tester) async {
   await _tap(tester, find.text('Ajouter à MFP et Ekklo'));
 }
 
+Future<void> _deleteBasmati(WidgetTester tester) async {
+  tester
+      .state<ScaffoldMessengerState>(find.byType(ScaffoldMessenger))
+      .clearSnackBars();
+  await tester.pumpAndSettle();
+  await _tap(tester, find.text('1/1 · Riz basmati'));
+  await tester.timedDrag(
+    find.text('Riz basmati'),
+    const Offset(-640, 0),
+    const Duration(seconds: 1),
+  );
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Supprimer de MFP et Ekklo'));
+  await _frames(tester);
+}
+
 const _mfpNotWritten = 'Pas écrit dans MyFitnessPal';
 const _quarterTurn = Duration(seconds: 1);
 
 final Finder _turningHands = find.descendant(
-  of: find.byType(MfpPill),
+  of: find.byType(ConnectorPill),
   matching: find.byType(Transform),
 );
 
-Matrix4 _clockHand(WidgetTester tester) =>
-    tester.widget<Transform>(_turningHands).transform;
+Finder _pill(Connector connector) => find.byWidgetPredicate(
+  (widget) => widget is ConnectorPill && widget.connector == connector,
+);
+
+Finder _turning(Connector connector) =>
+    find.descendant(of: _pill(connector), matching: find.byType(Transform));
+
+Matrix4 _clockHand(WidgetTester tester, Connector connector) =>
+    tester.widget<Transform>(_turning(connector)).transform;
 
 Future<void> _frames(WidgetTester tester) async {
   for (var frame = 0; frame < 10; frame++) {
@@ -1119,7 +1143,9 @@ void main() {
       check(backends.ekkloItems).length.equals(1);
       check(find.text('Riz basmati ajouté').evaluate()).length.equals(1);
       check(
-        find.text('MyFitnessPal et Ekklo · $lunch').evaluate(),
+        find
+            .descendant(of: find.byType(SnackBar), matching: find.text(lunch))
+            .evaluate(),
       ).length.equals(1);
       check(find.text('Annuler').evaluate()).length.equals(1);
       check(find.text('1/1 · Riz basmati').evaluate()).length.equals(1);
@@ -1162,7 +1188,9 @@ void main() {
       check(backends.ekkloItems).isEmpty();
       check(find.text('Ajout annulé').evaluate()).length.equals(1);
       check(
-        find.text('Supprimé de MyFitnessPal et d’Ekklo').evaluate(),
+        find
+            .descendant(of: find.byType(SnackBar), matching: find.text(lunch))
+            .evaluate(),
       ).length.equals(1);
       check(find.text('Rien pour l’instant').evaluate()).length.equals(2);
     });
@@ -1209,8 +1237,8 @@ void main() {
   });
 
   group('writing in the background', () {
-    testWidgets('shows MFP pending with a turning clock, still under reduced '
-        'motion', (tester) async {
+    testWidgets('shows MFP and Ekklo pending with turning clocks, still '
+        'under reduced motion', (tester) async {
       _tallView(tester);
       final backends = _basmatiBackends();
       await pumpFujin(tester, backends);
@@ -1222,9 +1250,17 @@ void main() {
 
       check(find.text('Ajouter à MFP et Ekklo').evaluate()).isEmpty();
       check(find.text('MFP').evaluate()).length.equals(1);
-      final before = _clockHand(tester);
+      check(_pill(Connector.ekklo).evaluate()).length.equals(1);
+      check(find.text('À envoyer').evaluate()).isEmpty();
+      final mfpBefore = _clockHand(tester, Connector.mfp);
+      final ekkloBefore = _clockHand(tester, Connector.ekklo);
       await tester.pump(_quarterTurn);
-      check(_clockHand(tester)).not((it) => it.equals(before));
+      check(
+        _clockHand(tester, Connector.mfp),
+      ).not((it) => it.equals(mfpBefore));
+      check(
+        _clockHand(tester, Connector.ekklo),
+      ).not((it) => it.equals(ekkloBefore));
 
       tester.platformDispatcher.accessibilityFeaturesTestValue =
           const FakeAccessibilityFeatures(disableAnimations: true);
@@ -1234,13 +1270,15 @@ void main() {
       await tester.pumpAndSettle();
 
       check(find.text('MFP').evaluate()).length.equals(1);
+      check(_pill(Connector.ekklo).evaluate()).length.equals(1);
       check(_turningHands.evaluate()).isEmpty();
 
       gate.complete();
       backends.mfpAddGate = null;
       await tester.pumpAndSettle();
 
-      check(find.text('MFP').evaluate()).isEmpty();
+      check(find.byType(ConnectorPill).evaluate()).isEmpty();
+      check(find.text('Dans Ekklo').evaluate()).length.equals(1);
       check(backends.entries).length.equals(1);
       check(backends.ekkloItems).length.equals(1);
     });
@@ -1329,9 +1367,8 @@ void main() {
       check(find.text('Réessayer').evaluate()).isEmpty();
     });
 
-    testWidgets('says Ekklo pas mis à jour when Ekklo refuses the add', (
-      tester,
-    ) async {
+    testWidgets('says Pas écrit dans Ekklo with Réessayer and stops the Ekklo '
+        'clock when Ekklo refuses the add', (tester) async {
       _tallView(tester);
       final backends = _basmatiBackends();
       backends.failingMeals.add(dejeuner);
@@ -1341,17 +1378,92 @@ void main() {
 
       check(backends.entries).length.equals(1);
       check(backends.ekkloItems).isEmpty();
-      check(find.text('Ekklo pas mis à jour').evaluate()).length.equals(1);
+      check(find.text('Pas écrit dans Ekklo').evaluate()).length.equals(1);
       check(
         find.text('Riz basmati reste en attente').evaluate(),
       ).length.equals(1);
       check(find.text('MFP').evaluate()).isEmpty();
+      check(_pill(Connector.ekklo).evaluate()).length.equals(1);
+      check(find.text('À envoyer').evaluate()).isEmpty();
+      check(_turningHands.evaluate()).isEmpty();
 
       backends.failingMeals.clear();
       await _tap(tester, find.text('Réessayer'));
 
-      check(backends.entries).length.equals(1);
       check(backends.ekkloItems).length.equals(1);
+      check(find.byType(ConnectorPill).evaluate()).isEmpty();
+      check(find.text('Dans Ekklo').evaluate()).length.equals(1);
+    });
+
+    testWidgets('offers no Réessayer for Ekklo in Fūjin DEV', (tester) async {
+      _tallView(tester);
+      final backends = _basmatiBackends();
+      await pumpFujin(tester, backends, environment: AppEnvironment.dev);
+
+      await _addBasmatiToLunch(tester);
+
+      check(find.text('Pas écrit dans Ekklo').evaluate()).isEmpty();
+      check(find.text(_mfpNotWritten).evaluate()).length.equals(1);
+      check(find.text('Réessayer').evaluate()).isEmpty();
+    });
+
+    testWidgets('keeps a food deleted in Fūjin greyed in its meal, out of '
+        'the rings, until MyFitnessPal let go of it', (tester) async {
+      _tallView(tester);
+      final backends = _basmatiBackends();
+      await pumpFujin(tester, backends, goals: _goals);
+      await _addBasmatiToLunch(tester);
+      final gate = backends.mfpRemoveGate = Completer<void>();
+
+      await _deleteBasmati(tester);
+
+      check(backends.ekkloItems).isEmpty();
+      check(find.text('Riz basmati').evaluate()).length.equals(1);
+      check(find.text('Supprimé dans Fūjin').evaluate()).length.equals(1);
+      check(find.text('MFP').evaluate()).length.equals(1);
+      check(_pill(Connector.ekklo).evaluate()).isEmpty();
+      check(find.text('Rien pour l’instant').evaluate()).length.equals(2);
+      check(_ring(tester, '5').state).equals(DayGoalState.nothingLogged);
+      check(_turning(Connector.mfp).evaluate()).length.equals(1);
+
+      await tester.tap(find.text('Riz basmati'));
+      await _frames(tester);
+      check(find.text('Supprimé dans Fūjin').evaluate()).length.equals(1);
+
+      gate.complete();
+      backends.mfpRemoveGate = null;
+      await tester.pumpAndSettle();
+
+      check(backends.entries).isEmpty();
+      check(find.text('Riz basmati').evaluate()).isEmpty();
+      check(find.text('Supprimé dans Fūjin').evaluate()).isEmpty();
+    });
+
+    testWidgets('keeps a food deleted in Fūjin greyed with a still Ekklo '
+        'clock while Ekklo refuses its removal', (tester) async {
+      _tallView(tester);
+      final backends = _basmatiBackends();
+      await pumpFujin(tester, backends);
+      await _addBasmatiToLunch(tester);
+      backends.ekkloItemWritesFail = true;
+
+      await _deleteBasmati(tester);
+
+      check(backends.ekkloItems).length.equals(1);
+      check(backends.entries).length.equals(1);
+      check(find.text('Pas écrit dans Ekklo').evaluate()).length.equals(1);
+      check(find.text('Supprimé dans Fūjin').evaluate()).length.equals(1);
+      check(find.text('MFP').evaluate()).length.equals(1);
+      check(_pill(Connector.ekklo).evaluate()).length.equals(1);
+      check(_turningHands.evaluate()).isEmpty();
+
+      backends.ekkloItemWritesFail = false;
+      await _tap(tester, find.text('Réessayer'));
+
+      check(backends.ekkloItems).isEmpty();
+      check(backends.entries).isEmpty();
+      check(find.text('Supprimé dans Fūjin').evaluate()).isEmpty();
+      check(find.text('Riz basmati').evaluate()).isEmpty();
     });
 
     testWidgets('writes after foreground return', (tester) async {

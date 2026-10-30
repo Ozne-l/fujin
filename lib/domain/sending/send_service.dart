@@ -45,7 +45,7 @@ _OwnCopyKey _ownCopyKey(LoggedEntry entry) =>
     (entry.entry.foodId, entry.entry.servingUnit);
 
 final class SendService {
-  const SendService({
+  SendService({
     required this._journal,
     required this._ekklo,
     required this._memory,
@@ -60,6 +60,7 @@ final class SendService {
   final EntryRepository _entries;
   final FujinDatabase _database;
   final DateTime Function() _clock;
+  Future<void> _sending = Future.value();
 
   Future<SendPlan> plan(
     DateTime date, {
@@ -159,6 +160,18 @@ final class SendService {
   );
 
   Future<SendReport> send(
+    SendPlan plan, {
+    required SendMode mode,
+    required void Function(SendProgress progress) onProgress,
+  }) {
+    final report = _sending.then(
+      (_) => _send(plan, mode: mode, onProgress: onProgress),
+    );
+    _sending = report.then<void>((_) {}, onError: (_) {});
+    return report;
+  }
+
+  Future<SendReport> _send(
     SendPlan plan, {
     required SendMode mode,
     required void Function(SendProgress progress) onProgress,

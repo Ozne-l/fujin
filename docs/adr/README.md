@@ -5,7 +5,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | # | Decision | Status |
 | --- | --- | --- |
 | [0001](0001-recompute-statuses-from-both-sides.md) | Recompute statuses from both sides, with a send-link registry and no queue | Accepted (own-copy expectation settled by 0018; unattended items added by 0025; updates reviewed on screen 10 by 0018; extended to every connector by 0044) |
-| [0002](0002-write-ordering.md) | Write ordering for add, undo, send and own copies | Accepted (sending implemented by 0018, add and undo by 0026, edit and delete by 0043; Fūjin's database written first by 0044) |
+| [0002](0002-write-ordering.md) | Write ordering for add, undo, send and own copies | Accepted (sending implemented by 0018, add and undo by 0026, edit and delete by 0043; Fūjin's database written first, and sends run one at a time, by 0044) |
 | [0003](0003-refresh-on-foreground-and-pull.md) | Refresh on foreground return and pull to refresh | Accepted (pull indicator drawn by 0028; selection re-read added by 0029) |
 | [0004](0004-one-sqlite-file.md) | One SQLite file, schema and migrations | Accepted (cache file, ids and stamps added by 0044) |
 | [0005](0005-backup.md) | Backup: Auto Backup whitelist, manual JSON file | Accepted (B implemented, C implemented by 0021) |
@@ -24,11 +24,11 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0018](0018-send-flow.md) | Send flow: matching, review and execution | Accepted (automatic sends amended by 0025) |
 | [0019](0019-tab-shell.md) | Tab shell: Journal and Mémoire tabs, Scanner disabled | Accepted (Scanner enabled by 0027; amended by 0033 and 0037) |
 | [0020](0020-goals.md) | Goals: one row in Fūjin's SQLite | Accepted |
-| [0021](0021-backup-file.md) | Backup file: fujin-backup v1 behind the BackupFiles seam | Accepted (version 2 by 0027; version 3 by 0044) |
+| [0021](0021-backup-file.md) | Backup file: fujin-backup v1 behind the BackupFiles seam | Accepted (version 2 by 0027; version 4 by 0044) |
 | [0022](0022-journal-states-and-goal-rings.md) | Journal states and goal rings | Accepted (band reads held and neighbour weeks prefetched by 0029; MyFitnessPal foods shown with Ekklo missing and offline by 0030) |
 | [0023](0023-ui-flags-in-shared-preferences.md) | UI flags in shared preferences | Accepted (settings and `FujinPreferences.open` added by 0025) |
 | [0024](0024-splash-from-the-first-frame.md) | Splash from the first frame | Accepted |
-| [0025](0025-automatic-mode.md) | Automatic mode: unattended items instead of Memory, a setting in shared preferences | Accepted |
+| [0025](0025-automatic-mode.md) | Automatic mode: unattended items instead of Memory, a setting in shared preferences | Accepted (unattended items kept on the Ekklo link, and in the backup file, by 0044) |
 | [0026](0026-adding-a-food.md) | Adding a food: one draft, the send flow's Ekklo half, undo | Accepted (scanner and 02d built by 0027; remembered foods added to the search, and "Ajouter" to screen 19, by 0034; undo moved to `RemoveEntryService` by 0043; fiche closing at once by 0044) |
 | [0027](0027-barcode-scanner.md) | Barcode scanner: full-screen camera, barcode links in Memory, backup v2 | Accepted (built) |
 | [0028](0028-fujin-drawn-controls.md) | Fūjin-drawn controls instead of stock Material | Accepted (Android stretch under the pull replaced by the bounce in 0038) |
@@ -46,5 +46,5 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0040](0040-flutter-sdk-per-project.md) | Flutter SDK per project | Accepted |
 | [0041](0041-liquid-glass-renderer-1.0.md) | Liquid glass on liquid_glass_renderer 1.0 | Proposed |
 | [0042](0042-text-contrast-on-tinted-surfaces.md) | Text contrast on tinted surfaces | Accepted |
-| [0043](0043-edit-and-delete-a-logged-food.md) | Edit and delete a logged food | Accepted (offline edit and delete of known foods by 0044) |
-| [0044](0044-connector-model.md) | Connector model: Fūjin's entry at the centre | Accepted, not built |
+| [0043](0043-edit-and-delete-a-logged-food.md) | Edit and delete a logged food | Accepted (edit and delete saved first and written in the background by 0044; offline edit and delete of known foods planned by 0044) |
+| [0044](0044-connector-model.md) | Connector model: Fūjin's entry at the centre | Accepted (steps 1 to 3 built; offline, Ekklo "to remove", the role setting and the cache file not built) |

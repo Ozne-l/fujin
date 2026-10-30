@@ -208,12 +208,17 @@ final class JournalService {
     meals: [
       for (final name in _mealOrder(mealNames, [
         for (final compared in comparison.entries) compared.logged,
+        ...comparison.leaving,
       ]))
         JournalMeal(
           name: name,
           entries: [
             for (final compared in comparison.entries)
               if (compared.logged.mealName == name) compared,
+          ],
+          leaving: [
+            for (final logged in comparison.leaving)
+              if (logged.mealName == name) logged,
           ],
         ),
     ],

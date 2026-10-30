@@ -14,9 +14,8 @@ final class RemoveEntryNotifier extends Notifier<RemoveEntryState> {
   RemoveEntryState build() => const RemoveEntryIdle();
 
   void remove(EntryRemoval removal) {
-    if (ref.read(removeEntryServiceProvider).remove(removal.entryId)
-        case final removed?) {
-      state = RemoveEntryDone(removal, ekkloRemoved: removed.ekkloRemoved);
+    if (ref.read(removeEntryServiceProvider).remove(removal.entryId) case _?) {
+      state = RemoveEntryDone(removal);
     }
   }
 }

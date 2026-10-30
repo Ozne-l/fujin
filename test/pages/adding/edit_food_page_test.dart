@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/pages/common/day_picker_sheet.dart';
+import 'package:fujin/pages/journal/widgets/connector_pill.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -149,7 +150,11 @@ void main() {
 
     _missing(_title);
     _sees(_edited);
-    _sees('MyFitnessPal et Ekklo · 2 × 100 g');
+    check(
+      find
+          .descendant(of: find.byType(SnackBar), matching: find.text(lunch))
+          .evaluate(),
+    ).length.equals(1);
     check(
       backends.entries.where((entry) => entry.food.id == rice).single.servings,
     ).equals(2);
@@ -170,7 +175,8 @@ void main() {
     check(backends.ekkloItems.single.quantity).equals(150);
   });
 
-  testWidgets('says Ekklo was not updated once the fiche closed, and '
+  testWidgets('says Pas écrit dans Ekklo once the fiche closed, with the '
+      'Ekklo clock still instead of À mettre à jour, and '
       'updates it on Réessayer', (tester) async {
     final backends = LoggedJournal.backends()..ekkloItemWritesFail = true;
     await _open(tester, backends, LoggedJournal.basmati);
@@ -179,16 +185,18 @@ void main() {
     await _tap(tester, _saveBoth);
 
     _missing(_title);
-    _sees('Ekklo pas mis à jour');
+    _sees('Pas écrit dans Ekklo');
     _sees('Riz basmati reste en attente');
-    _sees('À mettre à jour');
+    _missing('À mettre à jour');
     _missing(_mfp);
+    check(find.byType(ConnectorPill).evaluate()).length.equals(1);
 
     backends.ekkloItemWritesFail = false;
     await _tap(tester, _retry);
 
     check(backends.ekkloItems.single.quantity).equals(200);
     _missing('À mettre à jour');
+    check(find.byType(ConnectorPill).evaluate()).isEmpty();
   });
 
   testWidgets('shows the food once while its original stays in '

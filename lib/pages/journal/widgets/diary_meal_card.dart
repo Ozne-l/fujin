@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/connectors/connector.dart';
 import 'package:fujin/data/entries/mfp_write.dart';
-import 'package:fujin/domain/comparison/mfp_status.dart';
 import 'package:fujin/domain/journal/diary_meal.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/journal/background_write_notifier.dart';
+import 'package:fujin/pages/journal/widgets/connector_pill.dart';
 import 'package:fujin/pages/journal/widgets/entry_row.dart';
 import 'package:fujin/pages/journal/widgets/split_line.dart';
 import 'package:fujin/pages/journal/writer_state_ids.dart';
@@ -67,13 +68,13 @@ class DiaryMealCard extends ConsumerWidget {
                       context.intl,
                       entry.entry.nutrients,
                     ),
-                    mfp: switch (MfpWrite.of(entry)) {
-                      MfpAdd() || MfpEdit()
-                          when failed.contains(entry.entry.id) =>
-                        const MfpFailed(),
-                      MfpAdd() || MfpEdit() => const MfpPending(),
-                      MfpDeletion() || null => null,
-                    },
+                    pills: [
+                      if (MfpWrite.of(entry) case MfpAdd() || MfpEdit())
+                        ConnectorPill(
+                          connector: Connector.mfp,
+                          failed: failed.contains(entry.entry.id),
+                        ),
+                    ],
                   ),
                 ],
               ],

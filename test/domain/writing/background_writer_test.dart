@@ -18,6 +18,8 @@ import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/comparison/mfp_status.dart';
 import 'package:fujin/domain/journal/fetch.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
+import 'package:fujin/domain/sending/send_mode.dart';
+import 'package:fujin/domain/sending/send_report.dart';
 import 'package:fujin/domain/writing/ekklo_job.dart';
 import 'package:fujin/domain/writing/write_failure.dart';
 import 'package:fujin/domain/writing/writer_state.dart';
@@ -143,7 +145,9 @@ void main() {
         final second = await unwritten(writing, _draft(meal: breakfast));
         final writtenIds = <String>[];
         final listening = writing.background.states.listen((state) {
-          if (state case WriterRunning(:final current?)) {
+          if (state case WriterRunning(
+            :final current?,
+          ) when writtenIds.lastOrNull != current.entry.id) {
             writtenIds.add(current.entry.id);
           }
         });
@@ -398,8 +402,15 @@ void main() {
         final losing = _LosingMfpAdd(backends.httpClient);
         final writing = await services(httpClient: losing);
         final idle = <WriterIdle>[];
+        WriterState? previous;
         final listening = writing.background.states.listen((state) {
-          if (state case final WriterIdle state) idle.add(state);
+          if ((previous, state) case (
+            WriterRunning(),
+            final WriterIdle ended,
+          )) {
+            idle.add(ended);
+          }
+          previous = state;
         });
 
         final food = await writing.add(_draft());
@@ -786,6 +797,58 @@ void main() {
         );
       },
     );
+  });
+
+  group('an entry sent from the send page before MyFitnessPal', () {
+    Future<SendReport> sendDay(WriteServices writing) async =>
+        writing.sending.send(
+          await writing.sending.plan(day, onProgress: (_) {}),
+          mode: SendMode.reviewed,
+          onProgress: (_) {},
+        );
+
+    Future<void> idle() async {
+      for (var turn = 0; turn < 100; turn++) {
+        await Future<void>.delayed(Duration.zero);
+      }
+    }
+
+    test('is not sent again by its held send run meanwhile', () async {
+      final holding = _HeldEkkloAppend(backends.httpClient);
+      final writing = await services(httpClient: holding);
+      final food = await unwritten(writing, _draft());
+
+      final manual = sendDay(writing);
+      await holding.reached.future;
+      final retried = writing.background.run();
+      await sent(1);
+      await idle();
+      holding.gate.complete();
+      await manual;
+      await retried;
+
+      check(backends.ekkloItems).length.equals(1);
+      check(writing.background.heldFor(food.entryId)).isNull();
+      check((await writing.find(food.entryId, day))?.status).isA<InEkklo>();
+    });
+
+    test('is not sent again while its held send runs', () async {
+      final holding = _HeldEkkloAppend(backends.httpClient);
+      final writing = await services(httpClient: holding);
+      final food = await unwritten(writing, _draft());
+
+      final retried = writing.background.run();
+      await holding.reached.future;
+      final manual = sendDay(writing);
+      await idle();
+      holding.gate.complete();
+      await retried;
+      await manual;
+
+      check(backends.ekkloItems).length.equals(1);
+      check(writing.background.heldFor(food.entryId)).isNull();
+      check((await writing.find(food.entryId, day))?.status).isA<InEkklo>();
+    });
   });
 }
 
