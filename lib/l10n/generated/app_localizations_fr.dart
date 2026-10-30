@@ -1448,20 +1448,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String foodAddedBothSides(String meal) {
-    return 'MyFitnessPal et Ekklo · $meal';
-  }
-
-  @override
-  String foodAddedMfpOnly(String meal) {
-    return 'MyFitnessPal seulement · $meal';
-  }
-
-  @override
   String get addUndone => 'Ajout annulé';
-
-  @override
-  String get addUndoneDetail => 'Supprimé de MyFitnessPal et d’Ekklo';
 
   @override
   String get undoAdd => 'Annuler';
@@ -2216,38 +2203,13 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String foodDeletedDetail(String meal) {
-    return 'Retiré d’Ekklo et de MyFitnessPal · $meal';
-  }
-
-  @override
-  String foodDeletedMfpOnlyDetail(String meal) {
-    return 'Retiré de MyFitnessPal seulement · $meal';
-  }
-
-  @override
   String foodEdited(String food) {
     return '$food modifié';
   }
 
   @override
-  String foodEditedDetail(String serving) {
-    return 'MyFitnessPal et Ekklo · $serving';
-  }
-
-  @override
-  String foodEditedMfpOnlyDetail(String serving) {
-    return 'MyFitnessPal seulement · $serving';
-  }
-
-  @override
   String foodMoved(String food) {
     return '$food déplacé';
-  }
-
-  @override
-  String foodMovedToMealDetail(String meal) {
-    return 'MyFitnessPal et Ekklo · $meal';
   }
 
   @override
@@ -2262,10 +2224,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get foodMovedSee => 'Voir';
 
   @override
-  String get ekkloNotUpdated => 'Ekklo pas mis à jour';
+  String get mfpNotWritten => 'Pas écrit dans MyFitnessPal';
 
   @override
-  String get mfpNotWritten => 'Pas écrit dans MyFitnessPal';
+  String get ekkloNotWritten => 'Pas écrit dans Ekklo';
 
   @override
   String foodStillPending(String food) {
@@ -2287,6 +2249,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get mfpPendingSemantics => 'En attente de MyFitnessPal';
+
+  @override
+  String get ekkloPendingSemantics => 'En attente d’Ekklo';
+
+  @override
+  String get entryDeletedInFujin => 'Supprimé dans Fūjin';
 
   @override
   String get writeBlockedInDev =>

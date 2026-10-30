@@ -221,6 +221,7 @@ DayComparison compareEkkloDay(
       for (final logged in day.unstored)
         ComparedEntry(logged, const ToSend(), stored: false),
     ],
+    leaving: settled.leaving,
     changes: settled.changes,
   );
 }

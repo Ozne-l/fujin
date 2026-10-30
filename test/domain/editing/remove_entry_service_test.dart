@@ -62,9 +62,9 @@ void main() {
 
     final removed = services.removing.remove(food.entryId);
 
-    check(removed).isNotNull()
-      ..has((it) => it.entry.entry.id, 'entry').equals(food.entryId)
-      ..has((it) => it.ekkloRemoved, 'Ekklo removed').isTrue();
+    check(
+      removed,
+    ).isNotNull().has((it) => it.entry.entry.id, 'entry').equals(food.entryId);
     check(services.entries.find(food.entryId)).isNull();
     check(services.entries.pendingMfp().single).isA<MfpDeletion>();
 
@@ -100,10 +100,9 @@ void main() {
     await services.settle();
     backends.requests.clear();
 
-    final removed = services.removing.remove(food.entryId);
+    services.removing.remove(food.entryId);
     await services.settle();
 
-    check(removed?.ekkloRemoved).equals(false);
     check(services.writes()).deepEquals(['DELETE ${mfpApiUri.host}']);
     check(backends.entries).isEmpty();
   });

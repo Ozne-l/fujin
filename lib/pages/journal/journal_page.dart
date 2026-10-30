@@ -156,7 +156,10 @@ class JournalPage extends HookConsumerWidget {
     });
 
     ref.listen(backgroundWriteProvider, (previous, next) {
-      if (previous case WriterRunning(current: final written?)) {
+      if ((previous, next) case (
+        WriterRunning(current: final written?),
+        _,
+      ) when next is! WriterRunning || next.current != written) {
         rereadDaysOf([
           written.entry.date,
           if (written.mfpLink case final link?) link.date,

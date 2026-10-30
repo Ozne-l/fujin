@@ -46,6 +46,18 @@ final class DayDraft with DayDraftMappable {
   final List<EkkloLink> pendingLinks;
   final bool forgetsWaiting;
 
+  List<LoggedEntry> get leaving {
+    final byId = {
+      for (final logged in deleted)
+        logged.entry.id: logged.copyWith(mfpLink: null),
+      for (final logged in owed)
+        if ((logged.entry.deletedAt, logged.mfpLink) case (_?, _?))
+          logged.entry.id: logged,
+    };
+    return [...byId.values]
+      ..sort((first, second) => first.entry.id.compareTo(second.entry.id));
+  }
+
   DayChanges get changes {
     final before = [...stored.entries, ...stored.deleted];
     final after = [...entries, ...deleted];

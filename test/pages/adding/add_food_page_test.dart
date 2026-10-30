@@ -179,7 +179,7 @@ void main() {
     final added = await result;
     check(
       added,
-    ).isNotNull().has((added) => added.toEkklo, 'ekklo').isTrue();
+    ).isNotNull().has((added) => added.planned.sends, 'sends').isTrue();
     check(find.text('Ajouter à Breakfast').evaluate()).isEmpty();
     check(backends.entries).isEmpty();
 

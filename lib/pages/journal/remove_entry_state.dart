@@ -17,8 +17,7 @@ final class RemoveEntryIdle extends RemoveEntryState
 @MappableClass(discriminatorValue: 'done')
 final class RemoveEntryDone extends RemoveEntryState
     with RemoveEntryDoneMappable {
-  const RemoveEntryDone(this.removal, {required this.ekkloRemoved});
+  const RemoveEntryDone(this.removal);
 
   final EntryRemoval removal;
-  final bool ekkloRemoved;
 }

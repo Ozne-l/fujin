@@ -5,8 +5,7 @@ part 'removed_entry.mapper.dart';
 
 @MappableClass()
 final class RemovedEntry with RemovedEntryMappable {
-  const RemovedEntry(this.entry, {required this.ekkloRemoved});
+  const RemovedEntry(this.entry);
 
   final LoggedEntry entry;
-  final bool ekkloRemoved;
 }

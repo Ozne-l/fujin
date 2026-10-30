@@ -21,11 +21,14 @@ const _keep = 'Garder';
 const _confirmMfp = 'Supprimer de MFP';
 const _mfpOnlyCopy =
     'Pas encore dans Ekklo : il sera retiré de MyFitnessPal seulement.';
-const _bothDetail = 'Retiré d’Ekklo et de MyFitnessPal · $lunch';
 const _slowDrag = Duration(seconds: 1);
 const _mfpNotWritten = 'Pas écrit dans MyFitnessPal';
+const _deletedInFujin = 'Supprimé dans Fūjin';
 
 FakeBackends _backends() => LoggedJournal.backends();
+
+Finder _snackBarText(String text) =>
+    find.descendant(of: find.byType(SnackBar), matching: find.text(text));
 
 Future<void> _pump(WidgetTester tester, FakeBackends backends) =>
     LoggedJournal.pump(tester, backends);
@@ -151,11 +154,12 @@ void main() {
     check(find.text(_sheetTitle).evaluate()).isEmpty();
     check(find.text(_row).evaluate()).isEmpty();
     check(find.text('Riz basmati supprimé').evaluate()).length.equals(1);
-    check(find.text(_bothDetail).evaluate()).length.equals(1);
+    check(_snackBarText(lunch).evaluate()).length.equals(1);
   });
 
-  testWidgets('says the removal is not written in MyFitnessPal once Ekklo '
-      'let go of the food, and finishes it on Réessayer', (tester) async {
+  testWidgets('keeps the row greyed and says the removal is not written in '
+      'MyFitnessPal once Ekklo let go of the food, and finishes it on '
+      'Réessayer', (tester) async {
     final backends = _backends()..mfpRemoveFails = true;
     await _pump(tester, backends);
     await _drag(tester, _row, 0.8);
@@ -166,7 +170,8 @@ void main() {
     check(backends.ekkloItems.map((item) => item.id)).not(
       (it) => it.contains(LoggedJournal.basmatiItem),
     );
-    check(find.text(_row).evaluate()).isEmpty();
+    check(find.text(_row).evaluate()).length.equals(1);
+    check(find.text(_deletedInFujin).evaluate()).length.equals(1);
     check(find.text(_mfpNotWritten).evaluate()).length.equals(1);
     check(find.text('$_row reste en attente').evaluate()).length.equals(1);
 
@@ -178,6 +183,7 @@ void main() {
       backends.entries.map((entry) => entry.id),
     ).not((it) => it.contains(LoggedJournal.basmatiId));
     check(find.text(_mfpNotWritten).evaluate()).isEmpty();
+    check(find.text(_row).evaluate()).isEmpty();
   });
 
   testWidgets('removes a food still to send from MyFitnessPal only, and says '
@@ -196,9 +202,7 @@ void main() {
     check(backends.ekkloItems).length.equals(1);
     check(find.text(_below).evaluate()).isEmpty();
     check(find.text('Skyr nature supprimé').evaluate()).length.equals(1);
-    check(
-      find.text('Retiré de MyFitnessPal seulement · $lunch').evaluate(),
-    ).length.equals(1);
+    check(_snackBarText(lunch).evaluate()).length.equals(1);
   });
 
   testWidgets('removes the row at once and says MyFitnessPal is waiting '

@@ -205,18 +205,9 @@ class RemoveEntryDoneMapper extends SubClassMapperBase<RemoveEntryDone> {
     'removal',
     _$removal,
   );
-  static bool _$ekkloRemoved(RemoveEntryDone v) => v.ekkloRemoved;
-  static const Field<RemoveEntryDone, bool> _f$ekkloRemoved = Field(
-    'ekkloRemoved',
-    _$ekkloRemoved,
-    key: r'ekklo_removed',
-  );
 
   @override
-  final MappableFields<RemoveEntryDone> fields = const {
-    #removal: _f$removal,
-    #ekkloRemoved: _f$ekkloRemoved,
-  };
+  final MappableFields<RemoveEntryDone> fields = const {#removal: _f$removal};
   @override
   final bool ignoreNull = true;
 
@@ -229,10 +220,7 @@ class RemoveEntryDoneMapper extends SubClassMapperBase<RemoveEntryDone> {
       RemoveEntryStateMapper.ensureInitialized();
 
   static RemoveEntryDone _instantiate(DecodingData data) {
-    return RemoveEntryDone(
-      data.dec(_f$removal),
-      ekkloRemoved: data.dec(_f$ekkloRemoved),
-    );
+    return RemoveEntryDone(data.dec(_f$removal));
   }
 
   @override
@@ -299,7 +287,7 @@ abstract class RemoveEntryDoneCopyWith<$R, $In extends RemoveEntryDone, $Out>
     implements RemoveEntryStateCopyWith<$R, $In, $Out> {
   EntryRemovalCopyWith<$R, EntryRemoval, EntryRemoval> get removal;
   @override
-  $R call({EntryRemoval? removal, bool? ekkloRemoved});
+  $R call({EntryRemoval? removal});
   RemoveEntryDoneCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
   );
@@ -317,17 +305,11 @@ class _RemoveEntryDoneCopyWithImpl<$R, $Out>
   EntryRemovalCopyWith<$R, EntryRemoval, EntryRemoval> get removal =>
       $value.removal.copyWith.$chain((v) => call(removal: v));
   @override
-  $R call({EntryRemoval? removal, bool? ekkloRemoved}) => $apply(
-    FieldCopyWithData({
-      if (removal != null) #removal: removal,
-      if (ekkloRemoved != null) #ekkloRemoved: ekkloRemoved,
-    }),
-  );
+  $R call({EntryRemoval? removal}) =>
+      $apply(FieldCopyWithData({if (removal != null) #removal: removal}));
   @override
-  RemoveEntryDone $make(CopyWithData data) => RemoveEntryDone(
-    data.get(#removal, or: $value.removal),
-    ekkloRemoved: data.get(#ekkloRemoved, or: $value.ekkloRemoved),
-  );
+  RemoveEntryDone $make(CopyWithData data) =>
+      RemoveEntryDone(data.get(#removal, or: $value.removal));
 
   @override
   RemoveEntryDoneCopyWith<$R2, RemoveEntryDone, $Out2> $chain<$R2, $Out2>(

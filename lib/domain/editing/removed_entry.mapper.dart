@@ -28,26 +28,14 @@ class RemovedEntryMapper extends ClassMapperBase<RemovedEntry> {
     'entry',
     _$entry,
   );
-  static bool _$ekkloRemoved(RemovedEntry v) => v.ekkloRemoved;
-  static const Field<RemovedEntry, bool> _f$ekkloRemoved = Field(
-    'ekkloRemoved',
-    _$ekkloRemoved,
-    key: r'ekklo_removed',
-  );
 
   @override
-  final MappableFields<RemovedEntry> fields = const {
-    #entry: _f$entry,
-    #ekkloRemoved: _f$ekkloRemoved,
-  };
+  final MappableFields<RemovedEntry> fields = const {#entry: _f$entry};
   @override
   final bool ignoreNull = true;
 
   static RemovedEntry _instantiate(DecodingData data) {
-    return RemovedEntry(
-      data.dec(_f$entry),
-      ekkloRemoved: data.dec(_f$ekkloRemoved),
-    );
+    return RemovedEntry(data.dec(_f$entry));
   }
 
   @override
@@ -113,7 +101,7 @@ extension RemovedEntryValueCopy<$R, $Out>
 abstract class RemovedEntryCopyWith<$R, $In extends RemovedEntry, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get entry;
-  $R call({LoggedEntry? entry, bool? ekkloRemoved});
+  $R call({LoggedEntry? entry});
   RemovedEntryCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -129,17 +117,11 @@ class _RemovedEntryCopyWithImpl<$R, $Out>
   LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get entry =>
       $value.entry.copyWith.$chain((v) => call(entry: v));
   @override
-  $R call({LoggedEntry? entry, bool? ekkloRemoved}) => $apply(
-    FieldCopyWithData({
-      if (entry != null) #entry: entry,
-      if (ekkloRemoved != null) #ekkloRemoved: ekkloRemoved,
-    }),
-  );
+  $R call({LoggedEntry? entry}) =>
+      $apply(FieldCopyWithData({if (entry != null) #entry: entry}));
   @override
-  RemovedEntry $make(CopyWithData data) => RemovedEntry(
-    data.get(#entry, or: $value.entry),
-    ekkloRemoved: data.get(#ekkloRemoved, or: $value.ekkloRemoved),
-  );
+  RemovedEntry $make(CopyWithData data) =>
+      RemovedEntry(data.get(#entry, or: $value.entry));
 
   @override
   RemovedEntryCopyWith<$R2, RemovedEntry, $Out2> $chain<$R2, $Out2>(

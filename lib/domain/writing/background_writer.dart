@@ -45,11 +45,16 @@ final class BackgroundWriter {
 
   Stream<WriterState> get states => _states.stream;
 
-  void hold(String entryId, EkkloJob job) => _held[entryId] = job;
+  void hold(String entryId, EkkloJob job) {
+    _held[entryId] = job;
+    _emit(_state);
+  }
 
   EkkloJob? heldFor(String entryId) => _held[entryId];
 
-  void drop(String entryId) => _held.remove(entryId);
+  void drop(String entryId) {
+    if (_held.remove(entryId) != null) _emit(_state);
+  }
 
   Future<void> run() {
     if (_running case final running?) {
@@ -92,8 +97,8 @@ final class BackgroundWriter {
   }
 
   void _emit(WriterState state) {
-    _state = state;
-    _states.add(state);
+    final next = _state = state.withHeld({..._held});
+    _states.add(next);
   }
 
   Future<WriteFailure?> _write(String id, LoggedEntry? logged) async =>

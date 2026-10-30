@@ -58,6 +58,7 @@ final class FakeBackends {
   Completer<void>? mfpSearchGate;
   Completer<void>? mfpFoodGate;
   Completer<void>? mfpAddGate;
+  Completer<void>? mfpRemoveGate;
   final requests = <http.Request>[];
 
   static const ekkloEmail = 'owner@example.com';
@@ -89,6 +90,10 @@ final class FakeBackends {
     }
     if (mfpAddGate case final gate?
         when request.method == 'POST' && request.url.path == _diaryPath) {
+      await gate.future;
+    }
+    if (mfpRemoveGate case final gate?
+        when request.method == 'DELETE' && request.url.host == mfpApiUri.host) {
       await gate.future;
     }
     return switch ((request.method, request.url.host, request.url.path)) {

@@ -772,16 +772,7 @@
   "@foodAdded": {
     "placeholders": {"food": {"type": "String"}}
   },
-  "foodAddedBothSides": "MyFitnessPal et Ekklo · {meal}",
-  "@foodAddedBothSides": {
-    "placeholders": {"meal": {"type": "String"}}
-  },
-  "foodAddedMfpOnly": "MyFitnessPal seulement · {meal}",
-  "@foodAddedMfpOnly": {
-    "placeholders": {"meal": {"type": "String"}}
-  },
   "addUndone": "Ajout annulé",
-  "addUndoneDetail": "Supprimé de MyFitnessPal et d’Ekklo",
   "undoAdd": "Annuler",
   "journalLoading": "Lecture de MyFitnessPal\net d’Ekklo…",
   "dayDetailTitle": "Détail du jour",
@@ -1211,33 +1202,13 @@
   "@foodDeleted": {
     "placeholders": {"food": {"type": "String"}}
   },
-  "foodDeletedDetail": "Retiré d’Ekklo et de MyFitnessPal · {meal}",
-  "@foodDeletedDetail": {
-    "placeholders": {"meal": {"type": "String"}}
-  },
-  "foodDeletedMfpOnlyDetail": "Retiré de MyFitnessPal seulement · {meal}",
-  "@foodDeletedMfpOnlyDetail": {
-    "placeholders": {"meal": {"type": "String"}}
-  },
   "foodEdited": "{food} modifié",
   "@foodEdited": {
     "placeholders": {"food": {"type": "String"}}
   },
-  "foodEditedDetail": "MyFitnessPal et Ekklo · {serving}",
-  "@foodEditedDetail": {
-    "placeholders": {"serving": {"type": "String"}}
-  },
-  "foodEditedMfpOnlyDetail": "MyFitnessPal seulement · {serving}",
-  "@foodEditedMfpOnlyDetail": {
-    "placeholders": {"serving": {"type": "String"}}
-  },
   "foodMoved": "{food} déplacé",
   "@foodMoved": {
     "placeholders": {"food": {"type": "String"}}
-  },
-  "foodMovedToMealDetail": "MyFitnessPal et Ekklo · {meal}",
-  "@foodMovedToMealDetail": {
-    "placeholders": {"meal": {"type": "String"}}
   },
   "foodMovedToDayDetail": "{meal}, {date}",
   "@foodMovedToDayDetail": {
@@ -1247,8 +1218,8 @@
     }
   },
   "foodMovedSee": "Voir",
-  "ekkloNotUpdated": "Ekklo pas mis à jour",
   "mfpNotWritten": "Pas écrit dans MyFitnessPal",
+  "ekkloNotWritten": "Pas écrit dans Ekklo",
   "foodStillPending": "{food} reste en attente",
   "@foodStillPending": {
     "placeholders": {"food": {"type": "String"}}
@@ -1259,5 +1230,7 @@
   },
   "pillMfp": "MFP",
   "mfpPendingSemantics": "En attente de MyFitnessPal",
+  "ekkloPendingSemantics": "En attente d’Ekklo",
+  "entryDeletedInFujin": "Supprimé dans Fūjin",
   "writeBlockedInDev": "Fūjin DEV n’écrit ni dans MyFitnessPal ni dans Ekklo : rien n’a changé."
 }

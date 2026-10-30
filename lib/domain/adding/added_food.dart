@@ -13,6 +13,4 @@ final class AddedFood with AddedFoodMappable {
   String get entryId => planned.entryId;
 
   LoggedEntry get entry => planned.entry;
-
-  bool get toEkklo => planned.sends;
 }
