@@ -8,6 +8,7 @@ import 'package:fujin/data/backup/backup_files.dart';
 import 'package:fujin/data/backup/backup_repository.dart';
 import 'package:fujin/data/backup/picker_backup_files.dart';
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/foods/food_repository.dart';
 import 'package:fujin/data/goals/goals_repository.dart';
 import 'package:fujin/data/hints/hint_repository.dart';
@@ -22,6 +23,7 @@ import 'package:fujin/data/settings/settings_repository.dart';
 import 'package:fujin/data/unattended/unattended_item_repository.dart';
 import 'package:fujin/domain/accounts/accounts_service.dart';
 import 'package:fujin/domain/adding/add_food_service.dart';
+import 'package:fujin/domain/adding/entry_writer.dart';
 import 'package:fujin/domain/backup/backup_service.dart';
 import 'package:fujin/domain/editing/edit_entry_service.dart';
 import 'package:fujin/domain/editing/remove_entry_service.dart';
@@ -158,11 +160,17 @@ final settingsRepositoryProvider = Provider<SettingsRepository>(
   (ref) => SettingsRepository(ref.watch(preferencesProvider)),
 );
 
+final entryRepositoryProvider = Provider<EntryRepository>(
+  (ref) =>
+      EntryRepository(ref.watch(databaseProvider), ref.watch(clockProvider)),
+);
+
 final backupRepositoryProvider = Provider<BackupRepository>(
   (ref) => BackupRepository(
     database: ref.watch(databaseProvider),
     foods: ref.watch(foodRepositoryProvider),
     meals: ref.watch(mealRepositoryProvider),
+    entries: ref.watch(entryRepositoryProvider),
     memory: ref.watch(memoryRepositoryProvider),
     recents: ref.watch(recentFoodRepositoryProvider),
     links: ref.watch(sentLinkRepositoryProvider),
@@ -190,9 +198,12 @@ final journalServiceProvider = Provider<JournalService>(
   (ref) => JournalService(
     mfp: ref.watch(mfpClientProvider),
     ekklo: ref.watch(ekkloClientProvider),
+    entries: ref.watch(entryRepositoryProvider),
     links: ref.watch(sentLinkRepositoryProvider),
     unattended: ref.watch(unattendedItemRepositoryProvider),
     memory: ref.watch(memoryRepositoryProvider),
+    foods: ref.watch(foodRepositoryProvider),
+    meals: ref.watch(mealRepositoryProvider),
     database: ref.watch(databaseProvider),
     clock: ref.watch(clockProvider),
   ),
@@ -210,9 +221,18 @@ final sendServiceProvider = Provider<SendService>(
     journal: ref.watch(journalServiceProvider),
     ekklo: ref.watch(ekkloClientProvider),
     memory: ref.watch(memoryRepositoryProvider),
-    links: ref.watch(sentLinkRepositoryProvider),
-    unattended: ref.watch(unattendedItemRepositoryProvider),
+    entries: ref.watch(entryRepositoryProvider),
     database: ref.watch(databaseProvider),
+    clock: ref.watch(clockProvider),
+  ),
+);
+
+final entryWriterProvider = Provider<EntryWriter>(
+  (ref) => EntryWriter(
+    database: ref.watch(databaseProvider),
+    foods: ref.watch(foodRepositoryProvider),
+    meals: ref.watch(mealRepositoryProvider),
+    entries: ref.watch(entryRepositoryProvider),
     clock: ref.watch(clockProvider),
   ),
 );
@@ -225,6 +245,7 @@ final addFoodServiceProvider = Provider<AddFoodService>(
     memory: ref.watch(memoryRepositoryProvider),
     foods: ref.watch(foodRepositoryProvider),
     recents: ref.watch(recentFoodRepositoryProvider),
+    writer: ref.watch(entryWriterProvider),
     clock: ref.watch(clockProvider),
   ),
 );
@@ -234,6 +255,7 @@ final removeEntryServiceProvider = Provider<RemoveEntryService>(
     mfp: ref.watch(mfpClientProvider),
     journal: ref.watch(journalServiceProvider),
     sending: ref.watch(sendServiceProvider),
+    entries: ref.watch(entryRepositoryProvider),
   ),
 );
 
@@ -245,5 +267,7 @@ final editEntryServiceProvider = Provider<EditEntryService>(
     sending: ref.watch(sendServiceProvider),
     memory: ref.watch(memoryRepositoryProvider),
     foods: ref.watch(foodRepositoryProvider),
+    entries: ref.watch(entryRepositoryProvider),
+    writer: ref.watch(entryWriterProvider),
   ),
 );

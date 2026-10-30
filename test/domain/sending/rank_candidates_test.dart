@@ -10,7 +10,11 @@ import '../../support/fixtures.dart';
 void main() {
   group('rankCandidates', () {
     test('puts foods sharing the product name first, then the closest', () {
-      final ranked = rankCandidates([fromageBlanc, siggis, isey], skyrEntry);
+      final ranked = rankCandidates([
+        fromageBlanc,
+        siggis,
+        isey,
+      ], loggedEntry(skyrEntry));
 
       check([for (final candidate in ranked) candidate.food.id]).deepEquals([
         'isey',
@@ -23,7 +27,11 @@ void main() {
     });
 
     test('accepts a food within 12 % kcal and 10 % per macro only', () {
-      final ranked = rankCandidates([isey, siggis, fromageBlanc], skyrEntry);
+      final ranked = rankCandidates([
+        isey,
+        siggis,
+        fromageBlanc,
+      ], loggedEntry(skyrEntry));
 
       check([for (final candidate in ranked) candidate.acceptable]).deepEquals(
         [true, false, false],
@@ -31,7 +39,9 @@ void main() {
     });
 
     test('gives signed gaps on the MyFitnessPal portion', () {
-      final deltas = rankCandidates([isey], skyrEntry).single.deltas;
+      final deltas = rankCandidates([
+        isey,
+      ], loggedEntry(skyrEntry)).single.deltas;
 
       check(deltas.kilocalories).isCloseTo(-5 / 160, 1e-9);
       check(deltas.of(Nutrient.protein)).isNotNull().isCloseTo(
@@ -51,7 +61,7 @@ void main() {
       );
       final candidate = rankCandidates([
         ekkloFood('skyr', name: 'Skyr', calories: 80, proteins: 10.4),
-      ], small).single;
+      ], loggedEntry(small)).single;
 
       check(candidate.deltas.of(Nutrient.protein)).isNotNull().isCloseTo(
         0.2,
@@ -61,7 +71,9 @@ void main() {
     });
 
     test('estimates the grams of an unknown unit from the kilocalories', () {
-      final candidate = rankCandidates([oliveOil], oilEntry).single;
+      final candidate = rankCandidates([
+        oliveOil,
+      ], loggedEntry(oilEntry)).single;
 
       check(candidate.gramsInferred).isTrue();
       check(candidate.grams).isCloseTo(119 * 100 / 884, 1e-9);
@@ -72,7 +84,7 @@ void main() {
         [
           oliveOil,
         ],
-        oilEntry,
+        loggedEntry(oilEntry),
         gramsPerUnit: 13.5,
       ).single;
 
@@ -88,7 +100,7 @@ void main() {
           portion: 1,
           quantityType: EkkloQuantityType.portion,
         ),
-      ], skyrEntry);
+      ], loggedEntry(skyrEntry));
 
       check(ranked).isEmpty();
     });

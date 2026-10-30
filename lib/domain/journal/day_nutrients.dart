@@ -1,16 +1,17 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
+import 'package:fujin/data/foods/food_nutrients.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 final class DayNutrients {
   const DayNutrients({this.amounts = const {}, this.partial = const {}});
 
-  factory DayNutrients.ofEntries(Iterable<MfpFoodEntry> entries) {
+  factory DayNutrients.ofEntries(Iterable<LoggedEntry> entries) {
     final amounts = <Nutrient, double>{};
     final partial = <Nutrient>{};
     for (final entry in entries) {
       for (final nutrient in Nutrient.values) {
-        switch (_mfpAmount(entry.nutrients, nutrient)) {
+        switch (_amount(entry.entry.nutrients, nutrient)) {
           case final amount?:
             amounts.update(
               nutrient,
@@ -42,9 +43,9 @@ final class DayNutrients {
 
   bool isPartial(Nutrient nutrient) => partial.contains(nutrient);
 
-  static double? _mfpAmount(MfpNutrients nutrients, Nutrient nutrient) =>
+  static double? _amount(FoodNutrients nutrients, Nutrient nutrient) =>
       switch (nutrient) {
-        Nutrient.kilocalories => nutrients.energy?.kilocalories,
+        Nutrient.kilocalories => nutrients.kilocalories,
         Nutrient.protein => nutrients.protein,
         Nutrient.carbohydrates => nutrients.carbohydrates,
         Nutrient.fat => nutrients.fat,

@@ -28,7 +28,9 @@ final class MealRepository {
 
   void map(MealMapping mapping) => _database.transaction(() {
     final now = _now();
-    final mealId = _mealOfMfp(mapping.mfpMealName) ?? _addMeal(mapping, now);
+    final mealId =
+        mealOfMfp(mapping.mfpMealName) ??
+        _addMeal(mapping.mfpMealName, id: FujinId.at(now), now: now);
     final ekklo = ConnectorMeal(
       id: FujinId.at(now),
       mealId: mealId,
@@ -48,6 +50,46 @@ final class MealRepository {
         _saveMapping(ekklo.copyWith(id: ConnectorMealMapper.fromMap(row).id));
       case _:
         _saveMapping(ekklo);
+    }
+  });
+
+  String? mealOfMfp(String mfpMealName) => switch (_database.select(
+    'SELECT meal.id FROM meal '
+    'JOIN meal_mapping mfp ON mfp.meal_id = meal.id '
+    "WHERE mfp.connector = 'mfp' AND mfp.name = ? "
+    'AND mfp.deleted_at IS NULL AND meal.deleted_at IS NULL',
+    [mfpMealName],
+  )) {
+    [final row] => row[_id] as String,
+    _ => null,
+  };
+
+  String mfpMeal(String mfpMealName, {required String id}) =>
+      _database.transaction(
+        () =>
+            mealOfMfp(mfpMealName) ??
+            _addMeal(mfpMealName, id: id, now: _now()),
+      );
+
+  void arrange(List<String> mfpMealNames) => _database.transaction(() {
+    final now = _now();
+    final named = <String>{
+      for (final name in mfpMealNames) mfpMeal(name, id: FujinId.at(now)),
+    };
+    final order = [
+      ...named,
+      for (final row in _database.select(
+        'SELECT id FROM meal WHERE deleted_at IS NULL ORDER BY position, id',
+      ))
+        if (!named.contains(row[_id])) row[_id] as String,
+    ];
+    final at = now.toIso8601String();
+    for (final (position, id) in order.indexed) {
+      _database.execute(
+        'UPDATE meal SET position = ?, updated_at = ? '
+        'WHERE id = ? AND position <> ?',
+        [position, at, id, position],
+      );
     }
   });
 
@@ -88,21 +130,14 @@ final class MealRepository {
 
   DateTime _now() => _clock().toUtc();
 
-  String? _mealOfMfp(String mfpMealName) => switch (_database.select(
-    'SELECT meal.id FROM meal '
-    'JOIN meal_mapping mfp ON mfp.meal_id = meal.id '
-    "WHERE mfp.connector = 'mfp' AND mfp.name = ? "
-    'AND mfp.deleted_at IS NULL AND meal.deleted_at IS NULL',
-    [mfpMealName],
-  )) {
-    [final row] => row[_id] as String,
-    _ => null,
-  };
-
-  String _addMeal(MealMapping mapping, DateTime now) {
+  String _addMeal(
+    String mfpMealName, {
+    required String id,
+    required DateTime now,
+  }) {
     final meal = Meal(
-      id: FujinId.at(now),
-      name: mapping.mfpMealName,
+      id: id,
+      name: mfpMealName,
       position: _nextPosition(),
       updatedAt: now,
     );
@@ -112,7 +147,7 @@ final class MealRepository {
         id: FujinId.at(now),
         mealId: meal.id,
         connector: Connector.mfp,
-        name: mapping.mfpMealName,
+        name: mfpMealName,
         updatedAt: now,
       ),
     );

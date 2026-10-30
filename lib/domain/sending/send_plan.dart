@@ -1,7 +1,7 @@
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 part 'send_plan.mapper.dart';
 
@@ -16,7 +16,7 @@ final class SendPlan with SendPlanMappable {
 
   final DateTime date;
   final List<PlannedEntry> entries;
-  final List<MfpFoodEntry> pending;
+  final List<LoggedEntry> pending;
   final List<ComparedEntry> inEkklo;
 
   bool get searching => pending.isNotEmpty;

@@ -1,13 +1,13 @@
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart' show group, test;
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/domain/sending/food_words.dart';
 import 'package:fujin/domain/sending/name_match.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../../support/fixtures.dart';
 
-MfpEntryFood _food(String description, {String? brand}) =>
-    entry(null, description: description, brand: brand).food;
+LoggedEntry _food(String description, {String? brand}) =>
+    loggedEntry(entry(null, description: description, brand: brand));
 
 void main() {
   group('productName', () {
@@ -69,7 +69,7 @@ void main() {
 
     test('finds nothing in common', () {
       check(
-        nameMatchOf(fromageBlanc, skyrEntry.food),
+        nameMatchOf(fromageBlanc, loggedEntry(skyrEntry)),
       ).equals(NameMatch.none);
     });
   });

@@ -1,12 +1,11 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/data/entries/entry.dart';
 import 'package:fujin/domain/comparison/gram_unit.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
-double entryUnits(MfpFoodEntry entry) =>
-    entry.servingSize.value * entry.servings;
+double entryUnits(Entry entry) => entry.servingValue * entry.servings;
 
-double? entryGrams(MfpFoodEntry entry, {double? gramsPerUnit}) =>
-    switch ((isGramUnit(entry.servingSize.unit), gramsPerUnit)) {
+double? entryGrams(Entry entry, {double? gramsPerUnit}) =>
+    switch ((isGramUnit(entry.servingUnit), gramsPerUnit)) {
       (true, _) => entryUnits(entry),
       (false, final perUnit?) => entryUnits(entry) * perUnit,
       (false, null) => null,

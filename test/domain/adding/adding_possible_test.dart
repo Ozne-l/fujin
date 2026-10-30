@@ -1,6 +1,7 @@
 import 'package:checks/checks.dart';
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_test/flutter_test.dart' show group, test;
+import 'package:fujin/data/entries/day_changes.dart';
 import 'package:fujin/domain/adding/adding_possible.dart';
 import 'package:fujin/domain/comparison/day_comparison.dart';
 import 'package:fujin/domain/journal/journal_day.dart';
@@ -11,13 +12,15 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 import '../../support/fixtures.dart';
 
 void main() {
-  final diary = MfpDiaryDay(date: day);
   final both = BothSides(
-    day: JournalDay(diary: diary, comparison: const DayComparison()),
+    day: JournalDay(
+      date: day,
+      comparison: DayComparison(changes: DayChanges(date: day)),
+    ),
     readAt: now,
   );
   MfpOnly mfpOnly(ReadProblem problem) =>
-      MfpOnly(diary: diary, ekkloProblem: problem, readAt: now);
+      MfpOnly(ekkloProblem: problem, readAt: now);
   EkkloOnly ekkloOnly(ReadProblem problem) =>
       EkkloOnly(mfpProblem: problem, readAt: now);
   final apiUri = Uri.parse('https://api.test');

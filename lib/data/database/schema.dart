@@ -211,6 +211,93 @@ const schemaMigrations = [
     ON meal_mapping (meal_id, connector) WHERE deleted_at IS NULL;
   CREATE UNIQUE INDEX meal_mapping_mfp_name
     ON meal_mapping (name) WHERE connector = 'mfp' AND deleted_at IS NULL;
+  CREATE TABLE entry (
+    id TEXT PRIMARY KEY,
+    date TEXT NOT NULL,
+    meal_id TEXT NOT NULL REFERENCES meal ON DELETE CASCADE,
+    food_id TEXT NOT NULL REFERENCES food ON DELETE CASCADE,
+    serving_value REAL NOT NULL,
+    serving_unit TEXT NOT NULL,
+    nutrition_multiplier REAL,
+    servings REAL NOT NULL,
+    energy_value REAL,
+    energy_unit TEXT CHECK (energy_unit IN ('calories', 'kilojoules')),
+    protein REAL,
+    carbohydrates REAL,
+    net_carbs REAL,
+    fiber REAL,
+    sugar REAL,
+    added_sugars REAL,
+    sugar_alcohols REAL,
+    fat REAL,
+    saturated_fat REAL,
+    monounsaturated_fat REAL,
+    polyunsaturated_fat REAL,
+    trans_fat REAL,
+    cholesterol_milligrams REAL,
+    sodium_milligrams REAL,
+    potassium_milligrams REAL,
+    vitamin_a REAL,
+    vitamin_c REAL,
+    vitamin_d REAL,
+    calcium REAL,
+    iron REAL,
+    updated_at TEXT NOT NULL,
+    deleted_at TEXT
+  );
+  CREATE INDEX entry_date ON entry (date);
+  CREATE TABLE mfp_link (
+    id TEXT PRIMARY KEY,
+    entry_id TEXT NOT NULL REFERENCES entry ON DELETE CASCADE,
+    mfp_entry_id TEXT NOT NULL,
+    date TEXT NOT NULL,
+    meal_name TEXT NOT NULL,
+    food_id TEXT NOT NULL,
+    food_version TEXT,
+    servings REAL NOT NULL,
+    serving_value REAL NOT NULL,
+    serving_unit TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    deleted_at TEXT
+  );
+  CREATE UNIQUE INDEX mfp_link_entry
+    ON mfp_link (entry_id) WHERE deleted_at IS NULL;
+  CREATE UNIQUE INDEX mfp_link_mfp_entry
+    ON mfp_link (mfp_entry_id) WHERE deleted_at IS NULL;
+  CREATE TABLE ekklo_link (
+    id TEXT PRIMARY KEY,
+    entry_id TEXT NOT NULL REFERENCES entry ON DELETE CASCADE,
+    ekklo_meal_id TEXT,
+    ekklo_item_id TEXT,
+    meal_id TEXT,
+    food_id TEXT,
+    servings REAL,
+    serving_value REAL,
+    serving_unit TEXT,
+    sent_at TEXT,
+    unattended_meal_name TEXT,
+    unattended_food_id TEXT,
+    unattended_quantity REAL,
+    unattended_quantity_type TEXT,
+    updated_at TEXT NOT NULL,
+    deleted_at TEXT,
+    CHECK (
+      (ekklo_meal_id IS NULL) + (ekklo_item_id IS NULL) + (meal_id IS NULL)
+        + (food_id IS NULL) + (servings IS NULL) + (serving_value IS NULL)
+        + (serving_unit IS NULL) + (sent_at IS NULL) IN (0, 8)
+    ),
+    CHECK (
+      (unattended_meal_name IS NULL) + (unattended_food_id IS NULL)
+        + (unattended_quantity IS NULL)
+        + (unattended_quantity_type IS NULL) IN (0, 4)
+    ),
+    CHECK (ekklo_item_id IS NOT NULL OR unattended_meal_name IS NOT NULL)
+  );
+  CREATE UNIQUE INDEX ekklo_link_entry
+    ON ekklo_link (entry_id) WHERE deleted_at IS NULL;
+  CREATE UNIQUE INDEX ekklo_link_item
+    ON ekklo_link (ekklo_item_id)
+    WHERE ekklo_item_id IS NOT NULL AND deleted_at IS NULL;
 
   CREATE TEMP TABLE migration_time AS
     SELECT strftime('%Y-%m-%dT%H:%M:%fZ', 'now') AS at;

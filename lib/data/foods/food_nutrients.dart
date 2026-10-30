@@ -85,4 +85,11 @@ final class FoodNutrients with FoodNutrientsMappable {
   final double? vitaminD;
   final double? calcium;
   final double? iron;
+
+  double? get kilocalories => switch ((energyValue, energyUnit)) {
+    (final value?, EnergyUnit.calories) => value,
+    (final value?, EnergyUnit.kilojoules) =>
+      value / MfpEnergy.kilojoulesPerKilocalorie,
+    _ => null,
+  };
 }

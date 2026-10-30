@@ -23,7 +23,6 @@ const _other = 'Autre';
 const _edited = 'Riz basmati modifié';
 const _retry = 'Réessayer';
 const _oldRice = 'ekklo-old-rice';
-const _resavedBasmati = 'e-basmati-before';
 const _reloaded =
     'Valeurs rechargées : 200 → 210 kcal / 100 g. Ce qui a '
     'bougé est surligné en jaune.';
@@ -490,7 +489,7 @@ void main() {
     await LoggedJournal.pump(
       tester,
       backends,
-      linked: LoggedJournal.basmatiLink(entryId: _resavedBasmati, servings: 1),
+      sent: LoggedJournal.basmatiSent(servings: 1),
     );
     _sees('À mettre à jour');
     await tester.tap(find.text(LoggedJournal.basmati));

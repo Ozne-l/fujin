@@ -71,8 +71,8 @@ void main() {
   test('MyFitnessPal entries add up and flag a nutrient some entries '
       'lack', () {
     final totals = DayNutrients.ofEntries([
-      entry('E-1', nutrients: nutrients(kcal: 300, fiber: 4)),
-      entry('E-2', nutrients: nutrients(kcal: 200)),
+      loggedEntry(entry('E-1', nutrients: nutrients(kcal: 300, fiber: 4))),
+      loggedEntry(entry('E-2', nutrients: nutrients(kcal: 200))),
     ]);
 
     check(totals.amount(Nutrient.kilocalories)).equals(500);

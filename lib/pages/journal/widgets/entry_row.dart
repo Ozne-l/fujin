@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/journal/widgets/split_line.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 class EntryRow extends StatelessWidget {
   const EntryRow({
@@ -13,7 +13,7 @@ class EntryRow extends StatelessWidget {
     super.key,
   });
 
-  final MfpFoodEntry entry;
+  final LoggedEntry entry;
   final String detail;
   final Widget? pill;
 
@@ -25,7 +25,7 @@ class EntryRow extends StatelessWidget {
       children: [
         SplitLine(
           leading: Text(
-            entry.food.description,
+            entry.foodName ?? '',
             style: FujinText.inter15Medium.copyWith(
               color: context.colors.textPrimary,
             ),

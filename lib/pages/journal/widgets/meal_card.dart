@@ -97,7 +97,7 @@ class MealCard extends HookWidget {
                     counts.inEkklo,
                     total,
                     meal.entries
-                        .map((compared) => compared.entry.food.description)
+                        .map((compared) => compared.logged.foodName ?? '')
                         .join(_foodSeparator),
                   ),
                   maxLines: 1,

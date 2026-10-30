@@ -1,6 +1,6 @@
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 part 'added_food.mapper.dart';
 
@@ -13,5 +13,5 @@ final class AddedFood with AddedFoodMappable {
 
   String get entryId => planned.entryId;
 
-  MfpFoodEntry get entry => planned.entry;
+  LoggedEntry get entry => planned.entry;
 }

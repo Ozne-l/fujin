@@ -30,7 +30,7 @@ final class RemoveEntryNotifier extends Notifier<RemoveEntryState> {
     state = RemoveEntryRunning(removal);
     final outcome = await ref
         .read(removeEntryServiceProvider)
-        .remove(entryId: removal.entryId, date: removal.entry.date);
+        .remove(entryId: removal.entryId, date: removal.entry.entry.date);
     if (!ref.mounted) return;
     state = switch (outcome) {
       Removed(:final ekkloRemoved) => RemoveEntryDone(

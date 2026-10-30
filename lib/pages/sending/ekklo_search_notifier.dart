@@ -26,7 +26,7 @@ final class EkkloSearchNotifier extends Notifier<EkkloSearchState> {
 
   @override
   EkkloSearchState build() {
-    final query = searchTerms(planned.entry.food);
+    final query = searchTerms(planned.entry);
     final service = ref.watch(sendServiceProvider);
     return switch (planned.candidates) {
       [] when query.isNotEmpty => _started(service, query),

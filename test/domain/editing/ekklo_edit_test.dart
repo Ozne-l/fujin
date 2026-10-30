@@ -1,7 +1,8 @@
 import 'package:checks/checks.dart';
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_test/flutter_test.dart' show group, test;
-import 'package:fujin/data/links/sent_link.dart';
+import 'package:fujin/data/entries/ekklo_link.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
@@ -18,8 +19,12 @@ const _itemId = 'item-1';
 const _mealId = 'meal-1';
 const _riceName = 'Riz basmati';
 
-final MfpFoodEntry _logged = entry('e1', food: rice, meal: lunch);
-final SentLink _link = link('e1', _itemId, food: rice, meal: lunch);
+final LoggedEntry _logged = loggedEntry(entry('e1', food: rice, meal: lunch));
+final EkkloLink _link = ekkloLinkRow(
+  'link-1',
+  entryId: 'e1',
+  item: sentItem(_itemId, food: rice, meal: lunch),
+);
 
 PlannedEntry _planned({
   String ekkloMeal = dejeuner,
@@ -27,8 +32,7 @@ PlannedEntry _planned({
   DateTime? date,
   double servings = 2,
 }) => PlannedEntry(
-  entry: _logged.copyWith(servings: servings, date: date ?? day),
-  entryId: AddDraft.pendingEntryId,
+  entry: _logged.copyWith.entry(servings: servings, date: date ?? day),
   ekkloMealName: ekkloMeal,
   choice: SendToEkkloFood(
     ekkloFoodId: ekkloFood,

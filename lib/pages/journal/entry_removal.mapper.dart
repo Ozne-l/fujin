@@ -15,7 +15,7 @@ class EntryRemovalMapper extends ClassMapperBase<EntryRemoval> {
   static EntryRemovalMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = EntryRemovalMapper._());
-      MfpFoodEntryMapper.ensureInitialized();
+      LoggedEntryMapper.ensureInitialized();
       RemovalReasonMapper.ensureInitialized();
     }
     return _instance!;
@@ -30,8 +30,8 @@ class EntryRemovalMapper extends ClassMapperBase<EntryRemoval> {
     _$entryId,
     key: r'entry_id',
   );
-  static MfpFoodEntry _$entry(EntryRemoval v) => v.entry;
-  static const Field<EntryRemoval, MfpFoodEntry> _f$entry = Field(
+  static LoggedEntry _$entry(EntryRemoval v) => v.entry;
+  static const Field<EntryRemoval, LoggedEntry> _f$entry = Field(
     'entry',
     _$entry,
   );
@@ -120,8 +120,8 @@ extension EntryRemovalValueCopy<$R, $Out>
 
 abstract class EntryRemovalCopyWith<$R, $In extends EntryRemoval, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  MfpFoodEntryCopyWith<$R, MfpFoodEntry, MfpFoodEntry> get entry;
-  $R call({String? entryId, MfpFoodEntry? entry, RemovalReason? reason});
+  LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get entry;
+  $R call({String? entryId, LoggedEntry? entry, RemovalReason? reason});
   EntryRemovalCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -134,10 +134,10 @@ class _EntryRemovalCopyWithImpl<$R, $Out>
   late final ClassMapperBase<EntryRemoval> $mapper =
       EntryRemovalMapper.ensureInitialized();
   @override
-  MfpFoodEntryCopyWith<$R, MfpFoodEntry, MfpFoodEntry> get entry =>
+  LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get entry =>
       $value.entry.copyWith.$chain((v) => call(entry: v));
   @override
-  $R call({String? entryId, MfpFoodEntry? entry, RemovalReason? reason}) =>
+  $R call({String? entryId, LoggedEntry? entry, RemovalReason? reason}) =>
       $apply(
         FieldCopyWithData({
           if (entryId != null) #entryId: entryId,

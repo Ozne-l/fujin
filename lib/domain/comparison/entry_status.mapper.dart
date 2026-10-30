@@ -70,7 +70,7 @@ class InEkkloMapper extends SubClassMapperBase<InEkklo> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = InEkkloMapper._());
       EntryStatusMapper.ensureInitialized().addSubMapper(_instance!);
-      SentLinkMapper.ensureInitialized();
+      EkkloLinkMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -78,8 +78,8 @@ class InEkkloMapper extends SubClassMapperBase<InEkklo> {
   @override
   final String id = 'InEkklo';
 
-  static SentLink _$link(InEkklo v) => v.link;
-  static const Field<InEkklo, SentLink> _f$link = Field('link', _$link);
+  static EkkloLink _$link(InEkklo v) => v.link;
+  static const Field<InEkklo, EkkloLink> _f$link = Field('link', _$link);
 
   @override
   final MappableFields<InEkklo> fields = const {#link: _f$link};
@@ -155,9 +155,9 @@ extension InEkkloValueCopy<$R, $Out> on ObjectCopyWith<$R, InEkklo, $Out> {
 
 abstract class InEkkloCopyWith<$R, $In extends InEkklo, $Out>
     implements EntryStatusCopyWith<$R, $In, $Out> {
-  SentLinkCopyWith<$R, SentLink, SentLink> get link;
+  EkkloLinkCopyWith<$R, EkkloLink, EkkloLink> get link;
   @override
-  $R call({SentLink? link});
+  $R call({EkkloLink? link});
   InEkkloCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -170,10 +170,10 @@ class _InEkkloCopyWithImpl<$R, $Out>
   late final ClassMapperBase<InEkklo> $mapper =
       InEkkloMapper.ensureInitialized();
   @override
-  SentLinkCopyWith<$R, SentLink, SentLink> get link =>
+  EkkloLinkCopyWith<$R, EkkloLink, EkkloLink> get link =>
       $value.link.copyWith.$chain((v) => call(link: v));
   @override
-  $R call({SentLink? link}) =>
+  $R call({EkkloLink? link}) =>
       $apply(FieldCopyWithData({if (link != null) #link: link}));
   @override
   InEkklo $make(CopyWithData data) => InEkklo(data.get(#link, or: $value.link));
@@ -290,7 +290,7 @@ class ToUpdateMapper extends SubClassMapperBase<ToUpdate> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ToUpdateMapper._());
       EntryStatusMapper.ensureInitialized().addSubMapper(_instance!);
-      SentLinkMapper.ensureInitialized();
+      EkkloLinkMapper.ensureInitialized();
       UpdateKindMapper.ensureInitialized();
     }
     return _instance!;
@@ -299,8 +299,8 @@ class ToUpdateMapper extends SubClassMapperBase<ToUpdate> {
   @override
   final String id = 'ToUpdate';
 
-  static SentLink _$link(ToUpdate v) => v.link;
-  static const Field<ToUpdate, SentLink> _f$link = Field('link', _$link);
+  static EkkloLink _$link(ToUpdate v) => v.link;
+  static const Field<ToUpdate, EkkloLink> _f$link = Field('link', _$link);
   static UpdateKind _$kind(ToUpdate v) => v.kind;
   static const Field<ToUpdate, UpdateKind> _f$kind = Field('kind', _$kind);
 
@@ -381,9 +381,9 @@ extension ToUpdateValueCopy<$R, $Out> on ObjectCopyWith<$R, ToUpdate, $Out> {
 
 abstract class ToUpdateCopyWith<$R, $In extends ToUpdate, $Out>
     implements EntryStatusCopyWith<$R, $In, $Out> {
-  SentLinkCopyWith<$R, SentLink, SentLink> get link;
+  EkkloLinkCopyWith<$R, EkkloLink, EkkloLink> get link;
   @override
-  $R call({SentLink? link, UpdateKind? kind});
+  $R call({EkkloLink? link, UpdateKind? kind});
   ToUpdateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -396,10 +396,10 @@ class _ToUpdateCopyWithImpl<$R, $Out>
   late final ClassMapperBase<ToUpdate> $mapper =
       ToUpdateMapper.ensureInitialized();
   @override
-  SentLinkCopyWith<$R, SentLink, SentLink> get link =>
+  EkkloLinkCopyWith<$R, EkkloLink, EkkloLink> get link =>
       $value.link.copyWith.$chain((v) => call(link: v));
   @override
-  $R call({SentLink? link, UpdateKind? kind}) => $apply(
+  $R call({EkkloLink? link, UpdateKind? kind}) => $apply(
     FieldCopyWithData({
       if (link != null) #link: link,
       if (kind != null) #kind: kind,

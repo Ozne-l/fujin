@@ -1,5 +1,8 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:fujin/data/connectors/connector.dart';
+import 'package:fujin/data/entries/ekklo_link.dart';
+import 'package:fujin/data/entries/entry.dart';
+import 'package:fujin/data/entries/mfp_link.dart';
 import 'package:fujin/data/foods/food.dart';
 import 'package:fujin/data/foods/food_barcode.dart';
 import 'package:fujin/data/foods/food_reference.dart';
@@ -38,6 +41,55 @@ sealed class Backup with BackupMappable {
   int get foodCount;
 
   int get mealCount;
+
+  int get linkCount => links.length;
+}
+
+@MappableClass()
+final class BackupV4 extends Backup with BackupV4Mappable {
+  const BackupV4({
+    required super.exportedAt,
+    required super.links,
+    required this.foods,
+    required this.foodServings,
+    required this.foodUnits,
+    required this.foodReferences,
+    required this.barcodeLinks,
+    required this.meals,
+    required this.mealMappings,
+    required this.entries,
+    required this.mfpLinks,
+    required this.ekkloLinks,
+    super.goals,
+    super.format = Backup.formatName,
+    super.version = currentVersion,
+  });
+
+  static const currentVersion = 4;
+
+  final List<Food> foods;
+  final List<FoodServing> foodServings;
+  final List<FoodUnit> foodUnits;
+  final List<FoodReference> foodReferences;
+  final List<FoodBarcode> barcodeLinks;
+  final List<Meal> meals;
+  final List<ConnectorMeal> mealMappings;
+  final List<Entry> entries;
+  final List<MfpLink> mfpLinks;
+  final List<EkkloLink> ekkloLinks;
+
+  @override
+  int get foodCount => _ownedFoodCount(foodReferences);
+
+  @override
+  int get mealCount => _ekkloMealCount(mealMappings);
+
+  @override
+  int get linkCount =>
+      ekkloLinks
+          .where((link) => link.deletedAt == null && link.item != null)
+          .length +
+      links.length;
 }
 
 @MappableClass()
@@ -52,12 +104,10 @@ final class BackupV3 extends Backup with BackupV3Mappable {
     required this.barcodeLinks,
     required this.meals,
     required this.mealMappings,
+    required super.version,
     super.goals,
     super.format = Backup.formatName,
-    super.version = currentVersion,
   });
-
-  static const currentVersion = 3;
 
   final List<Food> foods;
   final List<FoodServing> foodServings;
@@ -68,25 +118,29 @@ final class BackupV3 extends Backup with BackupV3Mappable {
   final List<ConnectorMeal> mealMappings;
 
   @override
-  int get foodCount => foodReferences
-      .where(
-        (reference) =>
-            reference.deletedAt == null &&
-            switch (reference) {
-              MfpReference() => false,
-              EkkloReference() || OwnCopyReference() => true,
-            },
-      )
-      .length;
+  int get foodCount => _ownedFoodCount(foodReferences);
 
   @override
-  int get mealCount => mealMappings
-      .where(
-        (mapping) =>
-            mapping.deletedAt == null && mapping.connector == Connector.ekklo,
-      )
-      .length;
+  int get mealCount => _ekkloMealCount(mealMappings);
 }
+
+int _ownedFoodCount(List<FoodReference> references) => references
+    .where(
+      (reference) =>
+          reference.deletedAt == null &&
+          switch (reference) {
+            MfpReference() => false,
+            EkkloReference() || OwnCopyReference() => true,
+          },
+    )
+    .length;
+
+int _ekkloMealCount(List<ConnectorMeal> mappings) => mappings
+    .where(
+      (mapping) =>
+          mapping.deletedAt == null && mapping.connector == Connector.ekklo,
+    )
+    .length;
 
 @MappableClass()
 final class BackupV2 extends Backup with BackupV2Mappable {

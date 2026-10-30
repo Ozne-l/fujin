@@ -56,13 +56,13 @@ class _RemoveSheet extends ConsumerWidget {
     };
     return SheetFrame(
       glyph: const AlertPictogram(icon: TrashIcon.asset),
-      title: intl.deleteFoodTitle(productName(entry.food)),
+      title: intl.deleteFoodTitle(productName(entry)),
       titleStyle: FujinText.hina24,
       subtitle: detail(
         EntryText.serving(intl, entry),
         EntryText.energy(intl, entry),
         entry.mealName,
-        entry.date,
+        entry.entry.date,
       ),
       subtitleStyle: FujinText.inter15RegularL22,
       primaryLabel: switch (inEkklo) {

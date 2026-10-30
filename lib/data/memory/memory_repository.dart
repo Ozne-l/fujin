@@ -53,7 +53,7 @@ final class MemoryRepository {
   });
 
   void forget(RememberedFood food) {
-    if (_foods.foodOfMfp(food.mfpFoodId) case final foodId?) {
+    if (_foods.foodOfMfp(food.mfpFoodId)?.id case final foodId?) {
       switch (food) {
         case OwnCopy():
           _foods.forgetOwnCopy(foodId, food.mfpUnit);
@@ -63,9 +63,11 @@ final class MemoryRepository {
     }
   }
 
-  void saveUnit(RememberedUnit unit) => switch (_foods.foodOfMfp(
-    unit.mfpFoodId,
-  )) {
+  void saveUnit(RememberedUnit unit) => switch (_foods
+      .foodOfMfp(
+        unit.mfpFoodId,
+      )
+      ?.id) {
     final foodId? when _foods.isMatched(foodId) => _foods.saveUnit(
       foodId,
       unit.mfpUnit,

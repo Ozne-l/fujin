@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/domain/goals/goal_amounts.dart';
 import 'package:fujin/domain/journal/day_nutrients.dart';
@@ -8,12 +9,11 @@ import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/sheet_frame.dart';
 import 'package:fujin/pages/common/sheet_header.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 Future<void> showMyDaySheet(
   BuildContext context, {
   required String subtitle,
-  required MfpFoodEntry entry,
+  required LoggedEntry entry,
   required DayNutrients? day,
   required Goals? goals,
 }) => SheetFrame.show(
@@ -35,14 +35,14 @@ class _MyDay extends StatelessWidget {
   static const _labelFlex = 1.4;
 
   final String subtitle;
-  final MfpFoodEntry entry;
+  final LoggedEntry entry;
   final DayNutrients? day;
   final Goals? goals;
 
   @override
   Widget build(BuildContext context) {
     final food = DayNutrients.ofEntries([entry]);
-    final nutrients = entry.nutrients;
+    final nutrients = entry.entry.nutrients;
     String amount(Nutrient nutrient, double value) => switch (nutrient) {
       Nutrient.kilocalories => context.intl.kilocaloriesValue(value),
       Nutrient.protein ||

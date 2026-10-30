@@ -3,12 +3,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart'
     show WidgetTester, addTearDown, find;
 import 'package:fujin/app/app_environment.dart';
-import 'package:fujin/data/links/sent_link.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import 'fake_backends.dart';
 import 'fixtures.dart';
 import 'pump_fujin.dart';
+import 'sent_food.dart';
 
 abstract final class LoggedJournal {
   static const basmatiId = 'e-basmati';
@@ -22,6 +22,14 @@ abstract final class LoggedJournal {
 
   static final MfpFood basmatiFood = mfpFood(rice, description: basmati);
   static final MfpFood skyrFood = mfpFood(skyr, description: skyrNature);
+  static final MfpFoodEntry _basmatiEntry = entry(
+    basmatiId,
+    food: rice,
+    meal: lunch,
+    servings: 1.5,
+    description: basmati,
+    version: '1',
+  );
   static const _pull = Offset(0, 400);
   static const _pullSpeed = 1000.0;
   static const _scrollStep = 200.0;
@@ -31,14 +39,7 @@ abstract final class LoggedJournal {
     mfpFoods: foods ?? [basmatiFood, skyrFood],
     entries: [
       entry(oatsId, description: oatFlakes, version: '1'),
-      entry(
-        basmatiId,
-        food: rice,
-        meal: lunch,
-        servings: 1.5,
-        description: basmati,
-        version: '1',
-      ),
+      _basmatiEntry,
       entry(
         skyrId,
         food: skyr,
@@ -54,14 +55,9 @@ abstract final class LoggedJournal {
     ],
   );
 
-  static SentLink basmatiLink({
-    String entryId = basmatiId,
-    double servings = 1.5,
-  }) => link(
-    entryId,
-    basmatiItem,
-    food: rice,
-    meal: lunch,
+  static SentFood basmatiSent({double servings = 1.5}) => SentFood(
+    _basmatiEntry,
+    itemId: basmatiItem,
     ekkloMeal: lunchMeal,
     servings: servings,
   );
@@ -69,7 +65,7 @@ abstract final class LoggedJournal {
   static Future<void> pump(
     WidgetTester tester,
     FakeBackends backends, {
-    SentLink? linked,
+    SentFood? sent,
     AppEnvironment environment = AppEnvironment.production,
     MyFitnessPalClient? mfp,
     EkkloClient? ekklo,
@@ -84,7 +80,7 @@ abstract final class LoggedJournal {
       mfp: mfp,
       ekklo: ekklo,
       environment: environment,
-      links: [linked ?? basmatiLink()],
+      sent: [sent ?? basmatiSent()],
     );
   }
 

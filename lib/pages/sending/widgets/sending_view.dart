@@ -50,8 +50,7 @@ class SendingView extends StatelessWidget {
       .firstOrNull) {
     MealStep(:final entryIds) => [
       for (final entryId in entryIds)
-        if (plan.entry(entryId) case final planned?)
-          productName(planned.entry.food),
+        if (plan.entry(entryId) case final planned?) productName(planned.entry),
     ],
     OwnCopyStep(:final name) || QuantityUpdateStep(:final name) => [name],
     null => const [],

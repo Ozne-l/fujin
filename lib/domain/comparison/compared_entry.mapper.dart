@@ -15,7 +15,7 @@ class ComparedEntryMapper extends ClassMapperBase<ComparedEntry> {
   static ComparedEntryMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ComparedEntryMapper._());
-      MfpFoodEntryMapper.ensureInitialized();
+      LoggedEntryMapper.ensureInitialized();
       EntryStatusMapper.ensureInitialized();
     }
     return _instance!;
@@ -24,27 +24,39 @@ class ComparedEntryMapper extends ClassMapperBase<ComparedEntry> {
   @override
   final String id = 'ComparedEntry';
 
-  static MfpFoodEntry _$entry(ComparedEntry v) => v.entry;
-  static const Field<ComparedEntry, MfpFoodEntry> _f$entry = Field(
-    'entry',
-    _$entry,
+  static LoggedEntry _$logged(ComparedEntry v) => v.logged;
+  static const Field<ComparedEntry, LoggedEntry> _f$logged = Field(
+    'logged',
+    _$logged,
   );
   static EntryStatus _$status(ComparedEntry v) => v.status;
   static const Field<ComparedEntry, EntryStatus> _f$status = Field(
     'status',
     _$status,
   );
+  static bool _$stored(ComparedEntry v) => v.stored;
+  static const Field<ComparedEntry, bool> _f$stored = Field(
+    'stored',
+    _$stored,
+    opt: true,
+    def: true,
+  );
 
   @override
   final MappableFields<ComparedEntry> fields = const {
-    #entry: _f$entry,
+    #logged: _f$logged,
     #status: _f$status,
+    #stored: _f$stored,
   };
   @override
   final bool ignoreNull = true;
 
   static ComparedEntry _instantiate(DecodingData data) {
-    return ComparedEntry(data.dec(_f$entry), data.dec(_f$status));
+    return ComparedEntry(
+      data.dec(_f$logged),
+      data.dec(_f$status),
+      stored: data.dec(_f$stored),
+    );
   }
 
   @override
@@ -109,9 +121,9 @@ extension ComparedEntryValueCopy<$R, $Out>
 
 abstract class ComparedEntryCopyWith<$R, $In extends ComparedEntry, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  MfpFoodEntryCopyWith<$R, MfpFoodEntry, MfpFoodEntry> get entry;
+  LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get logged;
   EntryStatusCopyWith<$R, EntryStatus, EntryStatus> get status;
-  $R call({MfpFoodEntry? entry, EntryStatus? status});
+  $R call({LoggedEntry? logged, EntryStatus? status, bool? stored});
   ComparedEntryCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -124,22 +136,24 @@ class _ComparedEntryCopyWithImpl<$R, $Out>
   late final ClassMapperBase<ComparedEntry> $mapper =
       ComparedEntryMapper.ensureInitialized();
   @override
-  MfpFoodEntryCopyWith<$R, MfpFoodEntry, MfpFoodEntry> get entry =>
-      $value.entry.copyWith.$chain((v) => call(entry: v));
+  LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get logged =>
+      $value.logged.copyWith.$chain((v) => call(logged: v));
   @override
   EntryStatusCopyWith<$R, EntryStatus, EntryStatus> get status =>
       $value.status.copyWith.$chain((v) => call(status: v));
   @override
-  $R call({MfpFoodEntry? entry, EntryStatus? status}) => $apply(
+  $R call({LoggedEntry? logged, EntryStatus? status, bool? stored}) => $apply(
     FieldCopyWithData({
-      if (entry != null) #entry: entry,
+      if (logged != null) #logged: logged,
       if (status != null) #status: status,
+      if (stored != null) #stored: stored,
     }),
   );
   @override
   ComparedEntry $make(CopyWithData data) => ComparedEntry(
-    data.get(#entry, or: $value.entry),
+    data.get(#logged, or: $value.logged),
     data.get(#status, or: $value.status),
+    stored: data.get(#stored, or: $value.stored),
   );
 
   @override

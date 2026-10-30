@@ -18,6 +18,7 @@ import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/domain/sending/own_copy_renewal.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
+import 'package:http/http.dart' as http;
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../../support/fake_backends.dart';
@@ -115,7 +116,9 @@ void main() {
           ..has((it) => it.entry.mealName, 'meal').equals(lunch);
         check(backends.entries.single)
           ..has((it) => it.servings, 'servings').equals(1.5)
-          ..has((it) => it.id, 'id').equals(added.entryId);
+          ..has((it) => it.id, 'id').equals(
+            services.entries.find(added.entryId)?.mfpLink?.mfpEntryId,
+          );
         check(backends.ekkloMeals.single)
           ..has((it) => it.name, 'meal').equals(dejeuner)
           ..has((it) => it.items.single.foodId, 'food').equals(riceInEkklo)
@@ -228,6 +231,33 @@ void main() {
         (await services.find(failed.added.entryId, day))?.status,
       ).isA<InEkklo>();
     });
+
+    test(
+      'takes over the entry a read copied in while MyFitnessPal answered',
+      () async {
+        final reading = _ReadingAfterAdd(backends.httpClient);
+        final services = await WriteServices.over(
+          backends,
+          database,
+          httpClient: reading,
+          clock: () => clock,
+        );
+        reading.onAdded = () => services.journal.readDay(day);
+
+        final added = ((await services.add(_draft(_basmati))) as Added).added;
+
+        check(reading.onAdded).isNull();
+        check(services.entries.entries()).length.equals(2);
+        check(services.entries.forDate(day).entries.single)
+          ..has((it) => it.entry.id, 'Fūjin id').equals(added.entryId)
+          ..has(
+            (it) => it.mfpLink?.mfpEntryId,
+            'MyFitnessPal id',
+          ).equals(backends.entries.single.id)
+          ..has((it) => it.ekkloLink?.item, 'item').isNotNull();
+        check(backends.ekkloItems).length.equals(1);
+      },
+    );
 
     test(
       'makes a new own copy when the remembered one has an older version',
@@ -520,7 +550,7 @@ void main() {
         ..has((it) => it.servingSize, 'serving').equals(_onePot)
         ..has((it) => it.servings, 'servings').equals(2)
         ..has((it) => it.mfpMealName, 'meal').equals(breakfast)
-        ..has((it) => it.entry.nutrients.energy?.value, 'kcal').equals(128);
+        ..has((it) => it.entry.entry.nutrients.energyValue, 'kcal').equals(128);
     });
   });
 
@@ -609,8 +639,9 @@ void main() {
 
       setUp(() => foods = foodsOf(database));
 
-      Food rememberedFood() =>
-          foods.foods().firstWhere((food) => food.id == foods.foodOfMfp(rice));
+      Food rememberedFood() => foods.foods().firstWhere(
+        (food) => food.id == foods.foodOfMfp(rice)?.id,
+      );
 
       List<(int, double, String)> liveServings() => [
         for (final serving in foods.servings())
@@ -674,4 +705,25 @@ void main() {
       });
     });
   });
+}
+
+final class _ReadingAfterAdd extends http.BaseClient {
+  _ReadingAfterAdd(this._inner);
+
+  final http.Client _inner;
+  Future<void> Function()? onAdded;
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    final response = await _inner.send(request);
+    if ((request.method, request.url.host, onAdded) case (
+      'POST',
+      final host,
+      final read?,
+    ) when host == mfpApiUri.host) {
+      onAdded = null;
+      await read();
+    }
+    return response;
+  }
 }

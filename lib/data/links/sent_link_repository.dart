@@ -23,26 +23,15 @@ final class SentLinkRepository {
       SentLinkMapper.fromMap(row),
   ];
 
-  void add(SentLink link) =>
-      _database.insert(FujinTable.sentLink, link.toMap());
-
-  void remove(String mfpEntryId) => _database.execute(
-    'DELETE FROM sent_link WHERE mfp_entry_id = ?',
-    [mfpEntryId],
+  void forgetDate(DateTime date) => _database.execute(
+    'DELETE FROM sent_link WHERE date = ?',
+    [CalendarDateHook.format(date)],
   );
-
-  void replace({
-    required Iterable<SentLink> dropped,
-    required Iterable<SentLink> adopted,
-  }) => _database.transaction(() {
-    for (final link in dropped) {
-      remove(link.mfpEntryId);
-    }
-    adopted.forEach(add);
-  });
 
   void replaceAll(Iterable<SentLink> links) => _database.transaction(() {
     _database.execute('DELETE FROM sent_link');
-    links.forEach(add);
+    for (final link in links) {
+      _database.insert(FujinTable.sentLink, link.toMap());
+    }
   });
 }

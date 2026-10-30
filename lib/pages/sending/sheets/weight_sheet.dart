@@ -39,7 +39,7 @@ class _WeightSheet extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final entry = planned.entry;
-    final unit = entry.servingSize.unit;
+    final unit = entry.entry.servingUnit;
     final weight = useTextEditingController(
       text: switch (choice.gramsPerUnit) {
         null => '',
@@ -53,10 +53,10 @@ class _WeightSheet extends HookWidget {
     return SheetFrame(
       title: context.intl.weightQuestion(unit),
       titleStyle: FujinText.hina26,
-      subtitle: switch (entry.food.brandName?.trim()) {
-        null || '' => entry.food.description,
+      subtitle: switch (entry.brand?.trim()) {
+        null || '' => entry.foodName ?? '',
         final brand => context.intl.weightFoodBrand(
-          entry.food.description,
+          entry.foodName ?? '',
           brand,
         ),
       },
@@ -174,12 +174,12 @@ class _WeightSheet extends HookWidget {
   static const TextStyle _rememberedStyle = FujinText.inter12Medium;
 
   String? _estimate(AppLocalizations intl) => switch ((
-    planned.entry.nutrients.energy?.kilocalories,
+    planned.entry.entry.nutrients.kilocalories,
     planned.units,
   )) {
     (final kilocalories?, final units) when units > 0 => intl.weightEstimate(
       intl.kilocalories(kilocalories / units),
-      planned.entry.servingSize.unit,
+      planned.entry.entry.servingUnit,
     ),
     _ => null,
   };

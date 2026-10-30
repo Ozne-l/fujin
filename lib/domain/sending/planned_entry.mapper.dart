@@ -15,10 +15,10 @@ class PlannedEntryMapper extends ClassMapperBase<PlannedEntry> {
   static PlannedEntryMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = PlannedEntryMapper._());
-      MfpFoodEntryMapper.ensureInitialized();
+      LoggedEntryMapper.ensureInitialized();
       SendChoiceMapper.ensureInitialized();
       EkkloCandidateMapper.ensureInitialized();
-      SentLinkMapper.ensureInitialized();
+      EkkloLinkMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -26,16 +26,10 @@ class PlannedEntryMapper extends ClassMapperBase<PlannedEntry> {
   @override
   final String id = 'PlannedEntry';
 
-  static MfpFoodEntry _$entry(PlannedEntry v) => v.entry;
-  static const Field<PlannedEntry, MfpFoodEntry> _f$entry = Field(
+  static LoggedEntry _$entry(PlannedEntry v) => v.entry;
+  static const Field<PlannedEntry, LoggedEntry> _f$entry = Field(
     'entry',
     _$entry,
-  );
-  static String _$entryId(PlannedEntry v) => v.entryId;
-  static const Field<PlannedEntry, String> _f$entryId = Field(
-    'entryId',
-    _$entryId,
-    key: r'entry_id',
   );
   static String _$ekkloMealName(PlannedEntry v) => v.ekkloMealName;
   static const Field<PlannedEntry, String> _f$ekkloMealName = Field(
@@ -83,8 +77,8 @@ class PlannedEntryMapper extends ClassMapperBase<PlannedEntry> {
     key: r'remembered_grams_per_unit',
     opt: true,
   );
-  static SentLink? _$replacing(PlannedEntry v) => v.replacing;
-  static const Field<PlannedEntry, SentLink> _f$replacing = Field(
+  static EkkloLink? _$replacing(PlannedEntry v) => v.replacing;
+  static const Field<PlannedEntry, EkkloLink> _f$replacing = Field(
     'replacing',
     _$replacing,
     opt: true,
@@ -93,7 +87,6 @@ class PlannedEntryMapper extends ClassMapperBase<PlannedEntry> {
   @override
   final MappableFields<PlannedEntry> fields = const {
     #entry: _f$entry,
-    #entryId: _f$entryId,
     #ekkloMealName: _f$ekkloMealName,
     #choice: _f$choice,
     #reviewed: _f$reviewed,
@@ -109,7 +102,6 @@ class PlannedEntryMapper extends ClassMapperBase<PlannedEntry> {
   static PlannedEntry _instantiate(DecodingData data) {
     return PlannedEntry(
       entry: data.dec(_f$entry),
-      entryId: data.dec(_f$entryId),
       ekkloMealName: data.dec(_f$ekkloMealName),
       choice: data.dec(_f$choice),
       reviewed: data.dec(_f$reviewed),
@@ -183,7 +175,7 @@ extension PlannedEntryValueCopy<$R, $Out>
 
 abstract class PlannedEntryCopyWith<$R, $In extends PlannedEntry, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  MfpFoodEntryCopyWith<$R, MfpFoodEntry, MfpFoodEntry> get entry;
+  LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get entry;
   SendChoiceCopyWith<$R, SendChoice, SendChoice> get choice;
   ListCopyWith<
     $R,
@@ -191,10 +183,9 @@ abstract class PlannedEntryCopyWith<$R, $In extends PlannedEntry, $Out>
     EkkloCandidateCopyWith<$R, EkkloCandidate, EkkloCandidate>
   >
   get candidates;
-  SentLinkCopyWith<$R, SentLink, SentLink>? get replacing;
+  EkkloLinkCopyWith<$R, EkkloLink, EkkloLink>? get replacing;
   $R call({
-    MfpFoodEntry? entry,
-    String? entryId,
+    LoggedEntry? entry,
     String? ekkloMealName,
     SendChoice? choice,
     bool? reviewed,
@@ -202,7 +193,7 @@ abstract class PlannedEntryCopyWith<$R, $In extends PlannedEntry, $Out>
     List<EkkloCandidate>? candidates,
     String? rememberedEkkloFoodId,
     double? rememberedGramsPerUnit,
-    SentLink? replacing,
+    EkkloLink? replacing,
   });
   PlannedEntryCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -216,7 +207,7 @@ class _PlannedEntryCopyWithImpl<$R, $Out>
   late final ClassMapperBase<PlannedEntry> $mapper =
       PlannedEntryMapper.ensureInitialized();
   @override
-  MfpFoodEntryCopyWith<$R, MfpFoodEntry, MfpFoodEntry> get entry =>
+  LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get entry =>
       $value.entry.copyWith.$chain((v) => call(entry: v));
   @override
   SendChoiceCopyWith<$R, SendChoice, SendChoice> get choice =>
@@ -233,12 +224,11 @@ class _PlannedEntryCopyWithImpl<$R, $Out>
     (v) => call(candidates: v),
   );
   @override
-  SentLinkCopyWith<$R, SentLink, SentLink>? get replacing =>
+  EkkloLinkCopyWith<$R, EkkloLink, EkkloLink>? get replacing =>
       $value.replacing?.copyWith.$chain((v) => call(replacing: v));
   @override
   $R call({
-    MfpFoodEntry? entry,
-    String? entryId,
+    LoggedEntry? entry,
     String? ekkloMealName,
     SendChoice? choice,
     bool? reviewed,
@@ -250,7 +240,6 @@ class _PlannedEntryCopyWithImpl<$R, $Out>
   }) => $apply(
     FieldCopyWithData({
       if (entry != null) #entry: entry,
-      if (entryId != null) #entryId: entryId,
       if (ekkloMealName != null) #ekkloMealName: ekkloMealName,
       if (choice != null) #choice: choice,
       if (reviewed != null) #reviewed: reviewed,
@@ -266,7 +255,6 @@ class _PlannedEntryCopyWithImpl<$R, $Out>
   @override
   PlannedEntry $make(CopyWithData data) => PlannedEntry(
     entry: data.get(#entry, or: $value.entry),
-    entryId: data.get(#entryId, or: $value.entryId),
     ekkloMealName: data.get(#ekkloMealName, or: $value.ekkloMealName),
     choice: data.get(#choice, or: $value.choice),
     reviewed: data.get(#reviewed, or: $value.reviewed),

@@ -1,6 +1,6 @@
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/pages/journal/removal_reason.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 part 'entry_removal.mapper.dart';
 
@@ -13,6 +13,6 @@ final class EntryRemoval with EntryRemovalMappable {
   });
 
   final String entryId;
-  final MfpFoodEntry entry;
+  final LoggedEntry entry;
   final RemovalReason reason;
 }

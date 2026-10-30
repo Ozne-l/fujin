@@ -325,7 +325,7 @@ class SettingsPage extends HookConsumerWidget {
         backup.exportedAt.toLocal(),
         backup.foodCount,
         backup.mealCount,
-        backup.links.length,
+        backup.linkCount,
       ),
       confirmLabel: context.intl.importConfirm,
       onConfirm: onConfirm,

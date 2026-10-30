@@ -4,7 +4,7 @@ Date: 2026-10-10
 
 ## Status
 
-Accepted. Amends the execution of [0018](0018-send-flow.md) for automatic sends, adds a rule to the comparison of [0001](0001-recompute-statuses-from-both-sides.md), and adds the first setting to the shared preferences of [0023](0023-ui-flags-in-shared-preferences.md).
+Accepted. Amends the execution of [0018](0018-send-flow.md) for automatic sends, adds a rule to the comparison of [0001](0001-recompute-statuses-from-both-sides.md), and adds the first setting to the shared preferences of [0023](0023-ui-flags-in-shared-preferences.md). Step 2 of [0044](0044-connector-model.md) (2026-10-30) moves the unattended item onto the entry's Ekklo link as its unattended expectation, which now travels in the backup file (version 4), amending the consequence that rows of `unattended_item` are not in the backup file: a version 4 import restores the expectations with the links.
 
 ## Context
 

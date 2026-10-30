@@ -4,12 +4,16 @@ import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart'
     show addTearDown, group, setUp, tearDown, test;
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/database/schema.dart';
+import 'package:fujin/data/entries/day_changes.dart';
+import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/foods/food_nutrients.dart';
 import 'package:fujin/data/foods/food_reference.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/goals/goals_repository.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
+import 'package:fujin/data/meals/meal_repository.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/meal_mapping.dart';
 import 'package:fujin/data/memory/memory.dart';
@@ -66,16 +70,16 @@ void main() {
       'twice', () {
     final path = _databasePath();
     final first = FujinDatabase.open(path);
-    SentLinkRepository(first).add(link('E-1', 'I-1'));
+    storeEntry(first, entry('E-1'), 'e-1');
+    entriesOf(first).linkItem('e-1', ekkloMealId: 'meal-1', ekkloItemId: 'I-1');
+    final stored = entriesOf(first).find('e-1');
     first.close();
 
     final reopened = FujinDatabase.open(path);
     addTearDown(reopened.close);
 
     check(reopened.schemaVersion).equals(schemaMigrations.length);
-    check(SentLinkRepository(reopened).forDate(day)).deepEquals([
-      link('E-1', 'I-1'),
-    ]);
+    check(entriesOf(reopened).forDate(day).entries).deepEquals([?stored]);
   });
 
   test('moves the own copies of a version 2 database to one row per '
@@ -138,9 +142,9 @@ void main() {
 
     setUp(() {
       final (path, legacy) = _legacyDatabase(_versionOfRelease040);
-      SentLinkRepository(legacy).add(link('E-1', 'I-1', food: rice));
-      UnattendedItemRepository(legacy).record([unattendedItem('E-2')]);
       legacy
+        ..insert(FujinTable.sentLink, link('E-1', 'I-1', food: rice).toMap())
+        ..insert(FujinTable.unattendedItem, unattendedItem('E-2').toMap())
         ..execute(
           'INSERT INTO memory_food (mfp_food_id, mfp_description, kind, '
           'ekklo_food_id, ekklo_food_name) VALUES '
@@ -362,6 +366,14 @@ void main() {
       ).isA<String>().isNotEmpty();
     });
 
+    test('starts with no entry and no MyFitnessPal or Ekklo link', () {
+      final entries = entriesOf(migrated);
+
+      check(entries.entries()).isEmpty();
+      check(entries.mfpLinks()).isEmpty();
+      check(entries.ekkloLinks()).isEmpty();
+    });
+
     test('drops the old Memory tables', () {
       check([
         for (final row in migrated.select(
@@ -386,31 +398,74 @@ void main() {
 
     test('are read back for their own day only', () {
       final otherDay = link('E-2', 'I-2').copyWith(date: DateTime.utc(2026));
-      links
-        ..add(link('E-1', 'I-1'))
-        ..add(otherDay);
+      database
+        ..insert(FujinTable.sentLink, link('E-1', 'I-1').toMap())
+        ..insert(FujinTable.sentLink, otherDay.toMap());
 
       check(links.forDate(day)).deepEquals([link('E-1', 'I-1')]);
     });
+  });
 
-    test('move to a new entry when dropped and adopted together', () {
-      links
-        ..add(link('E-1', 'I-1'))
-        ..replace(dropped: [link('E-1', 'I-1')], adopted: [link('E-2', 'I-1')]);
+  group('Ekklo links', () {
+    late FujinDatabase database;
+    late EntryRepository entries;
 
-      check(links.forDate(day)).deepEquals([link('E-2', 'I-1')]);
+    setUp(() {
+      database = FujinDatabase.inMemory();
+      entries = entriesOf(database);
+      for (final id in ['E-1', 'E-2', 'E-3']) {
+        storeEntry(database, entry(id), id.toLowerCase());
+      }
+      entries.linkItem('e-1', ekkloMealId: 'meal-1', ekkloItemId: 'I-1');
     });
 
-    test('are all kept when one adoption is refused', () {
-      links.add(link('E-1', 'I-1'));
+    tearDown(() => database.close());
+
+    String? itemOf(String entryId) =>
+        entries.find(entryId)?.ekkloLink?.item?.ekkloItemId;
+
+    test('move to another entry with their item', () {
+      final moved = entries.find('e-1')?.ekkloLink;
+
+      entries.store(
+        DayChanges(
+          date: day,
+          changedEkkloLinks: [?moved?.copyWith(entryId: 'e-2')],
+        ),
+      );
+
+      check(itemOf('e-1')).isNull();
+      check(itemOf('e-2')).equals('I-1');
+      check(entries.find('e-2')?.ekkloLink?.id).equals(moved?.id);
+    });
+
+    test('are all kept when a second live link on one item is refused', () {
+      final dropped = entries.find('e-1')?.ekkloLink;
+      final item = dropped?.item;
 
       check(
-        () => links.replace(
-          dropped: [link('E-1', 'I-1')],
-          adopted: [link('E-2', 'I-2'), link('E-3', 'I-2')],
+        () => entries.store(
+          DayChanges(
+            date: day,
+            droppedEkkloLinkIds: [?dropped?.id],
+            addedEkkloLinks: [
+              ekkloLinkRow(
+                'link-2',
+                entryId: 'e-2',
+                item: item?.copyWith(ekkloItemId: 'I-2'),
+              ),
+              ekkloLinkRow(
+                'link-3',
+                entryId: 'e-3',
+                item: item?.copyWith(ekkloItemId: 'I-2'),
+              ),
+            ],
+          ),
         ),
       ).throws<Object>();
-      check(links.forDate(day)).deepEquals([link('E-1', 'I-1')]);
+      check(itemOf('e-1')).equals('I-1');
+      check(itemOf('e-2')).isNull();
+      check(itemOf('e-3')).isNull();
     });
   });
 
@@ -551,8 +606,11 @@ void main() {
     });
 
     test('clears every remembered food, unit, meal and barcode link but no '
-        'sent link', () {
-      final links = SentLinkRepository(database)..add(link('E-1', 'I-1'));
+        'Ekklo link', () {
+      storeEntry(database, entry('E-1'), 'e-1');
+      final entries = entriesOf(database)
+        ..linkItem('e-1', ekkloMealId: 'meal-1', ekkloItemId: 'I-1');
+      final links = entries.ekkloLinks();
       repository
         ..saveFood(_ownRice(grams))
         ..saveMeal(memory.meals.first)
@@ -563,7 +621,7 @@ void main() {
 
       check(repository.load()).equals(const Memory());
       check(repository.barcodeFood(_riceBarcode)).isNull();
-      check(links.all()).deepEquals([link('E-1', 'I-1')]);
+      check(entries.ekkloLinks()).deepEquals(links);
     });
 
     test('offers the food last linked to a barcode', () {
@@ -587,8 +645,8 @@ void main() {
   test('keeps the memory and links of a version 3 database when the goals '
       'table arrives', () {
     final (path, legacy) = _legacyDatabase(_versionBeforeGoals);
-    SentLinkRepository(legacy).add(link('E-1', 'I-1'));
     legacy
+      ..insert(FujinTable.sentLink, link('E-1', 'I-1').toMap())
       ..execute(
         'INSERT INTO memory_food (mfp_food_id, mfp_description, kind, '
         "ekklo_food_id, ekklo_food_name) VALUES (?, ?, 'ekklo', ?, ?), "
@@ -632,6 +690,45 @@ void main() {
     check(memoryOf(migrated).load()).equals(memory);
     check(SentLinkRepository(migrated).all()).deepEquals([link('E-1', 'I-1')]);
     check(goalsOf(migrated).load()).isNull();
+  });
+
+  group('meals arranged from the diary', () {
+    const dinner = 'Dinner';
+    late FujinDatabase database;
+    late MealRepository meals;
+
+    List<String> ordered() => [
+      for (final meal
+          in meals.meals()..sort((a, b) => a.position.compareTo(b.position)))
+        meal.name,
+    ];
+
+    setUp(() {
+      database = FujinDatabase.inMemory();
+      meals = mealsOf(database);
+      for (final name in [snacks, dinner, lunch]) {
+        meals.mfpMeal(name, id: 'meal-$name');
+      }
+    });
+
+    tearDown(() => database.close());
+
+    test('follow the order of its names, the others after in their own '
+        'order', () {
+      meals.arrange([breakfast, lunch]);
+
+      check(ordered()).deepEquals([breakfast, lunch, snacks, dinner]);
+    });
+
+    test('get one meal per name missing, mapped to MyFitnessPal', () {
+      meals
+        ..arrange([breakfast, lunch])
+        ..arrange([lunch, breakfast]);
+
+      check(ordered()).deepEquals([lunch, breakfast, snacks, dinner]);
+      check(meals.mealOfMfp(breakfast)).isNotNull();
+      check(meals.mealOfMfp(lunch)).equals('meal-$lunch');
+    });
   });
 
   group('goals', () {
