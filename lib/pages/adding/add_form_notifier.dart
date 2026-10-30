@@ -43,23 +43,14 @@ final class AddFormNotifier extends Notifier<AddForm> {
 
   void choose(PlannedEntry planned) => state = state.copyWith(planned: planned);
 
-  void reload(MfpFood after) {
-    final form = AddForm(
-      draft: state.draft.withFood(after),
-      changedFrom: state.draft.food,
-    );
-    state = form;
-    unawaited(_plan(form));
-  }
-
   Future<void> retryPlan() {
-    final form = AddForm(draft: state.draft, changedFrom: state.changedFrom);
+    final form = AddForm(draft: state.draft);
     state = form;
     return _plan(form);
   }
 
   void _replan(AddDraft draft, {PlannedEntry? previous}) {
-    final form = AddForm(draft: draft, changedFrom: state.changedFrom);
+    final form = AddForm(draft: draft);
     state = form;
     unawaited(_plan(form, previous: previous));
   }

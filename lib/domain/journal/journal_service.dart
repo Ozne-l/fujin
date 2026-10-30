@@ -53,7 +53,7 @@ final class JournalService {
     final diary = Fetch.of(fetchDiary(date));
     final meals = Fetch.of(fetchEkkloMeals(date));
     return switch ((await diary, await meals)) {
-      (Fetched(value: final diary), Fetched(value: final meals)) => _day(
+      (final Fetched<MfpDiaryDay> diary, Fetched(value: final meals)) => _day(
         date,
         _stored(date, diary, meals),
         meals,
@@ -80,7 +80,7 @@ final class JournalService {
     List<String> mealNames = const [],
   }) => switch ((diary, meals)) {
     (
-      Fetched(value: final diary, readAt: final mfpAt),
+      Fetched(readAt: final mfpAt) && final Fetched<MfpDiaryDay> diary,
       Fetched(value: final meals, readAt: final ekkloAt),
     ) =>
       BothSides(
@@ -95,7 +95,10 @@ final class JournalService {
           false => ekkloAt,
         },
       ),
-    (Fetched(value: final diary, :final readAt), FetchFailed(:final error)) =>
+    (
+      Fetched(:final readAt) && final Fetched<MfpDiaryDay> diary,
+      FetchFailed(:final error),
+    ) =>
       MfpOnly(
         meals: _diaryMeals(mealNames, _mfpSide(date, diary)),
         ekkloProblem: ReadProblem.of(error),
@@ -118,9 +121,9 @@ final class JournalService {
     required Fetch<List<EkkloDailyMeal>> meals,
   }) {
     switch ((diary, meals)) {
-      case (Fetched(value: final diary), Fetched(value: final meals)):
+      case (final Fetched<MfpDiaryDay> diary, Fetched(value: final meals)):
         _stored(date, diary, meals);
-      case (Fetched(value: final diary), FetchFailed()):
+      case (final Fetched<MfpDiaryDay> diary, FetchFailed()):
         _database.transaction(
           () => _entries.store(_mfpDraft(date, diary).changes),
         );
@@ -137,7 +140,7 @@ final class JournalService {
 
   DayComparison _stored(
     DateTime date,
-    MfpDiaryDay diary,
+    Fetched<MfpDiaryDay> diary,
     List<EkkloDailyMeal> meals,
   ) => _database.transaction(() {
     final comparison = _comparison(date, diary, meals);
@@ -147,12 +150,12 @@ final class JournalService {
 
   DayComparison _comparison(
     DateTime date,
-    MfpDiaryDay diary,
+    Fetched<MfpDiaryDay> diary,
     List<EkkloDailyMeal> meals,
   ) => compareDay(
     date: date,
     stored: _entries.forDate(date),
-    diary: diary.entries,
+    diary: diary.value.entries,
     meals: meals,
     waitingLinks: _links.forDate(date),
     waitingUnattended: _unattended.forDate(date),
@@ -160,10 +163,12 @@ final class JournalService {
     foodOf: _foods.foodOfMfp,
     mealOf: _meals.mealOfMfp,
     now: _clock(),
+    diaryReadAt: diary.readAt,
     ids: FujinId.source(_clock),
   );
 
-  DayDraft _mfpDraft(DateTime date, MfpDiaryDay diary) {
+  DayDraft _mfpDraft(DateTime date, Fetched<MfpDiaryDay> fetched) {
+    final diary = fetched.value;
     final now = _clock();
     final ids = FujinId.source(_clock);
     return compareMfpDay(
@@ -181,11 +186,12 @@ final class JournalService {
       foodOf: _foods.foodOfMfp,
       mealOf: _meals.mealOfMfp,
       now: now,
+      readAt: fetched.readAt,
       ids: ids,
     );
   }
 
-  List<LoggedEntry> _mfpSide(DateTime date, MfpDiaryDay diary) {
+  List<LoggedEntry> _mfpSide(DateTime date, Fetched<MfpDiaryDay> diary) {
     final draft = _mfpDraft(date, diary);
     return [...draft.entries, ...draft.unstored];
   }

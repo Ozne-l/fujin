@@ -1,15 +1,17 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:flutter_test/flutter_test.dart' show addTearDown;
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_food_service.dart';
-import 'package:fujin/domain/adding/add_outcome.dart';
+import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/adding/entry_writer.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/compared_entry_lookup.dart';
 import 'package:fujin/domain/editing/edit_entry_service.dart';
 import 'package:fujin/domain/editing/remove_entry_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
+import 'package:fujin/domain/writing/background_writer.dart';
 import 'package:http/http.dart' as http;
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -25,6 +27,7 @@ final class WriteServices {
     this.adding,
     this.removing,
     this.editing,
+    this.background,
   );
 
   static Future<WriteServices> over(
@@ -56,36 +59,39 @@ final class WriteServices {
       entries: entries,
       clock: writeClock,
     );
+    final background = BackgroundWriter(
+      mfp: mfp,
+      sending: sending,
+      memory: memoryRepository,
+      entries: entries,
+      writer: writer,
+    );
+    addTearDown(background.run);
     return WriteServices._(
       backends,
       entries,
       journal,
       AddFoodService(
         mfp: mfp,
-        ekklo: ekklo,
         sending: sending,
         memory: memoryRepository,
         foods: foods,
         recents: recentsOf(database),
         writer: writer,
+        background: background,
         clock: writeClock,
       ),
-      RemoveEntryService(
-        mfp: mfp,
-        journal: journal,
-        sending: sending,
-        entries: entries,
-      ),
+      RemoveEntryService(entries: entries, background: background),
       EditEntryService(
         mfp: mfp,
-        ekklo: ekklo,
-        journal: journal,
         sending: sending,
         memory: memoryRepository,
         foods: foods,
         entries: entries,
         writer: writer,
+        background: background,
       ),
+      background,
     );
   }
 
@@ -95,9 +101,12 @@ final class WriteServices {
   final AddFoodService adding;
   final RemoveEntryService removing;
   final EditEntryService editing;
+  final BackgroundWriter background;
 
-  Future<AddOutcome> add(AddDraft draft) async =>
+  Future<AddedFood> add(AddDraft draft) async =>
       adding.add(draft, await adding.plan(draft));
+
+  Future<void> settle() => background.run();
 
   Future<ComparedEntry?> find(String entryId, DateTime date) async =>
       (await journal.readDay(date)).comparison.entryWithId(entryId);

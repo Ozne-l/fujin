@@ -1,4 +1,5 @@
-import 'package:ekklo_client/ekklo_client.dart';
+import 'dart:async';
+
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/foods/food_repository.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
@@ -8,8 +9,6 @@ import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/recents/recent_food.dart';
 import 'package:fujin/data/recents/recent_food_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
-import 'package:fujin/domain/adding/add_outcome.dart';
-import 'package:fujin/domain/adding/add_stage.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/adding/entry_writer.dart';
 import 'package:fujin/domain/adding/remembered_serving.dart';
@@ -17,30 +16,30 @@ import 'package:fujin/domain/adding/rescale_planned.dart';
 import 'package:fujin/domain/adding/scan_outcome.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/send_service.dart';
+import 'package:fujin/domain/writing/background_writer.dart';
+import 'package:fujin/domain/writing/ekklo_job.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 final class AddFoodService {
   AddFoodService({
     required this._mfp,
-    required this._ekklo,
     required this._sending,
     required this._memory,
     required this._foods,
     required this._recents,
     required this._writer,
+    required this._background,
     required this._clock,
   });
 
   final MyFitnessPalClient _mfp;
-  final EkkloClient _ekklo;
   final SendService _sending;
   final MemoryRepository _memory;
   final FoodRepository _foods;
   final RecentFoodRepository _recents;
   final EntryWriter _writer;
+  final BackgroundWriter _background;
   final DateTime Function() _clock;
-
-  Future<AddOutcome>? _writing;
 
   Future<List<MfpFood>> search(
     String query, {
@@ -150,52 +149,14 @@ final class AddFoodService {
     };
   }
 
-  Future<AddOutcome> add(
+  AddedFood add(
     AddDraft draft,
     PlannedEntry planned, {
-    void Function(AddStage stage)? onStage,
     String? barcodeToLink,
-  }) => _writing ??= _add(
-    draft,
-    planned,
-    onStage,
-    barcodeToLink,
-  ).whenComplete(() => _writing = null);
-
-  Future<AddOutcome> retryEkklo(AddedFood added) =>
-      _writing ??= _toEkklo(added).whenComplete(() => _writing = null);
-
-  Future<AddOutcome> _add(
-    AddDraft draft,
-    PlannedEntry planned,
-    void Function(AddStage stage)? onStage,
-    String? barcodeToLink,
-  ) async {
-    final String mfpEntryId;
-    try {
-      final current = await _mfp.foods.byId(draft.food.id);
-      await _ekklo.meals.forDate(draft.date);
-      if (current case final current?
-          when current.version != draft.food.version) {
-        return FoodChanged(before: draft.food, after: current);
-      }
-      onStage?.call(AddStage.mfp);
-      mfpEntryId =
-          await _mfp.diary.addFood(
-            date: draft.date,
-            mealName: draft.mfpMealName,
-            food: draft.food,
-            servingSize: draft.servingSize,
-            servings: draft.servings,
-          ) ??
-          (throw StateError('MyFitnessPal returned no entry id'));
-    } on Object catch (error) {
-      return NotAdded(error);
-    }
-    final stored = _writer.save(
+  }) {
+    final stored = _writer.store(
       draft,
       entryId: _writer.newEntryId(),
-      mfpEntryId: mfpEntryId,
       alongside: () {
         _recents.record(
           RecentFood.forEntry(draft.mfpEntry, addedAt: _clock()),
@@ -210,10 +171,12 @@ final class AddFoodService {
     );
     final added = AddedFood(
       planned: rescalePlanned(planned, stored, _memory.load()),
-      ekkloWritten: false,
     );
-    onStage?.call(AddStage.ekklo);
-    return _toEkklo(added);
+    if (planned.sends) {
+      _background.hold(added.entryId, EkkloSend(added.planned));
+    }
+    unawaited(_background.run());
+    return added;
   }
 
   static bool _sameServing(LoggedEntry before, LoggedEntry after) =>
@@ -229,10 +192,4 @@ final class AddFoodService {
     _foods.fill(food);
     return food;
   }
-
-  Future<AddOutcome> _toEkklo(AddedFood added) async =>
-      switch (await _sending.sendOne(added.planned)) {
-        null => Added(added.copyWith(ekkloWritten: true)),
-        final error => EkkloFailed(added, error),
-      };
 }

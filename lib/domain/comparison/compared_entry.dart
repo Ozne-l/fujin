@@ -1,16 +1,23 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
+import 'package:fujin/domain/comparison/mfp_status.dart';
 
 part 'compared_entry.mapper.dart';
 
 @MappableClass()
 final class ComparedEntry with ComparedEntryMappable {
-  const ComparedEntry(this.logged, this.status, {this.stored = true});
+  const ComparedEntry(
+    this.logged,
+    this.status, {
+    this.stored = true,
+    this.mfp,
+  });
 
   final LoggedEntry logged;
   final EntryStatus status;
   final bool stored;
+  final MfpStatus? mfp;
 
   String? get entryId => switch (stored) {
     true => logged.entry.id,

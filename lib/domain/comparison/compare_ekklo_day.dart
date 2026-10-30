@@ -3,6 +3,7 @@ import 'package:fujin/data/database/id_source.dart';
 import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/data/entries/linked_item.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
+import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/day_comparison.dart';
@@ -10,8 +11,10 @@ import 'package:fujin/domain/comparison/day_draft.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/comparison/entry_status_link.dart';
 import 'package:fujin/domain/comparison/expected_item.dart';
+import 'package:fujin/domain/comparison/mfp_status.dart';
 import 'package:fujin/domain/comparison/placement.dart';
 import 'package:fujin/domain/comparison/update_kind.dart';
+import 'package:fujin/domain/journal/same_day.dart';
 
 typedef _Orphan = ({
   LoggedEntry deleted,
@@ -89,11 +92,14 @@ DayComparison compareEkkloDay(
 
   for (final (index, logged) in day.entries.indexed) {
     if (logged.ekkloLink case EkkloLink(item: final item?) && final link) {
-      switch (placements[item.ekkloItemId]) {
-        case final placement?:
+      switch ((placements[item.ekkloItemId], logged.mfpLink)) {
+        case (final placement?, _):
           claimed.add(item.ekkloItemId);
           settle(index, logged, linkedStatus(logged, link, item, placement));
-        case null:
+        case (null, final mfpLink?)
+            when !sameDay(mfpLink.date, logged.entry.date):
+          settle(index, logged, ToUpdate(link, UpdateKind.mealChanged));
+        case (null, _):
           entries[index] = logged.copyWith(
             ekkloLink: switch (link.unattended) {
               _? => link.copyWith(item: null),
@@ -204,7 +210,14 @@ DayComparison compareEkkloDay(
   return DayComparison(
     entries: [
       for (final (index, logged) in entries.indexed)
-        ComparedEntry(logged, statuses[index] ?? const ToSend()),
+        ComparedEntry(
+          logged,
+          statuses[index] ?? const ToSend(),
+          mfp: switch (MfpWrite.of(logged)) {
+            MfpAdd() || MfpEdit() => const MfpPending(),
+            MfpDeletion() || null => null,
+          },
+        ),
       for (final logged in day.unstored)
         ComparedEntry(logged, const ToSend(), stored: false),
     ],

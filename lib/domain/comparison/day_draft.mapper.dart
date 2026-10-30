@@ -54,6 +54,13 @@ class DayDraftMapper extends ClassMapperBase<DayDraft> {
     opt: true,
     def: const [],
   );
+  static List<LoggedEntry> _$owed(DayDraft v) => v.owed;
+  static const Field<DayDraft, List<LoggedEntry>> _f$owed = Field(
+    'owed',
+    _$owed,
+    opt: true,
+    def: const [],
+  );
   static List<LoggedEntry> _$unstored(DayDraft v) => v.unstored;
   static const Field<DayDraft, List<LoggedEntry>> _f$unstored = Field(
     'unstored',
@@ -106,6 +113,7 @@ class DayDraftMapper extends ClassMapperBase<DayDraft> {
     #stored: _f$stored,
     #entries: _f$entries,
     #deleted: _f$deleted,
+    #owed: _f$owed,
     #unstored: _f$unstored,
     #foods: _f$foods,
     #meals: _f$meals,
@@ -122,6 +130,7 @@ class DayDraftMapper extends ClassMapperBase<DayDraft> {
       stored: data.dec(_f$stored),
       entries: data.dec(_f$entries),
       deleted: data.dec(_f$deleted),
+      owed: data.dec(_f$owed),
       unstored: data.dec(_f$unstored),
       foods: data.dec(_f$foods),
       meals: data.dec(_f$meals),
@@ -206,6 +215,12 @@ abstract class DayDraftCopyWith<$R, $In extends DayDraft, $Out>
     LoggedEntry,
     LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry>
   >
+  get owed;
+  ListCopyWith<
+    $R,
+    LoggedEntry,
+    LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry>
+  >
   get unstored;
   ListCopyWith<$R, CopiedFood, CopiedFoodCopyWith<$R, CopiedFood, CopiedFood>>
   get foods;
@@ -220,6 +235,7 @@ abstract class DayDraftCopyWith<$R, $In extends DayDraft, $Out>
     StoredDay? stored,
     List<LoggedEntry>? entries,
     List<LoggedEntry>? deleted,
+    List<LoggedEntry>? owed,
     List<LoggedEntry>? unstored,
     List<CopiedFood>? foods,
     List<CopiedMeal>? meals,
@@ -269,6 +285,17 @@ class _DayDraftCopyWithImpl<$R, $Out>
     LoggedEntry,
     LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry>
   >
+  get owed => ListCopyWith(
+    $value.owed,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(owed: v),
+  );
+  @override
+  ListCopyWith<
+    $R,
+    LoggedEntry,
+    LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry>
+  >
   get unstored => ListCopyWith(
     $value.unstored,
     (v, t) => v.copyWith.$chain(t),
@@ -308,6 +335,7 @@ class _DayDraftCopyWithImpl<$R, $Out>
     StoredDay? stored,
     List<LoggedEntry>? entries,
     List<LoggedEntry>? deleted,
+    List<LoggedEntry>? owed,
     List<LoggedEntry>? unstored,
     List<CopiedFood>? foods,
     List<CopiedMeal>? meals,
@@ -320,6 +348,7 @@ class _DayDraftCopyWithImpl<$R, $Out>
       if (stored != null) #stored: stored,
       if (entries != null) #entries: entries,
       if (deleted != null) #deleted: deleted,
+      if (owed != null) #owed: owed,
       if (unstored != null) #unstored: unstored,
       if (foods != null) #foods: foods,
       if (meals != null) #meals: meals,
@@ -334,6 +363,7 @@ class _DayDraftCopyWithImpl<$R, $Out>
     stored: data.get(#stored, or: $value.stored),
     entries: data.get(#entries, or: $value.entries),
     deleted: data.get(#deleted, or: $value.deleted),
+    owed: data.get(#owed, or: $value.owed),
     unstored: data.get(#unstored, or: $value.unstored),
     foods: data.get(#foods, or: $value.foods),
     meals: data.get(#meals, or: $value.meals),

@@ -782,12 +782,6 @@
   },
   "addUndone": "Ajout annulé",
   "addUndoneDetail": "Supprimé de MyFitnessPal et d’Ekklo",
-  "addStillInMfp": "Encore dans MyFitnessPal",
-  "addStillInMfpDetail": "{food} retiré d’Ekklo seulement",
-  "@addStillInMfpDetail": {
-    "placeholders": {"food": {"type": "String"}}
-  },
-  "addNotUndone": "Ajout non annulé",
   "undoAdd": "Annuler",
   "journalLoading": "Lecture de MyFitnessPal\net d’Ekklo…",
   "dayDetailTitle": "Détail du jour",
@@ -1001,7 +995,6 @@
   "addWriteOrder": "Écrit d’abord dans MyFitnessPal, puis dans Ekklo.",
   "addToBoth": "Ajouter à MFP et Ekklo",
   "addChooseEkkloFood": "Choisir l’aliment Ekklo",
-  "addConfirmAndAdd": "Confirmer et ajouter",
   "addDaySubtitle": "{date}, avec {food}, {amount}",
   "@addDaySubtitle": {
     "placeholders": {
@@ -1025,23 +1018,6 @@
       "sodium": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 0}}
     }
   },
-  "addingTitle": "Ajout en cours",
-  "addWrittenIn": "Écrit dans {meal}",
-  "@addWrittenIn": {
-    "placeholders": {"meal": {"type": "String"}}
-  },
-  "addWriting": "Écriture…",
-  "addAdding": "Ajout en cours…",
-  "addAddingNote": "Le bouton reste bloqué jusqu’à la réponse des deux côtés : un double tap n’ajoute rien deux fois.",
-  "addEkkloNoReply": "Ekklo n’a pas répondu",
-  "addNotWritten": "Non écrit",
-  "addEkkloFailedDetail": "L’entrée MyFitnessPal est gardée. Réessayer Ekklo n’écrit pas une deuxième fois dans MyFitnessPal.",
-  "addRetryEkklo": "Réessayer Ekklo",
-  "addCancelMfpEntry": "Annuler l’entrée MFP",
-  "addMfpNoReply": "MyFitnessPal n’a pas répondu",
-  "addNotSent": "Pas envoyé",
-  "addMfpFailedDetail": "Rien n’a été écrit, ni dans MyFitnessPal ni dans Ekklo. Ta saisie est gardée.",
-  "addEditEntry": "Modifier la saisie",
   "addFoodChangedTitle": "Cet aliment a changé dans MyFitnessPal",
   "addFoodChangedDetail": "Valeurs rechargées : {before} → {after} kcal / {serving}. Ce qui a bougé est surligné en jaune.",
   "@addFoodChangedDetail": {
@@ -1052,18 +1028,7 @@
     }
   },
   "addMfpSessionTitle": "Session MyFitnessPal expirée",
-  "addMfpSessionDetail": "Reconnecte-toi pour ajouter. Ta saisie est gardée : {food}, {serving}, {meal} du {date}.",
-  "@addMfpSessionDetail": {
-    "placeholders": {
-      "food": {"type": "String"},
-      "serving": {"type": "String"},
-      "meal": {"type": "String"},
-      "date": {"type": "DateTime", "format": "MMMMd"}
-    }
-  },
   "addMfpSessionSearchDetail": "Reconnecte-toi pour chercher. Ta recherche est gardée.",
-  "addEkkloSessionTitle": "Session Ekklo expirée",
-  "addEkkloSessionDetail": "MyFitnessPal reste connecté. Reconnecte Ekklo pour écrire des deux côtés ; ta saisie est gardée.",
   "addScannedUnresolved": "MyFitnessPal connaît ce code-barres mais n’a pas de fiche pour cet aliment. Choisis-le dans la recherche.",
   "scannerTitle": "Scanner un code-barres",
   "scannerContext": "{meal} · {date}",
@@ -1218,11 +1183,6 @@
   "editEkkloSessionExpired": "Session Ekklo expirée : modifier ou supprimer attendra la reconnexion.",
   "editFoodUnreadable": "MyFitnessPal ne donne plus cet aliment : Fūjin ne peut pas le modifier. Tu peux toujours le supprimer depuis le Journal.",
   "editServingMissing": "Cette portion n’existe plus pour cet aliment dans MyFitnessPal : Fūjin ne peut pas le modifier. Tu peux toujours le supprimer depuis le Journal.",
-  "editOldEntryKept": "{food} en double dans MyFitnessPal",
-  "@editOldEntryKept": {
-    "placeholders": {"food": {"type": "String"}}
-  },
-  "editOldEntryKeptDetail": "L’ancienne entrée n’a pas pu être retirée.",
   "rowDelete": "Supprimer",
   "deleteFoodTitle": "Supprimer {food} ?",
   "@deleteFoodTitle": {
@@ -1259,11 +1219,6 @@
   "@foodDeletedMfpOnlyDetail": {
     "placeholders": {"meal": {"type": "String"}}
   },
-  "foodNotDeleted": "{food} non supprimé",
-  "@foodNotDeleted": {
-    "placeholders": {"food": {"type": "String"}}
-  },
-  "foodNotDeletedDetail": "Rien n’a changé dans MyFitnessPal ni dans Ekklo.",
   "foodEdited": "{food} modifié",
   "@foodEdited": {
     "placeholders": {"food": {"type": "String"}}
@@ -1293,12 +1248,16 @@
   },
   "foodMovedSee": "Voir",
   "ekkloNotUpdated": "Ekklo pas mis à jour",
-  "ekkloNotUpdatedDetail": "{food} y reste à {serving}",
-  "@ekkloNotUpdatedDetail": {
-    "placeholders": {
-      "food": {"type": "String"},
-      "serving": {"type": "String"}
-    }
+  "mfpNotWritten": "Pas écrit dans MyFitnessPal",
+  "foodStillPending": "{food} reste en attente",
+  "@foodStillPending": {
+    "placeholders": {"food": {"type": "String"}}
   },
+  "foodsStillPending": "{count, plural, other{{count} aliments restent en attente}}",
+  "@foodsStillPending": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "pillMfp": "MFP",
+  "mfpPendingSemantics": "En attente de MyFitnessPal",
   "writeBlockedInDev": "Fūjin DEV n’écrit ni dans MyFitnessPal ni dans Ekklo : rien n’a changé."
 }

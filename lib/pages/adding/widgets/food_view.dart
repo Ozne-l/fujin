@@ -1,20 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
-import 'package:fujin/domain/adding/add_outcome.dart';
 import 'package:fujin/domain/adding/ekklo_side.dart';
 import 'package:fujin/domain/comparison/entry_quantity.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/editing/draft_changes.dart';
 import 'package:fujin/domain/editing/edit_outcome.dart';
 import 'package:fujin/domain/editing/ekklo_edit.dart';
-import 'package:fujin/domain/editing/remove_outcome.dart';
 import 'package:fujin/domain/journal/day_nutrients.dart';
 import 'package:fujin/domain/journal/journal_read.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
@@ -25,11 +24,7 @@ import 'package:fujin/domain/sending/unit_weight.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/adding/add_form_notifier.dart';
 import 'package:fujin/pages/adding/add_text.dart';
-import 'package:fujin/pages/adding/add_write_notifier.dart';
-import 'package:fujin/pages/adding/add_write_state.dart';
 import 'package:fujin/pages/adding/edit_text.dart';
-import 'package:fujin/pages/adding/edit_write_notifier.dart';
-import 'package:fujin/pages/adding/edit_write_state.dart';
 import 'package:fujin/pages/adding/food_view_mode.dart';
 import 'package:fujin/pages/adding/widgets/add_section_label.dart';
 import 'package:fujin/pages/adding/widgets/edit_food_header.dart';
@@ -41,11 +36,9 @@ import 'package:fujin/pages/adding/widgets/my_day_sheet.dart';
 import 'package:fujin/pages/adding/widgets/nutrition_card.dart';
 import 'package:fujin/pages/adding/widgets/serving_field.dart';
 import 'package:fujin/pages/adding/widgets/servings_picker.dart';
-import 'package:fujin/pages/adding/widgets/write_panel.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/flow_header.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
-import 'package:fujin/pages/common/fujin_spinner.dart';
 import 'package:fujin/pages/common/glass_fill.dart';
 import 'package:fujin/pages/common/glass_finish.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
@@ -90,10 +83,7 @@ class FoodView extends HookConsumerWidget {
       final EditingFood editing => editing,
       AddingFood() => null,
     };
-    final write = ref.watch(addWriteProvider);
-    final writer = ref.read(addWriteProvider.notifier);
-    final edit = ref.watch(editWriteProvider);
-    final editor = ref.read(editWriteProvider.notifier);
+    final saving = useRef(false);
     final original = editing?.original;
     final originalJournal = switch (original) {
       final original? => ref.watch(journalProvider(original.logged.entry.date)),
@@ -124,14 +114,8 @@ class FoodView extends HookConsumerWidget {
     };
     final mealNames = ref.watch(mealNamesProvider).value ?? const <String>[];
     final food = DayNutrients.ofEntries([entry]);
-    final banner = switch ((form.changedFrom, editing)) {
-      (final changed?, _) => (
-        before: _perServing(draft.withFood(changed)),
-        after: _perServing(draft),
-        serving: AddText.serving(context.intl, draft.servingSize),
-        changed: _changed(draft.withFood(changed).entry, entry),
-      ),
-      (null, EditingFood(newVersion: true, :final original)) => (
+    final banner = switch (editing) {
+      EditingFood(newVersion: true, :final original) => (
         before:
             DayNutrients.ofEntries([
               original.logged,
@@ -146,10 +130,6 @@ class FoodView extends HookConsumerWidget {
       ),
       _ => null,
     };
-    final running = switch (mode) {
-      AddingFood() => write is AddWriteRunning,
-      EditingFood() => edit is EditWriteRunning,
-    };
     final linked = switch (original?.status) {
       InEkklo() || ToUpdate() => true,
       ToSend() || null => false,
@@ -159,22 +139,13 @@ class FoodView extends HookConsumerWidget {
       null => true,
     };
 
-    ref
-      ..listen(addWriteProvider, (previous, next) {
-        if ((next, mode) case (
-          AddWriteDone(:final added),
-          AddingFood(:final onLeave),
-        )) {
-          onLeave(added);
-        }
-      })
-      ..listen(removeEntryProvider, (previous, next) {
-        if (next case RemoveEntryDone(
-          :final removal,
-        ) when removal.entryId == editing?.entryId) {
-          onBack();
-        }
-      });
+    ref.listen(removeEntryProvider, (previous, next) {
+      if (next case RemoveEntryDone(
+        :final removal,
+      ) when removal.entryId == editing?.entryId) {
+        onBack();
+      }
+    });
 
     EntryChoices choices(PlannedEntry planned) => (
       choose: (candidate) => notifier.choose(planned.choose(candidate)),
@@ -214,37 +185,30 @@ class FoodView extends HookConsumerWidget {
       }
     }
 
-    Future<void> add() async {
+    void add() {
       final current = ref.read(formProvider);
-      if (current.planned case final planned?) {
+      if (current.planned case final planned? when !saving.value) {
+        saving.value = true;
         switch (mode) {
-          case AddingFood(:final barcodeToLink):
-            final outcome = await writer.add(
-              current.draft,
-              planned,
-              barcodeToLink: barcodeToLink,
+          case AddingFood(:final barcodeToLink, :final onLeave):
+            onLeave(
+              ref
+                  .read(addFoodServiceProvider)
+                  .add(current.draft, planned, barcodeToLink: barcodeToLink),
             );
-            if (outcome case FoodChanged(:final after)) notifier.reload(after);
-          case EditingFood(:final entryId, :final original, :final onLeave):
-            final environment = ref.read(appEnvironmentProvider);
-            switch (await editor.save(
-              current.draft,
-              planned,
-              entryId: entryId,
-              date: original.logged.entry.date,
-            )) {
-              case EditFoodChanged(:final after):
-                notifier.reload(after);
+          case EditingFood(:final entryId, :final onLeave):
+            switch (ref
+                .read(editEntryServiceProvider)
+                .save(current.draft, planned, entryId: entryId)) {
               case NotEdited(:final error):
-                if (context.mounted) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showWriteProblem(context.intl, error, environment);
-                }
-              case final EditOutcome written:
-                if (context.mounted) onLeave(written);
-              case null:
-                break;
+                saving.value = false;
+                ScaffoldMessenger.of(context).showWriteProblem(
+                  context.intl,
+                  error,
+                  ref.read(appEnvironmentProvider),
+                );
+              case final Edited edited:
+                onLeave(edited);
             }
         }
       }
@@ -266,57 +230,9 @@ class FoodView extends HookConsumerWidget {
       }
     }
 
-    Future<void> undo() async {
-      final environment = ref.read(appEnvironmentProvider);
-      switch (await writer.undo()) {
-        case StillInMfp(:final error) || NotRemoved(:final error):
-          if (context.mounted) {
-            ScaffoldMessenger.of(
-              context,
-            ).showWriteProblem(context.intl, error, environment);
-          }
-        case Removed() || null:
-          break;
-      }
-    }
-
-    Future<bool> signedIn(FujinRoute route) async =>
-        await context.push<bool>(route.path) ?? false;
-
-    Future<void> signInToWrite(FujinRoute route) async {
-      if (!await signedIn(route)) return;
-      switch (ref.read(addWriteProvider)) {
-        case AddWriteEkkloFailed(:final added):
-          await writer.retryEkklo(added);
-        case AddWriteFailed():
-          writer.dismiss();
-          await add();
-        case AddWriteIdle() || AddWriteRunning() || AddWriteDone():
-          break;
-      }
-    }
-
     Future<void> signInToPlan() async {
-      if (await signedIn(FujinRoute.ekkloSignIn)) await notifier.retryPlan();
-    }
-
-    void back() {
-      switch ((mode, ref.read(addWriteProvider), ref.read(editWriteProvider))) {
-        case (EditingFood(), _, EditWriteRunning()):
-          break;
-        case (EditingFood(), _, _):
-          onBack();
-        case (AddingFood(), AddWriteRunning(), _) ||
-            (AddingFood(), AddWriteEkkloFailed(undoing: true), _):
-          break;
-        case (
-          AddingFood(:final onLeave),
-          AddWriteEkkloFailed(:final added) || AddWriteDone(:final added),
-          _,
-        ):
-          onLeave(added);
-        case (AddingFood(), AddWriteIdle() || AddWriteFailed(), _):
-          onBack();
+      if (await context.push<bool>(FujinRoute.ekkloSignIn.path) ?? false) {
+        await notifier.retryPlan();
       }
     }
 
@@ -324,30 +240,23 @@ class FoodView extends HookConsumerWidget {
       final planned? => EkkloSide.of(planned),
       null => null,
     };
-    final (primaryLabel, onPrimary) = switch ((side, banner, mode)) {
-      (EkkloSide.toChoose, _, AddingFood()) => (
+    final (primaryLabel, onPrimary) = switch ((side, mode)) {
+      (EkkloSide.toChoose, AddingFood()) => (
         context.intl.addChooseEkkloFood,
         () => unawaited(chooseEkklo()),
       ),
-      (EkkloSide.toChoose, _, EditingFood()) when linked => (
+      (EkkloSide.toChoose, EditingFood()) when linked => (
         context.intl.addChooseEkkloFood,
         () => unawaited(chooseEkklo()),
       ),
-      (_, _, EditingFood()) => (
+      (_, EditingFood()) => (
         switch (linked) {
           true => context.intl.editSaveBoth,
           false => context.intl.editSaveMfpOnly,
         },
-        () => unawaited(add()),
+        add,
       ),
-      (_, _?, AddingFood()) => (
-        context.intl.addConfirmAndAdd,
-        () => unawaited(add()),
-      ),
-      (_, null, AddingFood()) => (
-        context.intl.addToBoth,
-        () => unawaited(add()),
-      ),
+      (_, AddingFood()) => (context.intl.addToBoth, add),
     };
     final ekkloEdit = switch ((original, planned, originalJournal?.value)) {
       (final original?, final planned?, final read?) => EkkloEdit.of(
@@ -370,206 +279,172 @@ class FoodView extends HookConsumerWidget {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) back();
+        if (!didPop) onBack();
       },
-      child: Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              switch (original) {
-                final original? => EditFoodHeader(
-                  entry: original.logged,
-                  onBack: back,
+          switch (original) {
+            final original? => EditFoodHeader(
+              entry: original.logged,
+              onBack: onBack,
+            ),
+            null => FlowHeader(
+              title: context.intl.addToMeal(draft.mfpMealName),
+              subtitle: dayTitle,
+              onBack: onBack,
+            ),
+          },
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.only(bottom: FujinSpace.s4),
+              children: [
+                if (banner case (
+                  :final before,
+                  :final after,
+                  :final serving,
+                  changed: _,
+                )) ...[
+                  FoodChangedBanner(
+                    before: before,
+                    after: after,
+                    serving: serving,
+                  ),
+                  const SizedBox(height: FujinSpace.s3),
+                ],
+                FoodIdentity(food: draft.food, barcode: barcode),
+                const SizedBox(height: FujinSpace.s4),
+                AddSectionLabel(label: context.intl.addServingSize),
+                const SizedBox(height: FujinSpace.s2),
+                ServingField(
+                  servings: draft.food.servingSizes,
+                  selected: draft.servingSize,
+                  onSelected: notifier.serving,
                 ),
-                null => FlowHeader(
-                  title: context.intl.addToMeal(draft.mfpMealName),
-                  subtitle: dayTitle,
-                  onBack: back,
+                const SizedBox(height: FujinSpace.s4),
+                AddSectionLabel(label: context.intl.addServings),
+                const SizedBox(height: FujinSpace.s2),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: FujinSize.screenMargin,
+                  ),
+                  child: ServingsPicker(
+                    servings: draft.servings,
+                    onServings: notifier.servings,
+                  ),
                 ),
-              },
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.only(bottom: FujinSpace.s4),
-                  children: [
-                    if (banner case (
-                      :final before,
-                      :final after,
-                      :final serving,
-                      changed: _,
-                    )) ...[
-                      FoodChangedBanner(
-                        before: before,
-                        after: after,
-                        serving: serving,
+                const SizedBox(height: FujinSpace.s3),
+                MealDateRow(
+                  meal: draft.mfpMealName,
+                  meals: mealNames,
+                  date: draft.date,
+                  onMeal: notifier.meal,
+                  onDate: notifier.date,
+                  lastDay: switch (mode) {
+                    EditingFood() => today,
+                    AddingFood() => null,
+                  },
+                ),
+                const SizedBox(height: FujinSpace.s3),
+                NutritionCard(
+                  servingLine: AddText.forServing(context.intl, draft),
+                  food: food,
+                  day: day,
+                  goals: goals,
+                  changed: banner?.changed ?? const {},
+                  onMyDay: () => unawaited(
+                    showMyDaySheet(
+                      context,
+                      subtitle: context.intl.addDaySubtitle(
+                        dayTitle,
+                        draft.food.description,
+                        grams,
                       ),
-                      const SizedBox(height: FujinSpace.s3),
-                    ],
-                    FoodIdentity(food: draft.food, barcode: barcode),
-                    const SizedBox(height: FujinSpace.s4),
-                    AddSectionLabel(label: context.intl.addServingSize),
-                    const SizedBox(height: FujinSpace.s2),
-                    ServingField(
-                      servings: draft.food.servingSizes,
-                      selected: draft.servingSize,
-                      onSelected: notifier.serving,
-                    ),
-                    const SizedBox(height: FujinSpace.s4),
-                    AddSectionLabel(label: context.intl.addServings),
-                    const SizedBox(height: FujinSpace.s2),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: FujinSize.screenMargin,
-                      ),
-                      child: ServingsPicker(
-                        servings: draft.servings,
-                        onServings: notifier.servings,
-                      ),
-                    ),
-                    const SizedBox(height: FujinSpace.s3),
-                    MealDateRow(
-                      meal: draft.mfpMealName,
-                      meals: mealNames,
-                      date: draft.date,
-                      onMeal: notifier.meal,
-                      onDate: notifier.date,
-                      lastDay: switch (mode) {
-                        EditingFood() => today,
-                        AddingFood() => null,
-                      },
-                    ),
-                    const SizedBox(height: FujinSpace.s3),
-                    NutritionCard(
-                      servingLine: AddText.forServing(context.intl, draft),
-                      food: food,
+                      entry: entry,
                       day: day,
                       goals: goals,
-                      changed: banner?.changed ?? const {},
-                      onMyDay: () => unawaited(
-                        showMyDaySheet(
-                          context,
-                          subtitle: context.intl.addDaySubtitle(
-                            dayTitle,
-                            draft.food.description,
-                            grams,
-                          ),
-                          entry: entry,
-                          day: day,
-                          goals: goals,
-                        ),
-                      ),
                     ),
-                    const SizedBox(height: FujinSpace.s3),
-                    EkkloSummaryCard(
-                      planned: planned,
-                      problem: form.planProblem,
-                      onTap: () => unawaited(chooseEkklo()),
-                      onRetry: () => unawaited(notifier.retryPlan()),
-                      onSignIn: () => unawaited(signInToPlan()),
-                      summary: switch (ekkloEdit) {
-                        final ekkloEdit? => EditText.ekkloSummary(
-                          context.intl,
-                          ekkloEdit,
-                        ),
-                        null => null,
-                      },
+                  ),
+                ),
+                const SizedBox(height: FujinSpace.s3),
+                EkkloSummaryCard(
+                  planned: planned,
+                  problem: form.planProblem,
+                  onTap: () => unawaited(chooseEkklo()),
+                  onRetry: () => unawaited(notifier.retryPlan()),
+                  onSignIn: () => unawaited(signInToPlan()),
+                  summary: switch (ekkloEdit) {
+                    final ekkloEdit? => EditText.ekkloSummary(
+                      context.intl,
+                      ekkloEdit,
                     ),
-                    const SizedBox(height: FujinSpace.s3),
+                    null => null,
+                  },
+                ),
+                const SizedBox(height: FujinSpace.s3),
+                Text(
+                  context.intl.addWriteOrder,
+                  textAlign: TextAlign.center,
+                  style: FujinText.inter12Regular.copyWith(
+                    color: context.colors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(
+            height: FujinStroke.card,
+            thickness: FujinStroke.card,
+          ),
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                FujinSize.screenMargin,
+                FujinSpace.s3,
+                FujinSize.screenMargin,
+                FujinSpace.s4,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: FujinSpace.s3,
+                children: [
+                  if (readOnly case final readOnly?)
                     Text(
-                      context.intl.addWriteOrder,
+                      readOnly,
                       textAlign: TextAlign.center,
-                      style: FujinText.inter12Regular.copyWith(
+                      style: FujinText.inter13Regular.copyWith(
                         color: context.colors.textSecondary,
                       ),
                     ),
-                  ],
-                ),
-              ),
-              const Divider(
-                height: FujinStroke.card,
-                thickness: FujinStroke.card,
-              ),
-              SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    FujinSize.screenMargin,
-                    FujinSpace.s3,
-                    FujinSize.screenMargin,
-                    FujinSpace.s4,
+                  FilledButton(
+                    style: FujinTheme.floatingButtonStyle(context.colors),
+                    onPressed: switch ((
+                      planned,
+                      readOnly,
+                      changes || banner != null,
+                    )) {
+                      (_?, null, true) => onPrimary,
+                      _ => null,
+                    },
+                    child: Text(primaryLabel),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    spacing: FujinSpace.s3,
-                    children: [
-                      if (readOnly case final readOnly?)
-                        Text(
-                          readOnly,
-                          textAlign: TextAlign.center,
-                          style: FujinText.inter13Regular.copyWith(
-                            color: context.colors.textSecondary,
-                          ),
-                        ),
-                      switch ((mode, running)) {
-                        (EditingFood(), true) => FilledButton.icon(
-                          style: FujinTheme.floatingButtonStyle(context.colors),
-                          onPressed: null,
-                          icon: const FujinSpinner.button(),
-                          label: Text(primaryLabel),
-                        ),
-                        _ => FilledButton(
-                          style: FujinTheme.floatingButtonStyle(context.colors),
-                          onPressed: switch ((
-                            planned,
-                            running,
-                            readOnly,
-                            changes || banner != null,
-                          )) {
-                            (_?, false, null, true) => onPrimary,
-                            _ => null,
-                          },
-                          child: Text(primaryLabel),
-                        ),
-                      },
-                      if ((mode, readOnly) case (EditingFood(), null))
-                        OutlinedButton(
-                          style: GlassFill.style(
-                            context.colors,
-                            GlassFinish.alert,
-                          ).merge(FujinTheme.largeOutlinedButtonStyle),
-                          onPressed: switch (running) {
-                            true => null,
-                            false => remove,
-                          },
-                          child: Text(switch (linked) {
-                            true => context.intl.editDeleteBoth,
-                            false => context.intl.editDeleteMfpOnly,
-                          }),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          if (mode case AddingFood())
-            Positioned.fill(
-              child: WritePanel(
-                state: write,
-                draft: draft,
-                actions: (
-                  retry: () => unawaited(add()),
-                  retryEkklo: () {
-                    if (write case AddWriteEkkloFailed(:final added)) {
-                      unawaited(writer.retryEkklo(added));
-                    }
-                  },
-                  undo: () => unawaited(undo()),
-                  dismiss: writer.dismiss,
-                  signIn: (route) => unawaited(signInToWrite(route)),
-                ),
+                  if ((mode, readOnly) case (EditingFood(), null))
+                    OutlinedButton(
+                      style: GlassFill.style(
+                        context.colors,
+                        GlassFinish.alert,
+                      ).merge(FujinTheme.largeOutlinedButtonStyle),
+                      onPressed: remove,
+                      child: Text(switch (linked) {
+                        true => context.intl.editDeleteBoth,
+                        false => context.intl.editDeleteMfpOnly,
+                      }),
+                    ),
+                ],
               ),
             ),
+          ),
         ],
       ),
     );

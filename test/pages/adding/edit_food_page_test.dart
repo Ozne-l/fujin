@@ -22,6 +22,8 @@ const _deleteMfp = 'Supprimer de MFP';
 const _other = 'Autre';
 const _edited = 'Riz basmati modifié';
 const _retry = 'Réessayer';
+const _mfp = 'MFP';
+const _mfpNotWritten = 'Pas écrit dans MyFitnessPal';
 const _oldRice = 'ekklo-old-rice';
 const _reloaded =
     'Valeurs rechargées : 200 → 210 kcal / 100 g. Ce qui a '
@@ -168,44 +170,56 @@ void main() {
     check(backends.ekkloItems.single.quantity).equals(150);
   });
 
-  testWidgets('says Ekklo was not updated, and finishes on Réessayer', (
-    tester,
-  ) async {
+  testWidgets('says Ekklo was not updated once the fiche closed, and '
+      'updates it on Réessayer', (tester) async {
     final backends = LoggedJournal.backends()..ekkloItemWritesFail = true;
     await _open(tester, backends, LoggedJournal.basmati);
     await _servings(tester, '2');
 
     await _tap(tester, _saveBoth);
 
+    _missing(_title);
     _sees('Ekklo pas mis à jour');
+    _sees('Riz basmati reste en attente');
     _sees('À mettre à jour');
+    _missing(_mfp);
 
     backends.ekkloItemWritesFail = false;
     await _tap(tester, _retry);
 
-    _sees(_edited);
     check(backends.ekkloItems.single.quantity).equals(200);
+    _missing('À mettre à jour');
   });
 
-  testWidgets('says the food is twice in MyFitnessPal when the original '
-      'stayed, and removes it on Réessayer', (tester) async {
+  testWidgets('shows the food once while its original stays in '
+      'MyFitnessPal, and removes the original on Réessayer', (tester) async {
     final backends = LoggedJournal.backends()..mfpRemoveFails = true;
     await _open(tester, backends, LoggedJournal.basmati);
     await _servings(tester, '2');
 
     await _tap(tester, _saveBoth);
 
-    _sees('Riz basmati en double dans MyFitnessPal');
-    _sees('L’ancienne entrée n’a pas pu être retirée.');
-    check(find.text(LoggedJournal.basmati).evaluate()).length.equals(2);
+    _sees(_mfpNotWritten);
+    _sees('Riz basmati reste en attente');
+    check(find.text(LoggedJournal.basmati).evaluate()).length.equals(1);
+    _sees(_mfp);
+    check(
+      backends.entries.where((entry) => entry.food.id == rice),
+    ).length.equals(2);
 
     backends.mfpRemoveFails = false;
     await _tap(tester, _retry);
 
-    _sees(_edited);
     check(
-      backends.entries.where((entry) => entry.food.id == rice),
+      backends.entries.where((entry) => entry.food.id == rice).single.servings,
+    ).equals(2);
+    check(
+      backends.requests.where(
+        (request) =>
+            request.method == 'POST' && request.url.path == '/v2/diary',
+      ),
     ).length.equals(1);
+    _missing(_mfp);
   });
 
   testWidgets('offers MyFitnessPal only for a food not in Ekklo yet', (
@@ -503,17 +517,19 @@ void main() {
     check(backends.ekkloItems.single.quantity).equals(200);
   });
 
-  testWidgets('stays on the fiche and says why when MyFitnessPal refuses the '
-      'edit', (tester) async {
+  testWidgets('closes the fiche and says the edit is waiting when '
+      'MyFitnessPal refuses it', (tester) async {
     final backends = LoggedJournal.backends()..mfpWritesFail = true;
     await _open(tester, backends, LoggedJournal.basmati);
     await _servings(tester, '2');
 
     await _tap(tester, _saveBoth);
 
-    _sees('MyFitnessPal ne répond pas.');
-    _sees(_title);
-    check(_enabled(tester, _saveBoth)).isTrue();
+    _missing(_title);
+    _sees(_mfpNotWritten);
+    _sees('Riz basmati reste en attente');
+    _sees(_retry);
+    _sees(_mfp);
     check(backends.ekkloItems.single.quantity).equals(150);
   });
 
@@ -528,8 +544,10 @@ void main() {
 
     await _tap(tester, _saveBoth);
 
+    _sees(_mfpNotWritten);
     _sees(_blockedInDev);
-    _sees(_title);
+    _missing(_title);
+    _missing(_retry);
     check(
       backends.entries.where((entry) => entry.food.id == rice).single.servings,
     ).equals(1.5);

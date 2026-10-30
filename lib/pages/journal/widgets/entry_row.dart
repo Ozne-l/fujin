@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
+import 'package:fujin/domain/comparison/mfp_status.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
+import 'package:fujin/pages/journal/widgets/mfp_pill.dart';
 import 'package:fujin/pages/journal/widgets/split_line.dart';
 
 class EntryRow extends StatelessWidget {
@@ -10,12 +12,14 @@ class EntryRow extends StatelessWidget {
     required this.entry,
     required this.detail,
     this.pill,
+    this.mfp,
     super.key,
   });
 
   final LoggedEntry entry;
   final String detail;
   final Widget? pill;
+  final MfpStatus? mfp;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +60,17 @@ class EntryRow extends StatelessWidget {
               ),
             ],
           ),
-          trailing: pill,
+          trailing: switch (mfp) {
+            null => pill,
+            final mfp => Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: FujinSpace.s2,
+              children: [
+                MfpPill(failed: mfp is MfpFailed),
+                ?pill,
+              ],
+            ),
+          },
         ),
       ],
     );

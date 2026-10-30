@@ -10,25 +10,19 @@ part 'edited_food.mapper.dart';
 final class EditedFood with EditedFoodMappable {
   const EditedFood({
     required this.original,
-    required this.originalMfpEntryId,
-    required this.mfpEntryId,
     required this.draft,
     required this.planned,
-    required this.ekkloWritten,
     this.link,
   });
 
   final LoggedEntry original;
-  final String originalMfpEntryId;
-  final String mfpEntryId;
   final AddDraft draft;
   final EkkloLink? link;
   final PlannedEntry planned;
-  final bool ekkloWritten;
 
   String get entryId => original.entry.id;
 
   LoggedEntry get entry => planned.entry;
 
-  bool get toEkklo => link != null;
+  bool get toEkklo => link?.item != null;
 }

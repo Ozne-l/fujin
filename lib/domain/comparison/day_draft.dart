@@ -16,6 +16,7 @@ final class DayDraft with DayDraftMappable {
     this.stored = const StoredDay(),
     this.entries = const [],
     this.deleted = const [],
+    this.owed = const [],
     this.unstored = const [],
     this.foods = const [],
     this.meals = const [],
@@ -29,6 +30,7 @@ final class DayDraft with DayDraftMappable {
     stored: stored,
     entries: stored.entries,
     deleted: stored.deleted,
+    owed: stored.owed,
   );
 
   @MappableField(hook: CalendarDateHook())
@@ -36,6 +38,7 @@ final class DayDraft with DayDraftMappable {
   final StoredDay stored;
   final List<LoggedEntry> entries;
   final List<LoggedEntry> deleted;
+  final List<LoggedEntry> owed;
   final List<LoggedEntry> unstored;
   final List<CopiedFood> foods;
   final List<CopiedMeal> meals;
@@ -51,10 +54,15 @@ final class DayDraft with DayDraftMappable {
     };
     final live = {for (final logged in entries) logged.entry.id};
     final mfpBefore = {
-      for (final link in [for (final logged in stored.entries) ?logged.mfpLink])
+      for (final link in [
+        for (final logged in [...stored.entries, ...stored.owed])
+          ?logged.mfpLink,
+      ])
         link.id: link,
     };
-    final mfpAfter = [for (final logged in entries) ?logged.mfpLink];
+    final mfpAfter = [
+      for (final logged in [...entries, ...owed]) ?logged.mfpLink,
+    ];
     final ekkloBefore = {
       for (final link in [for (final logged in before) ?logged.ekkloLink])
         link.id: link,

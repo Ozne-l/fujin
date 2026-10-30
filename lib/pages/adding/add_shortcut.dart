@@ -57,13 +57,11 @@ abstract final class AddShortcut {
     JournalSnackBar.added(
       context,
       added,
-      onUndo: () => unawaited(
-        remover.remove(
-          EntryRemoval(
-            entryId: added.entryId,
-            entry: added.entry,
-            reason: RemovalReason.undoAdd,
-          ),
+      onUndo: () => remover.remove(
+        EntryRemoval(
+          entryId: added.entryId,
+          entry: added.entry,
+          reason: RemovalReason.undoAdd,
         ),
       ),
     );

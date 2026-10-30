@@ -1218,6 +1218,14 @@
       },
       "$type": "dimension"
     },
+    "pill-small-icon": {
+      "$value": {
+        "value": 14,
+        "unit": "px"
+      },
+      "$description": "Icon in a small pill, such as the MyFitnessPal clock.",
+      "$type": "dimension"
+    },
     "motif-band": {
       "$value": {
         "value": 252,

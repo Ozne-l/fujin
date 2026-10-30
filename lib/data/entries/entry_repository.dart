@@ -8,6 +8,7 @@ import 'package:fujin/data/entries/entry.dart';
 import 'package:fujin/data/entries/linked_item.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/entries/mfp_link.dart';
+import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/data/entries/stored_day.dart';
 import 'package:fujin/data/entries/unattended_expectation.dart';
 import 'package:fujin/data/foods/food_repository.dart';
@@ -31,22 +32,43 @@ final class EntryRepository {
         'WHERE live.entry_id = entry.id AND live.deleted_at IS NULL)',
         day,
       ),
+      owed: _logged(
+        'entry.id IN (SELECT entry_id FROM mfp_link '
+        'WHERE deleted_at IS NULL AND date = ?) '
+        'AND (entry.deleted_at IS NOT NULL OR entry.date <> ?)',
+        [...day, ...day],
+      ),
     );
   }
+
+  List<MfpWrite> pendingMfp() =>
+      [
+        for (final logged in _logged('entry.id IN ($_pendingIds)', const []))
+          MfpWrite.of(logged) ??
+              (throw StateError('Entry ${logged.entry.id} is not pending')),
+      ]..sort(
+        (first, second) => first.logged.entry.id.compareTo(
+          second.logged.entry.id,
+        ),
+      );
+
+  LoggedEntry? findAny(String entryId) =>
+      switch (_logged('entry.id = ?', [entryId])) {
+        [final logged] => logged,
+        _ => null,
+      };
+
+  Set<String> heldMfpEntryIds(DateTime date) => {
+    for (final row in _database.select(
+      'SELECT mfp_entry_id FROM mfp_link WHERE deleted_at IS NULL AND date = ?',
+      [CalendarDateHook.format(date)],
+    ))
+      row[_mfpEntryId] as String,
+  };
 
   LoggedEntry? find(String entryId) => switch (_logged(
     'entry.id = ? AND entry.deleted_at IS NULL',
     [entryId],
-  )) {
-    [final logged] => logged,
-    _ => null,
-  };
-
-  LoggedEntry? findByMfpEntryId(String mfpEntryId) => switch (_logged(
-    'entry.deleted_at IS NULL '
-    'AND entry.id IN (SELECT entry_id FROM mfp_link '
-    'WHERE mfp_entry_id = ? AND deleted_at IS NULL)',
-    [mfpEntryId],
   )) {
     [final logged] => logged,
     _ => null,
@@ -118,24 +140,33 @@ final class EntryRepository {
     }
   });
 
-  void save(Entry entry, MfpLink mfpLink) => _database.transaction(() {
+  void saveEntry(Entry entry) => _database.transaction(
+    () => _saveEntry(entry.copyWith(updatedAt: _now())),
+  );
+
+  void saveLink(MfpLink link, {Entry? entry}) => _database.transaction(() {
     final now = _now();
-    _saveEntry(entry.copyWith(updatedAt: now));
-    if (_mfpLinkHolding(mfpLink.mfpEntryId) case final copy?
-        when copy.entryId != entry.id) {
-      _takeOver(copy.entryId, by: entry.id, now: now);
+    if (entry case final entry?) {
+      _saveEntry(entry.copyWith(updatedAt: now));
     }
-    final written = mfpLink.copyWith(entryId: entry.id, updatedAt: now);
-    _saveMfpLink(switch (_mfpLinkOf(entry.id)) {
+    if (_mfpLinkHolding(link.mfpEntryId) case final copy?
+        when copy.entryId != link.entryId) {
+      _takeOver(copy.entryId, by: link.entryId, now: now);
+    }
+    final written = link.copyWith(updatedAt: now);
+    _saveMfpLink(switch (_mfpLinkOf(link.entryId)) {
       final current? => written.copyWith(id: current.id),
       null => written,
     });
   });
 
+  void unlinkMfp(String entryId) => _database.transaction(
+    () => _softDelete(FujinTable.mfpLink, 'entry_id = ?', [entryId], _now()),
+  );
+
   void remove(String entryId) => _database.transaction(() {
     final now = _now();
     _softDelete(FujinTable.entry, 'id = ?', [entryId], now);
-    _softDelete(FujinTable.mfpLink, 'entry_id = ?', [entryId], now);
     _softDelete(
       FujinTable.ekkloLink,
       'entry_id = ? AND ekklo_item_id IS NULL',
@@ -148,10 +179,11 @@ final class EntryRepository {
     String entryId, {
     required String ekkloMealId,
     required String ekkloItemId,
+    Entry? sent,
   }) => _database.transaction(() {
     final now = _now();
     final item = LinkedItem.of(
-      _entryRow(entryId),
+      sent ?? _entryRow(entryId),
       ekkloMealId: ekkloMealId,
       ekkloItemId: ekkloItemId,
       sentAt: now,
@@ -167,11 +199,11 @@ final class EntryRepository {
     });
   });
 
-  void refreshLink(String entryId) => _database.transaction(() {
+  void refreshLink(String entryId, {Entry? sent}) => _database.transaction(() {
     if (_ekkloLinkOf(entryId) case EkkloLink(item: final item?) && final link) {
       _saveEkkloLink(
         link.copyWith(
-          item: item.refreshedFrom(_entryRow(entryId)),
+          item: item.refreshedFrom(sent ?? _entryRow(entryId)),
           updatedAt: _now(),
         ),
       );
@@ -390,7 +422,26 @@ final class EntryRepository {
   void _saveEkkloLink(EkkloLink link) =>
       _database.upsert(FujinTable.ekkloLink, link.toMap(), key: const [_id]);
 
+  static const _pendingIds =
+      'SELECT entry.id FROM entry '
+      'JOIN meal ON meal.id = entry.meal_id '
+      'LEFT JOIN meal_mapping mapping ON mapping.meal_id = meal.id '
+      "AND mapping.connector = 'mfp' AND mapping.deleted_at IS NULL "
+      'LEFT JOIN food_reference mfp ON mfp.food_id = entry.food_id '
+      "AND mfp.kind = 'mfp' AND mfp.deleted_at IS NULL "
+      'LEFT JOIN mfp_link link ON link.entry_id = entry.id '
+      'AND link.deleted_at IS NULL '
+      'WHERE (entry.deleted_at IS NULL AND link.id IS NULL) '
+      'OR (entry.deleted_at IS NOT NULL AND link.id IS NOT NULL) '
+      'OR (entry.deleted_at IS NULL AND link.id IS NOT NULL AND ( '
+      'link.date <> entry.date '
+      'OR link.meal_name <> coalesce(mapping.name, meal.name) '
+      'OR link.food_id IS NOT mfp.external_id '
+      'OR link.servings <> entry.servings '
+      'OR link.serving_value <> entry.serving_value '
+      'OR link.serving_unit <> entry.serving_unit))';
   static const _id = 'id';
+  static const _mfpEntryId = 'mfp_entry_id';
   static const _entryId = 'entry_id';
   static const _entry = 'entry';
 }

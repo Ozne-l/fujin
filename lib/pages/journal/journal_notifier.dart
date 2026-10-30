@@ -6,6 +6,7 @@ import 'package:fujin/domain/journal/calendar_week.dart';
 import 'package:fujin/domain/journal/fetch.dart';
 import 'package:fujin/domain/journal/journal_read.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
+import 'package:fujin/pages/journal/background_write_notifier.dart';
 import 'package:fujin/pages/journal/refresh_outcome.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -121,7 +122,7 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
 
   Future<RefreshOutcome> refresh() async {
     final before = ref.read(mfpDiaryProvider(date)).value?.value;
-    final (diary, meals) = await _reread();
+    final (diary, meals) = await _reread(thenWrite: true);
     return switch ((before, diary, meals)) {
       (final before?, Fetched(value: final after), Fetched())
           when before == after =>
@@ -130,7 +131,7 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
     };
   }
 
-  Future<void> reload() => _reread();
+  Future<void> reload({bool thenWrite = true}) => _reread(thenWrite: thenWrite);
 
   Future<void> revalidate() async {
     if (!ref.mounted) return;
@@ -140,10 +141,12 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
     ];
     if (held.isEmpty) return;
     held.forEach(ref.invalidate);
-    await _readSides();
+    await _readSides(thenWrite: true);
   }
 
-  Future<(Fetch<MfpDiaryDay>, Fetch<List<EkkloDailyMeal>>)> _reread() {
+  Future<(Fetch<MfpDiaryDay>, Fetch<List<EkkloDailyMeal>>)> _reread({
+    required bool thenWrite,
+  }) {
     switch (ref.read(mealNamesProvider)) {
       case AsyncError():
         ref.invalidate(mealNamesProvider);
@@ -156,23 +159,31 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
       if (ref.exists(meals) && ref.read(meals).hasError) ref.invalidate(meals);
     }
     ref.invalidate(ekkloMealsProvider(date));
-    return _readSides();
+    return _readSides(thenWrite: thenWrite);
   }
 
-  Future<(Fetch<MfpDiaryDay>, Fetch<List<EkkloDailyMeal>>)> _readSides() async {
+  Future<(Fetch<MfpDiaryDay>, Fetch<List<EkkloDailyMeal>>)> _readSides({
+    required bool thenWrite,
+  }) async {
     final service = ref.read(journalServiceProvider);
     final diary = Fetch.of(ref.read(mfpDiaryProvider(date).future));
     final meals = Fetch.of(ref.read(ekkloMealsProvider(date).future));
     final (diaryRead, mealsRead) = (await diary, await meals);
-    _settle(service, diaryRead, mealsRead);
+    _settle(service, diaryRead, mealsRead, thenWrite: thenWrite);
     return (diaryRead, mealsRead);
   }
 
   void _settle(
     JournalService service,
     Fetch<MfpDiaryDay> diary,
-    Fetch<List<EkkloDailyMeal>> meals,
-  ) => service.settleDay(date, diary: diary, meals: meals);
+    Fetch<List<EkkloDailyMeal>> meals, {
+    required bool thenWrite,
+  }) {
+    service.settleDay(date, diary: diary, meals: meals);
+    if ((thenWrite, diary) case (true, Fetched())) {
+      ref.read(backgroundWriteProvider.notifier).run();
+    }
+  }
 
   Future<JournalRead> _firstRead(
     JournalService service,
@@ -186,7 +197,7 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
       (Object error) => const <String>[],
     );
     final (diaryFetch, mealsFetch) = (await diaryRead, await mealsRead);
-    _settle(service, diaryFetch, mealsFetch);
+    _settle(service, diaryFetch, mealsFetch, thenWrite: true);
     return service.journalOf(
       date,
       diary: diaryFetch,

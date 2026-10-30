@@ -28,26 +28,14 @@ class AddedFoodMapper extends ClassMapperBase<AddedFood> {
     'planned',
     _$planned,
   );
-  static bool _$ekkloWritten(AddedFood v) => v.ekkloWritten;
-  static const Field<AddedFood, bool> _f$ekkloWritten = Field(
-    'ekkloWritten',
-    _$ekkloWritten,
-    key: r'ekklo_written',
-  );
 
   @override
-  final MappableFields<AddedFood> fields = const {
-    #planned: _f$planned,
-    #ekkloWritten: _f$ekkloWritten,
-  };
+  final MappableFields<AddedFood> fields = const {#planned: _f$planned};
   @override
   final bool ignoreNull = true;
 
   static AddedFood _instantiate(DecodingData data) {
-    return AddedFood(
-      planned: data.dec(_f$planned),
-      ekkloWritten: data.dec(_f$ekkloWritten),
-    );
+    return AddedFood(planned: data.dec(_f$planned));
   }
 
   @override
@@ -110,7 +98,7 @@ extension AddedFoodValueCopy<$R, $Out> on ObjectCopyWith<$R, AddedFood, $Out> {
 abstract class AddedFoodCopyWith<$R, $In extends AddedFood, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry> get planned;
-  $R call({PlannedEntry? planned, bool? ekkloWritten});
+  $R call({PlannedEntry? planned});
   AddedFoodCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -126,17 +114,11 @@ class _AddedFoodCopyWithImpl<$R, $Out>
   PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry> get planned =>
       $value.planned.copyWith.$chain((v) => call(planned: v));
   @override
-  $R call({PlannedEntry? planned, bool? ekkloWritten}) => $apply(
-    FieldCopyWithData({
-      if (planned != null) #planned: planned,
-      if (ekkloWritten != null) #ekkloWritten: ekkloWritten,
-    }),
-  );
+  $R call({PlannedEntry? planned}) =>
+      $apply(FieldCopyWithData({if (planned != null) #planned: planned}));
   @override
-  AddedFood $make(CopyWithData data) => AddedFood(
-    planned: data.get(#planned, or: $value.planned),
-    ekkloWritten: data.get(#ekkloWritten, or: $value.ekkloWritten),
-  );
+  AddedFood $make(CopyWithData data) =>
+      AddedFood(planned: data.get(#planned, or: $value.planned));
 
   @override
   AddedFoodCopyWith<$R2, AddedFood, $Out2> $chain<$R2, $Out2>(

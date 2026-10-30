@@ -14,6 +14,7 @@ import 'package:fujin/domain/comparison/compare_ekklo_day.dart';
 import 'package:fujin/domain/comparison/day_comparison.dart';
 import 'package:fujin/domain/comparison/day_draft.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
+import 'package:fujin/domain/comparison/mfp_status.dart';
 import 'package:fujin/domain/comparison/update_kind.dart';
 
 import '../../support/fixtures.dart';
@@ -185,6 +186,44 @@ void main() {
       ).copyWith(item: sentItem('I-1', servings: 1.5));
       check(statusesOf(result)).deepEquals([InEkklo(refreshed)]);
       check(result.changes).equals(changes(changed: [refreshed]));
+    });
+  });
+
+  group('an entry waiting for MyFitnessPal', () {
+    test('marks entries waiting for MyFitnessPal as pending', () {
+      final added = stored('e-1').copyWith(mfpLink: null);
+      final edited = stored('e-2');
+      final written = stored('e-3');
+
+      final result = compare(
+        [
+          added,
+          edited.copyWith(entry: edited.entry.copyWith(servings: 2)),
+          written,
+        ],
+        [],
+      );
+
+      check([
+        for (final compared in result.entries) compared.mfp,
+      ]).deepEquals([const MfpPending(), const MfpPending(), null]);
+    });
+
+    test('keeps the Ekklo link of an entry moved to another day until it is '
+        'written', () {
+      final sent = stored('e-1', item: sentItem('I-1'));
+      final moved = sent.copyWith(
+        mfpLink: sent.mfpLink?.copyWith(
+          date: day.subtract(const Duration(days: 1)),
+        ),
+      );
+
+      final result = compare([moved], [meal('meal-1', [])]);
+
+      check(
+        statusesOf(result),
+      ).deepEquals([ToUpdate(linkOf(sent), UpdateKind.mealChanged)]);
+      check(result.changes).equals(changes());
     });
   });
 

@@ -20,14 +20,33 @@ DayDraft read(
   List<LoggedEntry> stored,
   List<MfpFoodEntry> diary, {
   Food? Function(String mfpFoodId) foodOf = knownFood,
+  List<LoggedEntry> owed = const [],
+  DateTime? readAt,
 }) => compareMfpDay(
-  DayDraft.of(StoredDay(entries: stored), date: day),
+  DayDraft.of(
+    StoredDay(entries: stored, owed: owed),
+    date: day,
+  ),
   diary: diary,
   foodOf: foodOf,
   mealOf: knownMeal,
   now: now,
+  readAt: readAt ?? now,
   ids: idsFrom('n'),
 );
+
+LoggedEntry unlinked(String id) =>
+    loggedEntry(entry(id)).copyWith(mfpLink: null);
+
+LoggedEntry editedTo(double servings, {String id = 'E-1'}) {
+  final logged = loggedEntry(entry(id));
+  return logged.copyWith(entry: logged.entry.copyWith(servings: servings));
+}
+
+LoggedEntry deletedEntry(String id) {
+  final logged = loggedEntry(entry(id));
+  return logged.copyWith(entry: logged.entry.copyWith(deletedAt: now));
+}
 
 void main() {
   group('an entry with an id', () {
@@ -214,5 +233,124 @@ void main() {
     check(result.held().entries.single)
       ..has((compared) => compared.status, 'status').isA<InEkklo>()
       ..has((compared) => compared.entryId, 'entryId').isNull();
+  });
+
+  group('an entry waiting for MyFitnessPal', () {
+    test('adopts the oldest matching unlinked row', () {
+      final row = entry('E-1');
+
+      final draft = read([unlinked('e-b'), unlinked('e-a')], [row]);
+
+      check(draft.changes).equals(
+        DayChanges(
+          date: day,
+          addedMfpLinks: [
+            MfpLink.of(
+              row,
+              id: 'n-1',
+              entryId: 'e-a',
+              mfpEntryId: 'E-1',
+              updatedAt: now,
+            ),
+          ],
+        ),
+      );
+    });
+
+    test("keeps Fūjin's values when the diary changed under a pending "
+        'edit', () {
+      final edited = editedTo(2);
+      final changed = entry('E-1', servings: 3);
+
+      final draft = read([edited], [changed]);
+
+      check(draft.entries.single.entry).equals(edited.entry);
+      check(draft.changes).equals(
+        DayChanges(
+          date: day,
+          changedMfpLinks: [
+            MfpLink.of(
+              changed,
+              id: 'mfp-link-E-1',
+              entryId: 'E-1',
+              mfpEntryId: 'E-1',
+              updatedAt: now,
+            ),
+          ],
+        ),
+      );
+    });
+
+    test('turns a pending edit whose row vanished into a pending add', () {
+      final edited = editedTo(2).copyWith(
+        ekkloLink: ekkloLinkRow('k-E-1', entryId: 'E-1'),
+      );
+
+      final draft = read([edited], []);
+
+      check(draft.entries.single)
+        ..has((logged) => logged.mfpLink, 'MyFitnessPal link').isNull()
+        ..has((logged) => logged.ekkloLink, 'Ekklo link').equals(
+          edited.ekkloLink,
+        );
+      check(draft.changes).equals(
+        DayChanges(date: day, deletedMfpLinkIds: ['mfp-link-E-1']),
+      );
+    });
+
+    test('holds the copy of a pending edit', () {
+      final draft = read(
+        [editedTo(2)],
+        [entry('E-1'), entry('E-2', servings: 2)],
+      );
+
+      check(draft.entries).length.equals(1);
+      check(draft.changes).equals(DayChanges(date: day));
+    });
+
+    test('keeps a pending move whose row is on another day', () {
+      final logged = loggedEntry(entry('E-1'));
+      final moved = logged.copyWith(
+        mfpLink: logged.mfpLink?.copyWith(
+          date: day.subtract(const Duration(days: 1)),
+        ),
+      );
+
+      final draft = read([moved], []);
+
+      check(draft.entries).deepEquals([moved]);
+      check(draft.changes).equals(DayChanges(date: day));
+    });
+
+    test("holds an owed deletion's row and never copies it in", () {
+      final owed = deletedEntry('E-1');
+
+      final draft = read([], [entry('E-1')], owed: [owed]);
+
+      check(draft.owed).deepEquals([owed]);
+      check(draft.entries).isEmpty();
+      check(draft.changes).equals(DayChanges(date: day));
+    });
+
+    test('forgets an owed link whose row is gone', () {
+      final draft = read([], [], owed: [deletedEntry('E-1')]);
+
+      check(draft.changes).equals(
+        DayChanges(date: day, deletedMfpLinkIds: ['mfp-link-E-1']),
+      );
+    });
+
+    test('leaves a link written after the diary was read', () {
+      final written = loggedEntry(entry('E-1'));
+
+      final draft = read(
+        [written],
+        [],
+        readAt: now.subtract(const Duration(minutes: 1)),
+      );
+
+      check(draft.entries).deepEquals([written]);
+      check(draft.changes).equals(DayChanges(date: day));
+    });
   });
 }

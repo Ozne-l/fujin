@@ -5,8 +5,13 @@ part 'stored_day.mapper.dart';
 
 @MappableClass()
 final class StoredDay with StoredDayMappable {
-  const StoredDay({this.entries = const [], this.deleted = const []});
+  const StoredDay({
+    this.entries = const [],
+    this.deleted = const [],
+    this.owed = const [],
+  });
 
   final List<LoggedEntry> entries;
   final List<LoggedEntry> deleted;
+  final List<LoggedEntry> owed;
 }
