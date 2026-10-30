@@ -26,7 +26,8 @@ final class JournalDay with JournalDayMappable {
 
   List<ComparedEntry> get entries => comparison.entries;
 
-  StatusCounts get counts => StatusCounts.of(entries);
+  StatusCounts counts({Set<String> sending = const {}}) =>
+      StatusCounts.of(entries, sending: sending);
 
   DayNutrients get nutrients => DayNutrients.ofEntries([
     for (final compared in entries) compared.logged,

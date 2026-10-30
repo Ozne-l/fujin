@@ -46,12 +46,20 @@ class StatusCountsMapper extends ClassMapperBase<StatusCounts> {
     opt: true,
     def: 0,
   );
+  static int _$sending(StatusCounts v) => v.sending;
+  static const Field<StatusCounts, int> _f$sending = Field(
+    'sending',
+    _$sending,
+    opt: true,
+    def: 0,
+  );
 
   @override
   final MappableFields<StatusCounts> fields = const {
     #inEkklo: _f$inEkklo,
     #toSend: _f$toSend,
     #toUpdate: _f$toUpdate,
+    #sending: _f$sending,
   };
   @override
   final bool ignoreNull = true;
@@ -61,6 +69,7 @@ class StatusCountsMapper extends ClassMapperBase<StatusCounts> {
       inEkklo: data.dec(_f$inEkklo),
       toSend: data.dec(_f$toSend),
       toUpdate: data.dec(_f$toUpdate),
+      sending: data.dec(_f$sending),
     );
   }
 
@@ -126,7 +135,7 @@ extension StatusCountsValueCopy<$R, $Out>
 
 abstract class StatusCountsCopyWith<$R, $In extends StatusCounts, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({int? inEkklo, int? toSend, int? toUpdate});
+  $R call({int? inEkklo, int? toSend, int? toUpdate, int? sending});
   StatusCountsCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -139,11 +148,12 @@ class _StatusCountsCopyWithImpl<$R, $Out>
   late final ClassMapperBase<StatusCounts> $mapper =
       StatusCountsMapper.ensureInitialized();
   @override
-  $R call({int? inEkklo, int? toSend, int? toUpdate}) => $apply(
+  $R call({int? inEkklo, int? toSend, int? toUpdate, int? sending}) => $apply(
     FieldCopyWithData({
       if (inEkklo != null) #inEkklo: inEkklo,
       if (toSend != null) #toSend: toSend,
       if (toUpdate != null) #toUpdate: toUpdate,
+      if (sending != null) #sending: sending,
     }),
   );
   @override
@@ -151,6 +161,7 @@ class _StatusCountsCopyWithImpl<$R, $Out>
     inEkklo: data.get(#inEkklo, or: $value.inEkklo),
     toSend: data.get(#toSend, or: $value.toSend),
     toUpdate: data.get(#toUpdate, or: $value.toUpdate),
+    sending: data.get(#sending, or: $value.sending),
   );
 
   @override

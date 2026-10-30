@@ -109,7 +109,7 @@ void main() {
       [for (final item in backends.ekkloItems) item.quantity],
     ).deepEquals([100, 180, 50]);
     check(linked()).length.equals(3);
-    check((await journal.readDay(day)).counts.inEkklo).equals(3);
+    check((await journal.readDay(day)).counts().inEkklo).equals(3);
     check(report)
       ..has((it) => it.sent, 'sent').equals(3)
       ..has((it) => it.reused, 'reused').equals(3);
@@ -146,7 +146,7 @@ void main() {
     ).isNotNull().isCloseTo(80 * 100 / 62, 1e-9);
     check(remembered.ekkloMealName(snacks)).equals(snacks);
     check(appendedMeals()).deepEquals([snacks]);
-    check((await journal.readDay(day)).counts.inEkklo).equals(1);
+    check((await journal.readDay(day)).counts().inEkklo).equals(1);
     check(report)
       ..has((it) => it.newAssociations, 'associations').deepEquals([
         'Skyr nature',
@@ -188,7 +188,7 @@ void main() {
       check(memoryRepository.load().food(_gratin, _portion)).isA<OwnCopy>()
         ..has((it) => it.ekkloFoodId, 'food').equals(copy.id)
         ..has((it) => it.mfpUnit, 'unit').equals(_portion);
-      check((await journal.readDay(day)).counts.inEkklo).equals(1);
+      check((await journal.readDay(day)).counts().inEkklo).equals(1);
       check(report.ownCopies).deepEquals([_gratinName]);
     },
   );
@@ -241,7 +241,7 @@ void main() {
       entries.unlinkItem(link.entryId);
     }
     check(linked()).isEmpty();
-    check((await journal.readDay(day)).counts.inEkklo).equals(2);
+    check((await journal.readDay(day)).counts().inEkklo).equals(2);
   });
 
   test('reuses the own copy created before an interruption', () async {
@@ -268,7 +268,7 @@ void main() {
     final copy = backends.ekkloFoods.single;
     check(backends.ekkloItems.single.foodId).equals(copy.id);
     check(report.ownCopies).isEmpty();
-    check((await journal.readDay(day)).counts.inEkklo).equals(1);
+    check((await journal.readDay(day)).counts().inEkklo).equals(1);
   });
 
   test('reads the remembered Ekklo food to weigh a new unit', () async {
@@ -329,7 +329,7 @@ void main() {
     check(
       linked().single.item,
     ).isNotNull().has((item) => item.servings, 'servings').equals(2);
-    check((await journal.readDay(day)).counts.inEkklo).equals(1);
+    check((await journal.readDay(day)).counts().inEkklo).equals(1);
     check(report.updated).equals(1);
   });
 
@@ -381,7 +381,7 @@ void main() {
 
     check(appendedMeals()).deepEquals([petitDejeuner, dejeuner]);
     check(backends.ekkloItems).length.equals(2);
-    check((await journal.readDay(day)).counts.inEkklo).equals(2);
+    check((await journal.readDay(day)).counts().inEkklo).equals(2);
   });
 
   test('sends again only the meal that failed', () async {
@@ -455,7 +455,7 @@ void main() {
       check(remembered.ekkloMealName(snacks)).isNull();
       check(remembered.food(_gratin, _portion)).isA<OwnCopy>();
       check(backends.ekkloItems).length.equals(3);
-      check((await journal.readDay(day)).counts.inEkklo).equals(3);
+      check((await journal.readDay(day)).counts().inEkklo).equals(3);
     });
 
     test('never sends twice an item or an own copy whose reply was '
@@ -471,7 +471,7 @@ void main() {
       final plan = await planDay(sending);
       await check(sendAutomatically(sending, plan)).throws<SendInterruption>();
 
-      check((await journal.readDay(day)).counts.inEkklo).equals(2);
+      check((await journal.readDay(day)).counts().inEkklo).equals(2);
       backends.lostReplies.clear();
       await sendAutomatically(sending, plan);
       await sendAutomatically(sending, await planDay(sending));
@@ -544,7 +544,7 @@ void main() {
         await send(sending, await planDay(sending));
 
         check(backends.ekkloItems.single.quantity).equals(1998);
-        check((await journal.readDay(day)).counts.inEkklo).equals(1);
+        check((await journal.readDay(day)).counts().inEkklo).equals(1);
       },
     );
 
@@ -575,7 +575,7 @@ void main() {
         await send(sending, await planDay(sending));
 
         check(backends.ekkloItems.single.foodId).equals(siggis.id);
-        check((await journal.readDay(day)).counts.inEkklo).equals(1);
+        check((await journal.readDay(day)).counts().inEkklo).equals(1);
       },
     );
   });

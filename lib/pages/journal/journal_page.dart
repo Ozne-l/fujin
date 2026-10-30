@@ -115,6 +115,9 @@ class JournalPage extends HookConsumerWidget {
     }
 
     Future<void> send() async {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..removeCurrentSnackBar();
       await context.push<void>(FujinRoute.send.forDate(day));
       ref.invalidate(memoryProvider);
       await notifier.reload();

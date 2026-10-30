@@ -17,7 +17,8 @@ final class JournalMeal with JournalMealMappable {
   final List<ComparedEntry> entries;
   final List<LoggedEntry> leaving;
 
-  StatusCounts get counts => StatusCounts.of(entries);
+  StatusCounts counts({Set<String> sending = const {}}) =>
+      StatusCounts.of(entries, sending: sending);
 
   double get kilocalories => entries.fold(
     0,

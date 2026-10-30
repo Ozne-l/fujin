@@ -9,7 +9,10 @@ import 'package:fujin/pages/common/sheet_frame.dart';
 import 'package:fujin/pages/common/sheet_header.dart';
 import 'package:fujin/pages/common/source_dot.dart';
 import 'package:fujin/pages/common/title_text.dart';
+import 'package:fujin/pages/journal/background_write_notifier.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
+import 'package:fujin/pages/journal/writer_state_ids.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 Future<void> showDayDetailSheet(
   BuildContext context, {
@@ -21,16 +24,20 @@ Future<void> showDayDetailSheet(
       SheetFrame.handled(_DayDetail(day: day, onSend: onSend)),
 );
 
-class _DayDetail extends StatelessWidget {
+class _DayDetail extends ConsumerWidget {
   const _DayDetail({required this.day, required this.onSend});
 
   final JournalDay day;
   final VoidCallback onSend;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final navigator = Navigator.of(context);
-    final counts = day.counts;
+    final counts = ref.watch(
+      backgroundWriteProvider.select(
+        (state) => day.counts(sending: state.ekkloSendIds),
+      ),
+    );
     final mfp = day.nutrients;
     final ekklo = day.ekkloNutrients;
     final notes = [

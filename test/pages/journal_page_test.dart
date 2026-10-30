@@ -1151,6 +1151,20 @@ void main() {
       check(find.text('1/1 · Riz basmati').evaluate()).length.equals(1);
     });
 
+    testWidgets('leaves no snackbar over the send page opened right after', (
+      tester,
+    ) async {
+      _tallView(tester);
+      final backends = _basmatiBackends()..entries = [entry('E-1')];
+      await pumpFujin(tester, backends);
+      await _addBasmatiToLunch(tester);
+      check(find.text('Riz basmati ajouté').evaluate()).length.equals(1);
+
+      await _tap(tester, find.text('Envoyer 1 aliment vers Ekklo'));
+
+      check(find.byType(SnackBar).evaluate()).isEmpty();
+    });
+
     testWidgets('shows the food on the day chosen in the fiche once the '
         'Journal moves there', (tester) async {
       _tallView(tester);
@@ -1305,6 +1319,31 @@ void main() {
       check(find.text('MFP').evaluate()).isEmpty();
       check(backends.entries).length.equals(1);
       check(backends.ekkloItems).length.equals(1);
+    });
+
+    testWidgets('counts a food held for Ekklo as sending, not as to send, '
+        'without folding its meal', (tester) async {
+      _tallView(tester);
+      final backends = _basmatiBackends()..mfpWritesFail = true;
+      await pumpFujin(tester, backends);
+
+      await _addBasmatiToLunch(tester);
+
+      check(_pill(Connector.ekklo).evaluate()).length.equals(1);
+      check(find.text('0/1 dans Ekklo').evaluate()).length.equals(1);
+      check(find.text('1 à envoyer').evaluate()).isEmpty();
+      check(find.text('Dans Ekklo').evaluate()).isEmpty();
+      check(find.text('Envoyer 1 aliment vers Ekklo').evaluate()).isEmpty();
+
+      await _tap(tester, find.text('MyFitnessPal'));
+
+      check(find.text('Détail du jour').evaluate()).length.equals(1);
+      check(
+        find
+            .textContaining('1 aliment sur 1 n’est pas encore dans Ekklo.')
+            .evaluate(),
+      ).length.equals(1);
+      check(find.text('Envoyer 1 aliment vers Ekklo').evaluate()).isEmpty();
     });
 
     testWidgets('says n aliments restent en attente', (tester) async {

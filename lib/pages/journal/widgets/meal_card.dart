@@ -51,7 +51,11 @@ class MealCard extends HookConsumerWidget {
             removals.contains(logged.entry.id))
           logged,
     ];
-    final counts = meal.counts;
+    final counts = ref.watch(
+      backgroundWriteProvider.select(
+        (state) => meal.counts(sending: state.ekkloSendIds),
+      ),
+    );
     final settled = counts.total > 0 && counts.pending == 0;
     final toggled = useState<({bool settled, bool open})?>(null);
     final open = switch (toggled.value) {
@@ -223,11 +227,12 @@ class MealCard extends HookConsumerWidget {
   static List<(String, PillTone)> _mealPills(
     AppLocalizations intl,
     StatusCounts counts,
-  ) => switch ((counts.toSend, counts.toUpdate)) {
-    (0, 0) => [(intl.statusInEkklo, PillTone.validated)],
-    (final send, 0) => [(intl.mealToSend(send), PillTone.attention)],
-    (0, final update) => [(intl.mealToUpdate(update), PillTone.info)],
-    (final send, final update) => [
+  ) => switch ((counts.toSend, counts.toUpdate, counts.sending)) {
+    (0, 0, 0) => [(intl.statusInEkklo, PillTone.validated)],
+    (0, 0, _) => [],
+    (final send, 0, _) => [(intl.mealToSend(send), PillTone.attention)],
+    (0, final update, _) => [(intl.mealToUpdate(update), PillTone.info)],
+    (final send, final update, _) => [
       (intl.mealToSend(send), PillTone.attention),
       (intl.mealToUpdate(update), PillTone.info),
     ],
