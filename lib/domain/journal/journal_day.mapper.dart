@@ -15,8 +15,8 @@ class JournalDayMapper extends ClassMapperBase<JournalDay> {
   static JournalDayMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = JournalDayMapper._());
-      MfpDiaryDayMapper.ensureInitialized();
       DayComparisonMapper.ensureInitialized();
+      JournalMealMapper.ensureInitialized();
       EkkloDailyMealMapper.ensureInitialized();
     }
     return _instance!;
@@ -25,21 +25,21 @@ class JournalDayMapper extends ClassMapperBase<JournalDay> {
   @override
   final String id = 'JournalDay';
 
-  static MfpDiaryDay _$diary(JournalDay v) => v.diary;
-  static const Field<JournalDay, MfpDiaryDay> _f$diary = Field(
-    'diary',
-    _$diary,
+  static DateTime _$date(JournalDay v) => v.date;
+  static const Field<JournalDay, DateTime> _f$date = Field(
+    'date',
+    _$date,
+    hook: CalendarDateHook(),
   );
   static DayComparison _$comparison(JournalDay v) => v.comparison;
   static const Field<JournalDay, DayComparison> _f$comparison = Field(
     'comparison',
     _$comparison,
   );
-  static List<String> _$mealNames(JournalDay v) => v.mealNames;
-  static const Field<JournalDay, List<String>> _f$mealNames = Field(
-    'mealNames',
-    _$mealNames,
-    key: r'meal_names',
+  static List<JournalMeal> _$meals(JournalDay v) => v.meals;
+  static const Field<JournalDay, List<JournalMeal>> _f$meals = Field(
+    'meals',
+    _$meals,
     opt: true,
     def: const [],
   );
@@ -54,9 +54,9 @@ class JournalDayMapper extends ClassMapperBase<JournalDay> {
 
   @override
   final MappableFields<JournalDay> fields = const {
-    #diary: _f$diary,
+    #date: _f$date,
     #comparison: _f$comparison,
-    #mealNames: _f$mealNames,
+    #meals: _f$meals,
     #ekkloMeals: _f$ekkloMeals,
   };
   @override
@@ -64,9 +64,9 @@ class JournalDayMapper extends ClassMapperBase<JournalDay> {
 
   static JournalDay _instantiate(DecodingData data) {
     return JournalDay(
-      diary: data.dec(_f$diary),
+      date: data.dec(_f$date),
       comparison: data.dec(_f$comparison),
-      mealNames: data.dec(_f$mealNames),
+      meals: data.dec(_f$meals),
       ekkloMeals: data.dec(_f$ekkloMeals),
     );
   }
@@ -131,9 +131,13 @@ extension JournalDayValueCopy<$R, $Out>
 
 abstract class JournalDayCopyWith<$R, $In extends JournalDay, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  MfpDiaryDayCopyWith<$R, MfpDiaryDay, MfpDiaryDay> get diary;
   DayComparisonCopyWith<$R, DayComparison, DayComparison> get comparison;
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get mealNames;
+  ListCopyWith<
+    $R,
+    JournalMeal,
+    JournalMealCopyWith<$R, JournalMeal, JournalMeal>
+  >
+  get meals;
   ListCopyWith<
     $R,
     EkkloDailyMeal,
@@ -141,9 +145,9 @@ abstract class JournalDayCopyWith<$R, $In extends JournalDay, $Out>
   >
   get ekkloMeals;
   $R call({
-    MfpDiaryDay? diary,
+    DateTime? date,
     DayComparison? comparison,
-    List<String>? mealNames,
+    List<JournalMeal>? meals,
     List<EkkloDailyMeal>? ekkloMeals,
   });
   JournalDayCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
@@ -158,18 +162,19 @@ class _JournalDayCopyWithImpl<$R, $Out>
   late final ClassMapperBase<JournalDay> $mapper =
       JournalDayMapper.ensureInitialized();
   @override
-  MfpDiaryDayCopyWith<$R, MfpDiaryDay, MfpDiaryDay> get diary =>
-      $value.diary.copyWith.$chain((v) => call(diary: v));
-  @override
   DayComparisonCopyWith<$R, DayComparison, DayComparison> get comparison =>
       $value.comparison.copyWith.$chain((v) => call(comparison: v));
   @override
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get mealNames =>
-      ListCopyWith(
-        $value.mealNames,
-        (v, t) => ObjectCopyWith(v, $identity, t),
-        (v) => call(mealNames: v),
-      );
+  ListCopyWith<
+    $R,
+    JournalMeal,
+    JournalMealCopyWith<$R, JournalMeal, JournalMeal>
+  >
+  get meals => ListCopyWith(
+    $value.meals,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(meals: v),
+  );
   @override
   ListCopyWith<
     $R,
@@ -183,23 +188,23 @@ class _JournalDayCopyWithImpl<$R, $Out>
   );
   @override
   $R call({
-    MfpDiaryDay? diary,
+    DateTime? date,
     DayComparison? comparison,
-    List<String>? mealNames,
+    List<JournalMeal>? meals,
     List<EkkloDailyMeal>? ekkloMeals,
   }) => $apply(
     FieldCopyWithData({
-      if (diary != null) #diary: diary,
+      if (date != null) #date: date,
       if (comparison != null) #comparison: comparison,
-      if (mealNames != null) #mealNames: mealNames,
+      if (meals != null) #meals: meals,
       if (ekkloMeals != null) #ekkloMeals: ekkloMeals,
     }),
   );
   @override
   JournalDay $make(CopyWithData data) => JournalDay(
-    diary: data.get(#diary, or: $value.diary),
+    date: data.get(#date, or: $value.date),
     comparison: data.get(#comparison, or: $value.comparison),
-    mealNames: data.get(#mealNames, or: $value.mealNames),
+    meals: data.get(#meals, or: $value.meals),
     ekkloMeals: data.get(#ekkloMeals, or: $value.ekkloMeals),
   );
 

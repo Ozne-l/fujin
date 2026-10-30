@@ -1,6 +1,7 @@
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart' show setUp, tearDown, test;
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_outcome.dart';
 import 'package:fujin/domain/adding/added_food.dart';
@@ -32,6 +33,9 @@ AddDraft _draft() => AddDraft(
   mfpMealName: lunch,
   date: day,
 );
+
+Iterable<EkkloLink> _liveEkkloLinks(WriteServices services) =>
+    services.entries.ekkloLinks().where((link) => link.deletedAt == null);
 
 void main() {
   late FujinDatabase database;
@@ -72,7 +76,8 @@ void main() {
     ]);
     check(backends.entries).isEmpty();
     check(backends.ekkloMeals.expand((meal) => meal.items)).isEmpty();
-    check(services.links.forDate(day)).isEmpty();
+    check(services.entries.find(food.entryId)).isNull();
+    check(_liveEkkloLinks(services)).isEmpty();
   });
 
   test('removes the Ekklo item of an entry to update', () async {
@@ -101,7 +106,8 @@ void main() {
     ).isA<Removed>().has((it) => it.ekkloRemoved, 'Ekklo removed').isTrue();
     check(backends.entries).isEmpty();
     check(backends.ekkloMeals.expand((meal) => meal.items)).isEmpty();
-    check(services.links.forDate(day)).isEmpty();
+    check(services.entries.find(edited.entryId)).isNull();
+    check(_liveEkkloLinks(services)).isEmpty();
   });
 
   test('removes once when asked twice at the same time', () async {
@@ -132,7 +138,8 @@ void main() {
 
       check(partial).isA<StillInMfp>();
       check(backends.ekkloMeals.expand((meal) => meal.items)).isEmpty();
-      check(services.links.forDate(day)).isEmpty();
+      check(services.entries.find(food.entryId)).isNotNull();
+      check(_liveEkkloLinks(services)).isEmpty();
       check(
         (await services.find(food.entryId, day))?.status,
       ).isA<ToSend>();
@@ -150,6 +157,7 @@ void main() {
       ).isA<Removed>().has((it) => it.ekkloRemoved, 'Ekklo removed').isFalse();
       check(services.writes()).deepEquals(['DELETE ${mfpApiUri.host}']);
       check(backends.entries).isEmpty();
+      check(services.entries.find(food.entryId)).isNull();
     },
   );
 

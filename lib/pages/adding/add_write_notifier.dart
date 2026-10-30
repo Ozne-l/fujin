@@ -55,7 +55,7 @@ final class AddWriteNotifier extends Notifier<AddWriteState> {
           .read(removeEntryServiceProvider)
           .remove(
             entryId: failed.added.entryId,
-            date: failed.added.entry.date,
+            date: failed.added.entry.entry.date,
           );
       if (ref.mounted) {
         state = switch (outcome) {

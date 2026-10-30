@@ -48,7 +48,7 @@ abstract final class AddShortcut {
   }
 
   static void added(BuildContext context, WidgetRef ref, AddedFood added) {
-    final day = SelectedDay.calendarDay(added.entry.date);
+    final day = SelectedDay.calendarDay(added.entry.entry.date);
     final remover = ref.read(removeEntryProvider.notifier);
     ref
       ..invalidate(memoryProvider)

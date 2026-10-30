@@ -49,7 +49,7 @@ class _OwnCopySheet extends StatelessWidget {
     }
 
     return SheetFrame(
-      title: entry.food.description,
+      title: entry.foodName ?? '',
       subtitle: context.intl.entryDetail(
         EntryText.serving(context.intl, entry),
         energy,
@@ -70,7 +70,7 @@ class _OwnCopySheet extends StatelessWidget {
                 ),
               ),
               Text(
-                productName(entry.food),
+                productName(entry),
                 style: FujinText.inter15Medium.copyWith(
                   color: context.colors.textPrimary,
                 ),
@@ -85,7 +85,7 @@ class _OwnCopySheet extends StatelessWidget {
                 ),
               ),
               Text(
-                EntryText.macros(context.intl, entry.nutrients),
+                EntryText.macros(context.intl, entry.entry.nutrients),
                 style: FujinText.inter12Medium.copyWith(
                   color: context.colors.textTertiary,
                 ),

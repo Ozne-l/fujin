@@ -1,4 +1,7 @@
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:fujin/data/entries/entry.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
+import 'package:fujin/data/entries/mfp_link.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 part 'add_draft.mapper.dart';
@@ -15,6 +18,7 @@ final class AddDraft with AddDraftMappable {
 
   static const pendingEntryId = '';
   static const oneServing = 1.0;
+  static const _unstoredId = '';
   static const _baseMultiplier = 1.0;
   static const _mealPosition = 0;
 
@@ -41,7 +45,31 @@ final class AddDraft with AddDraftMappable {
     null => null,
   };
 
-  MfpFoodEntry get entry => MfpFoodEntry(
+  LoggedEntry get entry {
+    final written = mfpEntry;
+    return LoggedEntry(
+      entry: Entry.copyOf(
+        written,
+        id: pendingEntryId,
+        mealId: _unstoredId,
+        foodId: _unstoredId,
+        updatedAt: date,
+      ),
+      mealName: mfpMealName,
+      foodName: food.description,
+      brand: food.brandName,
+      mfpFoodId: food.id,
+      mfpLink: MfpLink.of(
+        written,
+        id: _unstoredId,
+        entryId: pendingEntryId,
+        mfpEntryId: _unstoredId,
+        updatedAt: date,
+      ),
+    );
+  }
+
+  MfpFoodEntry get mfpEntry => MfpFoodEntry(
     date: date,
     mealName: mfpMealName,
     mealPosition: _mealPosition,

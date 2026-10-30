@@ -120,14 +120,10 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
   }
 
   Future<RefreshOutcome> refresh() async {
-    final before = state.value;
+    final before = ref.read(mfpDiaryProvider(date)).value?.value;
     final (diary, meals) = await _reread();
     return switch ((before, diary, meals)) {
-      (
-        BothSides(diary: final before),
-        Fetched(value: final after),
-        Fetched(),
-      )
+      (final before?, Fetched(value: final after), Fetched())
           when before == after =>
         RefreshOutcome.nothingNew,
       _ => RefreshOutcome.changed,
@@ -176,14 +172,7 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
     JournalService service,
     Fetch<MfpDiaryDay> diary,
     Fetch<List<EkkloDailyMeal>> meals,
-  ) {
-    if ((diary, meals) case (
-      Fetched(value: final diary),
-      Fetched(value: final meals),
-    )) {
-      service.settleLinks(date, diary: diary, meals: meals);
-    }
-  }
+  ) => service.settleDay(date, diary: diary, meals: meals);
 
   Future<JournalRead> _firstRead(
     JournalService service,
@@ -197,14 +186,13 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
       (Object error) => const <String>[],
     );
     final (diaryFetch, mealsFetch) = (await diaryRead, await mealsRead);
-    final read = service.journalOf(
+    _settle(service, diaryFetch, mealsFetch);
+    return service.journalOf(
       date,
       diary: diaryFetch,
       meals: mealsFetch,
       mealNames: names,
     );
-    _settle(service, diaryFetch, mealsFetch);
-    return read;
   }
 
   static Fetch<T>? _held<T>(AsyncValue<Fetched<T>> side) => switch (side) {

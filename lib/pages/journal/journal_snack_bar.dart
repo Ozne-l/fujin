@@ -34,7 +34,7 @@ abstract final class JournalSnackBar {
       duration: undoWindow,
       content: SnackBarContent(
         glyph: SnackBarGlyph.done,
-        title: context.intl.foodAdded(productName(entry.food)),
+        title: context.intl.foodAdded(productName(entry)),
         detail: switch (added.ekkloWritten) {
           true => context.intl.foodAddedBothSides(entry.mealName),
           false => context.intl.foodAddedMfpOnly(entry.mealName),
@@ -55,7 +55,7 @@ abstract final class JournalSnackBar {
       ),
       RemovalReason.delete => (
         SnackBarGlyph.done,
-        intl.foodDeleted(productName(entry.food)),
+        intl.foodDeleted(productName(entry)),
         switch (done.ekkloRemoved) {
           true => intl.foodDeletedDetail(entry.mealName),
           false => intl.foodDeletedMfpOnlyDetail(entry.mealName),
@@ -75,7 +75,7 @@ abstract final class JournalSnackBar {
     required VoidCallback onRetry,
   }) {
     final intl = context.intl;
-    final food = productName(failed.removal.entry.food);
+    final food = productName(failed.removal.entry);
     final reason = switch (failed.blockedInDev) {
       true => intl.writeBlockedInDev,
       false => JournalText.problemHeadline(intl, failed.problem),
@@ -117,16 +117,16 @@ abstract final class JournalSnackBar {
   }) {
     final intl = context.intl;
     final entry = edited.entry;
-    final food = productName(entry.food);
+    final food = productName(entry);
     final serving = EntryText.serving(intl, entry);
     final (title, detail, action) = switch ((
-      SelectedDay.calendarDay(entry.date) ==
-          SelectedDay.calendarDay(edited.original.date),
+      SelectedDay.calendarDay(entry.entry.date) ==
+          SelectedDay.calendarDay(edited.original.entry.date),
       entry.mealName == edited.original.mealName,
     )) {
       (false, _) => (
         intl.foodMoved(food),
-        intl.foodMovedToDayDetail(entry.mealName, entry.date),
+        intl.foodMovedToDayDetail(entry.mealName, entry.entry.date),
         (intl.foodMovedSee, onSee),
       ),
       (true, false) => (
@@ -164,14 +164,14 @@ abstract final class JournalSnackBar {
     required VoidCallback onRetry,
   }) {
     final intl = context.intl;
-    final kept = switch (edited.link) {
-      final link? => EntryText.linkServing(intl, link),
+    final kept = switch (edited.link?.item) {
+      final item? => EntryText.linkServing(intl, item),
       null => EntryText.serving(intl, edited.original),
     };
     _failed(
       context,
       title: intl.ekkloNotUpdated,
-      detail: intl.ekkloNotUpdatedDetail(productName(edited.entry.food), kept),
+      detail: intl.ekkloNotUpdatedDetail(productName(edited.entry), kept),
       onRetry: onRetry,
     );
   }
@@ -182,7 +182,7 @@ abstract final class JournalSnackBar {
     required VoidCallback onRetry,
   }) => _failed(
     context,
-    title: context.intl.editOldEntryKept(productName(edited.entry.food)),
+    title: context.intl.editOldEntryKept(productName(edited.entry)),
     detail: context.intl.editOldEntryKeptDetail,
     onRetry: onRetry,
   );

@@ -70,7 +70,7 @@ class ReviewCard extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  entry.food.description,
+                  entry.foodName ?? '',
                   style: FujinText.inter16Medium.copyWith(
                     color: context.colors.textPrimary,
                   ),
@@ -150,7 +150,7 @@ class ReviewCard extends ConsumerWidget {
   };
 
   EntryChoices _choices(WidgetRef ref) {
-    final plan = ref.read(sendPlanProvider(planned.entry.date).notifier);
+    final plan = ref.read(sendPlanProvider(planned.entry.entry.date).notifier);
     final entryId = planned.entryId;
     return (
       choose: (candidate) => plan.choose(entryId, candidate),
@@ -171,7 +171,7 @@ class ReviewCard extends ConsumerWidget {
           ReviewReason.skipped ||
           ReviewReason.confirmed:
         ref
-            .read(sendPlanProvider(planned.entry.date).notifier)
+            .read(sendPlanProvider(planned.entry.entry.date).notifier)
             .confirm(planned.entryId);
     }
   }

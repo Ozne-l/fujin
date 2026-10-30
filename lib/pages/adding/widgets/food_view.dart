@@ -5,6 +5,7 @@ import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_outcome.dart';
 import 'package:fujin/domain/adding/ekklo_side.dart';
@@ -63,7 +64,6 @@ import 'package:fujin/pages/sending/sheets/own_copy_sheet.dart';
 import 'package:fujin/pages/sending/sheets/weight_sheet.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 class FoodView extends HookConsumerWidget {
   const FoodView({
@@ -96,7 +96,7 @@ class FoodView extends HookConsumerWidget {
     final editor = ref.read(editWriteProvider.notifier);
     final original = editing?.original;
     final originalJournal = switch (original) {
-      final original? => ref.watch(journalProvider(original.entry.date)),
+      final original? => ref.watch(journalProvider(original.logged.entry.date)),
       null => null,
     };
     final readOnly = switch (originalJournal) {
@@ -113,10 +113,12 @@ class FoodView extends HookConsumerWidget {
     final draft = form.draft;
     final entry = draft.entry;
     final planned = form.planned;
-    final day = switch (ref.watch(journalProvider(draft.date)).value?.diary) {
-      final diary? => DayNutrients.ofEntries([
-        for (final logged in diary.entries)
-          if (original == null || logged.id != original.entry.id) logged,
+    final read = ref.watch(journalProvider(draft.date)).value;
+    final day = switch (read?.diaryMeals) {
+      final meals? => DayNutrients.ofEntries([
+        for (final meal in meals)
+          for (final logged in meal.entries)
+            if (original == null || logged.entry.id != original.entryId) logged,
       ]),
       null => null,
     };
@@ -132,14 +134,14 @@ class FoodView extends HookConsumerWidget {
       (null, EditingFood(newVersion: true, :final original)) => (
         before:
             DayNutrients.ofEntries([
-              original.entry,
+              original.logged,
             ]).amount(Nutrient.kilocalories) /
-            original.entry.servings,
+            original.logged.entry.servings,
         after: _perServing(initial),
         serving: AddText.serving(context.intl, initial.servingSize),
         changed: _changed(
-          original.entry,
-          initial.copyWith(servings: original.entry.servings).entry,
+          original.logged,
+          initial.copyWith(servings: original.logged.entry.servings).entry,
         ),
       ),
       _ => null,
@@ -153,7 +155,7 @@ class FoodView extends HookConsumerWidget {
       ToSend() || null => false,
     };
     final changes = switch (original) {
-      final original? => draftChanges(draft, original.entry),
+      final original? => draftChanges(draft, original.logged),
       null => true,
     };
 
@@ -229,7 +231,7 @@ class FoodView extends HookConsumerWidget {
               current.draft,
               planned,
               entryId: entryId,
-              date: original.entry.date,
+              date: original.logged.entry.date,
             )) {
               case EditFoodChanged(:final after):
                 notifier.reload(after);
@@ -255,7 +257,7 @@ class FoodView extends HookConsumerWidget {
             context,
             removal: EntryRemoval(
               entryId: entryId,
-              entry: original.entry,
+              entry: original.logged,
               reason: RemovalReason.delete,
             ),
             inEkklo: linked,
@@ -359,7 +361,7 @@ class FoodView extends HookConsumerWidget {
       ),
       _ => null,
     };
-    final grams = switch (entryGrams(entry)) {
+    final grams = switch (entryGrams(entry.entry)) {
       final grams? => SendText.grams(context.intl, grams),
       null => EntryText.serving(context.intl, entry),
     };
@@ -377,7 +379,7 @@ class FoodView extends HookConsumerWidget {
             children: [
               switch (original) {
                 final original? => EditFoodHeader(
-                  entry: original.entry,
+                  entry: original.logged,
                   onBack: back,
                 ),
                 null => FlowHeader(
@@ -577,7 +579,7 @@ class FoodView extends HookConsumerWidget {
     draft.copyWith(servings: AddDraft.oneServing).entry,
   ]).amount(Nutrient.kilocalories);
 
-  static Set<Nutrient> _changed(MfpFoodEntry before, MfpFoodEntry after) {
+  static Set<Nutrient> _changed(LoggedEntry before, LoggedEntry after) {
     final was = DayNutrients.ofEntries([before]);
     final now = DayNutrients.ofEntries([after]);
     return {

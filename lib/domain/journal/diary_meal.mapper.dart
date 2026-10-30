@@ -15,7 +15,7 @@ class DiaryMealMapper extends ClassMapperBase<DiaryMeal> {
   static DiaryMealMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = DiaryMealMapper._());
-      MfpFoodEntryMapper.ensureInitialized();
+      LoggedEntryMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -25,8 +25,8 @@ class DiaryMealMapper extends ClassMapperBase<DiaryMeal> {
 
   static String _$name(DiaryMeal v) => v.name;
   static const Field<DiaryMeal, String> _f$name = Field('name', _$name);
-  static List<MfpFoodEntry> _$entries(DiaryMeal v) => v.entries;
-  static const Field<DiaryMeal, List<MfpFoodEntry>> _f$entries = Field(
+  static List<LoggedEntry> _$entries(DiaryMeal v) => v.entries;
+  static const Field<DiaryMeal, List<LoggedEntry>> _f$entries = Field(
     'entries',
     _$entries,
     opt: true,
@@ -106,11 +106,11 @@ abstract class DiaryMealCopyWith<$R, $In extends DiaryMeal, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   ListCopyWith<
     $R,
-    MfpFoodEntry,
-    MfpFoodEntryCopyWith<$R, MfpFoodEntry, MfpFoodEntry>
+    LoggedEntry,
+    LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry>
   >
   get entries;
-  $R call({String? name, List<MfpFoodEntry>? entries});
+  $R call({String? name, List<LoggedEntry>? entries});
   DiaryMealCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -125,8 +125,8 @@ class _DiaryMealCopyWithImpl<$R, $Out>
   @override
   ListCopyWith<
     $R,
-    MfpFoodEntry,
-    MfpFoodEntryCopyWith<$R, MfpFoodEntry, MfpFoodEntry>
+    LoggedEntry,
+    LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry>
   >
   get entries => ListCopyWith(
     $value.entries,
@@ -134,7 +134,7 @@ class _DiaryMealCopyWithImpl<$R, $Out>
     (v) => call(entries: v),
   );
   @override
-  $R call({String? name, List<MfpFoodEntry>? entries}) => $apply(
+  $R call({String? name, List<LoggedEntry>? entries}) => $apply(
     FieldCopyWithData({
       if (name != null) #name: name,
       if (entries != null) #entries: entries,

@@ -1,16 +1,15 @@
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/database/fujin_database.dart';
-import 'package:fujin/data/links/sent_link_repository.dart';
-import 'package:fujin/data/unattended/unattended_item_repository.dart';
+import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_food_service.dart';
 import 'package:fujin/domain/adding/add_outcome.dart';
+import 'package:fujin/domain/adding/entry_writer.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/compared_entry_lookup.dart';
 import 'package:fujin/domain/editing/edit_entry_service.dart';
 import 'package:fujin/domain/editing/remove_entry_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
-import 'package:fujin/domain/sending/send_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -21,7 +20,7 @@ import 'repositories.dart';
 final class WriteServices {
   WriteServices._(
     this.backends,
-    this.links,
+    this.entries,
     this.journal,
     this.adding,
     this.removing,
@@ -44,54 +43,54 @@ final class WriteServices {
       ekkloTokens ?? await backends.ekkloTokenStore(),
       client: httpClient,
     );
-    final links = SentLinkRepository(database);
+    final entries = entriesOf(database);
+    final foods = foodsOf(database);
     final memoryRepository = memoryOf(database);
-    final unattended = UnattendedItemRepository(database);
-    final journal = JournalService(
-      mfp: mfp,
-      ekklo: ekklo,
-      links: links,
-      unattended: unattended,
-      memory: memoryRepository,
+    final journal = journalOver(database, mfp: mfp, ekklo: ekklo);
+    final sending = sendingOver(database, journal: journal, ekklo: ekklo);
+    final writeClock = clock ?? () => now;
+    final writer = EntryWriter(
       database: database,
-      clock: () => now,
-    );
-    final sending = SendService(
-      journal: journal,
-      ekklo: ekklo,
-      memory: memoryRepository,
-      links: links,
-      unattended: unattended,
-      database: database,
-      clock: () => now,
+      foods: foods,
+      meals: mealsOf(database),
+      entries: entries,
+      clock: writeClock,
     );
     return WriteServices._(
       backends,
-      links,
+      entries,
       journal,
       AddFoodService(
         mfp: mfp,
         ekklo: ekklo,
         sending: sending,
         memory: memoryRepository,
-        foods: foodsOf(database),
+        foods: foods,
         recents: recentsOf(database),
-        clock: clock ?? () => now,
+        writer: writer,
+        clock: writeClock,
       ),
-      RemoveEntryService(mfp: mfp, journal: journal, sending: sending),
+      RemoveEntryService(
+        mfp: mfp,
+        journal: journal,
+        sending: sending,
+        entries: entries,
+      ),
       EditEntryService(
         mfp: mfp,
         ekklo: ekklo,
         journal: journal,
         sending: sending,
         memory: memoryRepository,
-        foods: foodsOf(database),
+        foods: foods,
+        entries: entries,
+        writer: writer,
       ),
     );
   }
 
   final FakeBackends backends;
-  final SentLinkRepository links;
+  final EntryRepository entries;
   final JournalService journal;
   final AddFoodService adding;
   final RemoveEntryService removing;

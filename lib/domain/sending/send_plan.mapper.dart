@@ -16,7 +16,7 @@ class SendPlanMapper extends ClassMapperBase<SendPlan> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = SendPlanMapper._());
       PlannedEntryMapper.ensureInitialized();
-      MfpFoodEntryMapper.ensureInitialized();
+      LoggedEntryMapper.ensureInitialized();
       ComparedEntryMapper.ensureInitialized();
     }
     return _instance!;
@@ -34,8 +34,8 @@ class SendPlanMapper extends ClassMapperBase<SendPlan> {
     opt: true,
     def: const [],
   );
-  static List<MfpFoodEntry> _$pending(SendPlan v) => v.pending;
-  static const Field<SendPlan, List<MfpFoodEntry>> _f$pending = Field(
+  static List<LoggedEntry> _$pending(SendPlan v) => v.pending;
+  static const Field<SendPlan, List<LoggedEntry>> _f$pending = Field(
     'pending',
     _$pending,
     opt: true,
@@ -134,8 +134,8 @@ abstract class SendPlanCopyWith<$R, $In extends SendPlan, $Out>
   get entries;
   ListCopyWith<
     $R,
-    MfpFoodEntry,
-    MfpFoodEntryCopyWith<$R, MfpFoodEntry, MfpFoodEntry>
+    LoggedEntry,
+    LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry>
   >
   get pending;
   ListCopyWith<
@@ -147,7 +147,7 @@ abstract class SendPlanCopyWith<$R, $In extends SendPlan, $Out>
   $R call({
     DateTime? date,
     List<PlannedEntry>? entries,
-    List<MfpFoodEntry>? pending,
+    List<LoggedEntry>? pending,
     List<ComparedEntry>? inEkklo,
   });
   SendPlanCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
@@ -175,8 +175,8 @@ class _SendPlanCopyWithImpl<$R, $Out>
   @override
   ListCopyWith<
     $R,
-    MfpFoodEntry,
-    MfpFoodEntryCopyWith<$R, MfpFoodEntry, MfpFoodEntry>
+    LoggedEntry,
+    LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry>
   >
   get pending => ListCopyWith(
     $value.pending,
@@ -198,7 +198,7 @@ class _SendPlanCopyWithImpl<$R, $Out>
   $R call({
     DateTime? date,
     List<PlannedEntry>? entries,
-    List<MfpFoodEntry>? pending,
+    List<LoggedEntry>? pending,
     List<ComparedEntry>? inEkklo,
   }) => $apply(
     FieldCopyWithData({

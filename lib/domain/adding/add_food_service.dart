@@ -1,4 +1,5 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/foods/food_repository.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/memory.dart';
@@ -10,6 +11,7 @@ import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_outcome.dart';
 import 'package:fujin/domain/adding/add_stage.dart';
 import 'package:fujin/domain/adding/added_food.dart';
+import 'package:fujin/domain/adding/entry_writer.dart';
 import 'package:fujin/domain/adding/remembered_serving.dart';
 import 'package:fujin/domain/adding/rescale_planned.dart';
 import 'package:fujin/domain/adding/scan_outcome.dart';
@@ -25,6 +27,7 @@ final class AddFoodService {
     required this._memory,
     required this._foods,
     required this._recents,
+    required this._writer,
     required this._clock,
   });
 
@@ -34,6 +37,7 @@ final class AddFoodService {
   final MemoryRepository _memory;
   final FoodRepository _foods;
   final RecentFoodRepository _recents;
+  final EntryWriter _writer;
   final DateTime Function() _clock;
 
   Future<AddOutcome>? _writing;
@@ -140,11 +144,9 @@ final class AddFoodService {
   Future<PlannedEntry> plan(AddDraft draft, {PlannedEntry? previous}) async {
     final entry = draft.entry;
     return switch (previous) {
-      final previous?
-          when previous.entry.food == entry.food &&
-              previous.entry.servingSize == entry.servingSize =>
+      final previous? when _sameServing(previous.entry, entry) =>
         rescalePlanned(previous, entry, _memory.load()),
-      _ => _sending.planOne(entry, entryId: AddDraft.pendingEntryId),
+      _ => _sending.planOne(entry),
     };
   }
 
@@ -169,7 +171,7 @@ final class AddFoodService {
     void Function(AddStage stage)? onStage,
     String? barcodeToLink,
   ) async {
-    final String entryId;
+    final String mfpEntryId;
     try {
       final current = await _mfp.foods.byId(draft.food.id);
       await _ekklo.meals.forDate(draft.date);
@@ -178,7 +180,7 @@ final class AddFoodService {
         return FoodChanged(before: draft.food, after: current);
       }
       onStage?.call(AddStage.mfp);
-      entryId =
+      mfpEntryId =
           await _mfp.diary.addFood(
             date: draft.date,
             mealName: draft.mfpMealName,
@@ -190,25 +192,38 @@ final class AddFoodService {
     } on Object catch (error) {
       return NotAdded(error);
     }
-    final entry = draft.entry.copyWith(id: entryId);
-    _recents.record(RecentFood.forEntry(entry, addedAt: _clock()));
-    _foods.fill(draft.food);
-    if (barcodeToLink case final barcode?) {
-      _memory.saveBarcodeLink(
-        BarcodeLink(barcode: barcode, mfpFoodId: draft.food.id),
-      );
-    }
+    final stored = _writer.save(
+      draft,
+      entryId: _writer.newEntryId(),
+      mfpEntryId: mfpEntryId,
+      alongside: () {
+        _recents.record(
+          RecentFood.forEntry(draft.mfpEntry, addedAt: _clock()),
+        );
+        _foods.fill(draft.food);
+        if (barcodeToLink case final barcode?) {
+          _memory.saveBarcodeLink(
+            BarcodeLink(barcode: barcode, mfpFoodId: draft.food.id),
+          );
+        }
+      },
+    );
     final added = AddedFood(
-      planned: rescalePlanned(
-        planned,
-        entry,
-        _memory.load(),
-      ).copyWith(entryId: entryId),
+      planned: rescalePlanned(planned, stored, _memory.load()),
       ekkloWritten: false,
     );
     onStage?.call(AddStage.ekklo);
     return _toEkklo(added);
   }
+
+  static bool _sameServing(LoggedEntry before, LoggedEntry after) =>
+      before.mfpFoodId == after.mfpFoodId &&
+      before.foodName == after.foodName &&
+      before.brand == after.brand &&
+      before.mfpLink?.foodVersion == after.mfpLink?.foodVersion &&
+      before.entry.servingValue == after.entry.servingValue &&
+      before.entry.servingUnit == after.entry.servingUnit &&
+      before.entry.nutritionMultiplier == after.entry.nutritionMultiplier;
 
   MfpFood _filled(MfpFood food) {
     _foods.fill(food);

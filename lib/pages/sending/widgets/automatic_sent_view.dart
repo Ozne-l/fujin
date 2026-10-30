@@ -94,7 +94,7 @@ class _ChoiceRow extends ConsumerWidget {
               spacing: FujinSpace.s1,
               children: [
                 Text(
-                  sent.entry.food.description,
+                  sent.entry.foodName ?? '',
                   style: FujinText.inter15Medium.copyWith(
                     color: context.colors.textPrimary,
                   ),
@@ -142,7 +142,7 @@ class _ChoiceRow extends ConsumerWidget {
   }
 
   void _review(BuildContext context, WidgetRef ref) {
-    final kept = ref.read(keptChoicesProvider(sent.entry.date).notifier);
+    final kept = ref.read(keptChoicesProvider(sent.entry.entry.date).notifier);
     final messenger = ScaffoldMessenger.of(context);
     final router = GoRouter.of(context);
     final intl = context.intl;
@@ -204,7 +204,7 @@ class _ChoiceRow extends ConsumerWidget {
         SendFailure.ekkloSession => intl.ekkloSessionExpired,
         SendFailure.mfpSession => intl.mfpSessionExpired,
         SendFailure.blockedInDev => intl.interruptedDev(
-          sent.entry.food.description,
+          sent.entry.foodName ?? '',
         ),
         SendFailure.refused || SendFailure.other => intl.keepFailed,
       };

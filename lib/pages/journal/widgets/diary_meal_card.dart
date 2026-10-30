@@ -55,7 +55,10 @@ class DiaryMealCard extends StatelessWidget {
                   EntryRow(
                     key: ValueKey(entry),
                     entry: entry,
-                    detail: EntryText.macros(context.intl, entry.nutrients),
+                    detail: EntryText.macros(
+                      context.intl,
+                      entry.entry.nutrients,
+                    ),
                   ),
                 ],
               ],

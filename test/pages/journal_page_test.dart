@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/data/goals/goals.dart';
-import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/preferences/fujin_preferences.dart';
 import 'package:fujin/domain/goals/day_goal_state.dart';
 import 'package:fujin/pages/adding/add_search_notifier.dart';
@@ -28,6 +27,8 @@ import '../support/fixtures.dart';
 import '../support/in_memory_preferences.dart';
 import '../support/logged_journal.dart';
 import '../support/pump_fujin.dart';
+import '../support/repositories.dart';
+import '../support/sent_food.dart';
 
 const _space = '\u202f';
 const _souffleStep = Duration(milliseconds: 500);
@@ -271,11 +272,14 @@ void main() {
       entries: [entry('E-1', food: skyr)],
     );
     await pumpFujin(tester, backends, goals: _goals);
-    final links = SentLinkRepository(
+    final entries = entriesOf(
       ProviderScope.containerOf(
         tester.element(find.byType(JournalHeader)),
       ).read(databaseProvider),
-    )..add(link('E-1', 'I-1', food: skyr));
+    );
+    final entryId = entries.findByMfpEntryId('E-1')?.entry.id;
+    if (entryId == null) throw StateError('E-1 was not copied in');
+    entries.linkItem(entryId, ekkloMealId: 'meal-1', ekkloItemId: 'I-1');
     final diaryGate = Completer<void>();
     final mealsGate = Completer<void>();
     backends
@@ -287,12 +291,12 @@ void main() {
     await _pull(tester);
     await tester.pump(_souffleStep);
     await tester.pump(_souffleStep);
-    check(links.forDate(day)).length.equals(1);
+    check(entries.find(entryId)?.ekkloLink?.item).isNotNull();
 
     diaryGate.complete();
     mealsGate.complete();
     await tester.pumpAndSettle();
-    check(links.forDate(day)).length.equals(1);
+    check(entries.find(entryId)?.ekkloLink?.item).isNotNull();
     check(find.byType(FilledButton).evaluate()).isEmpty();
   });
 
@@ -843,7 +847,7 @@ void main() {
           meal('meal-1', [item('I-1')]),
         ],
       ),
-      links: [link('E-1', 'I-1')],
+      sent: [SentFood(entry('E-1'), itemId: 'I-1')],
       goals: _goals,
     );
 
@@ -863,7 +867,7 @@ void main() {
           meal('meal-1', [item('I-1')]),
         ],
       ),
-      links: [link('E-1', 'I-1')],
+      sent: [SentFood(entry('E-1'), itemId: 'I-1')],
       goals: _goals,
     );
 

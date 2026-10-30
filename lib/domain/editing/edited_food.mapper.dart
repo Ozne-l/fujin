@@ -15,9 +15,10 @@ class EditedFoodMapper extends ClassMapperBase<EditedFood> {
   static EditedFoodMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = EditedFoodMapper._());
-      MfpFoodEntryMapper.ensureInitialized();
+      LoggedEntryMapper.ensureInitialized();
+      AddDraftMapper.ensureInitialized();
       PlannedEntryMapper.ensureInitialized();
-      SentLinkMapper.ensureInitialized();
+      EkkloLinkMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -25,17 +26,25 @@ class EditedFoodMapper extends ClassMapperBase<EditedFood> {
   @override
   final String id = 'EditedFood';
 
-  static String _$originalId(EditedFood v) => v.originalId;
-  static const Field<EditedFood, String> _f$originalId = Field(
-    'originalId',
-    _$originalId,
-    key: r'original_id',
-  );
-  static MfpFoodEntry _$original(EditedFood v) => v.original;
-  static const Field<EditedFood, MfpFoodEntry> _f$original = Field(
+  static LoggedEntry _$original(EditedFood v) => v.original;
+  static const Field<EditedFood, LoggedEntry> _f$original = Field(
     'original',
     _$original,
   );
+  static String _$originalMfpEntryId(EditedFood v) => v.originalMfpEntryId;
+  static const Field<EditedFood, String> _f$originalMfpEntryId = Field(
+    'originalMfpEntryId',
+    _$originalMfpEntryId,
+    key: r'original_mfp_entry_id',
+  );
+  static String _$mfpEntryId(EditedFood v) => v.mfpEntryId;
+  static const Field<EditedFood, String> _f$mfpEntryId = Field(
+    'mfpEntryId',
+    _$mfpEntryId,
+    key: r'mfp_entry_id',
+  );
+  static AddDraft _$draft(EditedFood v) => v.draft;
+  static const Field<EditedFood, AddDraft> _f$draft = Field('draft', _$draft);
   static PlannedEntry _$planned(EditedFood v) => v.planned;
   static const Field<EditedFood, PlannedEntry> _f$planned = Field(
     'planned',
@@ -47,8 +56,8 @@ class EditedFoodMapper extends ClassMapperBase<EditedFood> {
     _$ekkloWritten,
     key: r'ekklo_written',
   );
-  static SentLink? _$link(EditedFood v) => v.link;
-  static const Field<EditedFood, SentLink> _f$link = Field(
+  static EkkloLink? _$link(EditedFood v) => v.link;
+  static const Field<EditedFood, EkkloLink> _f$link = Field(
     'link',
     _$link,
     opt: true,
@@ -56,8 +65,10 @@ class EditedFoodMapper extends ClassMapperBase<EditedFood> {
 
   @override
   final MappableFields<EditedFood> fields = const {
-    #originalId: _f$originalId,
     #original: _f$original,
+    #originalMfpEntryId: _f$originalMfpEntryId,
+    #mfpEntryId: _f$mfpEntryId,
+    #draft: _f$draft,
     #planned: _f$planned,
     #ekkloWritten: _f$ekkloWritten,
     #link: _f$link,
@@ -67,8 +78,10 @@ class EditedFoodMapper extends ClassMapperBase<EditedFood> {
 
   static EditedFood _instantiate(DecodingData data) {
     return EditedFood(
-      originalId: data.dec(_f$originalId),
       original: data.dec(_f$original),
+      originalMfpEntryId: data.dec(_f$originalMfpEntryId),
+      mfpEntryId: data.dec(_f$mfpEntryId),
+      draft: data.dec(_f$draft),
       planned: data.dec(_f$planned),
       ekkloWritten: data.dec(_f$ekkloWritten),
       link: data.dec(_f$link),
@@ -135,15 +148,18 @@ extension EditedFoodValueCopy<$R, $Out>
 
 abstract class EditedFoodCopyWith<$R, $In extends EditedFood, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  MfpFoodEntryCopyWith<$R, MfpFoodEntry, MfpFoodEntry> get original;
+  LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get original;
+  AddDraftCopyWith<$R, AddDraft, AddDraft> get draft;
   PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry> get planned;
-  SentLinkCopyWith<$R, SentLink, SentLink>? get link;
+  EkkloLinkCopyWith<$R, EkkloLink, EkkloLink>? get link;
   $R call({
-    String? originalId,
-    MfpFoodEntry? original,
+    LoggedEntry? original,
+    String? originalMfpEntryId,
+    String? mfpEntryId,
+    AddDraft? draft,
     PlannedEntry? planned,
     bool? ekkloWritten,
-    SentLink? link,
+    EkkloLink? link,
   });
   EditedFoodCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -157,25 +173,32 @@ class _EditedFoodCopyWithImpl<$R, $Out>
   late final ClassMapperBase<EditedFood> $mapper =
       EditedFoodMapper.ensureInitialized();
   @override
-  MfpFoodEntryCopyWith<$R, MfpFoodEntry, MfpFoodEntry> get original =>
+  LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get original =>
       $value.original.copyWith.$chain((v) => call(original: v));
+  @override
+  AddDraftCopyWith<$R, AddDraft, AddDraft> get draft =>
+      $value.draft.copyWith.$chain((v) => call(draft: v));
   @override
   PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry> get planned =>
       $value.planned.copyWith.$chain((v) => call(planned: v));
   @override
-  SentLinkCopyWith<$R, SentLink, SentLink>? get link =>
+  EkkloLinkCopyWith<$R, EkkloLink, EkkloLink>? get link =>
       $value.link?.copyWith.$chain((v) => call(link: v));
   @override
   $R call({
-    String? originalId,
-    MfpFoodEntry? original,
+    LoggedEntry? original,
+    String? originalMfpEntryId,
+    String? mfpEntryId,
+    AddDraft? draft,
     PlannedEntry? planned,
     bool? ekkloWritten,
     Object? link = $none,
   }) => $apply(
     FieldCopyWithData({
-      if (originalId != null) #originalId: originalId,
       if (original != null) #original: original,
+      if (originalMfpEntryId != null) #originalMfpEntryId: originalMfpEntryId,
+      if (mfpEntryId != null) #mfpEntryId: mfpEntryId,
+      if (draft != null) #draft: draft,
       if (planned != null) #planned: planned,
       if (ekkloWritten != null) #ekkloWritten: ekkloWritten,
       if (link != $none) #link: link,
@@ -183,8 +206,13 @@ class _EditedFoodCopyWithImpl<$R, $Out>
   );
   @override
   EditedFood $make(CopyWithData data) => EditedFood(
-    originalId: data.get(#originalId, or: $value.originalId),
     original: data.get(#original, or: $value.original),
+    originalMfpEntryId: data.get(
+      #originalMfpEntryId,
+      or: $value.originalMfpEntryId,
+    ),
+    mfpEntryId: data.get(#mfpEntryId, or: $value.mfpEntryId),
+    draft: data.get(#draft, or: $value.draft),
     planned: data.get(#planned, or: $value.planned),
     ekkloWritten: data.get(#ekkloWritten, or: $value.ekkloWritten),
     link: data.get(#link, or: $value.link),

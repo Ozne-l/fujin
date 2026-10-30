@@ -18,16 +18,19 @@ final class FoodRepository {
   final FujinDatabase _database;
   final DateTime Function() _clock;
 
-  String? foodOfMfp(String mfpFoodId) => _foodOfMfp(mfpFoodId)?.id;
-
   String mfpFood(String mfpFoodId, {String? name}) => _database.transaction(
-    () => switch (_foodOfMfp(mfpFoodId)) {
+    () => switch (foodOfMfp(mfpFoodId)) {
       final food? => _described(
         food,
         name: name ?? food.name,
         brand: food.brand,
       ),
-      null => _addMfpFood(mfpFoodId, name: name, brand: null),
+      null => _addMfpFood(
+        mfpFoodId,
+        id: FujinId.at(_now()),
+        name: name,
+        brand: null,
+      ),
     },
   );
 
@@ -36,15 +39,37 @@ final class FoodRepository {
     required String name,
     required String? brand,
   }) => _database.transaction(
-    () => switch (_foodOfMfp(mfpFoodId)) {
+    () => switch (foodOfMfp(mfpFoodId)) {
       final food? => _described(food, name: name, brand: brand),
-      null => _addMfpFood(mfpFoodId, name: name, brand: brand),
+      null => _addMfpFood(
+        mfpFoodId,
+        id: FujinId.at(_now()),
+        name: name,
+        brand: brand,
+      ),
+    },
+  );
+
+  String copiedMfpFood(
+    String mfpFoodId, {
+    required String id,
+    required String? name,
+    required String? brand,
+  }) => _database.transaction(
+    () => switch (foodOfMfp(mfpFoodId)) {
+      final food? when food.name == null => _described(
+        food,
+        name: name,
+        brand: brand,
+      ),
+      final food? => food.id,
+      null => _addMfpFood(mfpFoodId, id: id, name: name, brand: brand),
     },
   );
 
   void fill(MfpFood mfpFood) => _database.transaction(() {
     final now = _now();
-    switch ((_mfpReference(mfpFood.id), _foodOfMfp(mfpFood.id))) {
+    switch ((_mfpReference(mfpFood.id), foodOfMfp(mfpFood.id))) {
       case (final reference?, final food?)
           when reference.version != mfpFood.version || !_hasServings(food.id):
         _softDelete(FujinTable.foodServing, 'food_id = ?', [food.id], now);
@@ -351,12 +376,13 @@ final class FoodRepository {
 
   String _addMfpFood(
     String mfpFoodId, {
+    required String id,
     required String? name,
     required String? brand,
   }) {
     final now = _now();
     final food = Food(
-      id: FujinId.at(now),
+      id: id,
       name: name,
       brand: brand,
       updatedAt: now,
@@ -373,7 +399,7 @@ final class FoodRepository {
     return food.id;
   }
 
-  Food? _foodOfMfp(String mfpFoodId) => switch (_database.select(
+  Food? foodOfMfp(String mfpFoodId) => switch (_database.select(
     'SELECT food.* FROM food '
     'JOIN food_reference mfp ON mfp.food_id = food.id '
     "WHERE mfp.kind = 'mfp' AND mfp.external_id = ? "

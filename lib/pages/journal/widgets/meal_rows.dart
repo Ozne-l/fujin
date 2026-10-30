@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/app/theme/instant_motion.dart';
+import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/l10n/intl_context.dart';
@@ -58,13 +59,13 @@ class MealRows extends HookWidget {
       );
       return _Measured(
         onHeight: (height) {
-          if (compared.entry.id case final id?) heights.value[id] = height;
+          if (compared.entryId case final id?) heights.value[id] = height;
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Divider(),
-            switch (compared.entry.id) {
+            switch (compared.entryId) {
               null => row,
               final id => SwipeRow(
                 key: ValueKey(id),
@@ -100,7 +101,7 @@ class MealRows extends HookWidget {
           children: [
             for (final (index, compared) in entries.indexed)
               Transform.translate(
-                key: ValueKey(compared.entry),
+                key: ValueKey<Object>(compared.entryId ?? compared.logged),
                 offset: Offset(0, running?.shift(index, progress) ?? 0),
                 child: slot(compared),
               ),
@@ -135,8 +136,8 @@ final class _Cascade {
       final id?,
       final before?,
       final height?,
-    ) when !after.any((compared) => compared.entry.id == id)) {
-      final index = before.indexWhere((compared) => compared.entry.id == id);
+    ) when !after.any((compared) => compared.entryId == id)) {
+      final index = before.indexWhere((compared) => compared.entryId == id);
       if (index < 0 || after.isEmpty) return null;
       return _Cascade(
         entryId: id,
@@ -208,10 +209,16 @@ class _EntryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final entry = compared.entry;
+    final entry = compared.logged;
     final detail = switch (compared.status) {
-      ToUpdate(:final link) => EntryText.linkedServing(context.intl, link),
-      InEkklo() || ToSend() => EntryText.macros(context.intl, entry.nutrients),
+      ToUpdate(link: EkkloLink(:final item?)) => EntryText.linkedServing(
+        context.intl,
+        item,
+      ),
+      InEkklo() || ToSend() || ToUpdate() => EntryText.macros(
+        context.intl,
+        entry.entry.nutrients,
+      ),
     };
     final (label, tone, icon) = switch (compared.status) {
       InEkklo() => (context.intl.statusInEkklo, PillTone.validated, null),

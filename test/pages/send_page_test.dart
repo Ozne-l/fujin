@@ -15,6 +15,7 @@ import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
 import '../support/in_memory_preferences.dart';
 import '../support/pump_fujin.dart';
+import '../support/sent_food.dart';
 
 const double _middle = 0.5;
 
@@ -162,7 +163,11 @@ void main() {
         meal('meal-1', [item('I-1')]),
       ],
     );
-    await pumpFujin(tester, backends, links: [link('E-1', 'I-1')]);
+    await pumpFujin(
+      tester,
+      backends,
+      sent: [SentFood(entry('E-2'), itemId: 'I-1')],
+    );
 
     await _tap(tester, 'Mettre à jour 1 aliment dans Ekklo');
     _sees('Envoi terminé');

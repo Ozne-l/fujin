@@ -19,6 +19,7 @@ import '../support/fixtures.dart';
 import '../support/gestures.dart';
 import '../support/phone_brightness.dart';
 import '../support/pump_fujin.dart';
+import '../support/sent_food.dart';
 
 const _space = '\u202f';
 const _versionWithMemory = 2;
@@ -291,9 +292,13 @@ void main() {
     ).equals(1);
   });
 
-  testWidgets('clears the memory but keeps the sent links, so the Journal '
+  testWidgets('clears the memory but keeps the Ekklo links, so the Journal '
       'still shows what is in Ekklo', (tester) async {
-    await pumpFujin(tester, _diary(), links: [link('E-1', 'I-1')]);
+    await pumpFujin(
+      tester,
+      _diary(),
+      sent: [SentFood(entry('E-1'), itemId: 'I-1')],
+    );
     check(_count('1/2 dans Ekklo')).equals(1);
 
     await _tap(tester, 'Réglages');

@@ -73,7 +73,7 @@ class _MatchSheet extends HookConsumerWidget {
     final navigator = Navigator.of(context);
 
     return SheetFrame(
-      title: entry.food.description,
+      title: entry.foodName ?? '',
       subtitle: EntryText.brandedServing(context.intl, entry),
       lead: [_MfpReference(planned: planned)],
       initialQuery: search.query,
@@ -205,7 +205,7 @@ class _MfpReference extends StatelessWidget {
             ],
           ),
           Text(
-            EntryText.macros(context.intl, planned.entry.nutrients),
+            EntryText.macros(context.intl, planned.entry.entry.nutrients),
             style: FujinText.inter12Medium.copyWith(
               color: context.colors.textTertiary,
             ),

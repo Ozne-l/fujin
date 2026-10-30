@@ -146,10 +146,10 @@ class JournalPage extends HookConsumerWidget {
           if (removal.reason == RemovalReason.delete) {
             removed.value = removal.entryId;
           }
-          rereadDayOf(removal.entry.date);
+          rereadDayOf(removal.entry.entry.date);
           JournalSnackBar.removed(context, done);
         case RemoveEntryFailed(:final removal) && final failed:
-          rereadDayOf(removal.entry.date);
+          rereadDayOf(removal.entry.entry.date);
           JournalSnackBar.removeFailed(
             context,
             failed,
@@ -163,13 +163,13 @@ class JournalPage extends HookConsumerWidget {
     });
 
     void remove(ComparedEntry compared) {
-      if (compared.entry.id case final entryId?) {
+      if (compared.entryId case final entryId?) {
         unawaited(
           showRemoveSheet(
             context,
             removal: EntryRemoval(
               entryId: entryId,
-              entry: compared.entry,
+              entry: compared.logged,
               reason: RemovalReason.delete,
             ),
             inEkklo: switch (compared.status) {
@@ -193,17 +193,17 @@ class JournalPage extends HookConsumerWidget {
 
       switch (outcome) {
         case Edited(:final edited):
-          rereadDaysOf([edited.original.date, edited.entry.date]);
+          rereadDaysOf([edited.original.entry.date, edited.entry.entry.date]);
           JournalSnackBar.edited(
             context,
             edited,
             onUndo: () => unawaited(follow((writer) => writer.revert(edited))),
             onSee: () => ref
                 .read(selectedDayProvider.notifier)
-                .select(edited.entry.date),
+                .select(edited.entry.entry.date),
           );
         case EkkloNotUpdated(:final edited):
-          rereadDaysOf([edited.original.date, edited.entry.date]);
+          rereadDaysOf([edited.original.entry.date, edited.entry.entry.date]);
           JournalSnackBar.ekkloNotUpdated(
             context,
             edited,
@@ -211,7 +211,7 @@ class JournalPage extends HookConsumerWidget {
                 unawaited(follow((writer) => writer.retryEkklo(edited))),
           );
         case OldEntryKept(:final edited):
-          rereadDaysOf([edited.original.date, edited.entry.date]);
+          rereadDaysOf([edited.original.entry.date, edited.entry.entry.date]);
           JournalSnackBar.oldEntryKept(
             context,
             edited,
@@ -233,7 +233,7 @@ class JournalPage extends HookConsumerWidget {
     }
 
     Future<void> edit(ComparedEntry compared) async {
-      if (compared.entry.id case final entryId?) {
+      if (compared.entryId case final entryId?) {
         final outcome = await context.push<EditOutcome>(
           FujinRoute.editFood.forEntry(day, entryId),
         );

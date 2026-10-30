@@ -96,7 +96,7 @@ abstract final class AddText {
   static String forServing(AppLocalizations intl, AddDraft draft) {
     final entry = draft.entry;
     final serving = EntryText.serving(intl, entry);
-    return switch (entryGrams(entry)) {
+    return switch (entryGrams(entry.entry)) {
       final grams? when draft.servings != AddDraft.oneServing =>
         intl.addForGrams(
           serving,
@@ -111,9 +111,9 @@ abstract final class AddText {
     PlannedEntry planned,
   ) {
     final entry = planned.entry;
-    final unit = entry.servingSize.unit;
+    final unit = entry.entry.servingUnit;
     final gramUnit = isGramUnit(unit);
-    final ownAmount = switch (entryGrams(entry)) {
+    final ownAmount = switch (entryGrams(entry.entry)) {
       final grams? => SendText.grams(intl, grams),
       null => EntryText.serving(intl, entry),
     };

@@ -15,9 +15,8 @@ class DayComparisonMapper extends ClassMapperBase<DayComparison> {
   static DayComparisonMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = DayComparisonMapper._());
+      DayChangesMapper.ensureInitialized();
       ComparedEntryMapper.ensureInitialized();
-      SentLinkMapper.ensureInitialized();
-      UnattendedItemMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -25,6 +24,11 @@ class DayComparisonMapper extends ClassMapperBase<DayComparison> {
   @override
   final String id = 'DayComparison';
 
+  static DayChanges _$changes(DayComparison v) => v.changes;
+  static const Field<DayComparison, DayChanges> _f$changes = Field(
+    'changes',
+    _$changes,
+  );
   static List<ComparedEntry> _$entries(DayComparison v) => v.entries;
   static const Field<DayComparison, List<ComparedEntry>> _f$entries = Field(
     'entries',
@@ -32,49 +36,19 @@ class DayComparisonMapper extends ClassMapperBase<DayComparison> {
     opt: true,
     def: const [],
   );
-  static List<SentLink> _$linksToAdopt(DayComparison v) => v.linksToAdopt;
-  static const Field<DayComparison, List<SentLink>> _f$linksToAdopt = Field(
-    'linksToAdopt',
-    _$linksToAdopt,
-    key: r'links_to_adopt',
-    opt: true,
-    def: const [],
-  );
-  static List<SentLink> _$linksToDrop(DayComparison v) => v.linksToDrop;
-  static const Field<DayComparison, List<SentLink>> _f$linksToDrop = Field(
-    'linksToDrop',
-    _$linksToDrop,
-    key: r'links_to_drop',
-    opt: true,
-    def: const [],
-  );
-  static List<UnattendedItem> _$unattendedToAdopt(DayComparison v) =>
-      v.unattendedToAdopt;
-  static const Field<DayComparison, List<UnattendedItem>> _f$unattendedToAdopt =
-      Field(
-        'unattendedToAdopt',
-        _$unattendedToAdopt,
-        key: r'unattended_to_adopt',
-        opt: true,
-        def: const [],
-      );
 
   @override
   final MappableFields<DayComparison> fields = const {
+    #changes: _f$changes,
     #entries: _f$entries,
-    #linksToAdopt: _f$linksToAdopt,
-    #linksToDrop: _f$linksToDrop,
-    #unattendedToAdopt: _f$unattendedToAdopt,
   };
   @override
   final bool ignoreNull = true;
 
   static DayComparison _instantiate(DecodingData data) {
     return DayComparison(
+      changes: data.dec(_f$changes),
       entries: data.dec(_f$entries),
-      linksToAdopt: data.dec(_f$linksToAdopt),
-      linksToDrop: data.dec(_f$linksToDrop),
-      unattendedToAdopt: data.dec(_f$unattendedToAdopt),
     );
   }
 
@@ -140,28 +114,14 @@ extension DayComparisonValueCopy<$R, $Out>
 
 abstract class DayComparisonCopyWith<$R, $In extends DayComparison, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
+  DayChangesCopyWith<$R, DayChanges, DayChanges> get changes;
   ListCopyWith<
     $R,
     ComparedEntry,
     ComparedEntryCopyWith<$R, ComparedEntry, ComparedEntry>
   >
   get entries;
-  ListCopyWith<$R, SentLink, SentLinkCopyWith<$R, SentLink, SentLink>>
-  get linksToAdopt;
-  ListCopyWith<$R, SentLink, SentLinkCopyWith<$R, SentLink, SentLink>>
-  get linksToDrop;
-  ListCopyWith<
-    $R,
-    UnattendedItem,
-    UnattendedItemCopyWith<$R, UnattendedItem, UnattendedItem>
-  >
-  get unattendedToAdopt;
-  $R call({
-    List<ComparedEntry>? entries,
-    List<SentLink>? linksToAdopt,
-    List<SentLink>? linksToDrop,
-    List<UnattendedItem>? unattendedToAdopt,
-  });
+  $R call({DayChanges? changes, List<ComparedEntry>? entries});
   DayComparisonCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -174,6 +134,9 @@ class _DayComparisonCopyWithImpl<$R, $Out>
   late final ClassMapperBase<DayComparison> $mapper =
       DayComparisonMapper.ensureInitialized();
   @override
+  DayChangesCopyWith<$R, DayChanges, DayChanges> get changes =>
+      $value.changes.copyWith.$chain((v) => call(changes: v));
+  @override
   ListCopyWith<
     $R,
     ComparedEntry,
@@ -185,53 +148,16 @@ class _DayComparisonCopyWithImpl<$R, $Out>
     (v) => call(entries: v),
   );
   @override
-  ListCopyWith<$R, SentLink, SentLinkCopyWith<$R, SentLink, SentLink>>
-  get linksToAdopt => ListCopyWith(
-    $value.linksToAdopt,
-    (v, t) => v.copyWith.$chain(t),
-    (v) => call(linksToAdopt: v),
-  );
-  @override
-  ListCopyWith<$R, SentLink, SentLinkCopyWith<$R, SentLink, SentLink>>
-  get linksToDrop => ListCopyWith(
-    $value.linksToDrop,
-    (v, t) => v.copyWith.$chain(t),
-    (v) => call(linksToDrop: v),
-  );
-  @override
-  ListCopyWith<
-    $R,
-    UnattendedItem,
-    UnattendedItemCopyWith<$R, UnattendedItem, UnattendedItem>
-  >
-  get unattendedToAdopt => ListCopyWith(
-    $value.unattendedToAdopt,
-    (v, t) => v.copyWith.$chain(t),
-    (v) => call(unattendedToAdopt: v),
-  );
-  @override
-  $R call({
-    List<ComparedEntry>? entries,
-    List<SentLink>? linksToAdopt,
-    List<SentLink>? linksToDrop,
-    List<UnattendedItem>? unattendedToAdopt,
-  }) => $apply(
+  $R call({DayChanges? changes, List<ComparedEntry>? entries}) => $apply(
     FieldCopyWithData({
+      if (changes != null) #changes: changes,
       if (entries != null) #entries: entries,
-      if (linksToAdopt != null) #linksToAdopt: linksToAdopt,
-      if (linksToDrop != null) #linksToDrop: linksToDrop,
-      if (unattendedToAdopt != null) #unattendedToAdopt: unattendedToAdopt,
     }),
   );
   @override
   DayComparison $make(CopyWithData data) => DayComparison(
+    changes: data.get(#changes, or: $value.changes),
     entries: data.get(#entries, or: $value.entries),
-    linksToAdopt: data.get(#linksToAdopt, or: $value.linksToAdopt),
-    linksToDrop: data.get(#linksToDrop, or: $value.linksToDrop),
-    unattendedToAdopt: data.get(
-      #unattendedToAdopt,
-      or: $value.unattendedToAdopt,
-    ),
   );
 
   @override

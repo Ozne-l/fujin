@@ -75,7 +75,7 @@ void main() {
     draft,
     await services.adding.plan(draft),
     entryId: food.entryId,
-    date: food.entry.date,
+    date: food.entry.entry.date,
   );
 
   Iterable<double> ekkloQuantities() => [
@@ -100,16 +100,16 @@ void main() {
         final edited = (outcome as Edited).edited;
         check(edited)
           ..has((it) => it.ekkloWritten, 'Ekklo written').isTrue()
-          ..has((it) => it.entryId, 'entry id').not(
-            (it) => it.equals(food.entryId),
-          );
+          ..has((it) => it.entryId, 'entry id').equals(food.entryId);
         check(backends.entries.single)
-          ..has((it) => it.id, 'id').equals(edited.entryId)
+          ..has((it) => it.id, 'id').equals(edited.mfpEntryId)
           ..has((it) => it.servings, 'servings').equals(2);
         check(ekkloQuantities()).deepEquals([200]);
-        check(
-          services.links.forDate(day).single.mfpEntryId,
-        ).equals(edited.entryId);
+        check(services.entries.find(edited.entryId)).isNotNull()
+          ..has((it) => it.mfpLink?.mfpEntryId, 'MyFitnessPal id').equals(
+            edited.mfpEntryId,
+          )
+          ..has((it) => it.ekkloLink?.item?.servings, 'written').equals(2);
         check(
           (await services.find(edited.entryId, day))?.status,
         ).isA<InEkklo>();
@@ -155,7 +155,7 @@ void main() {
         ]);
         final edited = (outcome as Edited).edited;
         check(backends.entries.single.date).equals(_dayBefore);
-        check(services.links.forDate(day)).isEmpty();
+        check(services.entries.forDate(day).entries).isEmpty();
         check(
           (await services.find(edited.entryId, _dayBefore))?.status,
         ).isA<InEkklo>();
@@ -217,7 +217,9 @@ void main() {
 
       check(outcome).isA<NotEdited>();
       check(services.writes()).deepEquals(['POST ${mfpApiUri.host}']);
-      check(backends.entries.single.id).equals(food.entryId);
+      check(
+        backends.entries.single.id,
+      ).equals(services.entries.find(food.entryId)?.mfpLink?.mfpEntryId);
       check(
         (await services.find(food.entryId, day))?.status,
       ).isA<InEkklo>();
@@ -242,6 +244,26 @@ void main() {
         services.writes().where((write) => write == 'POST ${mfpApiUri.host}'),
       ).length.equals(1);
     });
+
+    test(
+      'keeps the Fūjin id and moves its MyFitnessPal link to the copy',
+      () async {
+        final (services, food) = await added();
+        final before = services.entries.find(food.entryId)?.mfpLink;
+
+        await save(services, food, _draft(servings: 2));
+
+        check(services.entries.entries()).length.equals(1);
+        check(services.entries.forDate(day).entries.single)
+          ..has((it) => it.entry.id, 'Fūjin id').equals(food.entryId)
+          ..has((it) => it.entry.servings, 'servings').equals(2)
+          ..has((it) => it.mfpLink?.id, 'link row').equals(before?.id)
+          ..has(
+            (it) => it.mfpLink?.mfpEntryId,
+            'MyFitnessPal id',
+          ).equals(backends.entries.single.id);
+      },
+    );
   });
 
   group('a save stopped halfway', () {
@@ -259,8 +281,9 @@ void main() {
         check(
           (await services.find(food.entryId, day))?.status,
         ).isA<InEkklo>();
+        final copied = services.entries.findByMfpEntryId(edited.mfpEntryId);
         check(
-          (await services.find(edited.entryId, day))?.status,
+          (await services.find(copied?.entry.id ?? '', day))?.status,
         ).isA<ToSend>();
 
         backends
@@ -275,7 +298,68 @@ void main() {
           'DELETE ${mfpApiUri.host}',
           'PUT ${ekkloUri.host}',
         ]);
-        check(backends.entries.single.id).equals(edited.entryId);
+        check(backends.entries.single.id).equals(edited.mfpEntryId);
+        check(ekkloQuantities()).deepEquals([200]);
+      },
+    );
+
+    test(
+      'finish takes over the copy a read copied in, under the Fūjin id',
+      () async {
+        final (services, food) = await added();
+        backends.mfpRemoveFails = true;
+        final edited =
+            ((await save(services, food, _draft(servings: 2))) as OldEntryKept)
+                .edited;
+        await services.journal.readDay(day);
+        final copied = services.entries.findByMfpEntryId(edited.mfpEntryId);
+        backends.mfpRemoveFails = false;
+
+        final finished = await services.editing.finish(edited);
+
+        check(finished)
+            .isA<Edited>()
+            .has((it) => it.edited.entryId, 'entry id')
+            .equals(food.entryId);
+        check(copied).isNotNull();
+        check(services.entries.find(copied?.entry.id ?? '')).isNull();
+        check(services.entries.forDate(day).entries.single)
+          ..has((it) => it.entry.id, 'Fūjin id').equals(food.entryId)
+          ..has(
+            (it) => it.mfpLink?.mfpEntryId,
+            'MyFitnessPal id',
+          ).equals(edited.mfpEntryId)
+          ..has((it) => it.ekkloLink?.item?.servings, 'written').equals(2);
+      },
+    );
+
+    test(
+      'finish keeps the Fūjin id when a read saw the original gone first',
+      () async {
+        final (services, food) = await added();
+        backends.mfpRemoveFails = true;
+        final edited =
+            ((await save(services, food, _draft(servings: 2))) as OldEntryKept)
+                .edited;
+        backends
+          ..mfpRemoveFails = false
+          ..entries = [
+            for (final entry in backends.entries)
+              if (entry.id == edited.mfpEntryId) entry,
+          ];
+        await services.journal.readDay(day);
+        check(services.entries.find(food.entryId)).isNull();
+
+        final finished = await services.editing.finish(edited);
+
+        check(finished).isA<Edited>();
+        check(services.entries.forDate(day).entries.single)
+          ..has((it) => it.entry.id, 'Fūjin id').equals(food.entryId)
+          ..has(
+            (it) => it.mfpLink?.mfpEntryId,
+            'MyFitnessPal id',
+          ).equals(edited.mfpEntryId)
+          ..has((it) => it.ekkloLink?.item?.servings, 'written').equals(2);
         check(ekkloQuantities()).deepEquals([200]);
       },
     );
@@ -304,8 +388,8 @@ void main() {
         check(services.writes()).deepEquals(['PUT ${ekkloUri.host}']);
         check(ekkloQuantities()).deepEquals([200]);
         check(
-          services.links.forDate(day).single.mfpEntryId,
-        ).equals(edited.entryId);
+          services.entries.find(edited.entryId)?.ekkloLink?.item?.servings,
+        ).equals(2);
       },
     );
   });
@@ -318,8 +402,9 @@ void main() {
     final reverted = await services.editing.revert(edited);
 
     final back = (reverted as Edited).edited;
+    check(back.entryId).equals(food.entryId);
     check(backends.entries.single)
-      ..has((it) => it.id, 'id').equals(back.entryId)
+      ..has((it) => it.id, 'id').equals(back.mfpEntryId)
       ..has((it) => it.servings, 'servings').equals(1.5);
     check(ekkloQuantities()).deepEquals([150]);
     check((await services.find(back.entryId, day))?.status).isA<InEkklo>();
@@ -344,10 +429,10 @@ void main() {
       check(again).isA<Edited>();
       check(services.writes()).deepEquals(['POST ${ekkloUri.host}']);
       check(ekkloQuantities()).deepEquals([150]);
-      check(services.links.forDate(day)).isEmpty();
-      check(
-        services.links.forDate(_dayBefore).single.mfpEntryId,
-      ).equals(edited.entryId);
+      check(services.entries.forDate(day).entries).isEmpty();
+      check(services.entries.forDate(_dayBefore).entries.single)
+        ..has((it) => it.entry.id, 'Fūjin id').equals(edited.entryId)
+        ..has((it) => it.ekkloLink?.item, 'item').isNotNull();
     },
   );
 
@@ -378,18 +463,19 @@ void main() {
       final reverted = await services.editing.revert(edited);
 
       final back = (reverted as Edited).edited;
+      check(back.entryId).equals(food.entryId);
       check(backends.entries.single)
-        ..has((it) => it.id, 'id').equals(back.entryId)
+        ..has((it) => it.id, 'id').equals(back.mfpEntryId)
         ..has((it) => it.date, 'date').equals(day);
       check(ekkloQuantities()).deepEquals([150]);
-      check(services.links.forDate(_dayBefore)).isEmpty();
+      check(services.entries.forDate(_dayBefore).entries).isEmpty();
       check((await services.find(back.entryId, day))?.status).isA<InEkklo>();
     },
   );
 
   test(
-    'pairs the orphan link with the first unlinked rice of the meal when the '
-    'meal holds the same food twice',
+    'keeps the link on the edited entry when the meal holds the same food '
+    'twice',
     () async {
       final (services, food) = await added();
       final unsent = entry(
@@ -404,20 +490,26 @@ void main() {
       final outcome = await save(services, food, _draft(servings: 2));
 
       final edited = (outcome as Edited).edited;
+      final unsentId = services.entries
+          .findByMfpEntryId(unsent.id ?? '')
+          ?.entry
+          .id;
       check(
-        (await services.find(unsent.id ?? '', day))?.status,
-      ).isA<ToUpdate>();
+        (await services.find(unsentId ?? '', day))?.status,
+      ).isA<ToSend>();
       check(
         (await services.find(edited.entryId, day))?.status,
       ).isA<InEkklo>();
-      check(ekkloQuantities()).deepEquals([150, 200]);
+      check(ekkloQuantities()).deepEquals([200]);
     },
   );
 
   group('opening', () {
     test('drafts the logged serving and servings', () async {
       final services = await WriteServices.over(backends, database);
-      final logged = entry('e1', food: rice, servings: 2.5, version: '1');
+      final logged = loggedEntry(
+        entry('e1', food: rice, servings: 2.5, version: '1'),
+      );
 
       final opening = await services.editing.open(logged);
 
@@ -431,7 +523,7 @@ void main() {
       final services = await WriteServices.over(backends, database);
 
       final opening = await services.editing.open(
-        entry('e1', food: rice, version: '0'),
+        loggedEntry(entry('e1', food: rice, version: '0')),
       );
 
       check(opening).isA<OpenedOnNewVersion>();
@@ -440,7 +532,7 @@ void main() {
     test('refuses a food MyFitnessPal does not give back', () async {
       final services = await WriteServices.over(backends, database);
 
-      final opening = await services.editing.open(entry('e1'));
+      final opening = await services.editing.open(loggedEntry(entry('e1')));
 
       check(opening).isA<FoodUnreadable>();
     });
@@ -449,7 +541,7 @@ void main() {
       final services = await WriteServices.over(backends, database);
 
       final opening = await services.editing.open(
-        entry('e1', food: rice, unit: cup, servingValue: 1),
+        loggedEntry(entry('e1', food: rice, unit: cup, servingValue: 1)),
       );
 
       check(opening).isA<ServingMissing>();

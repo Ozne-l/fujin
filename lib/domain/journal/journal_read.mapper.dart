@@ -217,8 +217,8 @@ class MfpOnlyMapper extends SubClassMapperBase<MfpOnly> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = MfpOnlyMapper._());
       JournalReadMapper.ensureInitialized().addSubMapper(_instance!);
-      MfpDiaryDayMapper.ensureInitialized();
       ReadProblemMapper.ensureInitialized();
+      DiaryMealMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -226,8 +226,6 @@ class MfpOnlyMapper extends SubClassMapperBase<MfpOnly> {
   @override
   final String id = 'MfpOnly';
 
-  static MfpDiaryDay _$diary(MfpOnly v) => v.diary;
-  static const Field<MfpOnly, MfpDiaryDay> _f$diary = Field('diary', _$diary);
   static ReadProblem _$ekkloProblem(MfpOnly v) => v.ekkloProblem;
   static const Field<MfpOnly, ReadProblem> _f$ekkloProblem = Field(
     'ekkloProblem',
@@ -240,21 +238,19 @@ class MfpOnlyMapper extends SubClassMapperBase<MfpOnly> {
     _$readAt,
     key: r'read_at',
   );
-  static List<String> _$mealNames(MfpOnly v) => v.mealNames;
-  static const Field<MfpOnly, List<String>> _f$mealNames = Field(
-    'mealNames',
-    _$mealNames,
-    key: r'meal_names',
+  static List<DiaryMeal> _$meals(MfpOnly v) => v.meals;
+  static const Field<MfpOnly, List<DiaryMeal>> _f$meals = Field(
+    'meals',
+    _$meals,
     opt: true,
     def: const [],
   );
 
   @override
   final MappableFields<MfpOnly> fields = const {
-    #diary: _f$diary,
     #ekkloProblem: _f$ekkloProblem,
     #readAt: _f$readAt,
-    #mealNames: _f$mealNames,
+    #meals: _f$meals,
   };
   @override
   final bool ignoreNull = true;
@@ -269,10 +265,9 @@ class MfpOnlyMapper extends SubClassMapperBase<MfpOnly> {
 
   static MfpOnly _instantiate(DecodingData data) {
     return MfpOnly(
-      diary: data.dec(_f$diary),
       ekkloProblem: data.dec(_f$ekkloProblem),
       readAt: data.dec(_f$readAt),
-      mealNames: data.dec(_f$mealNames),
+      meals: data.dec(_f$meals),
     );
   }
 
@@ -333,14 +328,13 @@ extension MfpOnlyValueCopy<$R, $Out> on ObjectCopyWith<$R, MfpOnly, $Out> {
 
 abstract class MfpOnlyCopyWith<$R, $In extends MfpOnly, $Out>
     implements JournalReadCopyWith<$R, $In, $Out> {
-  MfpDiaryDayCopyWith<$R, MfpDiaryDay, MfpDiaryDay> get diary;
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get mealNames;
+  ListCopyWith<$R, DiaryMeal, DiaryMealCopyWith<$R, DiaryMeal, DiaryMeal>>
+  get meals;
   @override
   $R call({
-    MfpDiaryDay? diary,
     ReadProblem? ekkloProblem,
     DateTime? readAt,
-    List<String>? mealNames,
+    List<DiaryMeal>? meals,
   });
   MfpOnlyCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -354,35 +348,29 @@ class _MfpOnlyCopyWithImpl<$R, $Out>
   late final ClassMapperBase<MfpOnly> $mapper =
       MfpOnlyMapper.ensureInitialized();
   @override
-  MfpDiaryDayCopyWith<$R, MfpDiaryDay, MfpDiaryDay> get diary =>
-      $value.diary.copyWith.$chain((v) => call(diary: v));
-  @override
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get mealNames =>
-      ListCopyWith(
-        $value.mealNames,
-        (v, t) => ObjectCopyWith(v, $identity, t),
-        (v) => call(mealNames: v),
-      );
+  ListCopyWith<$R, DiaryMeal, DiaryMealCopyWith<$R, DiaryMeal, DiaryMeal>>
+  get meals => ListCopyWith(
+    $value.meals,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(meals: v),
+  );
   @override
   $R call({
-    MfpDiaryDay? diary,
     ReadProblem? ekkloProblem,
     DateTime? readAt,
-    List<String>? mealNames,
+    List<DiaryMeal>? meals,
   }) => $apply(
     FieldCopyWithData({
-      if (diary != null) #diary: diary,
       if (ekkloProblem != null) #ekkloProblem: ekkloProblem,
       if (readAt != null) #readAt: readAt,
-      if (mealNames != null) #mealNames: mealNames,
+      if (meals != null) #meals: meals,
     }),
   );
   @override
   MfpOnly $make(CopyWithData data) => MfpOnly(
-    diary: data.get(#diary, or: $value.diary),
     ekkloProblem: data.get(#ekkloProblem, or: $value.ekkloProblem),
     readAt: data.get(#readAt, or: $value.readAt),
-    mealNames: data.get(#mealNames, or: $value.mealNames),
+    meals: data.get(#meals, or: $value.meals),
   );
 
   @override

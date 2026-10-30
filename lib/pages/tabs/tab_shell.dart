@@ -49,7 +49,7 @@ class TabShell extends HookConsumerWidget {
       navigationShell.goBranch(FujinTab.journal.index);
       ref
           .read(selectedDayProvider.notifier)
-          .select(SelectedDay.calendarDay(added.entry.date));
+          .select(SelectedDay.calendarDay(added.entry.entry.date));
       AddShortcut.added(context, ref, added);
     }
 
