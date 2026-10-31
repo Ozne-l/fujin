@@ -15,6 +15,7 @@ class AddedFoodMapper extends ClassMapperBase<AddedFood> {
   static AddedFoodMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = AddedFoodMapper._());
+      LoggedEntryMapper.ensureInitialized();
       PlannedEntryMapper.ensureInitialized();
     }
     return _instance!;
@@ -23,19 +24,25 @@ class AddedFoodMapper extends ClassMapperBase<AddedFood> {
   @override
   final String id = 'AddedFood';
 
-  static PlannedEntry _$planned(AddedFood v) => v.planned;
+  static LoggedEntry _$entry(AddedFood v) => v.entry;
+  static const Field<AddedFood, LoggedEntry> _f$entry = Field('entry', _$entry);
+  static PlannedEntry? _$planned(AddedFood v) => v.planned;
   static const Field<AddedFood, PlannedEntry> _f$planned = Field(
     'planned',
     _$planned,
+    opt: true,
   );
 
   @override
-  final MappableFields<AddedFood> fields = const {#planned: _f$planned};
+  final MappableFields<AddedFood> fields = const {
+    #entry: _f$entry,
+    #planned: _f$planned,
+  };
   @override
   final bool ignoreNull = true;
 
   static AddedFood _instantiate(DecodingData data) {
-    return AddedFood(planned: data.dec(_f$planned));
+    return AddedFood(entry: data.dec(_f$entry), planned: data.dec(_f$planned));
   }
 
   @override
@@ -97,8 +104,9 @@ extension AddedFoodValueCopy<$R, $Out> on ObjectCopyWith<$R, AddedFood, $Out> {
 
 abstract class AddedFoodCopyWith<$R, $In extends AddedFood, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry> get planned;
-  $R call({PlannedEntry? planned});
+  LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get entry;
+  PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry>? get planned;
+  $R call({LoggedEntry? entry, PlannedEntry? planned});
   AddedFoodCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -111,14 +119,23 @@ class _AddedFoodCopyWithImpl<$R, $Out>
   late final ClassMapperBase<AddedFood> $mapper =
       AddedFoodMapper.ensureInitialized();
   @override
-  PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry> get planned =>
-      $value.planned.copyWith.$chain((v) => call(planned: v));
+  LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get entry =>
+      $value.entry.copyWith.$chain((v) => call(entry: v));
   @override
-  $R call({PlannedEntry? planned}) =>
-      $apply(FieldCopyWithData({if (planned != null) #planned: planned}));
+  PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry>? get planned =>
+      $value.planned?.copyWith.$chain((v) => call(planned: v));
   @override
-  AddedFood $make(CopyWithData data) =>
-      AddedFood(planned: data.get(#planned, or: $value.planned));
+  $R call({LoggedEntry? entry, Object? planned = $none}) => $apply(
+    FieldCopyWithData({
+      if (entry != null) #entry: entry,
+      if (planned != $none) #planned: planned,
+    }),
+  );
+  @override
+  AddedFood $make(CopyWithData data) => AddedFood(
+    entry: data.get(#entry, or: $value.entry),
+    planned: data.get(#planned, or: $value.planned),
+  );
 
   @override
   AddedFoodCopyWith<$R2, AddedFood, $Out2> $chain<$R2, $Out2>(

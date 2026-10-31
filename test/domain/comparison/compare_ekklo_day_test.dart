@@ -5,6 +5,7 @@ import 'package:fujin/data/entries/day_changes.dart';
 import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/data/entries/linked_item.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
+import 'package:fujin/data/entries/mfp_link.dart';
 import 'package:fujin/data/entries/stored_day.dart';
 import 'package:fujin/data/entries/unattended_expectation.dart';
 import 'package:fujin/data/memory/meal_mapping.dart';
@@ -23,10 +24,11 @@ DayComparison compare(
   List<LoggedEntry> entries,
   List<EkkloDailyMeal> meals, {
   List<LoggedEntry> deleted = const [],
+  List<LoggedEntry> owed = const [],
   Memory remembered = memory,
 }) => compareEkkloDay(
   DayDraft.of(
-    StoredDay(entries: entries, deleted: deleted),
+    StoredDay(entries: entries, deleted: deleted, owed: owed),
     date: day,
   ),
   meals: meals,
@@ -390,6 +392,32 @@ void main() {
   });
 
   group('an orphan link', () {
+    test('is never the link of a deletion MyFitnessPal still owes', () {
+      final deleted = deletedIn('e-1', 'I-1');
+      final owed = deleted.copyWith(
+        mfpLink: MfpLink.of(
+          entry('mfp-1'),
+          id: 'l-1',
+          entryId: 'e-1',
+          mfpEntryId: 'mfp-1',
+          updatedAt: now,
+        ),
+      );
+
+      final result = compare(
+        [stored('e-2', servings: 1.5)],
+        [
+          meal('meal-1', [item('I-1')]),
+        ],
+        deleted: [owed],
+        owed: [owed],
+      );
+
+      check(statusesOf(result)).deepEquals([const ToSend()]);
+      check(result.changes).equals(changes());
+      check(result.leaving.single.entry.id).equals('e-1');
+    });
+
     test('turns the same food in the same meal into a quantity update', () {
       final orphan = deletedIn('e-1', 'I-1');
 

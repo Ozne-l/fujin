@@ -1,20 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/app/theme/instant_motion.dart';
 import 'package:fujin/data/connectors/connector.dart';
-import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/entries/mfp_write.dart';
-import 'package:fujin/domain/comparison/compared_entry.dart';
-import 'package:fujin/domain/comparison/entry_status.dart';
-import 'package:fujin/domain/comparison/mfp_status.dart';
 import 'package:fujin/l10n/intl_context.dart';
-import 'package:fujin/pages/common/entry_text.dart';
-import 'package:fujin/pages/common/pill_tone.dart';
-import 'package:fujin/pages/common/status_pill.dart';
 import 'package:fujin/pages/journal/background_write_notifier.dart';
 import 'package:fujin/pages/journal/widgets/connector_pill.dart';
 import 'package:fujin/pages/journal/widgets/entry_row.dart';
@@ -23,29 +17,47 @@ import 'package:fujin/pages/journal/writer_state_ids.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:motor/motor.dart';
 
-class MealRows extends HookWidget {
+class MealRows<T extends Object> extends HookWidget {
   const MealRows({
     required this.entries,
     required this.leaving,
+    required this.idOf,
+    required this.rowOf,
     required this.groupTag,
     required this.removable,
     required this.removedEntryId,
     required this.onOpen,
     required this.onRemove,
+    this.ekklo = true,
     super.key,
   });
 
-  final List<ComparedEntry> entries;
+  final List<T> entries;
   final List<LoggedEntry> leaving;
+  final String? Function(T entry) idOf;
+  final Widget Function(T entry) rowOf;
   final Object groupTag;
   final bool removable;
   final String? removedEntryId;
-  final ValueChanged<ComparedEntry> onOpen;
-  final ValueChanged<ComparedEntry> onRemove;
+  final ValueChanged<T> onOpen;
+  final ValueChanged<T> onRemove;
+  final bool ekklo;
+
+  static List<LoggedEntry> shown(
+    List<LoggedEntry> leaving,
+    Set<String> removals,
+  ) => [
+    for (final logged in leaving)
+      if (MfpWrite.of(logged) is MfpDeletion ||
+          removals.contains(logged.entry.id))
+        logged,
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final lines = _Line.merged(entries, leaving);
+    final lines = _Line.merged<T>([
+      for (final entry in entries) _Live(entry, idOf(entry)),
+    ], leaving);
     final ids = [for (final line in lines) line.entryId];
     final heights = useRef(<String, double>{});
     final previous = usePrevious(ids);
@@ -64,12 +76,12 @@ class MealRows extends HookWidget {
     final running = cascade.value;
     final start = generation.value - 1;
 
-    Widget slot(_Line line) {
+    Widget slot(_Line<T> line) {
       final row = Padding(
         padding: const EdgeInsets.symmetric(vertical: FujinSpace.s3),
         child: switch (line) {
-          _Live(:final compared) => _EntryRow(compared),
-          _Leaving(:final logged) => _LeavingRow(logged),
+          _Live(:final entry) => rowOf(entry),
+          _Leaving(:final logged) => _LeavingRow(logged, ekklo: ekklo),
         },
       );
       return _Measured(
@@ -81,21 +93,18 @@ class MealRows extends HookWidget {
           children: [
             const Divider(),
             switch (line) {
-              _Live(
-                compared: ComparedEntry(entryId: final id?) && final compared,
-              ) =>
-                SwipeRow(
-                  key: ValueKey(id),
-                  groupTag: groupTag,
-                  enabled: removable,
-                  label: context.intl.rowDelete,
-                  onRemove: () => onRemove(compared),
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () => onOpen(compared),
-                    child: row,
-                  ),
+              _Live(:final entry, entryId: final id?) => SwipeRow(
+                key: ValueKey(id),
+                groupTag: groupTag,
+                enabled: removable,
+                label: context.intl.rowDelete,
+                onRemove: () => onRemove(entry),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => onOpen(entry),
+                  child: row,
                 ),
+              ),
               _Live() || _Leaving() => row,
             },
           ],
@@ -220,27 +229,27 @@ class _RenderMeasured extends RenderProxyBox {
   }
 }
 
-sealed class _Line {
+sealed class _Line<T extends Object> {
   const _Line();
 
-  static List<_Line> merged(
-    List<ComparedEntry> entries,
+  static List<_Line<T>> merged<T extends Object>(
+    List<_Live<T>> live,
     List<LoggedEntry> leaving,
   ) {
-    final lines = <_Line>[];
+    final lines = <_Line<T>>[];
     var next = 0;
-    for (final compared in entries) {
-      if (compared.entryId case final id?) {
+    for (final line in live) {
+      if (line.entryId case final id?) {
         while (next < leaving.length &&
             leaving[next].entry.id.compareTo(id) < 0) {
-          lines.add(_Leaving(leaving[next++]));
+          lines.add(_Leaving<T>(leaving[next++]));
         }
       }
-      lines.add(_Live(compared));
+      lines.add(line);
     }
     return [
       ...lines,
-      for (final logged in leaving.skip(next)) _Leaving(logged),
+      for (final logged in leaving.skip(next)) _Leaving<T>(logged),
     ];
   }
 
@@ -249,19 +258,19 @@ sealed class _Line {
   Object get key;
 }
 
-final class _Live extends _Line {
-  const _Live(this.compared);
+final class _Live<T extends Object> extends _Line<T> {
+  const _Live(this.entry, this.entryId);
 
-  final ComparedEntry compared;
-
-  @override
-  String? get entryId => compared.entryId;
+  final T entry;
 
   @override
-  Object get key => compared.entryId ?? compared.logged;
+  final String? entryId;
+
+  @override
+  Object get key => entryId ?? entry;
 }
 
-final class _Leaving extends _Line {
+final class _Leaving<T extends Object> extends _Line<T> {
   const _Leaving(this.logged);
 
   final LoggedEntry logged;
@@ -273,81 +282,21 @@ final class _Leaving extends _Line {
   Object get key => logged.entry.id;
 }
 
-class _EntryRow extends ConsumerWidget {
-  const _EntryRow(this.compared);
-
-  final ComparedEntry compared;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final entry = compared.logged;
-    final id = entry.entry.id;
-    final (:mfpFailed, :failed, :sending) = ref.watch(
-      backgroundWriteProvider.select(
-        (state) => (
-          mfpFailed: state.mfpFailedIds.contains(id),
-          failed: state.failedIds.contains(id),
-          sending: state.ekkloSendIds.contains(id),
-        ),
-      ),
-    );
-    final detail = switch (compared.status) {
-      ToUpdate(link: EkkloLink(:final item?)) => EntryText.linkedServing(
-        context.intl,
-        item,
-      ),
-      InEkklo() || ToSend() || ToUpdate() => EntryText.macros(
-        context.intl,
-        entry.entry.nutrients,
-      ),
-    };
-    final status = switch ((compared.status, sending)) {
-      (ToSend() || ToUpdate(), true) => ConnectorPill(
-        connector: Connector.ekklo,
-        failed: failed,
-      ),
-      (InEkklo(), _) => StatusPill(
-        label: context.intl.statusInEkklo,
-        tone: PillTone.validated,
-      ),
-      (ToSend(), false) => StatusPill(
-        label: context.intl.statusToSend,
-        tone: PillTone.attention,
-      ),
-      (ToUpdate(), false) => StatusPill(
-        label: context.intl.statusToUpdate,
-        tone: PillTone.info,
-        icon: Icons.refresh,
-      ),
-    };
-    return EntryRow(
-      entry: entry,
-      detail: detail,
-      pills: [
-        if (compared.mfp case final mfp?)
-          ConnectorPill(
-            connector: Connector.mfp,
-            failed: mfp is MfpFailed || mfpFailed,
-          ),
-        status,
-      ],
-    );
-  }
-}
-
 class _LeavingRow extends ConsumerWidget {
-  const _LeavingRow(this.logged);
+  const _LeavingRow(this.logged, {required this.ekklo});
 
   final LoggedEntry logged;
+  final bool ekklo;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final id = logged.entry.id;
+    final environment = ref.watch(appEnvironmentProvider);
     final (:mfpFailed, :failed, :removing) = ref.watch(
       backgroundWriteProvider.select(
         (state) => (
-          mfpFailed: state.mfpFailedIds.contains(id),
-          failed: state.failedIds.contains(id),
+          mfpFailed: state.mfpFailedIds(environment).contains(id),
+          failed: state.failedIds(environment).contains(id),
           removing: state.ekkloRemovalIds.contains(id),
         ),
       ),
@@ -359,7 +308,8 @@ class _LeavingRow extends ConsumerWidget {
       pills: [
         if (MfpWrite.of(logged) case MfpDeletion())
           ConnectorPill(connector: Connector.mfp, failed: mfpFailed),
-        if (removing) ConnectorPill(connector: Connector.ekklo, failed: failed),
+        if (ekklo && removing)
+          ConnectorPill(connector: Connector.ekklo, failed: failed),
       ],
     );
   }

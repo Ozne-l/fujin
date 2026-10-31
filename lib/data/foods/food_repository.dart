@@ -78,6 +78,7 @@ final class FoodRepository {
             name: mfpFood.description,
             brand: mfpFood.brandName,
             nutrients: FoodNutrients.ofMfp(mfpFood.nutrients),
+            verified: mfpFood.verified ?? food.verified,
             updatedAt: now,
           ),
         );
@@ -98,10 +99,26 @@ final class FoodRepository {
             ).toMap(),
           );
         }
+      case (_?, final food?)
+          when mfpFood.verified != null && mfpFood.verified != food.verified:
+        _saveFood(food.copyWith(verified: mfpFood.verified, updatedAt: now));
       case _:
         return;
     }
   });
+
+  MfpFood? onPhone(String mfpFoodId) => _phoneCopies(
+    _database.select(
+      '$_versionedMfpFoods AND mfp.external_id = ?',
+      [mfpFoodId],
+    ),
+  ).firstOrNull;
+
+  List<MfpFood> onPhoneFoods() => _phoneCopies(
+    _database.select(
+      '$_versionedMfpFoods ORDER BY food.name, mfp.external_id',
+    ),
+  );
 
   List<MatchedFood> matches() => [
     for (final row in _database.select(
@@ -439,6 +456,47 @@ final class FoodRepository {
         _ => null,
       };
 
+  List<MfpFood> _phoneCopies(Iterable<Map<String, Object?>> rows) => [
+    for (final row in rows)
+      if ((row[_mfpFoodId], row[_mfpFoodVersion]) case (
+        final String mfpFoodId,
+        final String version,
+      ))
+        ?_phoneCopy(
+          FoodMapper.fromMap(row),
+          mfpFoodId: mfpFoodId,
+          version: version,
+        ),
+  ];
+
+  MfpFood? _phoneCopy(
+    Food food, {
+    required String mfpFoodId,
+    required String version,
+  }) => switch ((food.name, _servingSizes(food.id))) {
+    (final name?, final servings)
+        when servings.isNotEmpty && food.nutrients != const FoodNutrients() =>
+      MfpFood(
+        id: mfpFoodId,
+        version: version,
+        description: name,
+        brandName: food.brand,
+        verified: food.verified,
+        servingSizes: servings,
+        nutrients: food.nutrients.toMfp(),
+      ),
+    _ => null,
+  };
+
+  List<MfpServingSize> _servingSizes(String foodId) => [
+    for (final row in _database.select(
+      'SELECT * FROM food_serving '
+      'WHERE food_id = ? AND deleted_at IS NULL ORDER BY position, id',
+      [foodId],
+    ))
+      FoodServingMapper.fromMap(row).toMfp(),
+  ];
+
   bool _hasServings(String foodId) => _database.select(
     'SELECT 1 FROM food_serving WHERE food_id = ? AND deleted_at IS NULL',
     [foodId],
@@ -488,4 +546,12 @@ final class FoodRepository {
 
   static const _id = 'id';
   static const _mfpFoodId = 'mfp_food_id';
+  static const _mfpFoodVersion = 'mfp_food_version';
+  static const _versionedMfpFoods =
+      'SELECT food.*, mfp.external_id AS mfp_food_id, '
+      'mfp.version AS mfp_food_version '
+      'FROM food '
+      'JOIN food_reference mfp ON mfp.food_id = food.id '
+      "AND mfp.kind = 'mfp' AND mfp.deleted_at IS NULL "
+      'WHERE mfp.version IS NOT NULL AND food.deleted_at IS NULL';
 }

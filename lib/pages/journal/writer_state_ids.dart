@@ -1,7 +1,9 @@
+import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/domain/writing/ekklo_job.dart';
 import 'package:fujin/domain/writing/write_failure.dart';
 import 'package:fujin/domain/writing/writer_state.dart';
+import 'package:fujin/pages/sending/send_failure.dart';
 
 extension WriterStateIds on WriterState {
   String? get _currentId => switch (this) {
@@ -9,19 +11,24 @@ extension WriterStateIds on WriterState {
     WriterRunning() || WriterIdle() => null,
   };
 
-  Set<String> get mfpFailedIds => {
+  Iterable<WriteFailure> _stopped(AppEnvironment environment) => [
     for (final failure in failures)
-      if (failure.entryId != _currentId)
-        if (switch (failure) {
-          MfpNotWritten() => true,
-          EkkloNotWritten(:final logged) => MfpWrite.of(logged) != null,
-        })
-          failure.entryId,
+      if (failure.entryId != _currentId &&
+          SendFailure.of(failure.error, environment) != SendFailure.network)
+        failure,
+  ];
+
+  Set<String> mfpFailedIds(AppEnvironment environment) => {
+    for (final failure in _stopped(environment))
+      if (switch (failure) {
+        MfpNotWritten() => true,
+        EkkloNotWritten(:final logged) => MfpWrite.of(logged) != null,
+      })
+        failure.entryId,
   };
 
-  Set<String> get failedIds => {
-    for (final failure in failures)
-      if (failure.entryId != _currentId) failure.entryId,
+  Set<String> failedIds(AppEnvironment environment) => {
+    for (final failure in _stopped(environment)) failure.entryId,
   };
 
   Set<String> get ekkloSendIds => {

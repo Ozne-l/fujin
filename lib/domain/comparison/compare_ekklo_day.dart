@@ -110,10 +110,15 @@ DayComparison compareEkkloDay(
     }
   }
 
+  final owed = {
+    for (final logged in day.owed)
+      if (MfpWrite.of(logged) case MfpDeletion()) logged.entry.id,
+  };
   for (final logged in day.deleted) {
     if (logged.ekkloLink case EkkloLink(item: final item?) && final link) {
       if (placements[item.ekkloItemId] case final placement?) {
         claimed.add(item.ekkloItemId);
+        if (owed.contains(logged.entry.id)) continue;
         orphans.add((
           deleted: logged,
           link: link,
@@ -199,7 +204,7 @@ DayComparison compareEkkloDay(
     }
   }
 
-  final kept = {for (final orphan in orphans) orphan.deleted.entry.id};
+  final kept = {...owed, for (final orphan in orphans) orphan.deleted.entry.id};
   final settled = day.copyWith(
     entries: entries,
     deleted: [
@@ -223,5 +228,6 @@ DayComparison compareEkkloDay(
     ],
     leaving: settled.leaving,
     changes: settled.changes,
+    replaced: day.replaced,
   );
 }

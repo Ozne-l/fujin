@@ -109,7 +109,7 @@ void main() {
         final added = await services.add(_draft(_basmati));
 
         check(added)
-          ..has((it) => it.planned.sends, 'sends').isTrue()
+          ..has((it) => it.planned?.sends, 'sends').equals(true)
           ..has((it) => it.entry.mealName, 'meal').equals(lunch)
           ..has((it) => it.entry.mfpLink, 'link').isNull();
 
@@ -488,6 +488,92 @@ void main() {
         ..has((it) => it.servings, 'servings').equals(2)
         ..has((it) => it.mfpMealName, 'meal').equals(breakfast)
         ..has((it) => it.entry.entry.nutrients.energyValue, 'kcal').equals(128);
+    });
+  });
+
+  group('offline', () {
+    final rememberedRice = memory.matches.firstWhere(
+      (food) => food.mfpFoodId == rice,
+    );
+
+    test('reopens a recent food from its copy on the phone', () async {
+      final services = await writeServices();
+      await services.add(_draft(_skyr, serving: _onePot, servings: 2));
+      await services.settle();
+      backends.mfpReachable = false;
+
+      final draft = await services.adding.reopen(
+        services.adding.recents().single,
+        mfpMealName: breakfast,
+        date: day,
+      );
+
+      check(draft).isNotNull()
+        ..has((it) => it.food.id, 'food').equals(skyr)
+        ..has((it) => it.food.version, 'version').equals(_skyr.version)
+        ..has((it) => it.servingSize, 'serving').equals(_onePot)
+        ..has((it) => it.servings, 'servings').equals(2)
+        ..has((it) => it.entry.entry.nutrients.energyValue, 'kcal').equals(128);
+    });
+
+    test('opens a remembered food from its copy on the phone', () async {
+      final services = await writeServices();
+      await services.adding.openRemembered(
+        rememberedRice,
+        mfpMealName: lunch,
+        date: day,
+      );
+      backends.mfpReachable = false;
+
+      final draft = await services.adding.openRemembered(
+        rememberedRice,
+        mfpMealName: lunch,
+        date: day,
+      );
+
+      check(draft).isNotNull()
+        ..has((it) => it.food.description, 'name').equals(_basmati.description)
+        ..has((it) => it.food.brandName, 'brand').equals(_basmati.brandName)
+        ..has((it) => it.servingSize, 'serving').equals(_hundredGrams);
+    });
+
+    test('keeps the offline error for a food not on the phone', () async {
+      final services = await writeServices();
+      backends.mfpReachable = false;
+
+      await check(
+        services.adding.openRemembered(
+          rememberedRice,
+          mfpMealName: lunch,
+          date: day,
+        ),
+      ).throws<MfpNetworkException>();
+    });
+
+    test('offers the food linked to a scanned code from the phone', () async {
+      final services = await writeServices();
+      await services.add(_draft(_skyr, serving: _onePot));
+      memoryRepository.saveBarcodeLink(
+        const BarcodeLink(barcode: _barcode, mfpFoodId: skyr),
+      );
+      backends.mfpReachable = false;
+
+      check(await services.adding.scan(_barcode)).isA<ScanFound>()
+        ..has((it) => it.food.id, 'food').equals(skyr)
+        ..has((it) => it.remembered, 'remembered').isTrue();
+    });
+
+    test('lists the foods on the phone matching a search', () async {
+      final services = await writeServices();
+      await services.add(_draft(_skyr, serving: _onePot));
+      await services.add(_draft(_basmati));
+
+      check([
+        for (final food in services.adding.onPhone('riz')) food.id,
+      ]).deepEquals([rice]);
+      check([
+        for (final food in services.adding.onPhone('isey')) food.id,
+      ]).deepEquals([skyr]);
     });
   });
 

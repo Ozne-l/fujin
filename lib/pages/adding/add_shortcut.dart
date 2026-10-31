@@ -25,24 +25,20 @@ abstract final class AddShortcut {
   );
 
   static Future<String?> mealOfNow(BuildContext context, WidgetRef ref) async {
-    final List<String> names;
-    try {
-      names = await ref.read(mealNamesProvider.future);
-    } on Object catch (error) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showProblem(context.intl, ReadProblem.of(error));
-      }
-      return null;
-    }
+    final (names, problem) = await ref
+        .read(mealNamesProvider.future)
+        .then<(List<String>, ReadProblem)>(
+          (names) => (names, ReadProblem.unknown),
+          onError: (Object error) => (
+            ref.read(journalServiceProvider).storedMealNames(),
+            ReadProblem.of(error),
+          ),
+        );
     if (!context.mounted) return null;
     final meal =
         mealOfTheHour(names, ref.read(clockProvider)()) ?? names.firstOrNull;
     if (meal == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showProblem(context.intl, ReadProblem.unknown);
+      ScaffoldMessenger.of(context).showProblem(context.intl, problem);
     }
     return meal;
   }

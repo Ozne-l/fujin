@@ -333,9 +333,7 @@ void main() {
     check(backends.entries).isEmpty();
   });
 
-  testWidgets('greys out Ajouter while adding is not possible', (
-    tester,
-  ) async {
+  testWidgets('keeps Ajouter usable offline', (tester) async {
     final backends = _riceBackends();
     await pumpFujin(tester, backends, units: memory.units);
     backends
@@ -354,7 +352,7 @@ void main() {
       tester
           .widget<FilledButton>(find.widgetWithText(FilledButton, 'Ajouter'))
           .onPressed,
-    ).isNull();
+    ).isNotNull();
   });
 
   testWidgets('closes the open meal menu on back and stays on Mémoire', (

@@ -33,10 +33,16 @@ class EditedFoodMapper extends ClassMapperBase<EditedFood> {
   );
   static AddDraft _$draft(EditedFood v) => v.draft;
   static const Field<EditedFood, AddDraft> _f$draft = Field('draft', _$draft);
-  static PlannedEntry _$planned(EditedFood v) => v.planned;
+  static LoggedEntry _$entry(EditedFood v) => v.entry;
+  static const Field<EditedFood, LoggedEntry> _f$entry = Field(
+    'entry',
+    _$entry,
+  );
+  static PlannedEntry? _$planned(EditedFood v) => v.planned;
   static const Field<EditedFood, PlannedEntry> _f$planned = Field(
     'planned',
     _$planned,
+    opt: true,
   );
   static EkkloLink? _$link(EditedFood v) => v.link;
   static const Field<EditedFood, EkkloLink> _f$link = Field(
@@ -49,6 +55,7 @@ class EditedFoodMapper extends ClassMapperBase<EditedFood> {
   final MappableFields<EditedFood> fields = const {
     #original: _f$original,
     #draft: _f$draft,
+    #entry: _f$entry,
     #planned: _f$planned,
     #link: _f$link,
   };
@@ -59,6 +66,7 @@ class EditedFoodMapper extends ClassMapperBase<EditedFood> {
     return EditedFood(
       original: data.dec(_f$original),
       draft: data.dec(_f$draft),
+      entry: data.dec(_f$entry),
       planned: data.dec(_f$planned),
       link: data.dec(_f$link),
     );
@@ -126,11 +134,13 @@ abstract class EditedFoodCopyWith<$R, $In extends EditedFood, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get original;
   AddDraftCopyWith<$R, AddDraft, AddDraft> get draft;
-  PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry> get planned;
+  LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get entry;
+  PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry>? get planned;
   EkkloLinkCopyWith<$R, EkkloLink, EkkloLink>? get link;
   $R call({
     LoggedEntry? original,
     AddDraft? draft,
+    LoggedEntry? entry,
     PlannedEntry? planned,
     EkkloLink? link,
   });
@@ -152,8 +162,11 @@ class _EditedFoodCopyWithImpl<$R, $Out>
   AddDraftCopyWith<$R, AddDraft, AddDraft> get draft =>
       $value.draft.copyWith.$chain((v) => call(draft: v));
   @override
-  PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry> get planned =>
-      $value.planned.copyWith.$chain((v) => call(planned: v));
+  LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get entry =>
+      $value.entry.copyWith.$chain((v) => call(entry: v));
+  @override
+  PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry>? get planned =>
+      $value.planned?.copyWith.$chain((v) => call(planned: v));
   @override
   EkkloLinkCopyWith<$R, EkkloLink, EkkloLink>? get link =>
       $value.link?.copyWith.$chain((v) => call(link: v));
@@ -161,13 +174,15 @@ class _EditedFoodCopyWithImpl<$R, $Out>
   $R call({
     LoggedEntry? original,
     AddDraft? draft,
-    PlannedEntry? planned,
+    LoggedEntry? entry,
+    Object? planned = $none,
     Object? link = $none,
   }) => $apply(
     FieldCopyWithData({
       if (original != null) #original: original,
       if (draft != null) #draft: draft,
-      if (planned != null) #planned: planned,
+      if (entry != null) #entry: entry,
+      if (planned != $none) #planned: planned,
       if (link != $none) #link: link,
     }),
   );
@@ -175,6 +190,7 @@ class _EditedFoodCopyWithImpl<$R, $Out>
   EditedFood $make(CopyWithData data) => EditedFood(
     original: data.get(#original, or: $value.original),
     draft: data.get(#draft, or: $value.draft),
+    entry: data.get(#entry, or: $value.entry),
     planned: data.get(#planned, or: $value.planned),
     link: data.get(#link, or: $value.link),
   );

@@ -7,6 +7,7 @@ import 'package:fujin/data/foods/food_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/entry_writer.dart';
+import 'package:fujin/domain/adding/known_food.dart';
 import 'package:fujin/domain/adding/rescale_planned.dart';
 import 'package:fujin/domain/editing/edit_opening.dart';
 import 'package:fujin/domain/editing/edit_outcome.dart';
@@ -38,7 +39,7 @@ final class EditEntryService {
 
   Future<EditOpening> open(LoggedEntry logged) async {
     final food = switch (logged.mfpFoodId) {
-      final mfpFoodId? => await _mfp.foods.byId(mfpFoodId),
+      final mfpFoodId? => await knownFood(mfpFoodId, mfp: _mfp, foods: _foods),
       null => null,
     };
     if (food == null) return const FoodUnreadable();
@@ -53,7 +54,7 @@ final class EditEntryService {
 
   EditOutcome save(
     AddDraft draft,
-    PlannedEntry planned, {
+    PlannedEntry? planned, {
     required String entryId,
   }) {
     final original = _entries.find(entryId);
@@ -64,7 +65,11 @@ final class EditEntryService {
     final edited = EditedFood(
       original: original,
       draft: draft,
-      planned: rescalePlanned(planned, stored, _memory.load()),
+      entry: stored,
+      planned: switch (planned) {
+        final planned? => rescalePlanned(planned, stored, _memory.load()),
+        null => null,
+      },
       link: original.ekkloLink,
     );
     _holdSend(entryId, edited.planned, link: original.ekkloLink);
@@ -75,15 +80,14 @@ final class EditEntryService {
   Future<EditOutcome> revert(EditedFood edited) async {
     final stored = _writer.put(edited.original.entry);
     final replanned = await _replanned(stored);
-    if (replanned case final planned?) {
-      _holdSend(stored.entry.id, planned, link: stored.ekkloLink);
-    }
+    _holdSend(stored.entry.id, replanned, link: stored.ekkloLink);
     unawaited(_background.run());
     return Edited(
       EditedFood(
         original: edited.entry,
         draft: edited.draft,
-        planned: replanned ?? edited.planned.copyWith(entry: stored),
+        entry: stored,
+        planned: replanned,
         link: stored.ekkloLink,
       ),
     );
@@ -103,16 +107,16 @@ final class EditEntryService {
 
   void _holdSend(
     String entryId,
-    PlannedEntry planned, {
+    PlannedEntry? planned, {
     required EkkloLink? link,
   }) {
     final held = _background.heldFor(entryId) is EkkloSend;
-    switch ((planned.sends, link?.item != null || held)) {
-      case (true, true):
+    switch ((planned, link?.item != null || held)) {
+      case (final planned?, true) when planned.sends:
         _background.hold(entryId, EkkloSend(planned));
-      case (false, _) when held:
+      case (_, _) when held:
         _background.drop(entryId);
-      case (true, false) || (false, _):
+      case (_, _):
         break;
     }
   }

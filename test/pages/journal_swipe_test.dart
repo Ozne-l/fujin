@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/connectors/connector.dart';
 import 'package:fujin/pages/common/row_action.dart';
+import 'package:fujin/pages/journal/widgets/connector_pill.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
@@ -277,15 +279,57 @@ void main() {
     check(find.text('Modifier l’aliment').evaluate()).length.equals(1);
   });
 
-  testWidgets('uncovers nothing offline', (tester) async {
+  testWidgets('deletes a food offline and writes the removal once back', (
+    tester,
+  ) async {
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
     final backends = _backends();
     await _pump(tester, backends);
     await LoggedJournal.goOffline(tester, backends, showing: _row);
     check(find.text('Dans Ekklo').evaluate()).isEmpty();
 
-    await _drag(tester, _row, 0.5);
+    await _drag(tester, _row, 0.8);
+    await tester.tap(find.text(_confirm));
+    await tester.pumpAndSettle();
 
-    check(find.text(_action).hitTestable().evaluate()).isEmpty();
+    check(find.text('Riz basmati supprimé').evaluate()).length.equals(1);
+    check(find.text(_deletedInFujin).evaluate()).length.equals(1);
+    check(find.text(_mfpNotWritten).evaluate()).isEmpty();
+    check(
+      find
+          .byWidgetPredicate(
+            (widget) =>
+                widget is ConnectorPill && widget.connector == Connector.ekklo,
+          )
+          .evaluate(),
+    ).isEmpty();
+    check(
+      backends.entries.map((entry) => entry.id),
+    ).contains(LoggedJournal.basmatiId);
+
+    backends
+      ..mfpReachable = true
+      ..ekkloReachable = true
+      ..requests.clear();
+    await tester.fling(
+      find.byType(CustomScrollView),
+      const Offset(0, 2000),
+      1000,
+    );
+    await tester.pumpAndSettle();
+    await tester.fling(
+      find.byType(CustomScrollView),
+      const Offset(0, 400),
+      1000,
+    );
+    await tester.pumpAndSettle();
+
+    check(
+      _deletes(backends),
+    ).deepEquals([ekkloUri.host, mfpApiUri.host]);
+    check(find.text(_row).evaluate()).isEmpty();
   });
 
   testWidgets('opens the sheet from the Supprimer semantics action', (

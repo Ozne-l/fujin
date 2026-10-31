@@ -5,9 +5,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/domain/adding/added_food.dart';
-import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/editing/edit_outcome.dart';
 import 'package:fujin/domain/journal/journal_read.dart';
@@ -32,6 +32,7 @@ import 'package:fujin/pages/journal/refresh_outcome.dart';
 import 'package:fujin/pages/journal/removal_reason.dart';
 import 'package:fujin/pages/journal/remove_entry_notifier.dart';
 import 'package:fujin/pages/journal/remove_entry_state.dart';
+import 'package:fujin/pages/journal/replaced_notifier.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:fujin/pages/journal/widgets/day_detail_sheet.dart';
 import 'package:fujin/pages/journal/widgets/day_summary_card.dart';
@@ -43,6 +44,7 @@ import 'package:fujin/pages/journal/widgets/loading_meal_card.dart';
 import 'package:fujin/pages/journal/widgets/loading_summary_card.dart';
 import 'package:fujin/pages/journal/widgets/meal_card.dart';
 import 'package:fujin/pages/journal/widgets/remove_sheet.dart';
+import 'package:fujin/pages/journal/widgets/stored_meal_card.dart';
 import 'package:fujin/pages/journal/widgets/swipe_row.dart';
 import 'package:fujin/pages/journal/widgets/week_band.dart';
 import 'package:fujin/pages/memory/memory_notifier.dart';
@@ -70,15 +72,14 @@ class JournalPage extends HookConsumerWidget {
     final scrolled = useValueNotifier(_top);
     final offline = switch (journal) {
       AsyncValue(:final error?) => ReadProblem.of(error) == ReadProblem.offline,
-      AsyncValue(value: MfpOnly(ekkloProblem: ReadProblem.offline)) => true,
+      AsyncValue(value: FujinOnly()) => true,
       _ => false,
     };
 
     useOnAppLifecycleStateChange((previous, current) {
       switch (current) {
         case AppLifecycleState.resumed:
-          ref.read(backgroundWriteProvider.notifier).run();
-          unawaited(notifier.reload(thenWrite: false));
+          unawaited(notifier.reload());
         case AppLifecycleState.detached ||
             AppLifecycleState.inactive ||
             AppLifecycleState.hidden ||
@@ -91,6 +92,21 @@ class JournalPage extends HookConsumerWidget {
       scheduleMicrotask(() => unawaited(notifier.revalidate()));
       return null;
     }, [day]);
+
+    useEffect(() {
+      bool? connected;
+      final network = ref.read(connectivityProvider).listen((now) {
+        if ((connected, now) case (false, true)) {
+          unawaited(
+            ref
+                .read(journalProvider(ref.read(selectedDayProvider)).notifier)
+                .reload(),
+          );
+        }
+        connected = now;
+      });
+      return network.cancel;
+    }, const []);
 
     useEffect(() {
       final retrying = switch ((offline, lifecycle)) {
@@ -145,60 +161,57 @@ class JournalPage extends HookConsumerWidget {
 
     void rereadDayOf(DateTime date) => rereadDaysOf([date]);
 
-    ref.listen(removeEntryProvider, (previous, next) {
-      switch (next) {
-        case RemoveEntryDone(:final removal) && final done:
-          if (removal.reason == RemovalReason.delete) {
-            removed.value = removal.entryId;
-          }
-          rereadDayOf(removal.entry.entry.date);
-          JournalSnackBar.removed(context, done);
-        case RemoveEntryIdle():
-          break;
-      }
-    });
-
-    ref.listen(backgroundWriteProvider, (previous, next) {
-      if ((previous, next) case (
-        WriterRunning(current: final written?),
-        _,
-      ) when next is! WriterRunning || next.current != written) {
-        rereadDaysOf([
-          written.entry.date,
-          if (written.mfpLink case final link?) link.date,
-        ]);
-      }
-      if ((previous, next) case (
-        WriterRunning(),
-        WriterIdle(:final failures),
-      )) {
-        JournalSnackBar.notWritten(
-          context,
-          failures,
-          ref.read(appEnvironmentProvider),
-          onRetry: ref.read(backgroundWriteProvider.notifier).run,
-        );
-      }
-    });
-
-    void remove(ComparedEntry compared) {
-      if (compared.entryId case final entryId?) {
-        unawaited(
-          showRemoveSheet(
+    ref
+      ..listen(removeEntryProvider, (previous, next) {
+        switch (next) {
+          case RemoveEntryDone(:final removal) && final done:
+            if (removal.reason == RemovalReason.delete) {
+              removed.value = removal.entryId;
+            }
+            rereadDayOf(removal.entry.entry.date);
+            JournalSnackBar.removed(context, done);
+          case RemoveEntryIdle():
+            break;
+        }
+      })
+      ..listen(replacedProvider, (previous, next) {
+        JournalSnackBar.replaced(context, next);
+      })
+      ..listen(backgroundWriteProvider, (previous, next) {
+        if ((previous, next) case (
+          WriterRunning(current: final written?),
+          _,
+        ) when next is! WriterRunning || next.current != written) {
+          rereadDaysOf([
+            written.entry.date,
+            if (written.mfpLink case final link?) link.date,
+          ]);
+        }
+        if ((previous, next) case (
+          WriterRunning(),
+          WriterIdle(:final failures, :final replaced),
+        )) {
+          JournalSnackBar.replaced(context, replaced);
+          JournalSnackBar.notWritten(
             context,
-            removal: EntryRemoval(
-              entryId: entryId,
-              entry: compared.logged,
-              reason: RemovalReason.delete,
-            ),
-            inEkklo: switch (compared.status) {
-              InEkklo() || ToUpdate() => true,
-              ToSend() => false,
-            },
-          ),
-        );
-      }
-    }
+            failures,
+            ref.read(appEnvironmentProvider),
+            onRetry: ref.read(backgroundWriteProvider.notifier).run,
+          );
+        }
+      });
+
+    void remove(LoggedEntry logged, {required bool inEkklo}) => unawaited(
+      showRemoveSheet(
+        context,
+        removal: EntryRemoval(
+          entryId: logged.entry.id,
+          entry: logged,
+          reason: RemovalReason.delete,
+        ),
+        inEkklo: inEkklo,
+      ),
+    );
 
     void settleEdit(EditOutcome outcome) {
       Future<void> follow(Future<EditOutcome> write) async {
@@ -229,13 +242,11 @@ class JournalPage extends HookConsumerWidget {
       }
     }
 
-    Future<void> edit(ComparedEntry compared) async {
-      if (compared.entryId case final entryId?) {
-        final outcome = await context.push<EditOutcome>(
-          FujinRoute.editFood.forEntry(day, entryId),
-        );
-        if (outcome != null && context.mounted) settleEdit(outcome);
-      }
+    Future<void> edit(String entryId) async {
+      final outcome = await context.push<EditOutcome>(
+        FujinRoute.editFood.forEntry(day, entryId),
+      );
+      if (outcome != null && context.mounted) settleEdit(outcome);
     }
 
     Future<void> add(String meal) async {
@@ -366,11 +377,43 @@ class JournalPage extends HookConsumerWidget {
                             groupTag: day.date,
                             removable: removable,
                             removedEntryId: removed.value,
-                            onOpen: (compared) => unawaited(edit(compared)),
-                            onRemove: remove,
+                            onOpen: (compared) {
+                              if (compared.entryId case final entryId?) {
+                                unawaited(edit(entryId));
+                              }
+                            },
+                            onRemove: (compared) => remove(
+                              compared.logged,
+                              inEkklo: switch (compared.status) {
+                                InEkklo() || ToUpdate() => true,
+                                ToSend() => false,
+                              },
+                            ),
                           ),
                       ]),
                     ],
+                    AsyncValue(value: FujinOnly(:final meals) && final read) =>
+                      [
+                        ...problem(ReadProblem.offline),
+                        summary(read, stale: false),
+                        ..._meals(context, [
+                          for (final meal in meals)
+                            StoredMealCard(
+                              key: ValueKey((day, meal.name)),
+                              meal: meal,
+                              onAdd: () => unawaited(add(meal.name)),
+                              groupTag: day,
+                              removable: removable,
+                              removedEntryId: removed.value,
+                              onOpen: (logged) =>
+                                  unawaited(edit(logged.entry.id)),
+                              onRemove: (logged) => remove(
+                                logged,
+                                inEkklo: logged.ekkloLink?.item != null,
+                              ),
+                            ),
+                        ]),
+                      ],
                     AsyncValue(value: MfpOnly() && final read) => [
                       ...problem(read.ekkloProblem),
                       summary(read, stale: false),

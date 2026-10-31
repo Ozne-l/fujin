@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/entries/mfp_link.dart';
@@ -8,6 +9,8 @@ import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/entry_writer.dart';
 import 'package:fujin/domain/adding/rescale_planned.dart';
+import 'package:fujin/domain/comparison/replacement.dart';
+import 'package:fujin/domain/comparison/replacing_row.dart';
 import 'package:fujin/domain/comparison/written_row.dart';
 import 'package:fujin/domain/journal/same_day.dart';
 import 'package:fujin/domain/sending/own_copy_renewal.dart';
@@ -15,7 +18,9 @@ import 'package:fujin/domain/sending/plan_entry.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/domain/sending/send_service.dart';
+import 'package:fujin/domain/writing/derived_send.dart';
 import 'package:fujin/domain/writing/ekklo_job.dart';
+import 'package:fujin/domain/writing/network_down.dart';
 import 'package:fujin/domain/writing/write_failure.dart';
 import 'package:fujin/domain/writing/writer_state.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
@@ -37,6 +42,7 @@ final class BackgroundWriter {
 
   final _states = StreamController<WriterState>.broadcast();
   final Map<String, EkkloJob> _held = {};
+  final List<Replacement> _replaced = [];
   WriterState _state = const WriterIdle();
   Future<void>? _running;
   bool _again = false;
@@ -72,6 +78,7 @@ final class BackgroundWriter {
   }
 
   Future<void> _once() async {
+    _replaced.clear();
     final failures = {
       for (final failure in _state.failures) failure.entryId: failure,
     };
@@ -85,6 +92,9 @@ final class BackgroundWriter {
         final logged = _entries.findAny(id);
         _emit(WriterRunning(current: logged, failures: [...failures.values]));
         switch (await _write(id, logged)) {
+          case final failure? when networkDown(failure.error):
+            failures[id] = failure;
+            return;
           case final failure?:
             failures[id] = failure;
           case null:
@@ -92,7 +102,9 @@ final class BackgroundWriter {
         }
       }
     } finally {
-      _emit(WriterIdle(failures: [...failures.values]));
+      _emit(
+        WriterIdle(failures: [...failures.values], replaced: [..._replaced]),
+      );
     }
   }
 
@@ -142,8 +154,26 @@ final class BackgroundWriter {
         null => throw StateError('Food ${logged.mfpFoodId} is unreadable'),
       };
       final diary = (await _mfp.diary.forDate(date)).entries;
+      final written = writtenRow(
+        logged,
+        diary,
+        _entries.heldMfpEntryIds(date),
+      )?.id;
+      final original = switch (edit) {
+        MfpEdit(:final link) => await _original(
+          logged,
+          _entries.findAny(id)?.mfpLink ?? link,
+          written: written,
+          replaced: (moved) => ReplacedEdit(logged, before: moved),
+          diary: switch (sameDay(link.date, date)) {
+            true => diary,
+            false => null,
+          },
+        ),
+        null => null,
+      };
       final mfpEntryId =
-          writtenRow(logged, diary, _entries.heldMfpEntryIds(date))?.id ??
+          written ??
           await _mfp.diary.addFood(
             date: draft.date,
             mealName: draft.mfpMealName,
@@ -152,42 +182,84 @@ final class BackgroundWriter {
             servings: draft.servings,
           ) ??
           (throw StateError('MyFitnessPal returned no entry id'));
-      if (edit case MfpEdit(:final link)) {
-        final original = switch (sameDay(link.date, date)) {
-          true => diary,
-          false => (await _mfp.diary.forDate(link.date)).entries,
-        };
-        if (original.any((row) => row.id == link.mfpEntryId)) {
-          await _mfp.diary.remove(link.mfpEntryId);
-        }
+      if (original case final original?) {
+        await _mfp.diary.remove(original);
       }
       _writer.linkWritten(id, written: draft, mfpEntryId: mfpEntryId);
     } on Object catch (error) {
       return MfpNotWritten(logged, error);
     }
+    _derive(id);
     return _job(logged);
+  }
+
+  void _derive(String id) {
+    if ((_held[id], _entries.find(id)) case (null, final stored?)) {
+      if (derivedSend(stored, _memory.load()) case final planned?) {
+        hold(id, EkkloSend(planned));
+      }
+    }
   }
 
   Future<WriteFailure?> _deleted(LoggedEntry logged, MfpLink link) async {
     final id = logged.entry.id;
-    if (_held[id] case final EkkloRemoval removal) {
+    final held = _held[id];
+    final ekkloLink = switch (held) {
+      EkkloRemoval(:final link) => link,
+      EkkloSend() || null => logged.ekkloLink,
+    };
+    if (ekkloLink case EkkloLink(item: _?)) {
       try {
-        await _sending.removeLinked(removal.link);
+        await _sending.removeLinked(ekkloLink);
       } on Object catch (error) {
         return EkkloNotWritten(logged, error);
       }
-      _done(id, removal);
     }
+    if (held case final EkkloRemoval removal) _done(id, removal);
     try {
-      final diary = (await _mfp.diary.forDate(link.date)).entries;
-      if (diary.any((row) => row.id == link.mfpEntryId)) {
-        await _mfp.diary.remove(link.mfpEntryId);
+      if (await _original(
+            logged,
+            _entries.findAny(id)?.mfpLink ?? link,
+            replaced: (_) => ReplacedDeletion(logged),
+          )
+          case final original?) {
+        await _mfp.diary.remove(original);
       }
       _entries.unlinkMfp(id);
     } on Object catch (error) {
       return MfpNotWritten(logged, error);
     }
     return _dropped(id);
+  }
+
+  Future<String?> _original(
+    LoggedEntry logged,
+    MfpLink link, {
+    required Replacement Function(MfpLink moved) replaced,
+    List<MfpFoodEntry>? diary,
+    String? written,
+  }) async {
+    final rows = diary ?? (await _mfp.diary.forDate(link.date)).entries;
+    if (rows.any((row) => row.id == link.mfpEntryId)) return link.mfpEntryId;
+    final row = replacingRowAnyMeal(
+      link,
+      mfpFoodId: logged.mfpFoodId,
+      diary: rows,
+      held: {..._entries.heldMfpEntryIds(link.date), ?written},
+    );
+    if (row case MfpFoodEntry(id: final rowId?)) {
+      final moved = MfpLink.of(
+        row,
+        id: link.id,
+        entryId: link.entryId,
+        mfpEntryId: rowId,
+        updatedAt: link.updatedAt,
+      );
+      _entries.saveLink(moved);
+      _replaced.add(replaced(moved));
+      return rowId;
+    }
+    return null;
   }
 
   Future<WriteFailure?> _job(LoggedEntry logged) async {

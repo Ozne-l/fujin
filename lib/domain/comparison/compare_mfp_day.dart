@@ -6,6 +6,8 @@ import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/data/foods/food.dart';
 import 'package:fujin/domain/comparison/day_catalog.dart';
 import 'package:fujin/domain/comparison/day_draft.dart';
+import 'package:fujin/domain/comparison/replacement.dart';
+import 'package:fujin/domain/comparison/replacing_row.dart';
 import 'package:fujin/domain/comparison/written_row.dart';
 import 'package:fujin/domain/journal/same_day.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
@@ -127,12 +129,79 @@ DayDraft compareMfpDay(
       );
     }
   }
+  final editCopies = <String, MfpFoodEntry>{};
   for (final logged in byId) {
     if ((MfpWrite.of(logged), writtenRow(logged, diary, held)) case (
       MfpEdit(),
-      MfpFoodEntry(id: final mfpEntryId?),
+      MfpFoodEntry(id: final mfpEntryId?) && final row,
     )) {
       held.add(mfpEntryId);
+      editCopies[logged.entry.id] = row;
+    }
+  }
+
+  bool gone(MfpLink link) =>
+      !fresh(link) && !inDiary.containsKey(link.mfpEntryId);
+  final editsGone = [
+    for (final logged in byId)
+      if ((MfpWrite.of(logged), logged.mfpLink) case (
+        MfpEdit(),
+        final link?,
+      ) when gone(link) && sameDay(link.date, logged.entry.date))
+        logged,
+  ];
+  final deletionsGone = [
+    for (final logged in [
+      ...day.owed,
+    ]..sort((first, second) => first.entry.id.compareTo(second.entry.id)))
+      if ((MfpWrite.of(logged), logged.mfpLink) case (
+        MfpDeletion(),
+        final link?,
+      ) when gone(link))
+        logged,
+  ];
+  MfpLink movedTo(MfpLink link, MfpFoodEntry row, String mfpEntryId) =>
+      MfpLink.of(
+        row,
+        id: link.id,
+        entryId: link.entryId,
+        mfpEntryId: mfpEntryId,
+        updatedAt: link.updatedAt,
+      );
+  final moved = <String, MfpLink>{
+    for (final logged in editsGone)
+      if ((logged.mfpLink, editCopies[logged.entry.id]) case (
+        final link?,
+        MfpFoodEntry(id: final mfpEntryId?) && final row,
+      ))
+        logged.entry.id: movedTo(link, row, mfpEntryId),
+  };
+  for (final candidates in [editsGone, deletionsGone]) {
+    for (final sameMeal in const [true, false]) {
+      for (final logged in candidates) {
+        final link = logged.mfpLink;
+        if (link == null || moved.containsKey(logged.entry.id)) {
+          continue;
+        }
+        final row = replacingRow(
+          link,
+          mfpFoodId: logged.mfpFoodId,
+          diary: diary,
+          held: held,
+          sameMeal: sameMeal,
+        );
+        if (row case MfpFoodEntry(id: final mfpEntryId?)) {
+          held.add(mfpEntryId);
+          moved[logged.entry.id] = movedTo(link, row, mfpEntryId);
+        }
+      }
+    }
+  }
+
+  final replaced = <Replacement>[];
+  void replacedEdit(LoggedEntry logged, MfpLink before) {
+    if (MfpWrite.of(logged) case MfpEdit()) {
+      replaced.add(ReplacedEdit(logged, before: before));
     }
   }
 
@@ -157,19 +226,27 @@ DayDraft compareMfpDay(
       logged.ekkloLink,
     )) {
       case (MfpEdit(), final row?, _):
-        entries.add(
-          logged.copyWith(
-            mfpLink: MfpLink.of(
-              row,
-              id: link.id,
-              entryId: link.entryId,
-              mfpEntryId: link.mfpEntryId,
-              updatedAt: link.updatedAt,
-            ),
-          ),
+        final refreshed = MfpLink.of(
+          row,
+          id: link.id,
+          entryId: link.entryId,
+          mfpEntryId: link.mfpEntryId,
+          updatedAt: link.updatedAt,
         );
+        final kept = logged.copyWith(mfpLink: refreshed);
+        entries.add(kept);
+        if (!_sameWrite(refreshed, link)) {
+          replacedEdit(kept, refreshed);
+        }
       case (MfpEdit(), null, _):
-        entries.add(logged.copyWith(mfpLink: null));
+        switch (moved[logged.entry.id]) {
+          case final link?:
+            final kept = logged.copyWith(mfpLink: link);
+            entries.add(kept);
+            replacedEdit(kept, link);
+          case null:
+            entries.add(logged.copyWith(mfpLink: null));
+        }
       case (_, final row?, _):
         entries.add(updated(logged, link, row));
       case (_, null, _?):
@@ -183,15 +260,19 @@ DayDraft compareMfpDay(
         continue;
     }
   }
-  final owed = [
-    for (final logged in day.owed)
-      switch (logged.mfpLink) {
-        final link?
-            when !fresh(link) && !inDiary.containsKey(link.mfpEntryId) =>
-          logged.copyWith(mfpLink: null),
-        _ => logged,
-      },
-  ];
+  final owed = <LoggedEntry>[];
+  for (final logged in day.owed) {
+    switch ((logged.mfpLink, moved[logged.entry.id])) {
+      case (_, final link?):
+        final kept = logged.copyWith(mfpLink: link);
+        owed.add(kept);
+        replaced.add(ReplacedDeletion(kept));
+      case (final link?, null) when gone(link):
+        owed.add(logged.copyWith(mfpLink: null));
+      case _:
+        owed.add(logged);
+    }
+  }
   final unstored = <LoggedEntry>[];
   for (final entry in diary) {
     switch (entry.id) {
@@ -228,5 +309,14 @@ DayDraft compareMfpDay(
     meals: catalog.meals,
     plannedEntryIds: const {},
     pendingLinks: const [],
+    replaced: [...day.replaced, ...replaced],
   );
 }
+
+bool _sameWrite(MfpLink first, MfpLink second) =>
+    sameDay(first.date, second.date) &&
+    first.mealName == second.mealName &&
+    first.foodId == second.foodId &&
+    first.servings == second.servings &&
+    first.servingValue == second.servingValue &&
+    first.servingUnit == second.servingUnit;

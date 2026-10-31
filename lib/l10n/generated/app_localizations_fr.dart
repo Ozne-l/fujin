@@ -1680,6 +1680,16 @@ class AppLocalizationsFr extends AppLocalizations {
       'La recherche reprendra au retour du réseau. Tes récents restent là.';
 
   @override
+  String get addOfflineSearchDetail =>
+      'La recherche dans MyFitnessPal a besoin du réseau.';
+
+  @override
+  String get addOnPhoneFoods => 'DÉJÀ DANS FŪJIN';
+
+  @override
+  String get addMfpOffline => 'hors ligne';
+
+  @override
   String get addServerTitle => 'MyFitnessPal ne répond pas';
 
   @override
@@ -1785,6 +1795,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get addRemembered => 'mémorisé';
 
   @override
+  String get addEkkloWaits => 'à vérifier à l’envoi';
+
+  @override
   String addFoundAutomatically(double percent) {
     final intl.NumberFormat percentNumberFormat =
         intl.NumberFormat.decimalPatternDigits(
@@ -1826,6 +1839,9 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get addWriteOrder =>
       'Écrit d’abord dans MyFitnessPal, puis dans Ekklo.';
+
+  @override
+  String get addToMfpOnly => 'Ajouter à MFP';
 
   @override
   String get addToBoth => 'Ajouter à MFP et Ekklo';
@@ -2137,10 +2153,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get editOffline =>
-      'Hors ligne : modifier ou supprimer attendra le réseau.';
-
-  @override
   String get editMfpSessionExpired =>
       'Session MyFitnessPal expirée : modifier ou supprimer attendra la reconnexion.';
 
@@ -2255,6 +2267,30 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get entryDeletedInFujin => 'Supprimé dans Fūjin';
+
+  @override
+  String get replacedTitle => 'Remplacé dans MyFitnessPal';
+
+  @override
+  String replacedChange(String food, String before, String after) {
+    return '$food : $before → $after';
+  }
+
+  @override
+  String replacedDeletion(String food) {
+    return '$food supprimé dans Fūjin';
+  }
+
+  @override
+  String replacedMany(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count aliments gardés comme dans Fūjin',
+      one: '1 aliment gardé comme dans Fūjin',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get writeBlockedInDev =>

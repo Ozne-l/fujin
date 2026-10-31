@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -37,6 +38,12 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final clockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
+
+final connectivityProvider = Provider<Stream<bool>>(
+  (ref) => Connectivity().onConnectivityChanged.map(
+    (results) => results.any((result) => result != ConnectivityResult.none),
+  ),
+);
 
 final databaseProvider = Provider<FujinDatabase>(
   (ref) => throw StateError('databaseProvider is overridden in bootstrap'),

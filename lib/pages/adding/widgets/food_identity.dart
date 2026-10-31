@@ -47,7 +47,7 @@ class FoodIdentity extends StatelessWidget {
             children: [
               if (food.brandName case final brand? when brand.isNotEmpty)
                 Text(brand, style: secondary),
-              switch (food.verified ?? false) {
+              ?switch (food.verified) {
                 true => StatusPill(
                   label: context.intl.addVerified,
                   tone: PillTone.validated,
@@ -59,6 +59,7 @@ class FoodIdentity extends StatelessWidget {
                   tone: PillTone.muted,
                   size: PillSize.small,
                 ),
+                null => null,
               },
               if (barcode case final barcode?)
                 Text(context.intl.addEan(barcode), style: secondary),

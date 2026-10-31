@@ -92,8 +92,10 @@ final class AddSearchFailed extends AddSearchState
     required super.remembered,
     required this.problem,
     this.statusCode,
+    this.onPhone = const [],
   });
 
   final ReadProblem problem;
   final int? statusCode;
+  final List<MfpFood> onPhone;
 }

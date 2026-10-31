@@ -63,15 +63,16 @@ class DaySummaryCard extends ConsumerWidget {
     };
     final mfp = switch (read) {
       BothSides(:final day) => day.nutrients,
-      MfpOnly(:final nutrients) => nutrients,
+      MfpOnly(:final diaryNutrients) ||
+      FujinOnly(:final diaryNutrients) => diaryNutrients,
       EkkloOnly() => null,
     };
     final rings = switch ((mfp, goals, stale)) {
       (final mfp?, final goals?, false) => (mfp, goals),
       _ => null,
     };
-    final (sendLabel, onPressed) = switch (fresh) {
-      (ekklo: _, :final counts)? => switch (SendLabel.of(
+    final (sendLabel, onPressed) = switch ((fresh, read)) {
+      ((ekklo: _, :final counts)?, _) => switch (SendLabel.of(
         context.intl,
         counts.toSend,
         counts.toUpdate,
@@ -79,7 +80,8 @@ class DaySummaryCard extends ConsumerWidget {
         final label? => (label, onSend),
         null => (null, null),
       },
-      null => (context.intl.sendToEkklo, null),
+      (null, FujinOnly()) => (null, null),
+      (null, _) => (context.intl.sendToEkklo, null),
     };
     final colors = context.colors;
     return GestureDetector(
@@ -136,7 +138,7 @@ class DaySummaryCard extends ConsumerWidget {
                   (null, EkkloOnly(:final ekkloMeals)) => [
                     _counted(context.intl, colors, ekkloMeals),
                   ],
-                  (null, MfpOnly()) => [
+                  (null, MfpOnly() || FujinOnly()) => [
                     _SourceLine(
                       dot: colors.sourceEkklo,
                       label: context.intl.sourceEkklo,

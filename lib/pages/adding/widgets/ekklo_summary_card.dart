@@ -74,7 +74,7 @@ class EkkloSummaryCard extends StatelessWidget {
         JournalText.problemHeadline(context.intl, problem),
         switch (problem) {
           ReadProblem.ekkloSessionExpired => context.intl.ekkloReconnect,
-          ReadProblem.offline ||
+          ReadProblem.offline => context.intl.addEkkloWaits,
           ReadProblem.mfpSessionExpired ||
           ReadProblem.mfpUnavailable ||
           ReadProblem.ekkloUnavailable ||
@@ -90,6 +90,12 @@ class EkkloSummaryCard extends StatelessWidget {
       EkkloSide.willBeCreated => context.colors.sourceEkkloText,
       EkkloSide.toChoose => context.colors.textGold,
       null => context.colors.textSecondary,
+    };
+    final opens = switch ((planned, problem)) {
+      (_?, _) => onTap,
+      (null, ReadProblem.ekkloSessionExpired) => onSignIn,
+      (null, ReadProblem.offline) || (null, null) => null,
+      (null, _?) => onRetry,
     };
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(FujinRadius.card),
@@ -110,12 +116,7 @@ class EkkloSummaryCard extends StatelessWidget {
         shape: shape,
         child: InkWell(
           customBorder: shape,
-          onTap: switch ((planned, problem)) {
-            (_?, _) => onTap,
-            (null, ReadProblem.ekkloSessionExpired) => onSignIn,
-            (null, _?) => onRetry,
-            (null, null) => null,
-          },
+          onTap: opens,
           child: Padding(
             padding: const EdgeInsets.all(FujinSpace.s4),
             child: Row(
@@ -147,11 +148,12 @@ class EkkloSummaryCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(
-                  Icons.chevron_right,
-                  size: FujinSize.rowChevron,
-                  color: context.colors.textSecondary,
-                ),
+                if (opens != null)
+                  Icon(
+                    Icons.chevron_right,
+                    size: FujinSize.rowChevron,
+                    color: context.colors.textSecondary,
+                  ),
               ],
             ),
           ),

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/journal/journal_meal.dart';
 import 'package:fujin/domain/journal/status_counts.dart';
@@ -12,7 +10,10 @@ import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
 import 'package:fujin/pages/journal/background_write_notifier.dart';
+import 'package:fujin/pages/journal/widgets/compared_row.dart';
+import 'package:fujin/pages/journal/widgets/meal_card_frame.dart';
 import 'package:fujin/pages/journal/widgets/meal_rows.dart';
+import 'package:fujin/pages/journal/widgets/meal_title.dart';
 import 'package:fujin/pages/journal/widgets/split_line.dart';
 import 'package:fujin/pages/journal/writer_state_ids.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -29,7 +30,6 @@ class MealCard extends HookConsumerWidget {
     super.key,
   });
 
-  static const _plusIcon = 'assets/icons/plus.svg';
   static const _foodSeparator = ', ';
 
   final JournalMeal meal;
@@ -45,12 +45,7 @@ class MealCard extends HookConsumerWidget {
     final removals = ref.watch(
       backgroundWriteProvider.select((state) => state.ekkloRemovalIds),
     );
-    final leaving = [
-      for (final logged in meal.leaving)
-        if (MfpWrite.of(logged) is MfpDeletion ||
-            removals.contains(logged.entry.id))
-          logged,
-    ];
+    final leaving = MealRows.shown(meal.leaving, removals);
     final counts = ref.watch(
       backgroundWriteProvider.select(
         (state) => meal.counts(sending: state.ekkloSendIds),
@@ -75,7 +70,7 @@ class MealCard extends HookConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: FujinSpace.s3,
         children: [
-          _title(context.intl, context.colors),
+          MealTitle(name: meal.name, kilocalories: meal.kilocalories),
           Text(
             context.intl.mealEmpty,
             style: FujinText.inter13Regular.copyWith(
@@ -88,7 +83,7 @@ class MealCard extends HookConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: FujinSpace.s3,
         children: [
-          _title(context.intl, context.colors),
+          MealTitle(name: meal.name, kilocalories: meal.kilocalories),
           SplitLine(
             leading: Text(
               context.intl.mealProgress(counts.inEkklo, total),
@@ -134,76 +129,38 @@ class MealCard extends HookConsumerWidget {
         ],
       ),
     };
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
-      padding: const EdgeInsets.fromLTRB(
-        FujinSpace.s5,
-        FujinSpace.s4,
-        FujinSpace.s5,
-        FujinSpace.s2,
-      ),
-      decoration: BoxDecoration(
-        color: context.colors.backgroundCard,
-        borderRadius: BorderRadius.circular(FujinRadius.card),
-        border: Border.all(
-          color: context.colors.borderCard,
+    return MealCardFrame(
+      header: switch (counts.total) {
+        0 => header,
+        _ => GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => toggled.value = (settled: settled, open: !open),
+          child: header,
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          switch (counts.total) {
-            0 => header,
-            _ => GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => toggled.value = (settled: settled, open: !open),
-              child: header,
-            ),
-          },
-          AnimatedSize(
-            duration: FujinMotion.mealFold.duration,
-            curve: FujinMotion.mealFold.curve,
-            alignment: Alignment.topCenter,
-            child: switch ((open, [...meal.entries, ...leaving])) {
-              (true, [_, ...]) => Padding(
-                padding: const EdgeInsets.only(top: FujinSpace.s3),
-                child: MealRows(
-                  entries: meal.entries,
-                  leaving: leaving,
-                  groupTag: groupTag,
-                  removable: removable,
-                  removedEntryId: removedEntryId,
-                  onOpen: onOpen,
-                  onRemove: onRemove,
-                ),
-              ),
-              _ => const SizedBox(
-                width: double.infinity,
-                height: FujinSpace.s3,
-              ),
-            },
-          ),
-          const Divider(),
-          Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: TextButton.icon(
-              onPressed: onAdd,
-              style: TextButton.styleFrom(
-                textStyle: FujinText.inter14Medium,
-                padding: EdgeInsets.zero,
-              ),
-              icon: SvgPicture.asset(
-                _plusIcon,
-                width: FujinSize.tileIcon,
-                height: FujinSize.tileIcon,
-                theme: SvgTheme(currentColor: context.colors.textLink),
-                excludeFromSemantics: true,
-              ),
-              label: Text(context.intl.mealAddFood),
+      },
+      body: AnimatedSize(
+        duration: FujinMotion.mealFold.duration,
+        curve: FujinMotion.mealFold.curve,
+        alignment: Alignment.topCenter,
+        child: switch ((open, [...meal.entries, ...leaving])) {
+          (true, [_, ...]) => Padding(
+            padding: const EdgeInsets.only(top: FujinSpace.s3),
+            child: MealRows<ComparedEntry>(
+              entries: meal.entries,
+              leaving: leaving,
+              idOf: (compared) => compared.entryId,
+              rowOf: ComparedRow.new,
+              groupTag: groupTag,
+              removable: removable,
+              removedEntryId: removedEntryId,
+              onOpen: onOpen,
+              onRemove: onRemove,
             ),
           ),
-        ],
+          _ => const SizedBox(width: double.infinity, height: FujinSpace.s3),
+        },
       ),
+      onAdd: onAdd,
     );
   }
 
@@ -220,9 +177,6 @@ class MealCard extends HookConsumerWidget {
       color: colors.textPrimary,
     ),
   );
-
-  Widget _title(AppLocalizations intl, FujinColors colors) =>
-      SplitLine(leading: _name(colors), trailing: _kilocalories(intl, colors));
 
   static List<(String, PillTone)> _mealPills(
     AppLocalizations intl,

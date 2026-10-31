@@ -17,6 +17,7 @@ class JournalReadMapper extends ClassMapperBase<JournalRead> {
       MapperContainer.globals.use(_instance = JournalReadMapper._());
       BothSidesMapper.ensureInitialized();
       MfpOnlyMapper.ensureInitialized();
+      FujinOnlyMapper.ensureInitialized();
       EkkloOnlyMapper.ensureInitialized();
     }
     return _instance!;
@@ -376,6 +377,156 @@ class _MfpOnlyCopyWithImpl<$R, $Out>
   @override
   MfpOnlyCopyWith<$R2, MfpOnly, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
       _MfpOnlyCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
+class FujinOnlyMapper extends SubClassMapperBase<FujinOnly> {
+  FujinOnlyMapper._();
+
+  static FujinOnlyMapper? _instance;
+  static FujinOnlyMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = FujinOnlyMapper._());
+      JournalReadMapper.ensureInitialized().addSubMapper(_instance!);
+      DiaryMealMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'FujinOnly';
+
+  static DateTime _$readAt(FujinOnly v) => v.readAt;
+  static const Field<FujinOnly, DateTime> _f$readAt = Field(
+    'readAt',
+    _$readAt,
+    key: r'read_at',
+  );
+  static List<DiaryMeal> _$meals(FujinOnly v) => v.meals;
+  static const Field<FujinOnly, List<DiaryMeal>> _f$meals = Field(
+    'meals',
+    _$meals,
+    opt: true,
+    def: const [],
+  );
+
+  @override
+  final MappableFields<FujinOnly> fields = const {
+    #readAt: _f$readAt,
+    #meals: _f$meals,
+  };
+  @override
+  final bool ignoreNull = true;
+
+  @override
+  final String discriminatorKey = 'sides';
+  @override
+  final dynamic discriminatorValue = 'fujin_only';
+  @override
+  late final ClassMapperBase superMapper =
+      JournalReadMapper.ensureInitialized();
+
+  static FujinOnly _instantiate(DecodingData data) {
+    return FujinOnly(readAt: data.dec(_f$readAt), meals: data.dec(_f$meals));
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static FujinOnly fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<FujinOnly>(map);
+  }
+
+  static FujinOnly fromJson(String json) {
+    return ensureInitialized().decodeJson<FujinOnly>(json);
+  }
+}
+
+mixin FujinOnlyMappable {
+  String toJson() {
+    return FujinOnlyMapper.ensureInitialized().encodeJson<FujinOnly>(
+      this as FujinOnly,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return FujinOnlyMapper.ensureInitialized().encodeMap<FujinOnly>(
+      this as FujinOnly,
+    );
+  }
+
+  FujinOnlyCopyWith<FujinOnly, FujinOnly, FujinOnly> get copyWith =>
+      _FujinOnlyCopyWithImpl<FujinOnly, FujinOnly>(
+        this as FujinOnly,
+        $identity,
+        $identity,
+      );
+  @override
+  String toString() {
+    return FujinOnlyMapper.ensureInitialized().stringifyValue(
+      this as FujinOnly,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return FujinOnlyMapper.ensureInitialized().equalsValue(
+      this as FujinOnly,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return FujinOnlyMapper.ensureInitialized().hashValue(this as FujinOnly);
+  }
+}
+
+extension FujinOnlyValueCopy<$R, $Out> on ObjectCopyWith<$R, FujinOnly, $Out> {
+  FujinOnlyCopyWith<$R, FujinOnly, $Out> get $asFujinOnly =>
+      $base.as((v, t, t2) => _FujinOnlyCopyWithImpl<$R, $Out>(v, t, t2));
+}
+
+abstract class FujinOnlyCopyWith<$R, $In extends FujinOnly, $Out>
+    implements JournalReadCopyWith<$R, $In, $Out> {
+  ListCopyWith<$R, DiaryMeal, DiaryMealCopyWith<$R, DiaryMeal, DiaryMeal>>
+  get meals;
+  @override
+  $R call({DateTime? readAt, List<DiaryMeal>? meals});
+  FujinOnlyCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _FujinOnlyCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, FujinOnly, $Out>
+    implements FujinOnlyCopyWith<$R, FujinOnly, $Out> {
+  _FujinOnlyCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<FujinOnly> $mapper =
+      FujinOnlyMapper.ensureInitialized();
+  @override
+  ListCopyWith<$R, DiaryMeal, DiaryMealCopyWith<$R, DiaryMeal, DiaryMeal>>
+  get meals => ListCopyWith(
+    $value.meals,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(meals: v),
+  );
+  @override
+  $R call({DateTime? readAt, List<DiaryMeal>? meals}) => $apply(
+    FieldCopyWithData({
+      if (readAt != null) #readAt: readAt,
+      if (meals != null) #meals: meals,
+    }),
+  );
+  @override
+  FujinOnly $make(CopyWithData data) => FujinOnly(
+    readAt: data.get(#readAt, or: $value.readAt),
+    meals: data.get(#meals, or: $value.meals),
+  );
+
+  @override
+  FujinOnlyCopyWith<$R2, FujinOnly, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _FujinOnlyCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class EkkloOnlyMapper extends SubClassMapperBase<EkkloOnly> {

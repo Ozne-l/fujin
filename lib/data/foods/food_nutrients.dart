@@ -86,6 +86,40 @@ final class FoodNutrients with FoodNutrientsMappable {
   final double? calcium;
   final double? iron;
 
+  MfpNutrients toMfp() => MfpNutrients(
+    energy: switch ((energyValue, energyUnit)) {
+      (final value?, EnergyUnit.calories) => MfpEnergy(
+        unit: MfpEnergyUnit.calories,
+        value: value,
+      ),
+      (final value?, EnergyUnit.kilojoules) => MfpEnergy(
+        unit: MfpEnergyUnit.kilojoules,
+        value: value,
+      ),
+      _ => null,
+    },
+    protein: protein,
+    carbohydrates: carbohydrates,
+    netCarbs: netCarbs,
+    fiber: fiber,
+    sugar: sugar,
+    addedSugars: addedSugars,
+    sugarAlcohols: sugarAlcohols,
+    fat: fat,
+    saturatedFat: saturatedFat,
+    monounsaturatedFat: monounsaturatedFat,
+    polyunsaturatedFat: polyunsaturatedFat,
+    transFat: transFat,
+    cholesterolMilligrams: cholesterolMilligrams,
+    sodiumMilligrams: sodiumMilligrams,
+    potassiumMilligrams: potassiumMilligrams,
+    vitaminA: vitaminA,
+    vitaminC: vitaminC,
+    vitaminD: vitaminD,
+    calcium: calcium,
+    iron: iron,
+  );
+
   double? get kilocalories => switch ((energyValue, energyUnit)) {
     (final value?, EnergyUnit.calories) => value,
     (final value?, EnergyUnit.kilojoules) =>

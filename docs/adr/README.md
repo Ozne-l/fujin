@@ -46,5 +46,5 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0040](0040-flutter-sdk-per-project.md) | Flutter SDK per project | Accepted |
 | [0041](0041-liquid-glass-renderer-1.0.md) | Liquid glass on liquid_glass_renderer 1.0 | Proposed |
 | [0042](0042-text-contrast-on-tinted-surfaces.md) | Text contrast on tinted surfaces | Accepted |
-| [0043](0043-edit-and-delete-a-logged-food.md) | Edit and delete a logged food | Accepted (edit and delete saved first and written in the background by 0044; offline edit and delete of known foods planned by 0044) |
-| [0044](0044-connector-model.md) | Connector model: Fūjin's entry at the centre | Accepted (steps 1 to 3 built; offline, Ekklo "to remove", the role setting and the cache file not built) |
+| [0043](0043-edit-and-delete-a-logged-food.md) | Edit and delete a logged food | Accepted (edit and delete saved first and written in the background, and offline edit and delete of known foods built, by 0044) |
+| [0044](0044-connector-model.md) | Connector model: Fūjin's entry at the centre | Accepted (steps 1 to 4 built, offline included; Ekklo "to remove", the role setting and the cache file not built) |

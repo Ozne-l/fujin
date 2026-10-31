@@ -694,9 +694,7 @@ void main() {
       _seesNo(_scannerTitle);
     });
 
-    testWidgets('is greyed offline on every tab, then usable once back', (
-      tester,
-    ) async {
+    testWidgets('stays usable offline on every tab', (tester) async {
       final backends = _backends();
       await pumpFujin(tester, backends);
 
@@ -707,17 +705,10 @@ void main() {
 
       for (final tab in [_memory, _settings, _journal]) {
         await _tap(tester, _tab(tab));
-        check(_scanEnabled(tester)).isFalse();
-        await _openScanner(tester);
-        _seesNo(_scannerTitle);
+        check(_scanEnabled(tester)).isTrue();
       }
-
-      backends
-        ..mfpReachable = true
-        ..ekkloReachable = true;
-      await _pullToRefresh(tester);
-
-      check(_scanEnabled(tester)).isTrue();
+      await _openScanner(tester);
+      _sees(_scannerTitle);
     });
   });
 }

@@ -207,17 +207,24 @@ final class AddSearchNotifier extends Notifier<AddSearchState> {
     remembered: rememberedFoods(_memory, query),
   );
 
-  static AddSearchFailed _failed(AddSearchState running, Object error) =>
-      AddSearchFailed(
-        query: running.query,
-        verifiedOnly: running.verifiedOnly,
-        recents: running.recents,
-        remembered: running.remembered,
-        problem: ReadProblem.of(error),
-        statusCode: switch (error) {
-          MfpApiException(:final statusCode) ||
-          MfpUnexpectedResponseException(:final statusCode) => statusCode,
-          _ => null,
-        },
-      );
+  AddSearchFailed _failed(AddSearchState running, Object error) {
+    final problem = ReadProblem.of(error);
+    return AddSearchFailed(
+      query: running.query,
+      verifiedOnly: running.verifiedOnly,
+      recents: running.recents,
+      remembered: running.remembered,
+      problem: problem,
+      statusCode: switch (error) {
+        MfpApiException(:final statusCode) ||
+        MfpUnexpectedResponseException(:final statusCode) => statusCode,
+        _ => null,
+      },
+      onPhone: switch ((problem, running.query)) {
+        (ReadProblem.offline, final query) when query.isNotEmpty =>
+          ref.read(addFoodServiceProvider).onPhone(query),
+        _ => const [],
+      },
+    );
+  }
 }

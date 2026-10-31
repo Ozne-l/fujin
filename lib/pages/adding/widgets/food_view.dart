@@ -9,6 +9,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/ekklo_side.dart';
+import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/entry_quantity.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/editing/draft_changes.dart';
@@ -86,7 +87,7 @@ class FoodView extends HookConsumerWidget {
     final saving = useRef(false);
     final original = editing?.original;
     final originalJournal = switch (original) {
-      final original? => ref.watch(journalProvider(original.logged.entry.date)),
+      final original? => ref.watch(journalProvider(original.entry.date)),
       null => null,
     };
     final readOnly = switch (originalJournal) {
@@ -103,39 +104,45 @@ class FoodView extends HookConsumerWidget {
     final draft = form.draft;
     final entry = draft.entry;
     final planned = form.planned;
+    final waiting = form.planProblem == ReadProblem.offline;
+    final mfpOnly = waiting || planned?.sends == false;
     final read = ref.watch(journalProvider(draft.date)).value;
     final day = switch (read?.diaryMeals) {
       final meals? => DayNutrients.ofEntries([
         for (final meal in meals)
           for (final logged in meal.entries)
-            if (original == null || logged.entry.id != original.entryId) logged,
+            if (logged.entry.id != original?.entry.id) logged,
       ]),
       null => null,
     };
-    final mealNames = ref.watch(mealNamesProvider).value ?? const <String>[];
+    final mealNames =
+        ref.watch(mealNamesProvider).value ??
+        ref.watch(journalServiceProvider).storedMealNames();
     final food = DayNutrients.ofEntries([entry]);
     final banner = switch (editing) {
       EditingFood(newVersion: true, :final original) => (
         before:
             DayNutrients.ofEntries([
-              original.logged,
+              original,
             ]).amount(Nutrient.kilocalories) /
-            original.logged.entry.servings,
+            original.entry.servings,
         after: _perServing(initial),
         serving: AddText.serving(context.intl, initial.servingSize),
         changed: _changed(
-          original.logged,
-          initial.copyWith(servings: original.logged.entry.servings).entry,
+          original,
+          initial.copyWith(servings: original.entry.servings).entry,
         ),
       ),
       _ => null,
     };
-    final linked = switch (original?.status) {
-      InEkklo() || ToUpdate() => true,
-      ToSend() || null => false,
+    final linked = switch (editing) {
+      EditingFood(status: InEkklo() || ToUpdate()) => true,
+      EditingFood(status: ToSend()) || null => false,
+      EditingFood(status: null, :final original) =>
+        original.ekkloLink?.item != null,
     };
     final changes = switch (original) {
-      final original? => draftChanges(draft, original.logged),
+      final original? => draftChanges(draft, original),
       null => true,
     };
 
@@ -187,7 +194,8 @@ class FoodView extends HookConsumerWidget {
 
     void add() {
       final current = ref.read(formProvider);
-      if (current.planned case final planned? when !saving.value) {
+      final planned = current.planned;
+      if ((planned != null || waiting) && !saving.value) {
         saving.value = true;
         switch (mode) {
           case AddingFood(:final barcodeToLink, :final onLeave):
@@ -221,7 +229,7 @@ class FoodView extends HookConsumerWidget {
             context,
             removal: EntryRemoval(
               entryId: entryId,
-              entry: original.logged,
+              entry: original,
               reason: RemovalReason.delete,
             ),
             inEkklo: linked,
@@ -250,24 +258,35 @@ class FoodView extends HookConsumerWidget {
         () => unawaited(chooseEkklo()),
       ),
       (_, EditingFood()) => (
-        switch (linked) {
+        switch (linked && !mfpOnly) {
           true => context.intl.editSaveBoth,
           false => context.intl.editSaveMfpOnly,
         },
         add,
       ),
-      (_, AddingFood()) => (context.intl.addToBoth, add),
-    };
-    final ekkloEdit = switch ((original, planned, originalJournal?.value)) {
-      (final original?, final planned?, final read?) => EkkloEdit.of(
-        original: original,
-        planned: planned,
-        ekkloMeals: switch (read) {
-          BothSides(:final day) => day.ekkloMeals,
-          MfpOnly() || EkkloOnly() => const [],
+      (_, AddingFood()) => (
+        switch (mfpOnly) {
+          true => context.intl.addToMfpOnly,
+          false => context.intl.addToBoth,
         },
-        changed: changes,
+        add,
       ),
+    };
+    final ekkloEdit = switch ((editing, planned, originalJournal?.value)) {
+      (
+        EditingFood(:final original, status: final status?),
+        final planned?,
+        final read?,
+      ) =>
+        EkkloEdit.of(
+          original: ComparedEntry(original, status),
+          planned: planned,
+          ekkloMeals: switch (read) {
+            BothSides(:final day) => day.ekkloMeals,
+            MfpOnly() || FujinOnly() || EkkloOnly() => const [],
+          },
+          changed: changes,
+        ),
       _ => null,
     };
     final grams = switch (entryGrams(entry.entry)) {
@@ -286,7 +305,7 @@ class FoodView extends HookConsumerWidget {
         children: [
           switch (original) {
             final original? => EditFoodHeader(
-              entry: original.logged,
+              entry: original,
               onBack: onBack,
             ),
             null => FlowHeader(
@@ -381,14 +400,16 @@ class FoodView extends HookConsumerWidget {
                     null => null,
                   },
                 ),
-                const SizedBox(height: FujinSpace.s3),
-                Text(
-                  context.intl.addWriteOrder,
-                  textAlign: TextAlign.center,
-                  style: FujinText.inter12Regular.copyWith(
-                    color: context.colors.textSecondary,
+                if (!mfpOnly) ...[
+                  const SizedBox(height: FujinSpace.s3),
+                  Text(
+                    context.intl.addWriteOrder,
+                    textAlign: TextAlign.center,
+                    style: FujinText.inter12Regular.copyWith(
+                      color: context.colors.textSecondary,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
@@ -420,11 +441,11 @@ class FoodView extends HookConsumerWidget {
                   FilledButton(
                     style: FujinTheme.floatingButtonStyle(context.colors),
                     onPressed: switch ((
-                      planned,
+                      planned != null || waiting,
                       readOnly,
                       changes || banner != null,
                     )) {
-                      (_?, null, true) => onPrimary,
+                      (true, null, true) => onPrimary,
                       _ => null,
                     },
                     child: Text(primaryLabel),

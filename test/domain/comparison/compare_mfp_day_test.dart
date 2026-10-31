@@ -12,6 +12,7 @@ import 'package:fujin/domain/comparison/compare_ekklo_day.dart';
 import 'package:fujin/domain/comparison/compare_mfp_day.dart';
 import 'package:fujin/domain/comparison/day_draft.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
+import 'package:fujin/domain/comparison/replacement.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../../support/fixtures.dart';
@@ -264,21 +265,27 @@ void main() {
 
       final draft = read([edited], [changed]);
 
+      final refreshed = MfpLink.of(
+        changed,
+        id: 'mfp-link-E-1',
+        entryId: 'E-1',
+        mfpEntryId: 'E-1',
+        updatedAt: now,
+      );
       check(draft.entries.single.entry).equals(edited.entry);
       check(draft.changes).equals(
-        DayChanges(
-          date: day,
-          changedMfpLinks: [
-            MfpLink.of(
-              changed,
-              id: 'mfp-link-E-1',
-              entryId: 'E-1',
-              mfpEntryId: 'E-1',
-              updatedAt: now,
-            ),
-          ],
-        ),
+        DayChanges(date: day, changedMfpLinks: [refreshed]),
       );
+      check(draft.replaced).deepEquals([
+        ReplacedEdit(edited.copyWith(mfpLink: refreshed), before: refreshed),
+      ]);
+    });
+
+    test('records no replacement when the row still holds the link', () {
+      final draft = read([editedTo(2)], [entry('E-1')]);
+
+      check(draft.replaced).isEmpty();
+      check(draft.changes).equals(DayChanges(date: day));
     });
 
     test('turns a pending edit whose row vanished into a pending add', () {
@@ -351,6 +358,141 @@ void main() {
 
       check(draft.entries).deepEquals([written]);
       check(draft.changes).equals(DayChanges(date: day));
+    });
+  });
+
+  group('a pending change whose row the MyFitnessPal app replaced', () {
+    MfpLink movedTo(MfpFoodEntry row, {String id = 'E-1'}) => MfpLink.of(
+      row,
+      id: 'mfp-link-$id',
+      entryId: id,
+      mfpEntryId: row.id ?? '',
+      updatedAt: now,
+    );
+
+    test("moves an edit's link to a row of the same food and meal", () {
+      final edited = editedTo(2);
+      final otherMeal = entry('M-1', meal: lunch, servings: 3);
+      final sameMeal = entry('M-2', servings: 3);
+
+      final draft = read([edited], [otherMeal, sameMeal]);
+
+      final kept = edited.copyWith(mfpLink: movedTo(sameMeal));
+      check(draft.entries.first).equals(kept);
+      check(draft.entries).length.equals(2);
+      check(draft.replaced).deepEquals([
+        ReplacedEdit(kept, before: movedTo(sameMeal)),
+      ]);
+      check(
+        draft.changes.changedMfpLinks,
+      ).deepEquals([movedTo(sameMeal)]);
+    });
+
+    test('moves it to a row of another meal when none shares its meal', () {
+      final edited = editedTo(2);
+      final otherMeal = entry('M-1', meal: lunch, servings: 3);
+
+      final draft = read([edited], [otherMeal]);
+
+      final kept = edited.copyWith(mfpLink: movedTo(otherMeal));
+      check(draft.entries).deepEquals([kept]);
+      check(draft.replaced).deepEquals([
+        ReplacedEdit(kept, before: movedTo(otherMeal)),
+      ]);
+      check(draft.changes).equals(
+        DayChanges(date: day, changedMfpLinks: [movedTo(otherMeal)]),
+      );
+    });
+
+    test('gives the row to the oldest entry', () {
+      final older = editedTo(2);
+      final newer = editedTo(3, id: 'E-2');
+      final row = entry('M-1', servings: 5);
+
+      final draft = read([newer, older], [row]);
+
+      check(draft.entries).deepEquals([
+        newer.copyWith(mfpLink: null),
+        older.copyWith(mfpLink: movedTo(row)),
+      ]);
+    });
+
+    test('leaves a row another link holds', () {
+      final held = loggedEntry(entry('L-1', servings: 3));
+
+      final draft = read([editedTo(2), held], [entry('L-1', servings: 3)]);
+
+      check(draft.entries.first.mfpLink).isNull();
+      check(draft.replaced).isEmpty();
+      check(draft.changes).equals(
+        DayChanges(date: day, deletedMfpLinkIds: ['mfp-link-E-1']),
+      );
+    });
+
+    test('leaves a row an entry without a link adopts', () {
+      final draft = read([editedTo(2), unlinked('U-1')], [entry('M-1')]);
+
+      check(draft.entries.first.mfpLink).isNull();
+      check(draft.entries.last.mfpLink?.mfpEntryId).equals('M-1');
+      check(draft.replaced).isEmpty();
+    });
+
+    test('leaves a row of another food', () {
+      final draft = read([editedTo(2)], [entry('M-1', food: rice)]);
+
+      check(draft.entries.first.mfpLink).isNull();
+      check(draft.replaced).isEmpty();
+    });
+
+    test("takes a row holding Fūjin's values as the link", () {
+      final edited = editedTo(2);
+      final row = entry('M-1', servings: 2);
+
+      final draft = read([edited], [row]);
+
+      final kept = edited.copyWith(mfpLink: movedTo(row));
+      check(draft.entries).deepEquals([kept]);
+      check(draft.replaced).isEmpty();
+      check(draft.changes).equals(
+        DayChanges(date: day, changedMfpLinks: [movedTo(row)]),
+      );
+    });
+
+    test("moves an owed deletion's link to the replacing row", () {
+      final owed = deletedEntry('E-1');
+      final row = entry('M-1', servings: 3);
+
+      final draft = read([], [row], owed: [owed]);
+
+      final kept = owed.copyWith(mfpLink: movedTo(row));
+      check(draft.owed).deepEquals([kept]);
+      check(draft.entries).isEmpty();
+      check(draft.replaced).deepEquals([ReplacedDeletion(kept)]);
+      check(draft.changes).equals(
+        DayChanges(date: day, changedMfpLinks: [movedTo(row)]),
+      );
+    });
+
+    test('gives an edit the row before an owed deletion', () {
+      final row = entry('M-1', servings: 3);
+
+      final draft = read([editedTo(2)], [row], owed: [deletedEntry('D-1')]);
+
+      check(draft.entries.single.mfpLink).equals(movedTo(row));
+      check(draft.owed.single.mfpLink).isNull();
+    });
+
+    test('leaves a link written after the diary was read', () {
+      final edited = editedTo(2);
+
+      final draft = read(
+        [edited],
+        [entry('M-1', servings: 3)],
+        readAt: now.subtract(const Duration(minutes: 1)),
+      );
+
+      check(draft.entries.first).equals(edited);
+      check(draft.replaced).isEmpty();
     });
   });
 }

@@ -965,6 +965,7 @@ class AddSearchFailedMapper extends SubClassMapperBase<AddSearchFailed> {
       RecentFoodMapper.ensureInitialized();
       RememberedFoodMapper.ensureInitialized();
       ReadProblemMapper.ensureInitialized();
+      MfpFoodMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -1003,6 +1004,14 @@ class AddSearchFailedMapper extends SubClassMapperBase<AddSearchFailed> {
     key: r'status_code',
     opt: true,
   );
+  static List<MfpFood> _$onPhone(AddSearchFailed v) => v.onPhone;
+  static const Field<AddSearchFailed, List<MfpFood>> _f$onPhone = Field(
+    'onPhone',
+    _$onPhone,
+    key: r'on_phone',
+    opt: true,
+    def: const [],
+  );
 
   @override
   final MappableFields<AddSearchFailed> fields = const {
@@ -1012,6 +1021,7 @@ class AddSearchFailedMapper extends SubClassMapperBase<AddSearchFailed> {
     #remembered: _f$remembered,
     #problem: _f$problem,
     #statusCode: _f$statusCode,
+    #onPhone: _f$onPhone,
   };
   @override
   final bool ignoreNull = true;
@@ -1032,6 +1042,7 @@ class AddSearchFailedMapper extends SubClassMapperBase<AddSearchFailed> {
       remembered: data.dec(_f$remembered),
       problem: data.dec(_f$problem),
       statusCode: data.dec(_f$statusCode),
+      onPhone: data.dec(_f$onPhone),
     );
   }
 
@@ -1107,6 +1118,7 @@ abstract class AddSearchFailedCopyWith<$R, $In extends AddSearchFailed, $Out>
     RememberedFoodCopyWith<$R, RememberedFood, RememberedFood>
   >
   get remembered;
+  ListCopyWith<$R, MfpFood, MfpFoodCopyWith<$R, MfpFood, MfpFood>> get onPhone;
   @override
   $R call({
     String? query,
@@ -1115,6 +1127,7 @@ abstract class AddSearchFailedCopyWith<$R, $In extends AddSearchFailed, $Out>
     List<RememberedFood>? remembered,
     ReadProblem? problem,
     int? statusCode,
+    List<MfpFood>? onPhone,
   });
   AddSearchFailedCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -1148,6 +1161,13 @@ class _AddSearchFailedCopyWithImpl<$R, $Out>
     (v) => call(remembered: v),
   );
   @override
+  ListCopyWith<$R, MfpFood, MfpFoodCopyWith<$R, MfpFood, MfpFood>>
+  get onPhone => ListCopyWith(
+    $value.onPhone,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(onPhone: v),
+  );
+  @override
   $R call({
     String? query,
     bool? verifiedOnly,
@@ -1155,6 +1175,7 @@ class _AddSearchFailedCopyWithImpl<$R, $Out>
     List<RememberedFood>? remembered,
     ReadProblem? problem,
     Object? statusCode = $none,
+    List<MfpFood>? onPhone,
   }) => $apply(
     FieldCopyWithData({
       if (query != null) #query: query,
@@ -1163,6 +1184,7 @@ class _AddSearchFailedCopyWithImpl<$R, $Out>
       if (remembered != null) #remembered: remembered,
       if (problem != null) #problem: problem,
       if (statusCode != $none) #statusCode: statusCode,
+      if (onPhone != null) #onPhone: onPhone,
     }),
   );
   @override
@@ -1173,6 +1195,7 @@ class _AddSearchFailedCopyWithImpl<$R, $Out>
     remembered: data.get(#remembered, or: $value.remembered),
     problem: data.get(#problem, or: $value.problem),
     statusCode: data.get(#statusCode, or: $value.statusCode),
+    onPhone: data.get(#onPhone, or: $value.onPhone),
   );
 
   @override

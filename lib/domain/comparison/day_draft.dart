@@ -6,6 +6,7 @@ import 'package:fujin/data/entries/day_changes.dart';
 import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/entries/stored_day.dart';
+import 'package:fujin/domain/comparison/replacement.dart';
 
 part 'day_draft.mapper.dart';
 
@@ -23,6 +24,7 @@ final class DayDraft with DayDraftMappable {
     this.plannedEntryIds = const {},
     this.pendingLinks = const [],
     this.forgetsWaiting = false,
+    this.replaced = const [],
   });
 
   factory DayDraft.of(StoredDay stored, {required DateTime date}) => DayDraft(
@@ -45,6 +47,7 @@ final class DayDraft with DayDraftMappable {
   final Map<String, String> plannedEntryIds;
   final List<EkkloLink> pendingLinks;
   final bool forgetsWaiting;
+  final List<Replacement> replaced;
 
   List<LoggedEntry> get leaving {
     final byId = {
