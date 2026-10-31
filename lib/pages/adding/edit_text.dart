@@ -56,9 +56,9 @@ abstract final class EditText {
 
   static String? readOnly(AppLocalizations intl, ReadProblem? problem) =>
       switch (problem) {
-        ReadProblem.offline => intl.editOffline,
         ReadProblem.mfpSessionExpired => intl.editMfpSessionExpired,
         ReadProblem.ekkloSessionExpired => intl.editEkkloSessionExpired,
+        ReadProblem.offline ||
         ReadProblem.mfpUnavailable ||
         ReadProblem.ekkloUnavailable ||
         ReadProblem.unknown ||

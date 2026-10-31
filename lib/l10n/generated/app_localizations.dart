@@ -2294,6 +2294,24 @@ abstract class AppLocalizations {
   /// **'La recherche reprendra au retour du réseau. Tes récents restent là.'**
   String get addOfflineDetail;
 
+  /// No description provided for @addOfflineSearchDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'La recherche dans MyFitnessPal a besoin du réseau.'**
+  String get addOfflineSearchDetail;
+
+  /// No description provided for @addOnPhoneFoods.
+  ///
+  /// In fr, this message translates to:
+  /// **'DÉJÀ DANS FŪJIN'**
+  String get addOnPhoneFoods;
+
+  /// No description provided for @addMfpOffline.
+  ///
+  /// In fr, this message translates to:
+  /// **'hors ligne'**
+  String get addMfpOffline;
+
   /// No description provided for @addServerTitle.
   ///
   /// In fr, this message translates to:
@@ -2414,6 +2432,12 @@ abstract class AppLocalizations {
   /// **'mémorisé'**
   String get addRemembered;
 
+  /// No description provided for @addEkkloWaits.
+  ///
+  /// In fr, this message translates to:
+  /// **'à vérifier à l’envoi'**
+  String get addEkkloWaits;
+
   /// No description provided for @addFoundAutomatically.
   ///
   /// In fr, this message translates to:
@@ -2467,6 +2491,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Écrit d’abord dans MyFitnessPal, puis dans Ekklo.'**
   String get addWriteOrder;
+
+  /// No description provided for @addToMfpOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter à MFP'**
+  String get addToMfpOnly;
 
   /// No description provided for @addToBoth.
   ///
@@ -2870,12 +2900,6 @@ abstract class AppLocalizations {
   /// **'Ekklo : remplacé par {after}, {amount}'**
   String editEkkloReplacedUnnamed(String after, String amount);
 
-  /// No description provided for @editOffline.
-  ///
-  /// In fr, this message translates to:
-  /// **'Hors ligne : modifier ou supprimer attendra le réseau.'**
-  String get editOffline;
-
   /// No description provided for @editMfpSessionExpired.
   ///
   /// In fr, this message translates to:
@@ -3017,6 +3041,30 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Supprimé dans Fūjin'**
   String get entryDeletedInFujin;
+
+  /// No description provided for @replacedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remplacé dans MyFitnessPal'**
+  String get replacedTitle;
+
+  /// No description provided for @replacedChange.
+  ///
+  /// In fr, this message translates to:
+  /// **'{food} : {before} → {after}'**
+  String replacedChange(String food, String before, String after);
+
+  /// No description provided for @replacedDeletion.
+  ///
+  /// In fr, this message translates to:
+  /// **'{food} supprimé dans Fūjin'**
+  String replacedDeletion(String food);
+
+  /// No description provided for @replacedMany.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{1 aliment gardé comme dans Fūjin} other{{count} aliments gardés comme dans Fūjin}}'**
+  String replacedMany(int count);
 
   /// No description provided for @writeBlockedInDev.
   ///

@@ -14,6 +14,10 @@ sealed class JournalRead with JournalReadMappable {
   final DateTime readAt;
 
   List<DiaryMeal> get diaryMeals;
+
+  DayNutrients get diaryNutrients => DayNutrients.ofEntries([
+    for (final meal in diaryMeals) ...meal.entries,
+  ]);
 }
 
 @MappableClass(discriminatorValue: 'both')
@@ -43,9 +47,15 @@ final class MfpOnly extends JournalRead with MfpOnlyMappable {
   final List<DiaryMeal> meals;
   final ReadProblem ekkloProblem;
 
-  DayNutrients get nutrients => DayNutrients.ofEntries([
-    for (final meal in meals) ...meal.entries,
-  ]);
+  @override
+  List<DiaryMeal> get diaryMeals => meals;
+}
+
+@MappableClass(discriminatorValue: 'fujin_only')
+final class FujinOnly extends JournalRead with FujinOnlyMappable {
+  const FujinOnly({required super.readAt, this.meals = const []});
+
+  final List<DiaryMeal> meals;
 
   @override
   List<DiaryMeal> get diaryMeals => meals;

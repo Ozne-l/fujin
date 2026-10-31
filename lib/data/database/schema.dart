@@ -416,4 +416,7 @@ const schemaMigrations = [
   DROP TABLE migrated_food;
   DROP TABLE migration_time;
   ''',
+  '''
+  ALTER TABLE food ADD COLUMN verified INTEGER CHECK (verified IN (0, 1));
+  ''',
 ];

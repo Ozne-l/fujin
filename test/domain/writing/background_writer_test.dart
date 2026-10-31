@@ -16,6 +16,7 @@ import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/comparison/compared_entry_lookup.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/comparison/mfp_status.dart';
+import 'package:fujin/domain/comparison/replacement.dart';
 import 'package:fujin/domain/journal/fetch.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/domain/sending/send_mode.dart';
@@ -275,7 +276,7 @@ void main() {
 
     test('writes nothing in Ekklo for a skipped plan', () async {
       final writing = await services();
-      final draft = _draft();
+      final draft = _draft(food: _gratinFood, serving: _onePortion);
       final planned = await writing.adding.plan(draft);
 
       final food = writing.adding.add(
@@ -293,8 +294,9 @@ void main() {
       'drops the held send of an add edited to a food left to choose',
       () async {
         final writing = await services();
-        final food = await unwritten(writing, _draft());
-        final draft = _draft(servings: 2);
+        final gratin = _draft(food: _gratinFood, serving: _onePortion);
+        final food = await unwritten(writing, gratin);
+        final draft = gratin.copyWith(servings: 2);
         final planned = await writing.adding.plan(draft);
 
         writing.editing.save(
@@ -317,7 +319,10 @@ void main() {
       await writing.settle();
       backends.requests.clear();
 
-      writing.background.hold(food.entryId, EkkloSend(food.planned));
+      writing.background.hold(
+        food.entryId,
+        EkkloSend(await writing.adding.plan(_draft())),
+      );
       await writing.settle();
 
       check(writing.background.heldFor(food.entryId)).isNull();
@@ -354,6 +359,202 @@ void main() {
     });
   });
 
+  group('deriving the Ekklo send', () {
+    final gratin = _draft(food: _gratinFood, serving: _onePortion, servings: 1);
+
+    test(
+      'sends a remembered entry to Ekklo after its MyFitnessPal write, after '
+      'a restart that held nothing',
+      () async {
+        final food = await unwritten(await services(), _draft());
+
+        final restarted = await services();
+        check(restarted.background.heldFor(food.entryId)).isNull();
+        await restarted.settle();
+
+        check(restarted.writes()).deepEquals([
+          'POST ${mfpApiUri.host}',
+          'POST ${ekkloUri.host}',
+        ]);
+        check(ekkloQuantities()).deepEquals([150]);
+        check(
+          (await restarted.find(food.entryId, day))?.status,
+        ).isA<InEkklo>();
+      },
+    );
+
+    test('leaves an entry Memory does not decide to send, with no Ekklo '
+        'request', () async {
+      backends.mfpFoods = [_gratinFood];
+      final food = await unwritten(await services(), gratin);
+
+      final restarted = await services();
+      await restarted.settle();
+
+      check(restarted.writes()).deepEquals(['POST ${mfpApiUri.host}']);
+      check(
+        backends.requests.where((request) => request.url.host == ekkloUri.host),
+      ).isEmpty();
+      check(restarted.background.heldFor(food.entryId)).isNull();
+      check((await restarted.find(food.entryId, day))?.status).isA<ToSend>();
+    });
+
+    test('holds a derived send that failed, for the next run', () async {
+      final food = await unwritten(await services(), _draft());
+      backends.failingMeals.add(dejeuner);
+
+      final restarted = await services();
+      await restarted.settle();
+
+      check(
+        restarted.background.heldFor(food.entryId),
+      ).isA<EkkloSend>();
+      check(restarted.background.state.failures.single)
+          .isA<EkkloNotWritten>()
+          .has((it) => it.entryId, 'entry')
+          .equals(food.entryId);
+
+      backends.failingMeals.clear();
+      await restarted.settle();
+
+      check(restarted.background.heldFor(food.entryId)).isNull();
+      check(ekkloQuantities()).deepEquals([150]);
+    });
+  });
+
+  group('offline', () {
+    test(
+      'stops the run at the first network failure and keeps every entry '
+      'pending',
+      () async {
+        final writing = await services();
+        backends.mfpReachable = false;
+        final first = await writing.add(_draft());
+        clock = clock.add(const Duration(seconds: 1));
+        final second = await writing.add(_draft(servings: 2));
+        await writing.settle();
+        backends.requests.clear();
+
+        await writing.settle();
+
+        check(backends.requests).length.equals(1);
+        check(writing.background.state.failures.single)
+          ..isA<MfpNotWritten>()
+          ..has((it) => it.entryId, 'entry').equals(first.entryId);
+        check([
+          for (final write in writing.entries.pendingMfp())
+            write.logged.entry.id,
+        ]).unorderedEquals([first.entryId, second.entryId]);
+      },
+    );
+  });
+
+  group(
+    'a row the MyFitnessPal app replaced, with no read before the write',
+    () {
+      List<MfpFoodEntry> replacedByTheApp() => [
+        for (final row in backends.entries)
+          row.copyWith(id: 'mfp-app', servings: 3),
+      ];
+
+      test('is replaced by Fūjin’s edit, one row left', () async {
+        final (writing, food) = await written();
+        backends.mfpReachable = false;
+        writing.editing.save(
+          _draft(servings: 2),
+          await writing.adding.plan(_draft(servings: 2)),
+          entryId: food.entryId,
+        );
+        await writing.settle();
+        backends
+          ..mfpReachable = true
+          ..entries = replacedByTheApp();
+
+        await writing.settle();
+
+        check(backends.entries.single.servings).equals(2);
+        check(writing.background.state.replaced.single).isA<ReplacedEdit>();
+      });
+
+      test('is removed under Fūjin’s deletion', () async {
+        final (writing, food) = await written();
+        backends
+          ..mfpReachable = false
+          ..ekkloReachable = false;
+        writing.removing.remove(food.entryId);
+        await writing.settle();
+        backends
+          ..mfpReachable = true
+          ..ekkloReachable = true
+          ..entries = replacedByTheApp();
+
+        await writing.settle();
+
+        check(backends.entries).isEmpty();
+        check(
+          writing.background.state.replaced.single,
+        ).isA<ReplacedDeletion>();
+      });
+    },
+  );
+
+  test(
+    'removes the Ekklo item of a deletion made offline before its '
+    'MyFitnessPal row, and sends an add of the same food as a new item',
+    () async {
+      final (writing, food) = await written();
+      final before = [for (final item in backends.ekkloItems) item.id];
+      backends
+        ..mfpReachable = false
+        ..ekkloReachable = false;
+      writing.removing.remove(food.entryId);
+      clock = clock.add(const Duration(seconds: 1));
+      final added = await writing.add(_draft(meal: breakfast));
+      await writing.settle();
+      backends
+        ..mfpReachable = true
+        ..ekkloReachable = true
+        ..requests.clear();
+
+      final restarted = await services();
+      await restarted.journal.readDay(day);
+      await restarted.settle();
+
+      final writes = restarted.writes();
+      check(
+        writes.indexOf('DELETE ${ekkloUri.host}'),
+      ).isLessThan(writes.indexOf('DELETE ${mfpApiUri.host}'));
+      check(before).not((it) => it.contains(backends.ekkloItems.single.id));
+      check(backends.entries.single.mealName).equals(breakfast);
+      check(
+        (await restarted.find(added.entryId, day))?.status,
+      ).isA<InEkklo>();
+    },
+  );
+
+  test(
+    'removes the Ekklo item of a deletion made offline, after a restart',
+    () async {
+      final (writing, food) = await written();
+      backends
+        ..mfpReachable = false
+        ..ekkloReachable = false;
+      writing.removing.remove(food.entryId);
+      await writing.settle();
+      backends
+        ..mfpReachable = true
+        ..ekkloReachable = true;
+
+      final restarted = await services();
+      check(restarted.background.heldFor(food.entryId)).isNull();
+      await restarted.settle();
+
+      check(ekkloQuantities()).isEmpty();
+      check(backends.entries).isEmpty();
+      check(restarted.entries.pendingMfp()).isEmpty();
+    },
+  );
+
   group('a write stopped halfway', () {
     MfpFoodEntry row(String id, {double servings = 1.5, DateTime? date}) =>
         entry(
@@ -367,7 +568,7 @@ void main() {
 
     test(
       'H1: links the row of an add killed before its link, without adding '
-      'again',
+      'again, then sends its remembered Ekklo side',
       () async {
         final food = await unwritten(await services(), _draft());
         backends.entries = [row('mfp-written')];
@@ -375,12 +576,12 @@ void main() {
         final restarted = await services();
         await restarted.settle();
 
-        check(restarted.writes()).isEmpty();
+        check(restarted.writes()).deepEquals(['POST ${ekkloUri.host}']);
         check(mfpEntryIdOf(restarted, food.entryId)).equals('mfp-written');
         check(restarted.entries.pendingMfp()).isEmpty();
         check(
           (await restarted.find(food.entryId, day))?.status,
-        ).isA<ToSend>();
+        ).isA<InEkklo>();
       },
     );
 
@@ -514,8 +715,8 @@ void main() {
     );
 
     test(
-      'H4: copies a change of date killed after the Ekklo removal, without '
-      'Ekklo',
+      'H4: copies a change of date killed after the Ekklo removal, then '
+      'sends its remembered Ekklo side on the new day',
       () async {
         final (writing, food) = await written();
         backends.mfpReachable = false;
@@ -536,6 +737,7 @@ void main() {
         check(restarted.writes()).deepEquals([
           'POST ${mfpApiUri.host}',
           'DELETE ${mfpApiUri.host}',
+          'POST ${ekkloUri.host}',
         ]);
         check(backends.entries.single.date).equals(_nextDay);
         check(
@@ -543,7 +745,7 @@ void main() {
         ).equals(_nextDay);
         check(
           (await restarted.find(food.entryId, _nextDay))?.status,
-        ).isA<ToSend>();
+        ).isA<InEkklo>();
       },
     );
 

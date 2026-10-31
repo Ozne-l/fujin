@@ -11,9 +11,11 @@ import 'package:fujin/data/recents/recent_food_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/adding/entry_writer.dart';
+import 'package:fujin/domain/adding/known_food.dart';
 import 'package:fujin/domain/adding/remembered_serving.dart';
 import 'package:fujin/domain/adding/rescale_planned.dart';
 import 'package:fujin/domain/adding/scan_outcome.dart';
+import 'package:fujin/domain/memory/memory_rules.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/send_service.dart';
 import 'package:fujin/domain/writing/background_writer.dart';
@@ -67,7 +69,7 @@ final class AddFoodService {
 
   Future<ScanOutcome> scan(String barcode) async {
     if (_memory.barcodeFood(barcode) case final foodId?) {
-      if (await _mfp.foods.byId(foodId) case final food?
+      if (await knownFood(foodId, mfp: _mfp, foods: _foods) case final food?
           when food.servingSizes.isNotEmpty) {
         return ScanFound(barcode, _filled(food), remembered: true);
       }
@@ -103,6 +105,9 @@ final class AddFoodService {
 
   Memory memory() => _memory.load();
 
+  List<MfpFood> onPhone(String query) =>
+      foodsOnPhone(_foods.onPhoneFoods(), query);
+
   Future<AddDraft?> openRemembered(
     RememberedFood remembered, {
     required String mfpMealName,
@@ -127,7 +132,7 @@ final class AddFoodService {
     required String mfpMealName,
     required DateTime date,
     required (MfpServingSize?, double) Function(MfpFood food) serving,
-  }) async => switch (await _mfp.foods.byId(mfpFoodId)) {
+  }) async => switch (await knownFood(mfpFoodId, mfp: _mfp, foods: _foods)) {
     final food? => switch (serving(_filled(food))) {
       (final servingSize, final servings) => AddDraft.of(
         food,
@@ -151,7 +156,7 @@ final class AddFoodService {
 
   AddedFood add(
     AddDraft draft,
-    PlannedEntry planned, {
+    PlannedEntry? planned, {
     String? barcodeToLink,
   }) {
     final stored = _writer.store(
@@ -170,10 +175,14 @@ final class AddFoodService {
       },
     );
     final added = AddedFood(
-      planned: rescalePlanned(planned, stored, _memory.load()),
+      entry: stored,
+      planned: switch (planned) {
+        final planned? => rescalePlanned(planned, stored, _memory.load()),
+        null => null,
+      },
     );
-    if (planned.sends) {
-      _background.hold(added.entryId, EkkloSend(added.planned));
+    if (added.planned case final planned? when planned.sends) {
+      _background.hold(added.entryId, EkkloSend(planned));
     }
     unawaited(_background.run());
     return added;

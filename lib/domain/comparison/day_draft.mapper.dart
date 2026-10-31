@@ -20,6 +20,7 @@ class DayDraftMapper extends ClassMapperBase<DayDraft> {
       CopiedFoodMapper.ensureInitialized();
       CopiedMealMapper.ensureInitialized();
       EkkloLinkMapper.ensureInitialized();
+      ReplacementMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -106,6 +107,13 @@ class DayDraftMapper extends ClassMapperBase<DayDraft> {
     opt: true,
     def: false,
   );
+  static List<Replacement> _$replaced(DayDraft v) => v.replaced;
+  static const Field<DayDraft, List<Replacement>> _f$replaced = Field(
+    'replaced',
+    _$replaced,
+    opt: true,
+    def: const [],
+  );
 
   @override
   final MappableFields<DayDraft> fields = const {
@@ -120,6 +128,7 @@ class DayDraftMapper extends ClassMapperBase<DayDraft> {
     #plannedEntryIds: _f$plannedEntryIds,
     #pendingLinks: _f$pendingLinks,
     #forgetsWaiting: _f$forgetsWaiting,
+    #replaced: _f$replaced,
   };
   @override
   final bool ignoreNull = true;
@@ -137,6 +146,7 @@ class DayDraftMapper extends ClassMapperBase<DayDraft> {
       plannedEntryIds: data.dec(_f$plannedEntryIds),
       pendingLinks: data.dec(_f$pendingLinks),
       forgetsWaiting: data.dec(_f$forgetsWaiting),
+      replaced: data.dec(_f$replaced),
     );
   }
 
@@ -230,6 +240,12 @@ abstract class DayDraftCopyWith<$R, $In extends DayDraft, $Out>
   get plannedEntryIds;
   ListCopyWith<$R, EkkloLink, EkkloLinkCopyWith<$R, EkkloLink, EkkloLink>>
   get pendingLinks;
+  ListCopyWith<
+    $R,
+    Replacement,
+    ReplacementCopyWith<$R, Replacement, Replacement>
+  >
+  get replaced;
   $R call({
     DateTime? date,
     StoredDay? stored,
@@ -242,6 +258,7 @@ abstract class DayDraftCopyWith<$R, $In extends DayDraft, $Out>
     Map<String, String>? plannedEntryIds,
     List<EkkloLink>? pendingLinks,
     bool? forgetsWaiting,
+    List<Replacement>? replaced,
   });
   DayDraftCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -330,6 +347,17 @@ class _DayDraftCopyWithImpl<$R, $Out>
     (v) => call(pendingLinks: v),
   );
   @override
+  ListCopyWith<
+    $R,
+    Replacement,
+    ReplacementCopyWith<$R, Replacement, Replacement>
+  >
+  get replaced => ListCopyWith(
+    $value.replaced,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(replaced: v),
+  );
+  @override
   $R call({
     DateTime? date,
     StoredDay? stored,
@@ -342,6 +370,7 @@ class _DayDraftCopyWithImpl<$R, $Out>
     Map<String, String>? plannedEntryIds,
     List<EkkloLink>? pendingLinks,
     bool? forgetsWaiting,
+    List<Replacement>? replaced,
   }) => $apply(
     FieldCopyWithData({
       if (date != null) #date: date,
@@ -355,6 +384,7 @@ class _DayDraftCopyWithImpl<$R, $Out>
       if (plannedEntryIds != null) #plannedEntryIds: plannedEntryIds,
       if (pendingLinks != null) #pendingLinks: pendingLinks,
       if (forgetsWaiting != null) #forgetsWaiting: forgetsWaiting,
+      if (replaced != null) #replaced: replaced,
     }),
   );
   @override
@@ -370,6 +400,7 @@ class _DayDraftCopyWithImpl<$R, $Out>
     plannedEntryIds: data.get(#plannedEntryIds, or: $value.plannedEntryIds),
     pendingLinks: data.get(#pendingLinks, or: $value.pendingLinks),
     forgetsWaiting: data.get(#forgetsWaiting, or: $value.forgetsWaiting),
+    replaced: data.get(#replaced, or: $value.replaced),
   );
 
   @override

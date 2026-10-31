@@ -13,6 +13,7 @@ import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/preferences/fujin_preferences.dart';
 import 'package:fujin/domain/goals/day_goal_state.dart';
 import 'package:fujin/pages/adding/add_search_notifier.dart';
+import 'package:fujin/pages/adding/widgets/ekklo_summary_card.dart';
 import 'package:fujin/pages/common/appearance_toggle.dart';
 import 'package:fujin/pages/common/day_picker_sheet.dart';
 import 'package:fujin/pages/common/gold_volute.dart';
@@ -191,6 +192,12 @@ Finder _turning(Connector connector) =>
 
 Matrix4 _clockHand(WidgetTester tester, Connector connector) =>
     tester.widget<Transform>(_turning(connector)).transform;
+
+void _stillClocks(WidgetTester tester) {
+  tester.platformDispatcher.accessibilityFeaturesTestValue =
+      const FakeAccessibilityFeatures(disableAnimations: true);
+  addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+}
 
 Future<void> _frames(WidgetTester tester) async {
   for (var frame = 0; frame < 10; frame++) {
@@ -1054,8 +1061,7 @@ void main() {
   });
 
   group('offline', () {
-    testWidgets('keeps the last figures and foods with their time and '
-        'retries alone', (
+    testWidgets('lists Fūjin’s entries without Ekklo and retries alone', (
       tester,
     ) async {
       final backends = FakeBackends(
@@ -1071,18 +1077,17 @@ void main() {
 
       check(find.text('Hors ligne').evaluate()).length.equals(1);
       check(
-        find
-            .text(
-              'Les chiffres datent de 20:00. '
-              'Fūjin réessaie dès que le réseau revient.',
-            )
-            .evaluate(),
+        find.text('Fūjin réessaie dès que le réseau revient.').evaluate(),
       ).length.equals(1);
-      check(find.text('496 kcal à 20:00').evaluate()).length.equals(1);
+      check(_rich('496 / 3${_space}000 kcal').evaluate()).length.equals(1);
+      check(find.textContaining('vers Ekklo').evaluate()).isEmpty();
       await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
       await tester.pumpAndSettle();
       check(find.text(oats).evaluate()).length.equals(1);
+      check(find.text('Ajouter un aliment').evaluate()).isNotEmpty();
       check(find.text('À envoyer').evaluate()).isEmpty();
+      check(find.text('Dans Ekklo').evaluate()).isEmpty();
+      check(find.textContaining('dans Ekklo').evaluate()).isEmpty();
 
       backends
         ..mfpReachable = true
@@ -1090,6 +1095,105 @@ void main() {
       await tester.pump(const Duration(seconds: 15));
       await tester.pumpAndSettle();
       check(find.text('Hors ligne').evaluate()).isEmpty();
+    });
+
+    testWidgets('adds a recent food offline and shows it waiting for '
+        'MyFitnessPal', (tester) async {
+      _tallView(tester);
+      _stillClocks(tester);
+      final backends = _basmatiBackends();
+      await pumpFujin(tester, backends);
+      await _addBasmatiToLunch(tester);
+      tester
+          .state<ScaffoldMessengerState>(find.byType(ScaffoldMessenger))
+          .clearSnackBars();
+      backends
+        ..mfpReachable = false
+        ..ekkloReachable = false;
+      await _pullToRefresh(tester);
+
+      await _tap(tester, find.text('Ajouter un aliment').last);
+      await _tap(tester, find.text('Riz basmati').first);
+      await _tap(tester, find.text('Ajouter à MFP et Ekklo'));
+
+      check(find.text('Riz basmati ajouté').evaluate()).length.equals(1);
+      check(find.text('Riz basmati').evaluate()).length.equals(2);
+      check(_pill(Connector.mfp).evaluate()).length.equals(1);
+      check(_pill(Connector.ekklo).evaluate()).isEmpty();
+      check(backends.entries).length.equals(1);
+    });
+
+    testWidgets('adds to MyFitnessPal only when Ekklo cannot plan the food '
+        'offline', (tester) async {
+      _tallView(tester);
+      _stillClocks(tester);
+      final gratin = mfpFood(
+        'mfp-gratin',
+        description: 'Gratin dauphinois',
+        nutrients: nutrients(kcal: 320),
+      );
+      final backends = FakeBackends(
+        mealNames: [breakfast, lunch],
+        mfpFoods: [gratin],
+        mfpSearches: {
+          'gratin': [gratin],
+        },
+      );
+      await pumpFujin(tester, backends);
+      backends.ekkloReachable = false;
+
+      await _tap(tester, find.text('Ajouter un aliment').last);
+      await tester.enterText(find.byType(TextField), 'gratin');
+      await tester.pump(AddSearchNotifier.typingPause);
+      await tester.pumpAndSettle();
+      await _tap(tester, find.text('Gratin dauphinois').first);
+
+      check(find.text('à vérifier à l’envoi').evaluate()).length.equals(1);
+      check(
+        find
+            .descendant(
+              of: find.byType(EkkloSummaryCard),
+              matching: find.byIcon(Icons.chevron_right),
+            )
+            .evaluate(),
+      ).isEmpty();
+      check(find.text('Ajouter à MFP et Ekklo').evaluate()).isEmpty();
+      check(
+        find
+            .text('Écrit d’abord dans MyFitnessPal, puis dans Ekklo.')
+            .evaluate(),
+      ).isEmpty();
+
+      await _tap(tester, find.text('Ajouter à MFP'));
+
+      check(find.text('Gratin dauphinois ajouté').evaluate()).length.equals(1);
+      check(backends.entries).length.equals(1);
+    });
+
+    testWidgets('writes a pending add when the network comes back', (
+      tester,
+    ) async {
+      _tallView(tester);
+      _stillClocks(tester);
+      final network = StreamController<bool>();
+      addTearDown(network.close);
+      final backends = _basmatiBackends();
+      await pumpFujin(tester, backends, connectivity: network.stream);
+      await _openBasmatiInLunch(tester);
+      backends.mfpReachable = false;
+      network.add(false);
+
+      await _tap(tester, find.text('Ajouter à MFP et Ekklo'));
+      check(backends.entries).isEmpty();
+      check(_pill(Connector.mfp).evaluate()).length.equals(1);
+
+      backends.mfpReachable = true;
+      network.add(true);
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      check(backends.entries).length.equals(1);
+      check(_pill(Connector.mfp).evaluate()).isEmpty();
     });
 
     testWidgets('rings the whole week again at the first pull back online', (
@@ -1365,15 +1469,18 @@ void main() {
       check(find.text('MFP').evaluate()).length.equals(2);
     });
 
-    testWidgets('shows no snackbar offline', (tester) async {
+    testWidgets('shows no snackbar offline and keeps the MyFitnessPal clock '
+        'turning', (tester) async {
       _tallView(tester);
       final backends = _basmatiBackends();
       await pumpFujin(tester, backends);
       await _openBasmatiInLunch(tester);
       backends.mfpReachable = false;
 
-      await _tap(tester, find.text('Ajouter à MFP et Ekklo'));
+      await tester.tap(find.text('Ajouter à MFP et Ekklo'));
+      await _frames(tester);
 
+      check(_turning(Connector.mfp).evaluate()).length.equals(1);
       check(find.text(_mfpNotWritten).evaluate()).isEmpty();
       check(
         find

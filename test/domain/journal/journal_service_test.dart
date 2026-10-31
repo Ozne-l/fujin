@@ -300,13 +300,41 @@ void main() {
       check(entries.entries()).isEmpty();
     });
 
-    test('fails as offline when MyFitnessPal cannot be reached', () async {
-      backends = FakeBackends(entries: [entry('E-1')]);
-      final journal = await service();
-      backends.mfpReachable = false;
+    test(
+      'shows the entries stored in Fūjin when MyFitnessPal cannot be reached',
+      () async {
+        backends = FakeBackends(entries: [entry('E-1')]);
+        final id = stored('E-1');
+        final journal = await service();
+        backends.mfpReachable = false;
 
-      await check(readJournal(journal)).throws<MfpNetworkException>();
-    });
+        final read = await readJournal(journal);
+
+        check(read).isA<FujinOnly>();
+        check([
+          for (final meal in read.diaryMeals)
+            for (final logged in meal.entries) logged.entry.id,
+        ]).deepEquals([id]);
+      },
+    );
+
+    test(
+      'shows the entries stored in Fūjin when only Ekklo cannot be reached',
+      () async {
+        backends = FakeBackends(entries: [entry('E-1')]);
+        final id = stored('E-1');
+        final journal = await service();
+        backends.ekkloReachable = false;
+
+        final read = await readJournal(journal);
+
+        check(read).isA<FujinOnly>();
+        check([
+          for (final meal in read.diaryMeals)
+            for (final logged in meal.entries) logged.entry.id,
+        ]).deepEquals([id]);
+      },
+    );
   });
 
   test('sums the kilocalories logged on a day, null when nothing is '

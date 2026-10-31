@@ -31,14 +31,18 @@ void main() {
       check(addingPossible(read: both)).isTrue();
     });
 
-    test('is impossible when a side is offline or its session expired', () {
-      check(addingPossible(read: mfpOnly(ReadProblem.offline))).isFalse();
+    test('is impossible when a session expired', () {
       check(
         addingPossible(read: mfpOnly(ReadProblem.ekkloSessionExpired)),
       ).isFalse();
       check(
         addingPossible(read: ekkloOnly(ReadProblem.mfpSessionExpired)),
       ).isFalse();
+    });
+
+    test('stays possible offline, from the entries on the phone', () {
+      check(addingPossible(read: FujinOnly(readAt: now))).isTrue();
+      check(addingPossible(read: mfpOnly(ReadProblem.offline))).isTrue();
     });
 
     test('stays possible when a side is down or failed otherwise', () {
@@ -57,7 +61,7 @@ void main() {
           read: both,
           error: EkkloNetworkException(method: 'GET', uri: apiUri),
         ),
-      ).isFalse();
+      ).isTrue();
       check(
         addingPossible(
           error: const MfpAuthException(MfpAuthFailure.sessionExpired),

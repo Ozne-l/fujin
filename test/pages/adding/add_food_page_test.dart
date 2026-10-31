@@ -179,7 +179,7 @@ void main() {
     final added = await result;
     check(
       added,
-    ).isNotNull().has((added) => added.planned.sends, 'sends').isTrue();
+    ).isNotNull().has((added) => added.planned?.sends, 'sends').equals(true);
     check(find.text('Ajouter à Breakfast').evaluate()).isEmpty();
     check(backends.entries).isEmpty();
 
@@ -323,15 +323,74 @@ void main() {
     _sees(_oatsName);
   });
 
-  testWidgets('keeps the recents on screen when offline', (tester) async {
+  testWidgets('lists the foods already in Fūjin above the offline '
+      'MyFitnessPal results when the search is offline (02b)', (tester) async {
+    final backends = _backends();
+    await pumpFujin(tester, backends);
+    await _openAdd(tester);
+    await _search(tester, _query);
+    backends.mfpReachable = false;
+
+    await _search(tester, 'avoine');
+
+    _sees('DÉJÀ DANS FŪJIN');
+    _sees('1 trouvé');
+    _sees(_oatsName);
+    _sees('RÉSULTATS MYFITNESSPAL');
+    _sees('hors ligne');
+    _sees('Pas de connexion');
+    _sees('La recherche dans MyFitnessPal a besoin du réseau.');
+    _sees('Réessayer');
+    check(find.text('RÉCENTS').evaluate()).isEmpty();
+    check(
+      tester.getTopLeft(find.text('DÉJÀ DANS FŪJIN')).dy,
+    ).isLessThan(tester.getTopLeft(find.text('RÉSULTATS MYFITNESSPAL')).dy);
+  });
+
+  testWidgets('opens the fiche of a food already in Fūjin while the search '
+      'is offline', (tester) async {
+    final backends = _backends();
+    await pumpFujin(tester, backends);
+    await _openAdd(tester);
+    await _search(tester, _query);
+    backends.mfpReachable = false;
+    await _search(tester, 'avoine');
+
+    await _tap(tester, _oatsName);
+
+    _sees('Ajouter à Breakfast');
+  });
+
+  testWidgets('searches MyFitnessPal again from the offline banner once the '
+      'network is back', (tester) async {
     final backends = _backends();
     await pumpFujin(tester, backends);
     await _openAdd(tester);
     backends.mfpReachable = false;
-
     await _search(tester, _query);
-    _sees('Pas de connexion');
-    _sees('RÉCENTS');
+    check(find.text('DÉJÀ DANS FŪJIN').evaluate()).isEmpty();
+    _sees('La recherche dans MyFitnessPal a besoin du réseau.');
+
+    backends.mfpReachable = true;
+    await _tap(tester, 'Réessayer');
+
+    _sees(_oatsName);
+    check(find.text('Pas de connexion').evaluate()).isEmpty();
+  });
+
+  testWidgets('reopens a recent food offline from the phone', (tester) async {
+    final backends = _backends();
+    await pumpFujin(tester, backends);
+    final first = await _openAdd(tester);
+    await _openOats(tester);
+    await _tap(tester, _addToBoth);
+    await first;
+    backends.mfpReachable = false;
+
+    await _openAdd(tester);
+    await _tap(tester, _oatsName);
+
+    _sees('Ajouter à Breakfast');
   });
 
   testWidgets('lists the remembered foods under the recents, without the '
@@ -483,16 +542,34 @@ void main() {
     ).has((entry) => entry.servingSize.unit, 'unit').equals(cup);
   });
 
-  testWidgets('keeps the remembered foods on screen when offline', (
+  testWidgets('opens a remembered food offline from the phone', (
     tester,
   ) async {
+    final backends = _skyrBackends(_skyrInPots);
+    await pumpFujin(tester, backends, ownCopies: [_skyrInPotsCopy]);
+    await _openAdd(tester);
+    await _search(tester, 'skyr');
+    backends.mfpReachable = false;
+
+    await _tap(tester, _skyrName);
+
+    _sees(_addToBoth);
+  });
+
+  testWidgets('keeps the recents and the remembered foods under the offline '
+      'card when a remembered food is not on the phone (07c)', (tester) async {
     final backends = _backends();
     await pumpFujin(tester, backends);
     await _openAdd(tester);
     backends.mfpReachable = false;
 
-    await _search(tester, 'rice');
+    await _tap(tester, rice);
+
     _sees('Pas de connexion');
+    _sees(
+      'La recherche reprendra au retour du réseau. Tes récents restent là.',
+    );
+    _sees('RÉCENTS');
     _sees('MÉMORISÉS');
     _sees(rice);
   });

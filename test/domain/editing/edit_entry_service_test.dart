@@ -164,24 +164,34 @@ void main() {
       },
     );
 
-    test('writes only MyFitnessPal for an entry not in Ekklo yet', () async {
-      backends.failingMeals.add(dejeuner);
-      final first = await WriteServices.over(backends, database);
-      final food = await first.add(_draft());
-      await first.settle();
-      final services = await WriteServices.over(backends, database);
-      backends.requests.clear();
+    test(
+      'writes MyFitnessPal, then the remembered Ekklo side, for an entry not '
+      'in Ekklo yet',
+      () async {
+        backends.failingMeals.add(dejeuner);
+        final first = await WriteServices.over(backends, database);
+        final food = await first.add(_draft());
+        await first.settle();
+        backends.failingMeals.clear();
+        final services = await WriteServices.over(backends, database);
+        backends.requests.clear();
 
-      final outcome = await save(services, food, _draft(servings: 2));
+        final outcome = await save(services, food, _draft(servings: 2));
 
-      check(services.writes()).deepEquals([
-        'POST ${mfpApiUri.host}',
-        'DELETE ${mfpApiUri.host}',
-      ]);
-      check(
-        outcome,
-      ).isA<Edited>().has((it) => it.edited.link?.item, 'Ekklo item').isNull();
-    });
+        check(services.writes()).deepEquals([
+          'POST ${mfpApiUri.host}',
+          'DELETE ${mfpApiUri.host}',
+          'POST ${ekkloUri.host}',
+        ]);
+        check(
+              outcome,
+            )
+            .isA<Edited>()
+            .has((it) => it.edited.link?.item, 'Ekklo item')
+            .isNull();
+        check(services.entries.find(food.entryId)?.ekkloLink?.item).isNotNull();
+      },
+    );
 
     test(
       'keeps the Fūjin id and moves its MyFitnessPal link to the copy',
@@ -356,6 +366,29 @@ void main() {
       );
 
       check(opening).isA<ServingMissing>();
+    });
+
+    test('drafts from the copy on the phone when offline', () async {
+      final (services, _) = await added();
+      backends.mfpReachable = false;
+
+      final opening = await services.editing.open(
+        loggedEntry(entry('e1', food: rice, servings: 2.5, version: '1')),
+      );
+
+      check(opening).isA<Opened>().has((it) => it.draft, 'draft')
+        ..has((it) => it.food.description, 'name').equals(_basmati.description)
+        ..has((it) => it.servings, 'servings').equals(2.5)
+        ..has((it) => it.servingSize, 'serving').equals(_hundredGrams);
+    });
+
+    test('keeps the offline error for a food not on the phone', () async {
+      final services = await WriteServices.over(backends, database);
+      backends.mfpReachable = false;
+
+      await check(
+        services.editing.open(loggedEntry(entry('e1', food: rice))),
+      ).throws<MfpNetworkException>();
     });
   });
 }

@@ -297,8 +297,9 @@ void main() {
     _missing(_saveBoth);
   });
 
-  testWidgets('says why it cannot edit when the connection dropped since '
-      'the Journal was read', (tester) async {
+  testWidgets('says it cannot open a food not on the phone offline', (
+    tester,
+  ) async {
     final backends = LoggedJournal.backends();
     await LoggedJournal.pump(tester, backends);
     backends
@@ -308,9 +309,85 @@ void main() {
     await tester.tap(find.text(LoggedJournal.basmati));
     await tester.pumpAndSettle();
 
-    _sees('Hors ligne : modifier ou supprimer attendra le réseau.');
+    _sees('Pas de connexion internet.');
     _missing(_saveBoth);
     _missing(_deleteBoth);
+  });
+
+  testWidgets('edits a food offline from its copy on the phone', (
+    tester,
+  ) async {
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    final backends = LoggedJournal.backends(
+      foods: [
+        mfpFood(
+          rice,
+          description: LoggedJournal.basmati,
+          nutrients: nutrients(kcal: 350),
+        ),
+      ],
+    );
+    await _open(tester, backends, LoggedJournal.basmati);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    await LoggedJournal.goOffline(
+      tester,
+      backends,
+      showing: LoggedJournal.basmati,
+    );
+    await tester.tap(find.text(LoggedJournal.basmati));
+    await tester.pumpAndSettle();
+
+    check(_enabled(tester, _deleteBoth)).isTrue();
+    await _servings(tester, '2');
+    await _tap(tester, _saveBoth);
+
+    _missing(_title);
+    _sees(_edited);
+    _missing(_mfpNotWritten);
+    check(find.byType(ConnectorPill).evaluate()).length.equals(1);
+    check(
+      backends.entries.where((entry) => entry.food.id == rice).single.servings,
+    ).equals(1.5);
+  });
+
+  testWidgets('keeps the edit and says Remplacé dans MyFitnessPal when the '
+      'MyFitnessPal app changed the food before it was written', (
+    tester,
+  ) async {
+    final backends = LoggedJournal.backends()..mfpWritesFail = true;
+    await _open(tester, backends, LoggedJournal.basmati);
+    await _servings(tester, '2');
+    await _tap(tester, _saveBoth);
+    backends
+      ..mfpWritesFail = false
+      ..entries = [
+        for (final logged in backends.entries)
+          switch (logged.id) {
+            LoggedJournal.basmatiId => logged.copyWith(servings: 3),
+            _ => logged,
+          },
+      ];
+    tester
+        .state<ScaffoldMessengerState>(find.byType(ScaffoldMessenger))
+        .clearSnackBars();
+    tester.view.reset();
+    await tester.pumpAndSettle();
+
+    await tester.fling(
+      find.byType(CustomScrollView),
+      const Offset(0, 400),
+      1000,
+    );
+    await tester.pumpAndSettle();
+
+    _sees('Remplacé dans MyFitnessPal');
+    _sees('Riz basmati : 3 × 100 g → 2 × 100 g');
+    check(
+      backends.entries.where((entry) => entry.food.id == rice).single.servings,
+    ).equals(2);
   });
 
   testWidgets('returns to the Journal when the food is no longer in the day '

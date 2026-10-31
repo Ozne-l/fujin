@@ -6,11 +6,10 @@ part 'added_food.mapper.dart';
 
 @MappableClass()
 final class AddedFood with AddedFoodMappable {
-  const AddedFood({required this.planned});
+  const AddedFood({required this.entry, this.planned});
 
-  final PlannedEntry planned;
+  final LoggedEntry entry;
+  final PlannedEntry? planned;
 
-  String get entryId => planned.entryId;
-
-  LoggedEntry get entry => planned.entry;
+  String get entryId => entry.entry.id;
 }

@@ -6,8 +6,8 @@ import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
-import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/compared_entry_lookup.dart';
+import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/editing/edit_opening.dart';
 import 'package:fujin/domain/editing/edit_outcome.dart';
 import 'package:fujin/domain/journal/journal_read.dart';
@@ -23,6 +23,8 @@ import 'package:fujin/pages/journal/journal_text.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
+
+typedef _Original = ({LoggedEntry logged, EntryStatus? status});
 
 final FutureProviderFamily<EditOpening, LoggedEntry> editOpeningProvider =
     FutureProvider.autoDispose.family<EditOpening, LoggedEntry>(
@@ -40,10 +42,21 @@ class EditFoodPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final journal = ref.watch(journalProvider(date));
     final shown = switch (journal.value) {
-      BothSides(:final day) => day.comparison.entryWithId(entryId),
+      BothSides(:final day) => switch (day.comparison.entryWithId(entryId)) {
+        final compared? => (logged: compared.logged, status: compared.status),
+        null => null,
+      },
+      FujinOnly(:final meals) => switch ([
+        for (final meal in meals)
+          for (final logged in meal.entries)
+            if (logged.entry.id == entryId) logged,
+      ]) {
+        [final logged, ...] => (logged: logged, status: null),
+        [] => null,
+      },
       MfpOnly() || EkkloOnly() || null => null,
     };
-    final held = useRef<ComparedEntry?>(null)..value ??= shown;
+    final held = useRef<_Original?>(null)..value ??= shown;
     final gone = held.value == null && !journal.isLoading;
     useEffect(() {
       if (gone) {
@@ -56,7 +69,7 @@ class EditFoodPage extends HookConsumerWidget {
       return null;
     }, [gone]);
 
-    Widget frame(ComparedEntry original, Widget body) => Scaffold(
+    Widget frame(_Original original, Widget body) => Scaffold(
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -84,7 +97,7 @@ class EditFoodPage extends HookConsumerWidget {
         JournalText.problemHeadline(context.intl, problem);
 
     Widget fiche(
-      ComparedEntry original,
+      _Original original,
       AddDraft draft, {
       required bool newVersion,
     }) => Scaffold(
@@ -95,7 +108,8 @@ class EditFoodPage extends HookConsumerWidget {
           initial: draft,
           mode: EditingFood(
             entryId: entryId,
-            original: original,
+            original: original.logged,
+            status: original.status,
             newVersion: newVersion,
             onLeave: (outcome) => context.pop<EditOutcome>(outcome),
           ),

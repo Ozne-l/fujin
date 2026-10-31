@@ -11,16 +11,16 @@ final class EditedFood with EditedFoodMappable {
   const EditedFood({
     required this.original,
     required this.draft,
-    required this.planned,
+    required this.entry,
+    this.planned,
     this.link,
   });
 
   final LoggedEntry original;
   final AddDraft draft;
+  final LoggedEntry entry;
+  final PlannedEntry? planned;
   final EkkloLink? link;
-  final PlannedEntry planned;
 
   String get entryId => original.entry.id;
-
-  LoggedEntry get entry => planned.entry;
 }

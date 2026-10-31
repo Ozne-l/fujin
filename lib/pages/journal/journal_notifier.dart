@@ -8,6 +8,7 @@ import 'package:fujin/domain/journal/journal_read.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/pages/journal/background_write_notifier.dart';
 import 'package:fujin/pages/journal/refresh_outcome.dart';
+import 'package:fujin/pages/journal/replaced_notifier.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
@@ -179,7 +180,9 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
     Fetch<List<EkkloDailyMeal>> meals, {
     required bool thenWrite,
   }) {
-    service.settleDay(date, diary: diary, meals: meals);
+    ref
+        .read(replacedProvider.notifier)
+        .settled(service.settleDay(date, diary: diary, meals: meals));
     if ((thenWrite, diary) case (true, Fetched())) {
       ref.read(backgroundWriteProvider.notifier).run();
     }

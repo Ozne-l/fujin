@@ -3,8 +3,9 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
 
 class OfflineCard extends StatelessWidget {
-  const OfflineCard({required this.onRetry, super.key});
+  const OfflineCard({required this.detail, required this.onRetry, super.key});
 
+  final String detail;
   final VoidCallback onRetry;
 
   @override
@@ -41,7 +42,7 @@ class OfflineCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  context.intl.addOfflineDetail,
+                  detail,
                   style: FujinText.inter13Regular.copyWith(
                     color: context.colors.textSecondary,
                   ),

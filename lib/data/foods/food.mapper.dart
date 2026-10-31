@@ -46,6 +46,13 @@ class FoodMapper extends ClassMapperBase<Food> {
     opt: true,
     def: const FoodNutrients(),
   );
+  static bool? _$verified(Food v) => v.verified;
+  static const Field<Food, bool> _f$verified = Field(
+    'verified',
+    _$verified,
+    opt: true,
+    hook: SqliteBoolHook(),
+  );
   static DateTime? _$deletedAt(Food v) => v.deletedAt;
   static const Field<Food, DateTime> _f$deletedAt = Field(
     'deletedAt',
@@ -61,6 +68,7 @@ class FoodMapper extends ClassMapperBase<Food> {
     #name: _f$name,
     #brand: _f$brand,
     #nutrients: _f$nutrients,
+    #verified: _f$verified,
     #deletedAt: _f$deletedAt,
   };
   @override
@@ -75,6 +83,7 @@ class FoodMapper extends ClassMapperBase<Food> {
       name: data.dec(_f$name),
       brand: data.dec(_f$brand),
       nutrients: data.dec(_f$nutrients),
+      verified: data.dec(_f$verified),
       deletedAt: data.dec(_f$deletedAt),
     );
   }
@@ -132,6 +141,7 @@ abstract class FoodCopyWith<$R, $In extends Food, $Out>
     String? name,
     String? brand,
     FoodNutrients? nutrients,
+    bool? verified,
     DateTime? deletedAt,
   });
   FoodCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
@@ -153,6 +163,7 @@ class _FoodCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Food, $Out>
     Object? name = $none,
     Object? brand = $none,
     FoodNutrients? nutrients,
+    Object? verified = $none,
     Object? deletedAt = $none,
   }) => $apply(
     FieldCopyWithData({
@@ -161,6 +172,7 @@ class _FoodCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Food, $Out>
       if (name != $none) #name: name,
       if (brand != $none) #brand: brand,
       if (nutrients != null) #nutrients: nutrients,
+      if (verified != $none) #verified: verified,
       if (deletedAt != $none) #deletedAt: deletedAt,
     }),
   );
@@ -171,6 +183,7 @@ class _FoodCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Food, $Out>
     name: data.get(#name, or: $value.name),
     brand: data.get(#brand, or: $value.brand),
     nutrients: data.get(#nutrients, or: $value.nutrients),
+    verified: data.get(#verified, or: $value.verified),
     deletedAt: data.get(#deletedAt, or: $value.deletedAt),
   );
 

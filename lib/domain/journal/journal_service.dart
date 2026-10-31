@@ -5,6 +5,7 @@ import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/foods/food_repository.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
+import 'package:fujin/data/meals/meal.dart';
 import 'package:fujin/data/meals/meal_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/unattended/unattended_item_repository.dart';
@@ -13,6 +14,7 @@ import 'package:fujin/domain/comparison/compare_day.dart';
 import 'package:fujin/domain/comparison/compare_mfp_day.dart';
 import 'package:fujin/domain/comparison/day_comparison.dart';
 import 'package:fujin/domain/comparison/day_draft.dart';
+import 'package:fujin/domain/comparison/replacement.dart';
 import 'package:fujin/domain/journal/diary_meal.dart';
 import 'package:fujin/domain/journal/fetch.dart';
 import 'package:fujin/domain/journal/journal_day.dart';
@@ -95,6 +97,9 @@ final class JournalService {
           false => ekkloAt,
         },
       ),
+    (Fetched(), FetchFailed(:final error)) || (FetchFailed(:final error), _)
+        when ReadProblem.of(error) == ReadProblem.offline =>
+      FujinOnly(meals: _storedMeals(date, mealNames), readAt: _clock()),
     (
       Fetched(:final readAt) && final Fetched<MfpDiaryDay> diary,
       FetchFailed(:final error),
@@ -104,8 +109,7 @@ final class JournalService {
         ekkloProblem: ReadProblem.of(error),
         readAt: readAt,
       ),
-    (FetchFailed(:final error), Fetched(value: final meals, :final readAt))
-        when ReadProblem.of(error) != ReadProblem.offline =>
+    (FetchFailed(:final error), Fetched(value: final meals, :final readAt)) =>
       EkkloOnly(
         ekkloMeals: meals,
         mfpProblem: ReadProblem.of(error),
@@ -115,22 +119,25 @@ final class JournalService {
       Error.throwWithStackTrace(error, stackTrace),
   };
 
-  void settleDay(
+  List<Replacement> settleDay(
     DateTime date, {
     required Fetch<MfpDiaryDay> diary,
     required Fetch<List<EkkloDailyMeal>> meals,
-  }) {
-    switch ((diary, meals)) {
-      case (final Fetched<MfpDiaryDay> diary, Fetched(value: final meals)):
-        _stored(date, diary, meals);
-      case (final Fetched<MfpDiaryDay> diary, FetchFailed()):
-        _database.transaction(
-          () => _entries.store(_mfpDraft(date, diary).changes),
-        );
-      case (FetchFailed(), _):
-        return;
-    }
-  }
+  }) => switch ((diary, meals)) {
+    (final Fetched<MfpDiaryDay> diary, Fetched(value: final meals)) => _stored(
+      date,
+      diary,
+      meals,
+    ).replaced,
+    (final Fetched<MfpDiaryDay> diary, FetchFailed()) => _database.transaction(
+      () {
+        final draft = _mfpDraft(date, diary);
+        _entries.store(draft.changes);
+        return draft.replaced;
+      },
+    ),
+    (FetchFailed(), _) => const [],
+  };
 
   Future<List<String>> mealNames() async {
     final names = await _mfp.diary.mealNames();
@@ -238,24 +245,52 @@ final class JournalService {
       ),
   ];
 
+  List<String> storedMealNames() => [
+    for (final meal in _positioned()) meal.name,
+  ];
+
+  List<DiaryMeal> _storedMeals(DateTime date, List<String> mealNames) {
+    final draft = DayDraft.of(_entries.forDate(date), date: date);
+    final leaving = draft.leaving;
+    return [
+      for (final name in {
+        ...mealNames,
+        ...storedMealNames(),
+        for (final logged in [...draft.entries, ...leaving]) logged.mealName,
+      })
+        DiaryMeal(
+          name: name,
+          entries: [
+            for (final logged in draft.entries)
+              if (logged.mealName == name) logged,
+          ],
+          leaving: [
+            for (final logged in leaving)
+              if (logged.mealName == name) logged,
+          ],
+        ),
+    ];
+  }
+
   List<String> _mealOrder(List<String> mealNames, List<LoggedEntry> entries) {
     final held = {
       for (final logged in entries) logged.entry.mealId: logged.mealName,
     };
-    final positioned =
-        [
-          for (final meal in _meals.meals())
-            if (meal.deletedAt == null) meal,
-        ]..sort(
-          (a, b) => switch (a.position.compareTo(b.position)) {
-            0 => a.id.compareTo(b.id),
-            final order => order,
-          },
-        );
     return {
       ...mealNames,
-      for (final meal in positioned) ?held[meal.id],
+      for (final meal in _positioned()) ?held[meal.id],
       ...held.values,
     }.toList();
   }
+
+  List<Meal> _positioned() =>
+      [
+        for (final meal in _meals.meals())
+          if (meal.deletedAt == null) meal,
+      ]..sort(
+        (a, b) => switch (a.position.compareTo(b.position)) {
+          0 => a.id.compareTo(b.id),
+          final order => order,
+        },
+      );
 }

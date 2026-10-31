@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/adding/added_food.dart';
+import 'package:fujin/domain/comparison/replacement.dart';
 import 'package:fujin/domain/editing/edited_food.dart';
 import 'package:fujin/domain/sending/food_words.dart';
 import 'package:fujin/domain/writing/write_failure.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/snack_bar_content.dart';
 import 'package:fujin/pages/common/snack_bar_glyph.dart';
@@ -104,6 +106,47 @@ abstract final class JournalSnackBar {
         action: action,
       ),
     );
+  }
+
+  static void replaced(BuildContext context, List<Replacement> replaced) {
+    final intl = context.intl;
+    final detail = switch (replaced) {
+      [] => null,
+      [ReplacedDeletion(:final logged)] => intl.replacedDeletion(
+        productName(logged),
+      ),
+      [ReplacedEdit(:final logged, :final before)] => switch ((
+        intl.servingLine(
+          before.servings,
+          before.servingValue,
+          before.servingUnit,
+        ),
+        EntryText.serving(intl, logged),
+      )) {
+        (final was, final now) when was != now => intl.replacedChange(
+          productName(logged),
+          was,
+          now,
+        ),
+        _ => intl.replacedChange(
+          productName(logged),
+          before.mealName,
+          logged.mealName,
+        ),
+      },
+      _ => intl.replacedMany(replaced.length),
+    };
+    if (detail case final detail?) {
+      show(
+        context,
+        duration: _settledDuration,
+        content: SnackBarContent(
+          glyph: SnackBarGlyph.refresh,
+          title: intl.replacedTitle,
+          detail: detail,
+        ),
+      );
+    }
   }
 
   static void notWritten(

@@ -1,4 +1,5 @@
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 part 'food_serving.mapper.dart';
 
@@ -23,4 +24,10 @@ final class FoodServing with FoodServingMappable {
   final double? nutritionMultiplier;
   final DateTime updatedAt;
   final DateTime? deletedAt;
+
+  MfpServingSize toMfp() => MfpServingSize(
+    value: value,
+    unit: unit,
+    nutritionMultiplier: nutritionMultiplier,
+  );
 }

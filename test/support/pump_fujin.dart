@@ -44,6 +44,7 @@ Future<void> pumpFujin(
   List<BarcodeLink> barcodeLinks = const [],
   bool reduceTransparency = false,
   AppEnvironment environment = AppEnvironment.production,
+  Stream<bool> connectivity = const Stream.empty(),
 }) async {
   tester.platformDispatcher.localesTestValue = const [Locale('fr')];
   addTearDown(tester.platformDispatcher.clearLocalesTestValue);
@@ -87,6 +88,7 @@ Future<void> pumpFujin(
         appEnvironmentProvider.overrideWithValue(environment),
         databaseProvider.overrideWithValue(database),
         clockProvider.overrideWithValue(() => now),
+        connectivityProvider.overrideWithValue(connectivity),
         mfpClientProvider.overrideWithValue(signedInMfp),
         ekkloClientProvider.overrideWithValue(signedInEkklo),
         appVersionProvider.overrideWithValue(appVersion),
