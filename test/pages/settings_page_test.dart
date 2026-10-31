@@ -7,10 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/backup/backup.dart';
+import 'package:fujin/data/connectors/role.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/preferences/fujin_preferences.dart';
 import 'package:fujin/pages/common/fujin_switch.dart';
 import 'package:fujin/pages/common/switch_lens.dart';
+import 'package:fujin/pages/settings/widgets/role_row.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 import '../support/fake_backends.dart';
@@ -174,6 +176,87 @@ void main() {
       await finger.cancel();
       await tester.pumpAndSettle();
     }
+  });
+
+  group('the RÔLE DES APPS card', () {
+    const toReceiveOnly = 'MyFitnessPal en réception ?';
+
+    Role roleOf(WidgetTester tester, String name) => tester
+        .widget<RoleRow>(
+          find.byWidgetPredicate(
+            (widget) => widget is RoleRow && widget.name == name,
+          ),
+        )
+        .role;
+
+    Future<void> tapMfpReceiveOnly(WidgetTester tester) async {
+      final segment = find.text('Réception').first;
+      await tester.ensureVisible(segment);
+      await tester.pumpAndSettle();
+      await tester.tap(segment);
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('shows MyFitnessPal two-way and Ekklo receive only, without '
+        'a choice, with what each role does', (tester) async {
+      await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+      await _tap(tester, 'Réglages');
+
+      check(_count('RÔLE DES APPS · ALIMENTATION')).equals(1);
+      check(_count('Deux sens')).equals(1);
+      check(_count('Réception')).equals(2);
+      check(
+        find.textContaining('Deux sens : ce que tu ajoutes').evaluate(),
+      ).length.equals(1);
+      check(roleOf(tester, 'MyFitnessPal')).equals(Role.twoWay);
+      check(roleOf(tester, 'Ekklo')).equals(Role.receiveOnly);
+    });
+
+    testWidgets('asks before MyFitnessPal goes receive only, and Annuler '
+        'leaves it two-way', (tester) async {
+      await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+      await _tap(tester, 'Réglages');
+
+      await tapMfpReceiveOnly(tester);
+      check(_count(toReceiveOnly)).equals(1);
+      check(_count('Passer MyFitnessPal en réception')).equals(1);
+
+      await _tap(tester, 'Annuler');
+      check(_count(toReceiveOnly)).equals(0);
+      check(roleOf(tester, 'MyFitnessPal')).equals(Role.twoWay);
+    });
+
+    testWidgets('offers no choice for Ekklo, whose only role is receive only', (
+      tester,
+    ) async {
+      await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+      await _tap(tester, 'Réglages');
+      final ekklo = find.text('Réception').last;
+      await tester.ensureVisible(ekklo);
+      await tester.pumpAndSettle();
+
+      check(ekklo.hitTestable().evaluate()).isEmpty();
+      check(roleOf(tester, 'Ekklo')).equals(Role.receiveOnly);
+    });
+
+    testWidgets('keeps MyFitnessPal receive only once confirmed, across '
+        'launches', (tester) async {
+      await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+      await _tap(tester, 'Réglages');
+
+      await tapMfpReceiveOnly(tester);
+      await _tap(tester, 'Passer MyFitnessPal en réception');
+      check(roleOf(tester, 'MyFitnessPal')).equals(Role.receiveOnly);
+
+      await tester.pumpWidget(const SizedBox());
+      await pumpFujin(
+        tester,
+        FakeBackends(mealNames: [breakfast]),
+        preferences: await FujinPreferences.open(),
+      );
+      await _tap(tester, 'Réglages');
+      check(roleOf(tester, 'MyFitnessPal')).equals(Role.receiveOnly);
+    });
   });
 
   group('the APPARENCE card', () {

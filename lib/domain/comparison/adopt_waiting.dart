@@ -1,3 +1,4 @@
+import 'package:fujin/data/connectors/role.dart';
 import 'package:fujin/data/database/id_source.dart';
 import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/data/entries/entry.dart';
@@ -42,8 +43,13 @@ DayDraft adoptWaiting(
   required String? Function(String mfpMealName) mealOf,
   required DateTime now,
   required IdSource ids,
+  required Role role,
 }) {
   if (links.isEmpty && unattended.isEmpty) return day;
+  final copiesIn = switch (role) {
+    Role.twoWay => true,
+    Role.receiveOnly => false,
+  };
   final catalog = DayCatalog(
     foodOf: foodOf,
     mealOf: mealOf,
@@ -58,10 +64,17 @@ DayDraft adoptWaiting(
     for (final (index, logged) in entries.indexed)
       if (logged.mfpLink case final link?) link.mfpEntryId: index,
   };
-  final planned = {
+  final unheld = {
     for (final entry in diary)
-      if (entry.id case final id? when !storedIndex.containsKey(id))
-        id: day.plannedEntryIds[id] ?? ids(),
+      if (entry.id case final id? when !storedIndex.containsKey(id)) id,
+  };
+  final planned = {
+    for (final id in [if (copiesIn) ...unheld])
+      id: day.plannedEntryIds[id] ?? ids(),
+  };
+  final ignored = switch (copiesIn) {
+    true => const <String>{},
+    false => unheld,
   };
   final orphanIndex = <String, int>{};
   final linkedItems = {
@@ -128,8 +141,15 @@ DayDraft adoptWaiting(
     );
   }
 
+  final keepsWaiting = [
+    for (final link in links) link.mfpEntryId,
+    for (final item in unattended) item.mfpEntryId,
+  ].any(ignored.contains);
   for (final link in links) {
-    if (linkedItems.contains(link.ekkloItemId)) continue;
+    if (linkedItems.contains(link.ekkloItemId) ||
+        ignored.contains(link.mfpEntryId)) {
+      continue;
+    }
     switch (holderOf(link.mfpEntryId)) {
       case _Stored(:final index) when entries[index].ekkloLink == null:
         final logged = entries[index];
@@ -152,7 +172,10 @@ DayDraft adoptWaiting(
     for (final link in links) link.mfpEntryId,
   };
   for (final item in unattended) {
-    if (!waitingEntryIds.contains(item.mfpEntryId)) continue;
+    if (!waitingEntryIds.contains(item.mfpEntryId) ||
+        ignored.contains(item.mfpEntryId)) {
+      continue;
+    }
     final expectation = UnattendedExpectation(
       ekkloMealName: item.ekkloMealName,
       ekkloFoodId: item.ekkloFoodId,
@@ -192,6 +215,6 @@ DayDraft adoptWaiting(
     meals: catalog.meals,
     plannedEntryIds: planned,
     pendingLinks: [...pending.values],
-    forgetsWaiting: true,
+    forgetsWaiting: !keepsWaiting,
   );
 }

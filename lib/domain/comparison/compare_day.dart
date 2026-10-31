@@ -1,4 +1,5 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/data/connectors/connector_roles.dart';
 import 'package:fujin/data/database/id_source.dart';
 import 'package:fujin/data/entries/stored_day.dart';
 import 'package:fujin/data/foods/food.dart';
@@ -25,6 +26,7 @@ DayComparison compareDay({
   required DateTime now,
   required DateTime diaryReadAt,
   required IdSource ids,
+  required ConnectorRoles roles,
 }) => compareEkkloDay(
   compareMfpDay(
     adoptWaiting(
@@ -36,6 +38,7 @@ DayComparison compareDay({
       mealOf: mealOf,
       now: now,
       ids: ids,
+      role: roles.mfp,
     ),
     diary: diary,
     foodOf: foodOf,
@@ -43,6 +46,7 @@ DayComparison compareDay({
     now: now,
     readAt: diaryReadAt,
     ids: ids,
+    role: roles.mfp,
   ),
   meals: meals,
   memory: memory,

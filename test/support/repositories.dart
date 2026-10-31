@@ -1,4 +1,6 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/data/connectors/connector_domain.dart';
+import 'package:fujin/data/connectors/connector_roles.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_id.dart';
 import 'package:fujin/data/entries/entry.dart';
@@ -72,7 +74,9 @@ JournalService journalOver(
   FujinDatabase database, {
   required MyFitnessPalClient mfp,
   required EkkloClient ekklo,
+  ConnectorRoles Function()? roles,
 }) => JournalService(
+  roles: roles ?? () => ConnectorRoles.defaults(ConnectorDomain.food),
   mfp: mfp,
   ekklo: ekklo,
   entries: entriesOf(database),

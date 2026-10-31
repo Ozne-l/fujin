@@ -594,6 +594,34 @@
     "placeholders": {"nutrient": {"type": "String"}, "value": {"type": "String"}}
   },
   "summarySeparator": " · ",
+  "settingsRolesFood": "RÔLE DES APPS · ALIMENTATION",
+  "settingsRolesDetail": "Deux sens : ce que tu ajoutes, modifies ou supprimes dans l’app arrive dans Fūjin. Réception : l’app reçoit seulement ce que Fūjin lui envoie.",
+  "roleTwoWay": "Deux sens",
+  "roleReceiveOnly": "Réception",
+  "roleToReceiveOnlyTitle": "{app} en réception ?",
+  "@roleToReceiveOnlyTitle": {
+    "placeholders": {"app": {"type": "String"}}
+  },
+  "roleToReceiveOnlyDetail": "Dès la prochaine lecture, ce que tu changes dans {app} n’arrivera plus dans Fūjin : Fūjin y remettra ses entrées. Rien n’est réécrit.",
+  "@roleToReceiveOnlyDetail": {
+    "placeholders": {"app": {"type": "String"}}
+  },
+  "roleToReceiveOnlyConfirm": "Passer {app} en réception",
+  "@roleToReceiveOnlyConfirm": {
+    "placeholders": {"app": {"type": "String"}}
+  },
+  "roleToTwoWayTitle": "{app} dans les deux sens ?",
+  "@roleToTwoWayTitle": {
+    "placeholders": {"app": {"type": "String"}}
+  },
+  "roleToTwoWayDetail": "Dès la prochaine lecture, ce que tu changes dans {app} arrivera dans Fūjin. Rien n’est réécrit.",
+  "@roleToTwoWayDetail": {
+    "placeholders": {"app": {"type": "String"}}
+  },
+  "roleToTwoWayConfirm": "Passer {app} en deux sens",
+  "@roleToTwoWayConfirm": {
+    "placeholders": {"app": {"type": "String"}}
+  },
   "settingsSending": "ENVOI",
   "automaticMode": "Mode automatique",
   "automaticModeDetail": "Ne me demande rien : aliments mémorisés,\npuis meilleur candidat, sinon aliment perso.",

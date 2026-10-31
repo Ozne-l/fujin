@@ -1,5 +1,6 @@
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart' show group, test;
+import 'package:fujin/data/connectors/role.dart';
 import 'package:fujin/data/entries/copied_food.dart';
 import 'package:fujin/data/entries/copied_meal.dart';
 import 'package:fujin/data/entries/day_changes.dart';
@@ -23,6 +24,7 @@ DayDraft read(
   Food? Function(String mfpFoodId) foodOf = knownFood,
   List<LoggedEntry> owed = const [],
   DateTime? readAt,
+  Role role = Role.twoWay,
 }) => compareMfpDay(
   DayDraft.of(
     StoredDay(entries: stored, owed: owed),
@@ -34,6 +36,15 @@ DayDraft read(
   now: now,
   readAt: readAt ?? now,
   ids: idsFrom('n'),
+  role: role,
+);
+
+MfpLink linkTo(MfpFoodEntry row, {String id = 'E-1'}) => MfpLink.of(
+  row,
+  id: 'mfp-link-$id',
+  entryId: id,
+  mfpEntryId: row.id ?? '',
+  updatedAt: now,
 );
 
 LoggedEntry unlinked(String id) =>
@@ -362,14 +373,6 @@ void main() {
   });
 
   group('a pending change whose row the MyFitnessPal app replaced', () {
-    MfpLink movedTo(MfpFoodEntry row, {String id = 'E-1'}) => MfpLink.of(
-      row,
-      id: 'mfp-link-$id',
-      entryId: id,
-      mfpEntryId: row.id ?? '',
-      updatedAt: now,
-    );
-
     test("moves an edit's link to a row of the same food and meal", () {
       final edited = editedTo(2);
       final otherMeal = entry('M-1', meal: lunch, servings: 3);
@@ -377,15 +380,15 @@ void main() {
 
       final draft = read([edited], [otherMeal, sameMeal]);
 
-      final kept = edited.copyWith(mfpLink: movedTo(sameMeal));
+      final kept = edited.copyWith(mfpLink: linkTo(sameMeal));
       check(draft.entries.first).equals(kept);
       check(draft.entries).length.equals(2);
       check(draft.replaced).deepEquals([
-        ReplacedEdit(kept, before: movedTo(sameMeal)),
+        ReplacedEdit(kept, before: linkTo(sameMeal)),
       ]);
       check(
         draft.changes.changedMfpLinks,
-      ).deepEquals([movedTo(sameMeal)]);
+      ).deepEquals([linkTo(sameMeal)]);
     });
 
     test('moves it to a row of another meal when none shares its meal', () {
@@ -394,13 +397,13 @@ void main() {
 
       final draft = read([edited], [otherMeal]);
 
-      final kept = edited.copyWith(mfpLink: movedTo(otherMeal));
+      final kept = edited.copyWith(mfpLink: linkTo(otherMeal));
       check(draft.entries).deepEquals([kept]);
       check(draft.replaced).deepEquals([
-        ReplacedEdit(kept, before: movedTo(otherMeal)),
+        ReplacedEdit(kept, before: linkTo(otherMeal)),
       ]);
       check(draft.changes).equals(
-        DayChanges(date: day, changedMfpLinks: [movedTo(otherMeal)]),
+        DayChanges(date: day, changedMfpLinks: [linkTo(otherMeal)]),
       );
     });
 
@@ -413,7 +416,7 @@ void main() {
 
       check(draft.entries).deepEquals([
         newer.copyWith(mfpLink: null),
-        older.copyWith(mfpLink: movedTo(row)),
+        older.copyWith(mfpLink: linkTo(row)),
       ]);
     });
 
@@ -450,11 +453,11 @@ void main() {
 
       final draft = read([edited], [row]);
 
-      final kept = edited.copyWith(mfpLink: movedTo(row));
+      final kept = edited.copyWith(mfpLink: linkTo(row));
       check(draft.entries).deepEquals([kept]);
       check(draft.replaced).isEmpty();
       check(draft.changes).equals(
-        DayChanges(date: day, changedMfpLinks: [movedTo(row)]),
+        DayChanges(date: day, changedMfpLinks: [linkTo(row)]),
       );
     });
 
@@ -464,12 +467,12 @@ void main() {
 
       final draft = read([], [row], owed: [owed]);
 
-      final kept = owed.copyWith(mfpLink: movedTo(row));
+      final kept = owed.copyWith(mfpLink: linkTo(row));
       check(draft.owed).deepEquals([kept]);
       check(draft.entries).isEmpty();
       check(draft.replaced).deepEquals([ReplacedDeletion(kept)]);
       check(draft.changes).equals(
-        DayChanges(date: day, changedMfpLinks: [movedTo(row)]),
+        DayChanges(date: day, changedMfpLinks: [linkTo(row)]),
       );
     });
 
@@ -478,7 +481,7 @@ void main() {
 
       final draft = read([editedTo(2)], [row], owed: [deletedEntry('D-1')]);
 
-      check(draft.entries.single.mfpLink).equals(movedTo(row));
+      check(draft.entries.single.mfpLink).equals(linkTo(row));
       check(draft.owed.single.mfpLink).isNull();
     });
 
@@ -493,6 +496,97 @@ void main() {
 
       check(draft.entries.first).equals(edited);
       check(draft.replaced).isEmpty();
+    });
+  });
+
+  group('MyFitnessPal in receive only', () {
+    DayDraft receive(
+      List<LoggedEntry> stored,
+      List<MfpFoodEntry> diary, {
+      List<LoggedEntry> owed = const [],
+    }) => read(stored, diary, owed: owed, role: Role.receiveOnly);
+
+    test('neither copies in nor shows a row only the app logged', () {
+      final draft = receive([], [entry('E-1'), entry(null)]);
+
+      check(draft.entries).isEmpty();
+      check(draft.unstored).isEmpty();
+      check(draft.changes).equals(DayChanges(date: day));
+    });
+
+    test('changes nothing when MyFitnessPal holds what is stored', () {
+      final draft = receive([loggedEntry(entry('E-1'))], [entry('E-1')]);
+
+      check(draft.replaced).isEmpty();
+      check(draft.changes).equals(DayChanges(date: day));
+    });
+
+    test("keeps Fūjin's values when the app changed a row under its id", () {
+      final stored = loggedEntry(entry('E-1'));
+      final changed = entry('E-1', meal: lunch, servings: 2);
+
+      final draft = receive([stored], [changed]);
+
+      final kept = stored.copyWith(mfpLink: linkTo(changed));
+      check(draft.entries).deepEquals([kept]);
+      check(draft.replaced).deepEquals([
+        ReplacedEdit(kept, before: linkTo(changed)),
+      ]);
+      check(draft.changes).equals(
+        DayChanges(date: day, changedMfpLinks: [linkTo(changed)]),
+      );
+    });
+
+    test("moves the link of a row the app replaced and keeps Fūjin's "
+        'values', () {
+      final stored = loggedEntry(entry('E-1'));
+      final row = entry('M-1', servings: 3);
+
+      final draft = receive([stored], [row]);
+
+      final kept = stored.copyWith(mfpLink: linkTo(row));
+      check(draft.entries).deepEquals([kept]);
+      check(draft.replaced).deepEquals([
+        ReplacedEdit(kept, before: linkTo(row)),
+      ]);
+      check(draft.changes).equals(
+        DayChanges(date: day, changedMfpLinks: [linkTo(row)]),
+      );
+    });
+
+    test('keeps an entry whose row is gone, to be added again', () {
+      final link = ekkloLinkRow('k-1', entryId: 'E-1', item: sentItem('I-1'));
+      final sent = loggedEntry(entry('E-1')).copyWith(ekkloLink: link);
+      final unsent = loggedEntry(entry('E-2'));
+
+      final draft = receive([sent, unsent], [entry('M-1', food: rice)]);
+
+      check(draft.entries).deepEquals([
+        sent.copyWith(mfpLink: null),
+        unsent.copyWith(mfpLink: null),
+      ]);
+      check(draft.deleted).isEmpty();
+      check(draft.replaced).isEmpty();
+      check(draft.changes).equals(
+        DayChanges(
+          date: day,
+          deletedMfpLinkIds: ['mfp-link-E-1', 'mfp-link-E-2'],
+        ),
+      );
+    });
+
+    test("still settles Fūjin's owed deletions and pending edits", () {
+      final edited = editedTo(2);
+
+      final draft = receive(
+        [edited],
+        [entry('E-1'), entry('D-1')],
+        owed: [deletedEntry('D-1')],
+      );
+
+      check(draft.entries).deepEquals([edited]);
+      check(draft.owed).deepEquals([deletedEntry('D-1')]);
+      check(draft.changes).equals(DayChanges(date: day));
     });
   });
 }

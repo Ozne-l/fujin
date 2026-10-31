@@ -8,6 +8,7 @@ import 'package:fujin/data/accessibility/reduce_transparency_setting.dart';
 import 'package:fujin/data/backup/backup_files.dart';
 import 'package:fujin/data/backup/backup_repository.dart';
 import 'package:fujin/data/backup/picker_backup_files.dart';
+import 'package:fujin/data/connectors/connector_domain.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/foods/food_repository.dart';
@@ -214,6 +215,8 @@ final journalServiceProvider = Provider<JournalService>(
     meals: ref.watch(mealRepositoryProvider),
     database: ref.watch(databaseProvider),
     clock: ref.watch(clockProvider),
+    roles: () =>
+        ref.read(settingsRepositoryProvider).roles(ConnectorDomain.food),
   ),
 );
 

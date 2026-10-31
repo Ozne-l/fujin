@@ -1,3 +1,4 @@
+import 'package:fujin/data/connectors/role.dart';
 import 'package:fujin/data/database/id_source.dart';
 import 'package:fujin/data/entries/entry.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
@@ -20,7 +21,12 @@ DayDraft compareMfpDay(
   required DateTime now,
   required DateTime readAt,
   required IdSource ids,
+  required Role role,
 }) {
+  final receiving = switch (role) {
+    Role.twoWay => false,
+    Role.receiveOnly => true,
+  };
   final catalog = DayCatalog(
     foodOf: foodOf,
     mealOf: mealOf,
@@ -142,12 +148,14 @@ DayDraft compareMfpDay(
 
   bool gone(MfpLink link) =>
       !fresh(link) && !inDiary.containsKey(link.mfpEntryId);
+  bool keepsFujin(LoggedEntry logged) =>
+      receiving || MfpWrite.of(logged) is MfpEdit;
   final editsGone = [
     for (final logged in byId)
-      if ((MfpWrite.of(logged), logged.mfpLink) case (
-        MfpEdit(),
-        final link?,
-      ) when gone(link) && sameDay(link.date, logged.entry.date))
+      if (logged.mfpLink case final link?
+          when keepsFujin(logged) &&
+              gone(link) &&
+              sameDay(link.date, logged.entry.date))
         logged,
   ];
   final deletionsGone = [
@@ -220,12 +228,8 @@ DayDraft compareMfpDay(
       case final current:
         link = current;
     }
-    switch ((
-      MfpWrite.of(logged),
-      inDiary[link.mfpEntryId],
-      logged.ekkloLink,
-    )) {
-      case (MfpEdit(), final row?, _):
+    switch ((keepsFujin(logged), inDiary[link.mfpEntryId], logged.ekkloLink)) {
+      case (true, final row?, _):
         final refreshed = MfpLink.of(
           row,
           id: link.id,
@@ -238,7 +242,7 @@ DayDraft compareMfpDay(
         if (!_sameWrite(refreshed, link)) {
           replacedEdit(kept, refreshed);
         }
-      case (MfpEdit(), null, _):
+      case (true, null, _):
         switch (moved[logged.entry.id]) {
           case final link?:
             final kept = logged.copyWith(mfpLink: link);
@@ -247,16 +251,16 @@ DayDraft compareMfpDay(
           case null:
             entries.add(logged.copyWith(mfpLink: null));
         }
-      case (_, final row?, _):
+      case (false, final row?, _):
         entries.add(updated(logged, link, row));
-      case (_, null, _?):
+      case (false, null, _?):
         deleted.add(
           logged.copyWith(
             entry: logged.entry.copyWith(deletedAt: now),
             mfpLink: null,
           ),
         );
-      case (_, null, null):
+      case (false, null, null):
         continue;
     }
   }
@@ -274,7 +278,7 @@ DayDraft compareMfpDay(
     }
   }
   final unstored = <LoggedEntry>[];
-  for (final entry in diary) {
+  for (final entry in [if (!receiving) ...diary]) {
     switch (entry.id) {
       case final mfpEntryId? when !held.contains(mfpEntryId):
         final logged = copied(

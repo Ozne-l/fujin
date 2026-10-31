@@ -10,6 +10,7 @@ import 'package:fujin/data/memory/remembered_unit.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/adding/add_shortcut.dart';
+import 'package:fujin/pages/common/alert_pictogram.dart';
 import 'package:fujin/pages/common/confirm_sheet.dart';
 import 'package:fujin/pages/common/delete_icon.dart';
 import 'package:fujin/pages/common/fujin_icon_button.dart';
@@ -166,7 +167,7 @@ class MemoryFoodPage extends HookConsumerWidget {
                 onPressed: () => unawaited(
                   showConfirmSheet(
                     context,
-                    icon: DeleteIcon.asset,
+                    glyph: const AlertPictogram(icon: DeleteIcon.asset),
                     title: context.intl.memoryForgetTitle,
                     message: context.intl.memoryForgetDetail(
                       food.mfpDescription,

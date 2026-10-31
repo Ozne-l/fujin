@@ -1,5 +1,6 @@
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart' show group, test;
+import 'package:fujin/data/connectors/role.dart';
 import 'package:fujin/data/database/id_source.dart';
 import 'package:fujin/data/entries/day_changes.dart';
 import 'package:fujin/data/entries/ekklo_link.dart';
@@ -24,6 +25,7 @@ DayDraft adopt(
   required IdSource ids,
   List<SentLink> links = const [],
   List<UnattendedItem> unattended = const [],
+  Role role = Role.twoWay,
 }) => adoptWaiting(
   DayDraft.of(StoredDay(entries: stored), date: day),
   diary: diary,
@@ -33,21 +35,32 @@ DayDraft adopt(
   mealOf: knownMeal,
   now: now,
   ids: ids,
+  role: role,
 );
 
 DayComparison read(
   List<MfpFoodEntry> diary, {
   required List<SentLink> links,
   required IdSource ids,
+  List<UnattendedItem> unattended = const [],
+  Role role = Role.twoWay,
 }) => compareEkkloDay(
   compareMfpDay(
-    adopt([], diary, links: links, ids: ids),
+    adopt(
+      [],
+      diary,
+      links: links,
+      unattended: unattended,
+      ids: ids,
+      role: role,
+    ),
     diary: diary,
     foodOf: knownFood,
     mealOf: knownMeal,
     now: now,
     readAt: now,
     ids: ids,
+    role: role,
   ),
   meals: [
     meal('meal-1', [item('I-1')]),
@@ -91,6 +104,7 @@ void main() {
         now: now,
         readAt: now,
         ids: ids,
+        role: Role.twoWay,
       );
 
       check(draft.changes)
@@ -227,6 +241,54 @@ void main() {
       );
 
       check(draft.changes).equals(DayChanges(date: day, forgetsWaiting: true));
+    });
+  });
+
+  group('with MyFitnessPal in receive only', () {
+    test('a send link of a row Fūjin does not hold stays waiting', () {
+      final result = read(
+        [entry('E-1')],
+        links: [link('E-1', 'I-1')],
+        unattended: [unattendedItem('E-1')],
+        ids: idsFrom('w'),
+        role: Role.receiveOnly,
+      );
+
+      check(result.entries).isEmpty();
+      check(result.changes).equals(DayChanges(date: day));
+    });
+
+    test('a send link of a stored entry still becomes its Ekklo link', () {
+      final draft = adopt(
+        [loggedEntry(entry('E-1'))],
+        [entry('E-1')],
+        links: [link('E-1', 'I-1')],
+        ids: idsFrom('w'),
+        role: Role.receiveOnly,
+      );
+
+      check(draft.changes).equals(
+        DayChanges(
+          date: day,
+          addedEkkloLinks: [waitingLink('w-1', 'E-1')],
+          forgetsWaiting: true,
+        ),
+      );
+    });
+
+    test('a send link of a stored entry beside a row Fūjin does not hold '
+        'keeps the day waiting', () {
+      final draft = adopt(
+        [loggedEntry(entry('E-1'))],
+        [entry('E-1'), entry('E-2')],
+        links: [link('E-1', 'I-1'), link('E-2', 'I-2')],
+        ids: idsFrom('w'),
+        role: Role.receiveOnly,
+      );
+
+      check(draft.changes).equals(
+        DayChanges(date: day, addedEkkloLinks: [waitingLink('w-1', 'E-1')]),
+      );
     });
   });
 }
