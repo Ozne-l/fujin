@@ -11,7 +11,7 @@ import '../support/pump_fujin.dart';
 const _scroll = 300.0;
 const _scrollBack = 100.0;
 const _nudge = 12.0;
-const _goals = 'Tous les jours';
+const _accounts = 'COMPTES';
 
 double _plateWidth(WidgetTester tester) =>
     tester.getRect(find.byType(TabPlate)).width;
@@ -35,7 +35,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    check(find.text('APPARENCE').evaluate()).length.equals(1);
+    check(find.text('COMPTES').evaluate()).length.equals(1);
   });
 
   testWidgets('shrinks the bar while the journal scrolls down and brings it '
@@ -64,12 +64,12 @@ void main() {
     await tester.tap(find.text('Réglages'));
     await tester.pumpAndSettle();
     await tester.drag(
-      find.text(_goals),
+      find.text(_accounts),
       const Offset(0, -(kDragSlopDefault + _nudge)),
     );
     await tester.pumpAndSettle();
 
-    check(_scrolled(tester, _goals)).isGreaterThan(0);
+    check(_scrolled(tester, _accounts)).isGreaterThan(0);
     check(_plateWidth(tester)).equals(full);
   });
 }

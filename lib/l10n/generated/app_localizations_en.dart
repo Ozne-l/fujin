@@ -1031,6 +1031,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get summarySeparator => ' · ';
 
   @override
+  String get settingsRolesFood => 'APP ROLES · FOOD';
+
+  @override
+  String get settingsRolesDetail =>
+      'Two-way: what you add, edit or delete in the app comes into Fūjin. Receive only: the app only receives what Fūjin sends it.';
+
+  @override
+  String get roleTwoWay => 'Two-way';
+
+  @override
+  String get roleReceiveOnly => 'Receive only';
+
+  @override
+  String roleToReceiveOnlyTitle(String app) {
+    return '$app receive only?';
+  }
+
+  @override
+  String roleToReceiveOnlyDetail(String app) {
+    return 'From the next read, what you change in $app no longer comes into Fūjin: Fūjin puts its entries back there. Nothing is rewritten.';
+  }
+
+  @override
+  String roleToReceiveOnlyConfirm(String app) {
+    return 'Make $app receive only';
+  }
+
+  @override
+  String roleToTwoWayTitle(String app) {
+    return '$app two-way?';
+  }
+
+  @override
+  String roleToTwoWayDetail(String app) {
+    return 'From the next read, what you change in $app comes into Fūjin. Nothing is rewritten.';
+  }
+
+  @override
+  String roleToTwoWayConfirm(String app) {
+    return 'Make $app two-way';
+  }
+
+  @override
   String get settingsSending => 'SENDING';
 
   @override

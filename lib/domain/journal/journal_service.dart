@@ -1,4 +1,5 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/data/connectors/connector_roles.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_id.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
@@ -35,6 +36,7 @@ final class JournalService {
     required this._meals,
     required this._database,
     required this._clock,
+    required this._roles,
   });
 
   final MyFitnessPalClient _mfp;
@@ -47,6 +49,7 @@ final class JournalService {
   final MealRepository _meals;
   final FujinDatabase _database;
   final DateTime Function() _clock;
+  final ConnectorRoles Function() _roles;
 
   Future<JournalDay> readDay(
     DateTime date, {
@@ -172,12 +175,14 @@ final class JournalService {
     now: _clock(),
     diaryReadAt: diary.readAt,
     ids: FujinId.source(_clock),
+    roles: _roles(),
   );
 
   DayDraft _mfpDraft(DateTime date, Fetched<MfpDiaryDay> fetched) {
     final diary = fetched.value;
     final now = _clock();
     final ids = FujinId.source(_clock);
+    final role = _roles().mfp;
     return compareMfpDay(
       adoptWaiting(
         DayDraft.of(_entries.forDate(date), date: date),
@@ -188,6 +193,7 @@ final class JournalService {
         mealOf: _meals.mealOfMfp,
         now: now,
         ids: ids,
+        role: role,
       ),
       diary: diary.entries,
       foodOf: _foods.foodOfMfp,
@@ -195,6 +201,7 @@ final class JournalService {
       now: now,
       readAt: fetched.readAt,
       ids: ids,
+      role: role,
     );
   }
 

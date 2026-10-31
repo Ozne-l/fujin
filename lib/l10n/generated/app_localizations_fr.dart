@@ -1045,6 +1045,49 @@ class AppLocalizationsFr extends AppLocalizations {
   String get summarySeparator => ' · ';
 
   @override
+  String get settingsRolesFood => 'RÔLE DES APPS · ALIMENTATION';
+
+  @override
+  String get settingsRolesDetail =>
+      'Deux sens : ce que tu ajoutes, modifies ou supprimes dans l’app arrive dans Fūjin. Réception : l’app reçoit seulement ce que Fūjin lui envoie.';
+
+  @override
+  String get roleTwoWay => 'Deux sens';
+
+  @override
+  String get roleReceiveOnly => 'Réception';
+
+  @override
+  String roleToReceiveOnlyTitle(String app) {
+    return '$app en réception ?';
+  }
+
+  @override
+  String roleToReceiveOnlyDetail(String app) {
+    return 'Dès la prochaine lecture, ce que tu changes dans $app n’arrivera plus dans Fūjin : Fūjin y remettra ses entrées. Rien n’est réécrit.';
+  }
+
+  @override
+  String roleToReceiveOnlyConfirm(String app) {
+    return 'Passer $app en réception';
+  }
+
+  @override
+  String roleToTwoWayTitle(String app) {
+    return '$app dans les deux sens ?';
+  }
+
+  @override
+  String roleToTwoWayDetail(String app) {
+    return 'Dès la prochaine lecture, ce que tu changes dans $app arrivera dans Fūjin. Rien n’est réécrit.';
+  }
+
+  @override
+  String roleToTwoWayConfirm(String app) {
+    return 'Passer $app en deux sens';
+  }
+
+  @override
   String get settingsSending => 'ENVOI';
 
   @override

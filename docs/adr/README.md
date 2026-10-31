@@ -26,7 +26,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0020](0020-goals.md) | Goals: one row in Fūjin's SQLite | Accepted |
 | [0021](0021-backup-file.md) | Backup file: fujin-backup v1 behind the BackupFiles seam | Accepted (version 2 by 0027; version 4 by 0044) |
 | [0022](0022-journal-states-and-goal-rings.md) | Journal states and goal rings | Accepted (band reads held and neighbour weeks prefetched by 0029; MyFitnessPal foods shown with Ekklo missing and offline by 0030) |
-| [0023](0023-ui-flags-in-shared-preferences.md) | UI flags in shared preferences | Accepted (settings and `FujinPreferences.open` added by 0025) |
+| [0023](0023-ui-flags-in-shared-preferences.md) | UI flags in shared preferences | Accepted (settings and `FujinPreferences.open` added by 0025; connector roles kept there by 0044) |
 | [0024](0024-splash-from-the-first-frame.md) | Splash from the first frame | Accepted |
 | [0025](0025-automatic-mode.md) | Automatic mode: unattended items instead of Memory, a setting in shared preferences | Accepted (unattended items kept on the Ekklo link, and in the backup file, by 0044) |
 | [0026](0026-adding-a-food.md) | Adding a food: one draft, the send flow's Ekklo half, undo | Accepted (scanner and 02d built by 0027; remembered foods added to the search, and "Ajouter" to screen 19, by 0034; undo moved to `RemoveEntryService` by 0043; fiche closing at once by 0044) |
@@ -47,4 +47,4 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0041](0041-liquid-glass-renderer-1.0.md) | Liquid glass on liquid_glass_renderer 1.0 | Proposed |
 | [0042](0042-text-contrast-on-tinted-surfaces.md) | Text contrast on tinted surfaces | Accepted |
 | [0043](0043-edit-and-delete-a-logged-food.md) | Edit and delete a logged food | Accepted (edit and delete saved first and written in the background, and offline edit and delete of known foods built, by 0044) |
-| [0044](0044-connector-model.md) | Connector model: Fūjin's entry at the centre | Accepted (steps 1 to 4 built, offline included; Ekklo "to remove", the role setting and the cache file not built) |
+| [0044](0044-connector-model.md) | Connector model: Fūjin's entry at the centre | Accepted (steps 1 to 4 built, offline included, and the role setting, kept in shared preferences; Ekklo "to remove", Ekklo two-way and the cache file not built) |

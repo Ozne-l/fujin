@@ -1,5 +1,6 @@
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_test/flutter_test.dart' show addTearDown;
+import 'package:fujin/data/connectors/connector_roles.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
@@ -38,6 +39,7 @@ final class WriteServices {
     http.Client? httpClient,
     EkkloTokenStore? ekkloTokens,
     DateTime Function()? clock,
+    ConnectorRoles Function()? roles,
   }) async {
     final mfp = backends.mfpWith(
       InMemoryMfpSessionStore(),
@@ -51,7 +53,12 @@ final class WriteServices {
     final entries = entriesOf(database);
     final foods = foodsOf(database);
     final memoryRepository = memoryOf(database);
-    final journal = journalOver(database, mfp: mfp, ekklo: ekklo);
+    final journal = journalOver(
+      database,
+      mfp: mfp,
+      ekklo: ekklo,
+      roles: roles,
+    );
     final sending = sendingOver(database, journal: journal, ekklo: ekklo);
     final writeClock = clock ?? () => now;
     final writer = EntryWriter(

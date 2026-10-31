@@ -1448,6 +1448,66 @@ abstract class AppLocalizations {
   /// **' · '**
   String get summarySeparator;
 
+  /// No description provided for @settingsRolesFood.
+  ///
+  /// In fr, this message translates to:
+  /// **'RÔLE DES APPS · ALIMENTATION'**
+  String get settingsRolesFood;
+
+  /// No description provided for @settingsRolesDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Deux sens : ce que tu ajoutes, modifies ou supprimes dans l’app arrive dans Fūjin. Réception : l’app reçoit seulement ce que Fūjin lui envoie.'**
+  String get settingsRolesDetail;
+
+  /// No description provided for @roleTwoWay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Deux sens'**
+  String get roleTwoWay;
+
+  /// No description provided for @roleReceiveOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réception'**
+  String get roleReceiveOnly;
+
+  /// No description provided for @roleToReceiveOnlyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'{app} en réception ?'**
+  String roleToReceiveOnlyTitle(String app);
+
+  /// No description provided for @roleToReceiveOnlyDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dès la prochaine lecture, ce que tu changes dans {app} n’arrivera plus dans Fūjin : Fūjin y remettra ses entrées. Rien n’est réécrit.'**
+  String roleToReceiveOnlyDetail(String app);
+
+  /// No description provided for @roleToReceiveOnlyConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Passer {app} en réception'**
+  String roleToReceiveOnlyConfirm(String app);
+
+  /// No description provided for @roleToTwoWayTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'{app} dans les deux sens ?'**
+  String roleToTwoWayTitle(String app);
+
+  /// No description provided for @roleToTwoWayDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dès la prochaine lecture, ce que tu changes dans {app} arrivera dans Fūjin. Rien n’est réécrit.'**
+  String roleToTwoWayDetail(String app);
+
+  /// No description provided for @roleToTwoWayConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Passer {app} en deux sens'**
+  String roleToTwoWayConfirm(String app);
+
   /// No description provided for @settingsSending.
   ///
   /// In fr, this message translates to:

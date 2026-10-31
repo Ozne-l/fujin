@@ -20,6 +20,7 @@ const _toLight = 'Passer en thème clair';
 const _sunIcon = 'assets/icons/sun.svg';
 const _appName = 'Fūjin';
 const _scroll = 120.0;
+const _scrollStep = 200.0;
 
 Future<void> _tap(WidgetTester tester, Finder target) async {
   await tester.tap(target);
@@ -101,6 +102,12 @@ void main() {
       preferences: preferences,
     );
     await _tap(tester, find.text('Réglages').last);
+    await tester.scrollUntilVisible(
+      find.text('Système'),
+      _scrollStep,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
 
     Tristate selected(String segment) => tester
         .getSemantics(find.bySemanticsLabel(segment))

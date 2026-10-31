@@ -5,6 +5,9 @@ import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart'
     show group, setUp, tearDown, test;
 import 'package:fujin/app/app_environment.dart';
+import 'package:fujin/data/connectors/connector_domain.dart';
+import 'package:fujin/data/connectors/connector_roles.dart';
+import 'package:fujin/data/connectors/role.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/data/foods/food_reference.dart';
@@ -91,13 +94,16 @@ void main() {
 
   tearDown(() => database.close());
 
-  Future<WriteServices> services({http.Client? httpClient}) =>
-      WriteServices.over(
-        backends,
-        database,
-        httpClient: httpClient,
-        clock: () => clock,
-      );
+  Future<WriteServices> services({
+    http.Client? httpClient,
+    ConnectorRoles Function()? roles,
+  }) => WriteServices.over(
+    backends,
+    database,
+    httpClient: httpClient,
+    clock: () => clock,
+    roles: roles,
+  );
 
   Future<(WriteServices, AddedFood)> written([AddDraft? draft]) async {
     final writing = await services();
@@ -1050,6 +1056,66 @@ void main() {
       check(backends.ekkloItems).length.equals(1);
       check(writing.background.heldFor(food.entryId)).isNull();
       check((await writing.find(food.entryId, day))?.status).isA<InEkklo>();
+    });
+  });
+
+  group('MyFitnessPal in receive only', () {
+    var roles = const ConnectorRoles(
+      mfp: Role.receiveOnly,
+      ekklo: Role.receiveOnly,
+    );
+
+    setUp(
+      () => roles = const ConnectorRoles(
+        mfp: Role.receiveOnly,
+        ekklo: Role.receiveOnly,
+      ),
+    );
+
+    Future<(WriteServices, AddedFood)> receiving() async {
+      final writing = await services(roles: () => roles);
+      final food = await writing.add(_draft());
+      await writing.settle();
+      backends.requests.clear();
+      return (writing, food);
+    }
+
+    test('adds again a row deleted in the MyFitnessPal app', () async {
+      final (writing, food) = await receiving();
+      backends.entries = [];
+
+      await writing.journal.readDay(day);
+      await writing.settle();
+
+      check(writing.entries.find(food.entryId)?.entry.deletedAt).isNull();
+      check(mfpAdds()).length.equals(1);
+      check([
+        for (final row in backends.entries) row.food.id,
+      ]).deepEquals([rice]);
+      check(
+        mfpEntryIdOf(writing, food.entryId),
+      ).equals(backends.entries.single.id);
+    });
+
+    test('neither copies in nor removes a row logged only in the app, and '
+        'copies it in once back in two-way', () async {
+      final (writing, _) = await receiving();
+      final appOnly = entry('A-1', food: skyr, meal: snacks);
+      backends.entries = [...backends.entries, appOnly];
+
+      await writing.journal.readDay(day);
+      await writing.settle();
+
+      check(writing.entries.findByMfpEntryId('A-1')).isNull();
+      check(backends.entries).contains(appOnly);
+      check(writing.writes()).isEmpty();
+
+      roles = ConnectorRoles.defaults(ConnectorDomain.food);
+      await writing.journal.readDay(day);
+
+      check(
+        writing.entries.findByMfpEntryId('A-1')?.mfpFoodId,
+      ).equals(skyr);
     });
   });
 }
