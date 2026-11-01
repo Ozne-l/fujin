@@ -183,6 +183,9 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
     ref
         .read(replacedProvider.notifier)
         .settled(service.settleDay(date, diary: diary, meals: meals));
+    if (diary case Fetched()) {
+      unawaited(ref.read(foodCompletionServiceProvider).complete());
+    }
     if ((thenWrite, diary) case (true, Fetched())) {
       ref.read(backgroundWriteProvider.notifier).run();
     }
