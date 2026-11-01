@@ -347,6 +347,19 @@ void main() {
     ).isLessThan(tester.getTopLeft(find.text('RÉSULTATS MYFITNESSPAL')).dy);
   });
 
+  testWidgets('lists a remembered food never opened in Fūjin in the offline '
+      'search once the Journal has read MyFitnessPal', (tester) async {
+    final backends = _backends();
+    await pumpFujin(tester, backends);
+    await _openAdd(tester);
+    backends.mfpReachable = false;
+
+    await _search(tester, 'avoine');
+
+    _sees('DÉJÀ DANS FŪJIN');
+    _sees(_oatsName);
+  });
+
   testWidgets('opens the fiche of a food already in Fūjin while the search '
       'is offline', (tester) async {
     final backends = _backends();
@@ -363,7 +376,7 @@ void main() {
 
   testWidgets('searches MyFitnessPal again from the offline banner once the '
       'network is back', (tester) async {
-    final backends = _backends();
+    final backends = _backends(stored: const []);
     await pumpFujin(tester, backends);
     await _openAdd(tester);
     backends.mfpReachable = false;
@@ -532,7 +545,7 @@ void main() {
     await pumpFujin(tester, backends, units: memory.units);
     final result = await _openAdd(tester);
 
-    await _tap(tester, rice);
+    await _tap(tester, basmati.description);
     _sees('Ajouter à Breakfast');
     await _tap(tester, _addToBoth);
 

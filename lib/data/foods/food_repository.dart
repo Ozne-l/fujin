@@ -120,6 +120,19 @@ final class FoodRepository {
     ),
   );
 
+  List<String> mfpFoodsWithoutServings() => [
+    for (final row in _database.select(
+      'SELECT mfp.external_id AS mfp_food_id FROM food '
+      'JOIN food_reference mfp ON mfp.food_id = food.id '
+      "AND mfp.kind = 'mfp' AND mfp.deleted_at IS NULL "
+      'WHERE food.deleted_at IS NULL AND NOT EXISTS ( '
+      'SELECT 1 FROM food_serving serving '
+      'WHERE serving.food_id = food.id AND serving.deleted_at IS NULL '
+      ') ORDER BY mfp.external_id',
+    ))
+      row[_mfpFoodId] as String,
+  ];
+
   List<MatchedFood> matches() => [
     for (final row in _database.select(
       'SELECT mfp.external_id AS mfp_food_id, '

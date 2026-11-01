@@ -280,7 +280,7 @@ void main() {
       'confirms it and undoes it on request', (tester) async {
     final backends = _riceBackends();
     await _openMemory(tester, backends);
-    await _tap(tester, rice);
+    await _tap(tester, _thaiRiceName);
 
     await _tap(tester, 'Ajouter');
     check(_count('Ajouter à $breakfast')).equals(1);
@@ -302,7 +302,7 @@ void main() {
       'the food by an own copy', (tester) async {
     final backends = _riceBackends();
     await _openMemory(tester, backends);
-    await _tap(tester, rice);
+    await _tap(tester, _thaiRiceName);
     await _tap(tester, 'Ajouter');
 
     await tester.tap(find.textContaining('Ekklo : '));
@@ -322,7 +322,7 @@ void main() {
   ) async {
     final backends = _riceBackends();
     await _openMemory(tester, backends);
-    await _tap(tester, rice);
+    await _tap(tester, _thaiRiceName);
     await _tap(tester, 'Ajouter');
     check(_count('Ajouter à MFP et Ekklo')).equals(1);
 
@@ -346,7 +346,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     await _tap(tester, 'Mémoire');
-    await _tap(tester, rice);
+    await _tap(tester, _thaiRiceName);
 
     check(
       tester

@@ -26,6 +26,7 @@ import 'package:fujin/data/unattended/unattended_item_repository.dart';
 import 'package:fujin/domain/accounts/accounts_service.dart';
 import 'package:fujin/domain/adding/add_food_service.dart';
 import 'package:fujin/domain/adding/entry_writer.dart';
+import 'package:fujin/domain/adding/food_completion_service.dart';
 import 'package:fujin/domain/backup/backup_service.dart';
 import 'package:fujin/domain/editing/edit_entry_service.dart';
 import 'package:fujin/domain/editing/remove_entry_service.dart';
@@ -255,6 +256,13 @@ final backgroundWriterProvider = Provider<BackgroundWriter>(
     memory: ref.watch(memoryRepositoryProvider),
     entries: ref.watch(entryRepositoryProvider),
     writer: ref.watch(entryWriterProvider),
+  ),
+);
+
+final foodCompletionServiceProvider = Provider<FoodCompletionService>(
+  (ref) => FoodCompletionService(
+    mfp: ref.watch(mfpClientProvider),
+    foods: ref.watch(foodRepositoryProvider),
   ),
 );
 
