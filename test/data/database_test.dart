@@ -12,6 +12,7 @@ import 'package:fujin/data/foods/food_nutrients.dart';
 import 'package:fujin/data/foods/food_reference.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/goals/goals_repository.dart';
+import 'package:fujin/data/links/sent_link.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/meals/meal_repository.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
@@ -22,7 +23,9 @@ import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
 import 'package:fujin/data/recents/recent_food.dart';
 import 'package:fujin/data/unattended/unattended_item_repository.dart';
+import 'package:fujin/domain/comparison/entry_status.dart';
 
+import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
 import '../support/repositories.dart';
 
@@ -44,6 +47,9 @@ OwnCopy _ownRice(String unit) => OwnCopy(
   ekkloFoodName: rice,
   mfpUnit: unit,
 );
+
+String _uuid(int number) =>
+    '7f3c2a10-4b5d-4e6f-8a9b-${'$number'.padLeft(12, '0')}';
 
 String _databasePath() {
   final directory = Directory.systemTemp.createTempSync('fujin_db_');
@@ -382,6 +388,172 @@ void main() {
         ))
           row.columnAt(0),
       ]).isEmpty();
+    });
+  });
+
+  group('a 0.4.0 database with days it sent', () {
+    final sentOnDay = <SentLink>[
+      link(
+        _uuid(1),
+        _uuid(11),
+        ekkloMeal: _uuid(21),
+        servings: 1.149999976158142,
+        unit: 'gramme',
+      ).copyWith(sentAt: DateTime.utc(2026, 10, 7, 8, 0, 0, 123, 456)),
+      link(
+        _uuid(2),
+        _uuid(12),
+        ekkloMeal: _uuid(21),
+        servings: 45,
+        servingValue: 1,
+      ).copyWith(sentAt: DateTime.utc(2026, 10, 7, 8, 0, 0, 123, 461)),
+      link(
+        _uuid(3),
+        _uuid(13),
+        meal: lunch,
+        ekkloMeal: _uuid(22),
+        servings: 1.350000023841858,
+        servingValue: 30,
+      ).copyWith(sentAt: DateTime.utc(2026, 10, 7, 12, 30, 0, 500)),
+      for (final (number, sentAt) in [
+        (4, DateTime.utc(2026, 10, 7, 12, 30, 0, 500, 3)),
+        (5, DateTime.utc(2026, 10, 7, 19, 45, 10, 0, 2)),
+      ])
+        link(
+          _uuid(number),
+          _uuid(10 + number),
+          food: skyr,
+          meal: lunch,
+          ekkloMeal: _uuid(22),
+          servings: 120,
+          servingValue: 1,
+          unit: 'gram',
+        ).copyWith(sentAt: sentAt),
+    ];
+    final sentNextDay = link(
+      _uuid(6),
+      _uuid(16),
+      ekkloMeal: _uuid(23),
+      servings: 2.700000047683716,
+      servingValue: 1,
+      unit: 'gram(s)',
+    ).copyWith(date: DateTime.utc(2026, 10, 8), sentAt: now);
+    late FujinDatabase migrated;
+
+    setUp(() {
+      final (path, legacy) = _legacyDatabase(_versionOfRelease040);
+      for (final sent in [...sentOnDay, sentNextDay]) {
+        legacy.insert(FujinTable.sentLink, sent.toMap());
+      }
+      legacy
+        ..execute(
+          'INSERT INTO memory_food (mfp_food_id, mfp_description, kind, '
+          "ekklo_food_id, ekklo_food_name) VALUES (?, ?, 'ekklo', ?, ?)",
+          [oats, 'Flocons d’avoine', oatsInEkklo, 'Flocons d’avoine'],
+        )
+        ..execute(
+          'INSERT INTO memory_own_copy (mfp_food_id, mfp_unit, '
+          'mfp_description, kind, ekklo_food_id, ekklo_food_name, '
+          "mfp_food_version) VALUES (?, ?, ?, 'own_copy', ?, ?, ?), "
+          "(?, ?, ?, 'own_copy', ?, ?, ?), (?, ?, ?, 'own_copy', ?, ?, NULL)",
+          [
+            ...[skyr, 'gram', skyr, 'own-skyr-gram', skyr, 'v1'],
+            ...[skyr, 'gramme', skyr, 'own-skyr-gramme', skyr, 'v2'],
+            ...[skyr, grams, skyr, 'own-skyr-g', skyr],
+          ],
+        )
+        ..execute(
+          'INSERT INTO memory_meal (mfp_meal_name, ekklo_meal_name) VALUES '
+          '(?, ?), (?, ?)',
+          [
+            ...[breakfast, petitDejeuner],
+            ...[lunch, dejeuner],
+          ],
+        )
+        ..close();
+      migrated = FujinDatabase.open(path);
+    });
+
+    tearDown(() => migrated.close());
+
+    test('keeps one own copy per spelling of grams, each with its '
+        'version', () {
+      check(memoryOf(migrated).load().ownCopies).unorderedEquals([
+        for (final (unit, version) in [
+          ('gram', 'v1'),
+          ('gramme', 'v2'),
+          (grams, null),
+        ])
+          OwnCopy(
+            mfpFoodId: skyr,
+            mfpDescription: skyr,
+            ekkloFoodId: 'own-skyr-$unit',
+            ekkloFoodName: skyr,
+            mfpUnit: unit,
+            mfpFoodVersion: version,
+          ),
+      ]);
+    });
+
+    test('reads a day it sent as in Ekklo, adopting each send link once '
+        'without sending again', () async {
+      final backends = FakeBackends(
+        entries: [
+          for (final sent in sentOnDay)
+            entry(
+              sent.mfpEntryId,
+              food: sent.mfpFoodId,
+              meal: sent.mfpMealName,
+              servings: sent.mfpServings,
+              servingValue: sent.mfpServingValue,
+              unit: sent.mfpServingUnit,
+            ),
+        ],
+        ekkloMeals: [
+          meal(_uuid(21), [
+            item(_uuid(11), quantity: 115),
+            item(_uuid(12), quantity: 45),
+          ]),
+          meal(
+            _uuid(22),
+            [
+              item(_uuid(13), quantity: 40.5),
+              for (final number in [14, 15])
+                item(_uuid(number), food: 'own-skyr-gram', quantity: 120),
+            ],
+            name: dejeuner,
+          ),
+        ],
+      );
+      final entries = entriesOf(migrated);
+
+      final read = await journalOver(
+        migrated,
+        mfp: await backends.mfp(),
+        ekklo: await backends.ekklo(),
+      ).readDay(day);
+
+      check(read.entries).length.equals(sentOnDay.length);
+      check(read.entries).every(
+        (compared) => compared
+          ..has((it) => it.status, 'status').isA<InEkklo>()
+          ..has((it) => it.mfp, 'mfp').isNull(),
+      );
+      check({
+        for (final sent in sentOnDay)
+          if (entries.findByMfpEntryId(sent.mfpEntryId)?.ekkloLink?.item
+              case final item?)
+            sent.mfpEntryId: (item.ekkloItemId, item.servings, item.sentAt),
+      }).deepEquals({
+        for (final sent in sentOnDay)
+          sent.mfpEntryId: (sent.ekkloItemId, sent.mfpServings, sent.sentAt),
+      });
+      check(entries.pendingMfp()).isEmpty();
+      check([
+        for (final request in backends.requests)
+          if (request.method != 'GET') request.url.path,
+      ]).isEmpty();
+      check(SentLinkRepository(migrated).all()).deepEquals([sentNextDay]);
     });
   });
 
