@@ -1658,5 +1658,64 @@ void main() {
       ).equals(1.5);
       check(find.text('Riz basmati modifié').evaluate()).length.equals(1);
     });
+
+    testWidgets('says Remplacé dans MyFitnessPal, then Pas écrit, when one '
+        'pull brings both', (tester) async {
+      final backends = LoggedJournal.backends()..mfpWritesFail = true;
+      await LoggedJournal.pump(tester, backends);
+      await _tap(tester, find.text(LoggedJournal.basmati));
+      await tester.enterText(find.widgetWithText(TextField, 'Autre'), '2');
+      await tester.pumpAndSettle();
+      await _tap(tester, find.text('Enregistrer dans MFP et Ekklo'));
+      backends.entries = [
+        for (final logged in backends.entries)
+          switch (logged.id) {
+            LoggedJournal.basmatiId => logged.copyWith(servings: 3),
+            _ => logged,
+          },
+      ];
+      tester
+          .state<ScaffoldMessengerState>(find.byType(ScaffoldMessenger))
+          .clearSnackBars();
+      tester.view.reset();
+      await tester.pumpAndSettle();
+
+      await _pullToRefresh(tester);
+
+      check(
+        find.text('Remplacé dans MyFitnessPal').evaluate(),
+      ).length.equals(1);
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
+      check(find.text(_mfpNotWritten).evaluate()).length.equals(1);
+    });
+  });
+
+  testWidgets('keeps the read of a pull when another day is shown before '
+      'it ends', (tester) async {
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [entry('E-1')],
+    );
+    await pumpFujin(tester, backends);
+    final gate = Completer<void>();
+    backends
+      ..diaryGate = gate
+      ..entries = [entry('E-1'), entry('E-2')];
+    await _pull(tester);
+    await tester.pump(_souffleStep);
+    await tester.pump(_souffleStep);
+
+    await tester.tap(find.text('6'));
+    await tester.pump();
+    gate.complete();
+    await tester.pumpAndSettle();
+
+    final entries = entriesOf(
+      ProviderScope.containerOf(
+        tester.element(find.byType(JournalHeader)),
+      ).read(databaseProvider),
+    );
+    check(entries.findByMfpEntryId('E-2')).isNotNull();
   });
 }

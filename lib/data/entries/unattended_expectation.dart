@@ -12,7 +12,9 @@ final class UnattendedExpectation with UnattendedExpectationMappable {
     required this.quantityType,
   });
 
-  @MappableField(key: 'unattended_meal_name')
+  static const mealNameKey = 'unattended_meal_name';
+
+  @MappableField(key: mealNameKey)
   final String ekkloMealName;
   @MappableField(key: 'unattended_food_id')
   final String ekkloFoodId;

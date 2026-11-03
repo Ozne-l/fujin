@@ -223,12 +223,11 @@ class FoodView extends HookConsumerWidget {
     }
 
     void remove() {
-      if (editing case EditingFood(:final entryId, :final original)) {
+      if (editing case EditingFood(:final original)) {
         unawaited(
           showRemoveSheet(
             context,
             removal: EntryRemoval(
-              entryId: entryId,
               entry: original,
               reason: RemovalReason.delete,
             ),

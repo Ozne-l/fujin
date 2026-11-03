@@ -11,11 +11,13 @@ final class DiaryMeal with DiaryMealMappable {
     required this.name,
     this.entries = const [],
     this.leaving = const [],
+    this.mfpPending = const {},
   });
 
   final String name;
   final List<LoggedEntry> entries;
   final List<LoggedEntry> leaving;
+  final Set<String> mfpPending;
 
   double get kilocalories =>
       DayNutrients.ofEntries(entries).amount(Nutrient.kilocalories);

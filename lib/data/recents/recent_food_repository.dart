@@ -21,7 +21,7 @@ final class RecentFoodRepository {
       'JOIN food ON food.id = recent.food_id '
       'JOIN food_reference mfp ON mfp.food_id = recent.food_id '
       "AND mfp.kind = 'mfp' AND mfp.deleted_at IS NULL "
-      'WHERE food.deleted_at IS NULL AND food.name IS NOT NULL '
+      'WHERE food.deleted_at IS NULL '
       'ORDER BY recent.added_at DESC, mfp.external_id LIMIT ?',
       [_kept],
     ))

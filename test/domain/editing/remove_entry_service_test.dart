@@ -60,11 +60,8 @@ void main() {
   test('soft-deletes the entry and owes its MyFitnessPal deletion', () async {
     final (services, food) = await added();
 
-    final removed = services.removing.remove(food.entryId);
+    services.removing.remove(food.entryId);
 
-    check(
-      removed,
-    ).isNotNull().has((it) => it.entry.entry.id, 'entry').equals(food.entryId);
     check(services.entries.find(food.entryId)).isNull();
     check(services.entries.pendingMfp().single).isA<MfpDeletion>();
 

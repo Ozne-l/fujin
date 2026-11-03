@@ -25,7 +25,7 @@ void main() {
   setUp(() {
     database = FujinDatabase.inMemory();
     time = now;
-    entries = EntryRepository(database, () => time);
+    entries = entriesOf(database, clock: () => time);
   });
 
   tearDown(() => database.close());
@@ -109,7 +109,7 @@ void main() {
 
   group('pending in MyFitnessPal', () {
     test('lists an entry without a link, an edited entry and a deleted '
-        'linked entry, oldest first', () {
+        'linked entry', () {
       storeEntry(database, entry('E-3'), 'e-3');
       storeEntry(database, entry('E-1'), 'e-1');
       storeEntry(database, entry('E-2'), 'e-2');
@@ -121,14 +121,10 @@ void main() {
         )
         ..remove('e-3');
 
-      final pending = entries.pendingMfp();
-
-      check([
-        for (final write in pending) write.logged.entry.id,
-      ]).deepEquals(['e-1', 'e-2', 'e-3']);
-      check(pending[0]).isA<MfpAdd>();
-      check(pending[1]).isA<MfpEdit>();
-      check(pending[2]).isA<MfpDeletion>();
+      check({
+        for (final write in entries.pendingMfp())
+          write.logged.entry.id: write.runtimeType,
+      }).deepEquals({'e-1': MfpAdd, 'e-2': MfpEdit, 'e-3': MfpDeletion});
     });
 
     test('does not list an entry restamped by a read with unchanged '

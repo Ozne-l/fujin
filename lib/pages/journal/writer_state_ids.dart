@@ -11,7 +11,7 @@ extension WriterStateIds on WriterState {
     WriterRunning() || WriterIdle() => null,
   };
 
-  Iterable<WriteFailure> _stopped(AppEnvironment environment) => [
+  Iterable<WriteFailure> stopped(AppEnvironment environment) => [
     for (final failure in failures)
       if (failure.entryId != _currentId &&
           SendFailure.of(failure.error, environment) != SendFailure.network)
@@ -19,7 +19,7 @@ extension WriterStateIds on WriterState {
   ];
 
   Set<String> mfpFailedIds(AppEnvironment environment) => {
-    for (final failure in _stopped(environment))
+    for (final failure in stopped(environment))
       if (switch (failure) {
         MfpNotWritten() => true,
         EkkloNotWritten(:final logged) => MfpWrite.of(logged) != null,
@@ -28,7 +28,7 @@ extension WriterStateIds on WriterState {
   };
 
   Set<String> failedIds(AppEnvironment environment) => {
-    for (final failure in _stopped(environment)) failure.entryId,
+    for (final failure in stopped(environment)) failure.entryId,
   };
 
   Set<String> get ekkloSendIds => {

@@ -46,13 +46,7 @@ final class AddDraft with AddDraftMappable {
 
   static AddDraft? forEntry(LoggedEntry logged, MfpFood food) {
     final entry = logged.entry;
-    return switch (food.servingSizes
-        .where(
-          (serving) =>
-              serving.unit == entry.servingUnit &&
-              serving.value == entry.servingValue,
-        )
-        .firstOrNull) {
+    return switch (_serving(food, entry.servingUnit, entry.servingValue)) {
       final serving? => AddDraft(
         food: food,
         servingSize: serving,
@@ -107,13 +101,12 @@ final class AddDraft with AddDraftMappable {
   );
 
   static MfpServingSize? _servingLike(MfpFood food, MfpServingSize? like) =>
+      _serving(food, like?.unit, like?.value) ?? food.servingSizes.firstOrNull;
+
+  static MfpServingSize? _serving(MfpFood food, String? unit, double? value) =>
       food.servingSizes
-          .where(
-            (serving) =>
-                serving.unit == like?.unit && serving.value == like?.value,
-          )
-          .firstOrNull ??
-      food.servingSizes.firstOrNull;
+          .where((serving) => serving.unit == unit && serving.value == value)
+          .firstOrNull;
 
   static MfpNutrients _scaled(MfpNutrients nutrients, double factor) {
     double? scale(double? amount) => switch (amount) {

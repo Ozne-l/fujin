@@ -155,6 +155,33 @@ void main() {
       ..has((it) => it.reused, 'reused').equals(0);
   });
 
+  test('keeps the full MyFitnessPal name of a food it sends', () async {
+    backends = FakeBackends(
+      entries: [
+        entry(
+          'E-1',
+          food: skyr,
+          description: 'Isey - Skyr nature',
+          brand: 'Isey',
+          meal: snacks,
+          unit: pot,
+          servingValue: 1,
+          nutrients: nutrients(kcal: 80, protein: 12.5, carbs: 5, fat: 0.25),
+        ),
+      ],
+      ekkloSearches: {
+        'skyr': [isey],
+      },
+    );
+    final (_, sending) = await services();
+
+    await send(sending, await planDay(sending));
+
+    check(
+      foodsOf(database).foodOfMfp(skyr)?.name,
+    ).equals('Isey - Skyr nature');
+  });
+
   test(
     'creates an own copy before sending it in portions of its unit',
     () async {

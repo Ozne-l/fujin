@@ -41,7 +41,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 final clockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
 
-final connectivityProvider = Provider<Stream<bool>>(
+final connectivityProvider = StreamProvider<bool>(
   (ref) => Connectivity().onConnectivityChanged.map(
     (results) => results.any((result) => result != ConnectivityResult.none),
   ),
@@ -171,8 +171,14 @@ final settingsRepositoryProvider = Provider<SettingsRepository>(
 );
 
 final entryRepositoryProvider = Provider<EntryRepository>(
-  (ref) =>
-      EntryRepository(ref.watch(databaseProvider), ref.watch(clockProvider)),
+  (ref) => EntryRepository(
+    database: ref.watch(databaseProvider),
+    foods: ref.watch(foodRepositoryProvider),
+    meals: ref.watch(mealRepositoryProvider),
+    links: ref.watch(sentLinkRepositoryProvider),
+    unattended: ref.watch(unattendedItemRepositoryProvider),
+    clock: ref.watch(clockProvider),
+  ),
 );
 
 final backupRepositoryProvider = Provider<BackupRepository>(

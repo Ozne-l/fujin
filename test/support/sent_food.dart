@@ -38,7 +38,7 @@ final class SentFood {
               stored.copyWith(servings: servings ?? stored.servings),
               ekkloMealId: ekkloMeal,
               ekkloItemId: itemId,
-              sentAt: DateTime.utc(2026, 10, 7, 9),
+              sentAt: sentAt,
             ),
           ),
         ],

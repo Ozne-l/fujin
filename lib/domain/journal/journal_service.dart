@@ -2,9 +2,14 @@ import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/connectors/connector_roles.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_id.dart';
+import 'package:fujin/data/entries/day_changes.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
+import 'package:fujin/data/entries/mfp_write.dart';
+import 'package:fujin/data/entries/stored_day.dart';
+import 'package:fujin/data/foods/food.dart';
 import 'package:fujin/data/foods/food_repository.dart';
+import 'package:fujin/data/links/sent_link.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/meals/meal.dart';
 import 'package:fujin/data/meals/meal_repository.dart';
@@ -60,7 +65,7 @@ final class JournalService {
     return switch ((await diary, await meals)) {
       (final Fetched<MfpDiaryDay> diary, Fetched(value: final meals)) => _day(
         date,
-        _stored(date, diary, meals),
+        _stored(date, diary, meals).comparison,
         meals,
         mealNames,
       ),
@@ -91,7 +96,7 @@ final class JournalService {
       BothSides(
         day: _day(
           date,
-          _comparison(date, diary, meals).held(),
+          _comparison(date, _entries.forDate(date), diary, meals).held(),
           meals,
           mealNames,
         ),
@@ -108,7 +113,10 @@ final class JournalService {
       FetchFailed(:final error),
     ) =>
       MfpOnly(
-        meals: _diaryMeals(mealNames, _mfpSide(date, diary)),
+        meals: _mfpMeals(
+          mealNames,
+          _mfpDraft(date, _entries.forDate(date), diary),
+        ),
         ekkloProblem: ReadProblem.of(error),
         readAt: readAt,
       ),
@@ -122,24 +130,32 @@ final class JournalService {
       Error.throwWithStackTrace(error, stackTrace),
   };
 
-  List<Replacement> settleDay(
+  ({List<Replacement> replaced, List<String> adopted}) settleDay(
     DateTime date, {
     required Fetch<MfpDiaryDay> diary,
     required Fetch<List<EkkloDailyMeal>> meals,
   }) => switch ((diary, meals)) {
-    (final Fetched<MfpDiaryDay> diary, Fetched(value: final meals)) => _stored(
-      date,
-      diary,
-      meals,
-    ).replaced,
+    (final Fetched<MfpDiaryDay> diary, Fetched(value: final meals)) =>
+      switch (_stored(
+        date,
+        diary,
+        meals,
+      )) {
+        (:final comparison, :final adopted) => (
+          replaced: comparison.replaced,
+          adopted: adopted,
+        ),
+      },
     (final Fetched<MfpDiaryDay> diary, FetchFailed()) => _database.transaction(
       () {
-        final draft = _mfpDraft(date, diary);
-        _entries.store(draft.changes);
-        return draft.replaced;
+        final stored = _entries.forDate(date);
+        final draft = _mfpDraft(date, stored, diary);
+        final changes = draft.changes;
+        _entries.store(changes);
+        return (replaced: draft.replaced, adopted: _adopted(stored, changes));
       },
     ),
-    (FetchFailed(), _) => const [],
+    (FetchFailed(), _) => (replaced: const [], adopted: const []),
   };
 
   Future<List<String>> mealNames() async {
@@ -148,56 +164,82 @@ final class JournalService {
     return names;
   }
 
-  DayComparison _stored(
+  static List<String> _adopted(StoredDay stored, DayChanges changes) {
+    final unlinked = {
+      for (final logged in stored.entries)
+        if (logged.mfpLink == null) logged.entry.id,
+    };
+    return [
+      for (final link in changes.addedMfpLinks)
+        if (unlinked.contains(link.entryId)) link.entryId,
+    ];
+  }
+
+  ({DayComparison comparison, List<String> adopted}) _stored(
     DateTime date,
     Fetched<MfpDiaryDay> diary,
     List<EkkloDailyMeal> meals,
   ) => _database.transaction(() {
-    final comparison = _comparison(date, diary, meals);
+    final stored = _entries.forDate(date);
+    final comparison = _comparison(date, stored, diary, meals);
     _entries.store(comparison.changes);
-    return comparison;
+    return (
+      comparison: comparison,
+      adopted: _adopted(stored, comparison.changes),
+    );
   });
 
   DayComparison _comparison(
     DateTime date,
+    StoredDay stored,
     Fetched<MfpDiaryDay> diary,
     List<EkkloDailyMeal> meals,
-  ) => compareDay(
-    date: date,
-    stored: _entries.forDate(date),
-    diary: diary.value.entries,
-    meals: meals,
-    waitingLinks: _links.forDate(date),
-    waitingUnattended: _unattended.forDate(date),
-    memory: _memory.load(),
-    foodOf: _foods.foodOfMfp,
-    mealOf: _meals.mealOfMfp,
-    now: _clock(),
-    diaryReadAt: diary.readAt,
-    ids: FujinId.source(_clock),
-    roles: _roles(),
-  );
+  ) {
+    final links = _links.forDate(date);
+    final catalog = _catalogOf(diary.value.entries, links);
+    return compareDay(
+      date: date,
+      stored: stored,
+      diary: diary.value.entries,
+      meals: meals,
+      waitingLinks: links,
+      waitingUnattended: _unattended.forDate(date),
+      memory: _memory.load(),
+      foodOf: catalog.foodOf,
+      mealOf: catalog.mealOf,
+      now: _clock(),
+      diaryReadAt: diary.readAt,
+      ids: FujinId.source(_clock),
+      roles: _roles(),
+    );
+  }
 
-  DayDraft _mfpDraft(DateTime date, Fetched<MfpDiaryDay> fetched) {
+  DayDraft _mfpDraft(
+    DateTime date,
+    StoredDay stored,
+    Fetched<MfpDiaryDay> fetched,
+  ) {
     final diary = fetched.value;
     final now = _clock();
     final ids = FujinId.source(_clock);
     final role = _roles().mfp;
+    final links = _links.forDate(date);
+    final catalog = _catalogOf(diary.entries, links);
     return compareMfpDay(
       adoptWaiting(
-        DayDraft.of(_entries.forDate(date), date: date),
+        DayDraft.of(stored, date: date),
         diary: diary.entries,
-        links: _links.forDate(date),
+        links: links,
         unattended: _unattended.forDate(date),
-        foodOf: _foods.foodOfMfp,
-        mealOf: _meals.mealOfMfp,
+        foodOf: catalog.foodOf,
+        mealOf: catalog.mealOf,
         now: now,
         ids: ids,
         role: role,
       ),
       diary: diary.entries,
-      foodOf: _foods.foodOfMfp,
-      mealOf: _meals.mealOfMfp,
+      foodOf: catalog.foodOf,
+      mealOf: catalog.mealOf,
       now: now,
       readAt: fetched.readAt,
       ids: ids,
@@ -205,9 +247,29 @@ final class JournalService {
     );
   }
 
-  List<LoggedEntry> _mfpSide(DateTime date, Fetched<MfpDiaryDay> diary) {
-    final draft = _mfpDraft(date, diary);
-    return [...draft.entries, ...draft.unstored];
+  ({
+    Food? Function(String mfpFoodId) foodOf,
+    String? Function(String mfpMealName) mealOf,
+  })
+  _catalogOf(List<MfpFoodEntry> diary, List<SentLink> links) {
+    final foods = {
+      for (final mfpFoodId in {
+        for (final row in diary) row.food.id,
+        for (final link in links) link.mfpFoodId,
+      })
+        mfpFoodId: _foods.foodOfMfp(mfpFoodId),
+    };
+    final meals = {
+      for (final mfpMealName in {
+        for (final row in diary) row.mealName,
+        for (final link in links) link.mfpMealName,
+      })
+        mfpMealName: _meals.mealOfMfp(mfpMealName),
+    };
+    return (
+      foodOf: (mfpFoodId) => foods[mfpFoodId],
+      mealOf: (mfpMealName) => meals[mfpMealName],
+    );
   }
 
   JournalDay _day(
@@ -226,31 +288,40 @@ final class JournalService {
       ]))
         JournalMeal(
           name: name,
-          entries: [
-            for (final compared in comparison.entries)
-              if (compared.logged.mealName == name) compared,
-          ],
-          leaving: [
-            for (final logged in comparison.leaving)
-              if (logged.mealName == name) logged,
-          ],
+          entries: _inMeal(name, comparison.entries, (it) => it.logged),
+          leaving: _inMeal(name, comparison.leaving, _itself),
         ),
     ],
   );
 
   List<DiaryMeal> _diaryMeals(
-    List<String> mealNames,
-    List<LoggedEntry> entries,
-  ) => [
-    for (final name in _mealOrder(mealNames, entries))
+    Iterable<String> names,
+    List<LoggedEntry> entries, {
+    required List<LoggedEntry> stored,
+    List<LoggedEntry> leaving = const [],
+  }) => [
+    for (final name in names)
       DiaryMeal(
         name: name,
-        entries: [
-          for (final logged in entries)
-            if (logged.mealName == name) logged,
-        ],
+        entries: _inMeal(name, entries, _itself),
+        leaving: _inMeal(name, leaving, _itself),
+        mfpPending: {
+          for (final logged in _inMeal(name, stored, _itself))
+            if (MfpWrite.of(logged) case MfpAdd() || MfpEdit()) logged.entry.id,
+        },
       ),
   ];
+
+  static List<T> _inMeal<T>(
+    String name,
+    List<T> entries,
+    LoggedEntry Function(T entry) logged,
+  ) => [
+    for (final entry in entries)
+      if (logged(entry).mealName == name) entry,
+  ];
+
+  static LoggedEntry _itself(LoggedEntry logged) => logged;
 
   List<String> storedMealNames() => [
     for (final meal in _positioned()) meal.name,
@@ -259,24 +330,25 @@ final class JournalService {
   List<DiaryMeal> _storedMeals(DateTime date, List<String> mealNames) {
     final draft = DayDraft.of(_entries.forDate(date), date: date);
     final leaving = draft.leaving;
-    return [
-      for (final name in {
+    return _diaryMeals(
+      {
         ...mealNames,
         ...storedMealNames(),
         for (final logged in [...draft.entries, ...leaving]) logged.mealName,
-      })
-        DiaryMeal(
-          name: name,
-          entries: [
-            for (final logged in draft.entries)
-              if (logged.mealName == name) logged,
-          ],
-          leaving: [
-            for (final logged in leaving)
-              if (logged.mealName == name) logged,
-          ],
-        ),
-    ];
+      },
+      draft.entries,
+      stored: draft.entries,
+      leaving: leaving,
+    );
+  }
+
+  List<DiaryMeal> _mfpMeals(List<String> mealNames, DayDraft draft) {
+    final entries = [...draft.entries, ...draft.unstored];
+    return _diaryMeals(
+      _mealOrder(mealNames, entries),
+      entries,
+      stored: draft.entries,
+    );
   }
 
   List<String> _mealOrder(List<String> mealNames, List<LoggedEntry> entries) {

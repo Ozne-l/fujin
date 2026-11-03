@@ -3,6 +3,8 @@ import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/sending/food_words.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
+const _unnamed = '';
+
 List<RememberedFood> rememberedFoods(Memory memory, String query) => _matching(
   [...memory.matches, ...memory.ownCopies],
   query,
@@ -28,7 +30,7 @@ List<String> mealChoices(Memory memory, Iterable<String> ekkloMealNames) => {
 List<T> _matching<T>(
   List<T> foods,
   String query, {
-  required String Function(T food) name,
+  required String? Function(T food) name,
   required String? Function(T food) other,
 }) {
   final wanted = folded(query.trim());
@@ -39,5 +41,8 @@ List<T> _matching<T>(
   return foods
       .where((food) => matches(name(food)) || matches(other(food)))
       .toList()
-    ..sort((a, b) => folded(name(a)).compareTo(folded(name(b))));
+    ..sort(
+      (a, b) =>
+          folded(name(a) ?? _unnamed).compareTo(folded(name(b) ?? _unnamed)),
+    );
 }

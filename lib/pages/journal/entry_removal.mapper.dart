@@ -24,12 +24,6 @@ class EntryRemovalMapper extends ClassMapperBase<EntryRemoval> {
   @override
   final String id = 'EntryRemoval';
 
-  static String _$entryId(EntryRemoval v) => v.entryId;
-  static const Field<EntryRemoval, String> _f$entryId = Field(
-    'entryId',
-    _$entryId,
-    key: r'entry_id',
-  );
   static LoggedEntry _$entry(EntryRemoval v) => v.entry;
   static const Field<EntryRemoval, LoggedEntry> _f$entry = Field(
     'entry',
@@ -43,7 +37,6 @@ class EntryRemovalMapper extends ClassMapperBase<EntryRemoval> {
 
   @override
   final MappableFields<EntryRemoval> fields = const {
-    #entryId: _f$entryId,
     #entry: _f$entry,
     #reason: _f$reason,
   };
@@ -51,11 +44,7 @@ class EntryRemovalMapper extends ClassMapperBase<EntryRemoval> {
   final bool ignoreNull = true;
 
   static EntryRemoval _instantiate(DecodingData data) {
-    return EntryRemoval(
-      entryId: data.dec(_f$entryId),
-      entry: data.dec(_f$entry),
-      reason: data.dec(_f$reason),
-    );
+    return EntryRemoval(entry: data.dec(_f$entry), reason: data.dec(_f$reason));
   }
 
   @override
@@ -121,7 +110,7 @@ extension EntryRemovalValueCopy<$R, $Out>
 abstract class EntryRemovalCopyWith<$R, $In extends EntryRemoval, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get entry;
-  $R call({String? entryId, LoggedEntry? entry, RemovalReason? reason});
+  $R call({LoggedEntry? entry, RemovalReason? reason});
   EntryRemovalCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -137,17 +126,14 @@ class _EntryRemovalCopyWithImpl<$R, $Out>
   LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get entry =>
       $value.entry.copyWith.$chain((v) => call(entry: v));
   @override
-  $R call({String? entryId, LoggedEntry? entry, RemovalReason? reason}) =>
-      $apply(
-        FieldCopyWithData({
-          if (entryId != null) #entryId: entryId,
-          if (entry != null) #entry: entry,
-          if (reason != null) #reason: reason,
-        }),
-      );
+  $R call({LoggedEntry? entry, RemovalReason? reason}) => $apply(
+    FieldCopyWithData({
+      if (entry != null) #entry: entry,
+      if (reason != null) #reason: reason,
+    }),
+  );
   @override
   EntryRemoval $make(CopyWithData data) => EntryRemoval(
-    entryId: data.get(#entryId, or: $value.entryId),
     entry: data.get(#entry, or: $value.entry),
     reason: data.get(#reason, or: $value.reason),
   );

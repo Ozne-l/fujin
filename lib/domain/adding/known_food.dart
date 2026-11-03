@@ -7,7 +7,9 @@ Future<MfpFood?> knownFood(
   required FoodRepository foods,
 }) async {
   try {
-    return await mfp.foods.byId(mfpFoodId);
+    final food = await mfp.foods.byId(mfpFoodId);
+    if (food case final food?) foods.fill(food);
+    return food;
   } on MfpNetworkException {
     if (foods.onPhone(mfpFoodId) case final food?) return food;
     rethrow;

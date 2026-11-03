@@ -13,6 +13,11 @@ class MealCardFrame extends StatelessWidget {
 
   static const _plusIcon = 'assets/icons/plus.svg';
 
+  static const Widget emptyBody = SizedBox(
+    width: double.infinity,
+    height: FujinSpace.s3,
+  );
+
   final Widget header;
   final Widget body;
   final VoidCallback onAdd;

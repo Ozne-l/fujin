@@ -12,11 +12,4 @@ final class SqliteBoolHook extends MappingHook {
     _true => true,
     _ => value,
   };
-
-  @override
-  Object? afterEncode(Object? value) => switch (value) {
-    false => _false,
-    true => _true,
-    _ => value,
-  };
 }

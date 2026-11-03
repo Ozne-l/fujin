@@ -52,7 +52,7 @@ class ConnectorPill extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: _size.inset),
           decoration: BoxDecoration(
             color: context.colors.backgroundCard,
-            borderRadius: BorderRadius.circular(_size.height / 2),
+            borderRadius: BorderRadius.circular(FujinRadius.pill),
             border: Border.all(color: color),
           ),
           child: Row(

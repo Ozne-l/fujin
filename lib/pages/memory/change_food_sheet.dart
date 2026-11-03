@@ -43,7 +43,7 @@ class _ChangeFoodSheet extends HookConsumerWidget {
     final navigator = Navigator.of(context);
 
     return SheetFrame(
-      title: food.mfpDescription,
+      title: food.mfpDescription ?? context.intl.unnamedFood,
       subtitle: context.intl.memoryChangeSubtitle,
       initialQuery: terms,
       onSearch: (text) => unawaited(

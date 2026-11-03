@@ -3,6 +3,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/journal/widgets/split_line.dart';
 
 class EntryRow extends StatelessWidget {
@@ -32,7 +33,7 @@ class EntryRow extends StatelessWidget {
       children: [
         SplitLine(
           leading: Text(
-            entry.foodName ?? '',
+            FoodText.name(context.intl, entry.foodName),
             style: FujinText.inter15Medium.copyWith(color: main),
           ),
           trailing: Text(

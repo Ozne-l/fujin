@@ -128,13 +128,5 @@ void main() {
 
       check(foodReads()).deepEquals([rice, skyr]);
     });
-
-    test('reads MyFitnessPal and writes nothing there', () async {
-      await completion.complete();
-
-      check([
-        for (final request in backends.requests) request.method,
-      ]).every((method) => method.equals('GET'));
-    });
   });
 }

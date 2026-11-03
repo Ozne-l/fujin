@@ -39,12 +39,21 @@ class DiaryMealMapper extends ClassMapperBase<DiaryMeal> {
     opt: true,
     def: const [],
   );
+  static Set<String> _$mfpPending(DiaryMeal v) => v.mfpPending;
+  static const Field<DiaryMeal, Set<String>> _f$mfpPending = Field(
+    'mfpPending',
+    _$mfpPending,
+    key: r'mfp_pending',
+    opt: true,
+    def: const {},
+  );
 
   @override
   final MappableFields<DiaryMeal> fields = const {
     #name: _f$name,
     #entries: _f$entries,
     #leaving: _f$leaving,
+    #mfpPending: _f$mfpPending,
   };
   @override
   final bool ignoreNull = true;
@@ -54,6 +63,7 @@ class DiaryMealMapper extends ClassMapperBase<DiaryMeal> {
       name: data.dec(_f$name),
       entries: data.dec(_f$entries),
       leaving: data.dec(_f$leaving),
+      mfpPending: data.dec(_f$mfpPending),
     );
   }
 
@@ -132,6 +142,7 @@ abstract class DiaryMealCopyWith<$R, $In extends DiaryMeal, $Out>
     String? name,
     List<LoggedEntry>? entries,
     List<LoggedEntry>? leaving,
+    Set<String>? mfpPending,
   });
   DiaryMealCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -171,11 +182,13 @@ class _DiaryMealCopyWithImpl<$R, $Out>
     String? name,
     List<LoggedEntry>? entries,
     List<LoggedEntry>? leaving,
+    Set<String>? mfpPending,
   }) => $apply(
     FieldCopyWithData({
       if (name != null) #name: name,
       if (entries != null) #entries: entries,
       if (leaving != null) #leaving: leaving,
+      if (mfpPending != null) #mfpPending: mfpPending,
     }),
   );
   @override
@@ -183,6 +196,7 @@ class _DiaryMealCopyWithImpl<$R, $Out>
     name: data.get(#name, or: $value.name),
     entries: data.get(#entries, or: $value.entries),
     leaving: data.get(#leaving, or: $value.leaving),
+    mfpPending: data.get(#mfpPending, or: $value.mfpPending),
   );
 
   @override

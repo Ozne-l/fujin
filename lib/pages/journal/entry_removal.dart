@@ -6,13 +6,10 @@ part 'entry_removal.mapper.dart';
 
 @MappableClass()
 final class EntryRemoval with EntryRemovalMappable {
-  const EntryRemoval({
-    required this.entryId,
-    required this.entry,
-    required this.reason,
-  });
+  const EntryRemoval({required this.entry, required this.reason});
 
-  final String entryId;
   final LoggedEntry entry;
   final RemovalReason reason;
+
+  String get entryId => entry.entry.id;
 }

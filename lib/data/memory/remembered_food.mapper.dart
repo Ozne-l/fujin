@@ -30,7 +30,7 @@ class RememberedFoodMapper extends ClassMapperBase<RememberedFood> {
     _$mfpFoodId,
     key: r'mfp_food_id',
   );
-  static String _$mfpDescription(RememberedFood v) => v.mfpDescription;
+  static String? _$mfpDescription(RememberedFood v) => v.mfpDescription;
   static const Field<RememberedFood, String> _f$mfpDescription = Field(
     'mfpDescription',
     _$mfpDescription,
@@ -120,7 +120,7 @@ class MatchedFoodMapper extends SubClassMapperBase<MatchedFood> {
     _$mfpFoodId,
     key: r'mfp_food_id',
   );
-  static String _$mfpDescription(MatchedFood v) => v.mfpDescription;
+  static String? _$mfpDescription(MatchedFood v) => v.mfpDescription;
   static const Field<MatchedFood, String> _f$mfpDescription = Field(
     'mfpDescription',
     _$mfpDescription,
@@ -247,13 +247,13 @@ class _MatchedFoodCopyWithImpl<$R, $Out>
   @override
   $R call({
     String? mfpFoodId,
-    String? mfpDescription,
+    Object? mfpDescription = $none,
     String? ekkloFoodId,
     String? ekkloFoodName,
   }) => $apply(
     FieldCopyWithData({
       if (mfpFoodId != null) #mfpFoodId: mfpFoodId,
-      if (mfpDescription != null) #mfpDescription: mfpDescription,
+      if (mfpDescription != $none) #mfpDescription: mfpDescription,
       if (ekkloFoodId != null) #ekkloFoodId: ekkloFoodId,
       if (ekkloFoodName != null) #ekkloFoodName: ekkloFoodName,
     }),
@@ -293,7 +293,7 @@ class OwnCopyMapper extends SubClassMapperBase<OwnCopy> {
     _$mfpFoodId,
     key: r'mfp_food_id',
   );
-  static String _$mfpDescription(OwnCopy v) => v.mfpDescription;
+  static String? _$mfpDescription(OwnCopy v) => v.mfpDescription;
   static const Field<OwnCopy, String> _f$mfpDescription = Field(
     'mfpDescription',
     _$mfpDescription,
@@ -436,7 +436,7 @@ class _OwnCopyCopyWithImpl<$R, $Out>
   @override
   $R call({
     String? mfpFoodId,
-    String? mfpDescription,
+    Object? mfpDescription = $none,
     String? ekkloFoodId,
     String? ekkloFoodName,
     String? mfpUnit,
@@ -444,7 +444,7 @@ class _OwnCopyCopyWithImpl<$R, $Out>
   }) => $apply(
     FieldCopyWithData({
       if (mfpFoodId != null) #mfpFoodId: mfpFoodId,
-      if (mfpDescription != null) #mfpDescription: mfpDescription,
+      if (mfpDescription != $none) #mfpDescription: mfpDescription,
       if (ekkloFoodId != null) #ekkloFoodId: ekkloFoodId,
       if (ekkloFoodName != null) #ekkloFoodName: ekkloFoodName,
       if (mfpUnit != null) #mfpUnit: mfpUnit,

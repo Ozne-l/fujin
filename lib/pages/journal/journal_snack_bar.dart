@@ -6,6 +6,8 @@ import 'package:fujin/domain/comparison/replacement.dart';
 import 'package:fujin/domain/editing/edited_food.dart';
 import 'package:fujin/domain/sending/food_words.dart';
 import 'package:fujin/domain/writing/write_failure.dart';
+import 'package:fujin/domain/writing/writer_state.dart';
+import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
@@ -14,6 +16,7 @@ import 'package:fujin/pages/common/snack_bar_glyph.dart';
 import 'package:fujin/pages/journal/removal_reason.dart';
 import 'package:fujin/pages/journal/remove_entry_state.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
+import 'package:fujin/pages/journal/writer_state_ids.dart';
 import 'package:fujin/pages/sending/send_failure.dart';
 
 abstract final class JournalSnackBar {
@@ -108,8 +111,32 @@ abstract final class JournalSnackBar {
     );
   }
 
-  static void replaced(BuildContext context, List<Replacement> replaced) {
-    final intl = context.intl;
+  static void written(
+    BuildContext context,
+    WriterIdle idle,
+    AppEnvironment environment, {
+    required VoidCallback onRetry,
+  }) {
+    final notices = [
+      ?_replaced(context.intl, idle.replaced),
+      ?_notWritten(
+        context.intl,
+        [...idle.stopped(environment)],
+        environment,
+        onRetry: onRetry,
+      ),
+    ];
+    if (notices.isEmpty) return;
+    final messenger = ScaffoldMessenger.of(context)..clearSnackBars();
+    for (final (content, duration) in notices) {
+      messenger.showFujinSnackBar(_snackBar(content, duration));
+    }
+  }
+
+  static (Widget, Duration)? _replaced(
+    AppLocalizations intl,
+    List<Replacement> replaced,
+  ) {
     final detail = switch (replaced) {
       [] => null,
       [ReplacedDeletion(:final logged)] => intl.replacedDeletion(
@@ -136,49 +163,40 @@ abstract final class JournalSnackBar {
       },
       _ => intl.replacedMany(replaced.length),
     };
-    if (detail case final detail?) {
-      show(
-        context,
-        duration: _settledDuration,
-        content: SnackBarContent(
+    return switch (detail) {
+      final detail? => (
+        SnackBarContent(
           glyph: SnackBarGlyph.refresh,
           title: intl.replacedTitle,
           detail: detail,
         ),
-      );
-    }
+        _settledDuration,
+      ),
+      null => null,
+    };
   }
 
-  static void notWritten(
-    BuildContext context,
+  static (Widget, Duration)? _notWritten(
+    AppLocalizations intl,
     List<WriteFailure> failures,
     AppEnvironment environment, {
     required VoidCallback onRetry,
   }) {
-    final intl = context.intl;
-    List<WriteFailure> shown(bool Function(WriteFailure failure) side) => [
-      for (final failure in failures)
-        if (side(failure) &&
-            SendFailure.of(failure.error, environment) != SendFailure.network)
-          failure,
-    ];
-    final mfp = shown((failure) => failure is MfpNotWritten);
-    final ekklo = shown((failure) => failure is EkkloNotWritten);
+    final mfp = [...failures.whereType<MfpNotWritten>()];
+    final ekklo = [...failures.whereType<EkkloNotWritten>()];
     final notice = switch ((mfp, ekklo)) {
       ([_, ...], _) => (intl.mfpNotWritten, mfp),
       (_, [_, ...]) => (intl.ekkloNotWritten, ekklo),
       _ => null,
     };
-    if (notice case (final title, final reported)) {
+    if (notice case (final title, final List<WriteFailure> reported)) {
       final blocked = reported.every(
         (failure) =>
             SendFailure.of(failure.error, environment) ==
             SendFailure.blockedInDev,
       );
-      show(
-        context,
-        duration: undoWindow,
-        content: SnackBarContent(
+      return (
+        SnackBarContent(
           glyph: SnackBarGlyph.alert,
           title: title,
           detail: switch ((blocked, reported)) {
@@ -193,8 +211,10 @@ abstract final class JournalSnackBar {
             false => (intl.tryAgain, onRetry),
           },
         ),
+        undoWindow,
       );
     }
+    return null;
   }
 
   static void show(
@@ -204,8 +224,9 @@ abstract final class JournalSnackBar {
   }) {
     ScaffoldMessenger.of(context)
       ..clearSnackBars()
-      ..showFujinSnackBar(
-        SnackBar(duration: duration, padding: _padding, content: content),
-      );
+      ..showFujinSnackBar(_snackBar(content, duration));
   }
+
+  static SnackBar _snackBar(Widget content, Duration duration) =>
+      SnackBar(duration: duration, padding: _padding, content: content);
 }

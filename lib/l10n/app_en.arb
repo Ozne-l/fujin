@@ -320,6 +320,7 @@
   "ekkloUnavailable": "Ekklo unavailable",
   "goalLine": "Goal · {goals}",
   "mealEmpty": "Nothing yet",
+  "unnamedFood": "Unnamed food",
   "mealAddFood": "Add a food",
   "mealFolded": "{inEkklo}/{total} · {foods}",
   "foodAdded": "{food} added",

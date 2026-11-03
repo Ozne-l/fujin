@@ -100,7 +100,7 @@ class MemoryFoodPage extends HookConsumerWidget {
               top: FujinSpace.s3,
               bottom: FujinSpace.s6,
               child: Text(
-                food.mfpDescription,
+                food.mfpDescription ?? context.intl.unnamedFood,
                 style: FujinText.hina30.copyWith(
                   color: context.colors.textPrimary,
                 ),
@@ -109,7 +109,7 @@ class MemoryFoodPage extends HookConsumerWidget {
             _SourceCard(
               dot: context.colors.sourceMfp,
               source: context.intl.sourceMyFitnessPal,
-              name: food.mfpDescription,
+              name: food.mfpDescription ?? context.intl.unnamedFood,
               lines: [
                 if (servedIn.isNotEmpty)
                   _Line(
@@ -170,11 +170,12 @@ class MemoryFoodPage extends HookConsumerWidget {
                     glyph: const AlertPictogram(icon: DeleteIcon.asset),
                     title: context.intl.memoryForgetTitle,
                     message: context.intl.memoryForgetDetail(
-                      food.mfpDescription,
+                      food.mfpDescription ?? context.intl.unnamedFood,
                       units.length,
                     ),
                     confirmLabel: context.intl.memoryForgetConfirm,
                     onConfirm: () {
+                      wroteAdd.value = false;
                       context.pop();
                       notifier.forget(food);
                     },

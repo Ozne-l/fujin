@@ -4,6 +4,8 @@ import 'package:fujin/data/foods/food_nutrients.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 
 abstract final class EntryText {
+  static const _macroDecimals = 1;
+
   static String serving(AppLocalizations intl, LoggedEntry logged) =>
       intl.servingLine(
         logged.entry.servings,
@@ -32,10 +34,13 @@ abstract final class EntryText {
   static String energy(AppLocalizations intl, LoggedEntry logged) =>
       intl.kilocalories(logged.entry.nutrients.kilocalories ?? 0);
 
+  static String macro(AppLocalizations intl, double grams) =>
+      intl.macroValue(double.parse(grams.toStringAsFixed(_macroDecimals)));
+
   static String macros(AppLocalizations intl, FoodNutrients nutrients) {
     String amount(double? grams) => switch (grams) {
       null => intl.macroUnknown,
-      final grams => intl.macroValue(grams),
+      final grams => macro(intl, grams),
     };
     return intl.macros(
       amount(nutrients.protein),

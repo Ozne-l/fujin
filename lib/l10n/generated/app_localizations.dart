@@ -2018,6 +2018,12 @@ abstract class AppLocalizations {
   /// **'Rien pour l’instant'**
   String get mealEmpty;
 
+  /// No description provided for @unnamedFood.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aliment sans nom'**
+  String get unnamedFood;
+
   /// No description provided for @mealAddFood.
   ///
   /// In fr, this message translates to:

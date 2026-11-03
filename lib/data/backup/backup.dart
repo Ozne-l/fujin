@@ -20,7 +20,7 @@ import 'package:fujin/data/memory/remembered_unit.dart';
 
 part 'backup.mapper.dart';
 
-@MappableClass()
+@MappableClass(discriminatorKey: Backup.versionKey)
 sealed class Backup with BackupMappable {
   const Backup({
     required this.exportedAt,
@@ -31,6 +31,7 @@ sealed class Backup with BackupMappable {
   });
 
   static const formatName = 'fujin-backup';
+  static const versionKey = 'version';
 
   final String format;
   final int version;
@@ -45,7 +46,7 @@ sealed class Backup with BackupMappable {
   int get linkCount => links.length;
 }
 
-@MappableClass()
+@MappableClass(discriminatorValue: BackupV4.currentVersion)
 final class BackupV4 extends Backup with BackupV4Mappable {
   const BackupV4({
     required super.exportedAt,
@@ -92,7 +93,7 @@ final class BackupV4 extends Backup with BackupV4Mappable {
       links.length;
 }
 
-@MappableClass()
+@MappableClass(discriminatorValue: BackupV3.foodsVersion)
 final class BackupV3 extends Backup with BackupV3Mappable {
   const BackupV3({
     required super.exportedAt,
@@ -104,10 +105,12 @@ final class BackupV3 extends Backup with BackupV3Mappable {
     required this.barcodeLinks,
     required this.meals,
     required this.mealMappings,
-    required super.version,
     super.goals,
     super.format = Backup.formatName,
+    super.version = foodsVersion,
   });
+
+  static const foodsVersion = 3;
 
   final List<Food> foods;
   final List<FoodServing> foodServings;
@@ -142,7 +145,7 @@ int _ekkloMealCount(List<ConnectorMeal> mappings) => mappings
     )
     .length;
 
-@MappableClass()
+@MappableClass(discriminatorValue: BackupV2.isMemoryFile)
 final class BackupV2 extends Backup with BackupV2Mappable {
   const BackupV2({
     required super.exportedAt,
@@ -156,6 +159,14 @@ final class BackupV2 extends Backup with BackupV2Mappable {
     super.goals,
     super.format = Backup.formatName,
   });
+
+  static const memoryVersion = 2;
+  static const versionWithoutBarcodeLinks = 1;
+
+  static bool isMemoryFile(Map<String, dynamic> file) => switch (file) {
+    {Backup.versionKey: memoryVersion || versionWithoutBarcodeLinks} => true,
+    _ => false,
+  };
 
   final List<MatchedFood> matches;
   final List<OwnCopy> ownCopies;

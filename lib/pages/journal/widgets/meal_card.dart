@@ -7,6 +7,7 @@ import 'package:fujin/domain/journal/journal_meal.dart';
 import 'package:fujin/domain/journal/status_counts.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
 import 'package:fujin/pages/journal/background_write_notifier.dart';
@@ -66,18 +67,10 @@ class MealCard extends HookConsumerWidget {
       ],
     );
     final header = switch ((counts.total, open)) {
-      (0, _) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: FujinSpace.s3,
-        children: [
-          MealTitle(name: meal.name, kilocalories: meal.kilocalories),
-          Text(
-            context.intl.mealEmpty,
-            style: FujinText.inter13Regular.copyWith(
-              color: context.colors.textSecondary,
-            ),
-          ),
-        ],
+      (0, _) => MealTitle(
+        name: meal.name,
+        kilocalories: meal.kilocalories,
+        empty: true,
       ),
       (final total, true) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -103,13 +96,18 @@ class MealCard extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: FujinSpace.s2,
               children: [
-                _name(context.colors),
+                MealTitle.nameText(context, meal.name),
                 Text(
                   context.intl.mealFolded(
                     counts.inEkklo,
                     total,
                     meal.entries
-                        .map((compared) => compared.logged.foodName ?? '')
+                        .map(
+                          (compared) => FoodText.name(
+                            context.intl,
+                            compared.logged.foodName,
+                          ),
+                        )
                         .join(_foodSeparator),
                   ),
                   maxLines: 1,
@@ -124,7 +122,10 @@ class MealCard extends HookConsumerWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             spacing: FujinSpace.s1,
-            children: [_kilocalories(context.intl, context.colors), pills],
+            children: [
+              MealTitle.kilocaloriesText(context, meal.kilocalories),
+              pills,
+            ],
           ),
         ],
       ),
@@ -157,26 +158,12 @@ class MealCard extends HookConsumerWidget {
               onRemove: onRemove,
             ),
           ),
-          _ => const SizedBox(width: double.infinity, height: FujinSpace.s3),
+          _ => MealCardFrame.emptyBody,
         },
       ),
       onAdd: onAdd,
     );
   }
-
-  Widget _name(FujinColors colors) => Text(
-    meal.name,
-    style: FujinText.inter16Medium.copyWith(
-      color: colors.textPrimary,
-    ),
-  );
-
-  Widget _kilocalories(AppLocalizations intl, FujinColors colors) => Text(
-    intl.kilocalories(meal.kilocalories),
-    style: FujinText.inter15Semibold.copyWith(
-      color: colors.textPrimary,
-    ),
-  );
 
   static List<(String, PillTone)> _mealPills(
     AppLocalizations intl,

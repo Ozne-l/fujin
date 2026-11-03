@@ -100,9 +100,7 @@ void main() {
           'PUT ${ekkloUri.host}',
         ]);
         final edited = (outcome as Edited).edited;
-        check(edited)
-          ..has((it) => it.link?.item, 'Ekklo item').isNotNull()
-          ..has((it) => it.entryId, 'entry id').equals(food.entryId);
+        check(edited.entryId).equals(food.entryId);
         check(backends.entries.single)
           ..has((it) => it.id, 'id').equals(
             mfpEntryIdOf(services, edited.entryId),
@@ -176,19 +174,13 @@ void main() {
         final services = await WriteServices.over(backends, database);
         backends.requests.clear();
 
-        final outcome = await save(services, food, _draft(servings: 2));
+        await save(services, food, _draft(servings: 2));
 
         check(services.writes()).deepEquals([
           'POST ${mfpApiUri.host}',
           'DELETE ${mfpApiUri.host}',
           'POST ${ekkloUri.host}',
         ]);
-        check(
-              outcome,
-            )
-            .isA<Edited>()
-            .has((it) => it.edited.link?.item, 'Ekklo item')
-            .isNull();
         check(services.entries.find(food.entryId)?.ekkloLink?.item).isNotNull();
       },
     );

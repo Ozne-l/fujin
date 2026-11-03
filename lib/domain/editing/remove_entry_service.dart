@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:fujin/data/entries/entry_repository.dart';
-import 'package:fujin/domain/editing/removed_entry.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/domain/writing/background_writer.dart';
 import 'package:fujin/domain/writing/ekklo_job.dart';
 
@@ -14,7 +14,7 @@ final class RemoveEntryService {
   final EntryRepository _entries;
   final BackgroundWriter _background;
 
-  RemovedEntry? remove(String entryId) {
+  LoggedEntry? remove(String entryId) {
     final logged = _entries.find(entryId);
     if (logged == null) return null;
     _background.drop(entryId);
@@ -23,6 +23,6 @@ final class RemoveEntryService {
     }
     _entries.remove(entryId);
     unawaited(_background.run());
-    return RemovedEntry(logged);
+    return logged;
   }
 }

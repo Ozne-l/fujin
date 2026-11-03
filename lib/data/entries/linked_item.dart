@@ -32,7 +32,10 @@ final class LinkedItem with LinkedItemMappable {
     sentAt: sentAt,
   );
 
+  static const itemIdKey = 'ekklo_item_id';
+
   final String ekkloMealId;
+  @MappableField(key: itemIdKey)
   final String ekkloItemId;
   final String mealId;
   final String foodId;

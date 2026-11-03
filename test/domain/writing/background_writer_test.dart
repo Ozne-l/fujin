@@ -5,7 +5,6 @@ import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart'
     show group, setUp, tearDown, test;
 import 'package:fujin/app/app_environment.dart';
-import 'package:fujin/data/connectors/connector_domain.dart';
 import 'package:fujin/data/connectors/connector_roles.dart';
 import 'package:fujin/data/connectors/role.dart';
 import 'package:fujin/data/database/fujin_database.dart';
@@ -561,6 +560,33 @@ void main() {
     },
   );
 
+  test(
+    'stops a run offline at the deletion of an entry already in Ekklo',
+    () async {
+      final (writing, food) = await written();
+      clock = clock.add(const Duration(seconds: 1));
+      backends
+        ..mfpReachable = false
+        ..ekkloReachable = false;
+      await writing.add(_draft(meal: breakfast));
+      await writing.settle();
+      backends.requests.clear();
+
+      writing.removing.remove(food.entryId);
+      await writing.settle();
+
+      check(writing.writes()).isEmpty();
+      check({
+        for (final request in backends.requests) request.url.path,
+      }).deepEquals({'/v2/diary'});
+      check(
+        writing.background.state.failures.firstWhere(
+          (failure) => failure.entryId == food.entryId,
+        ),
+      ).isA<MfpNotWritten>();
+    },
+  );
+
   group('a write stopped halfway', () {
     MfpFoodEntry row(String id, {double servings = 1.5, DateTime? date}) =>
         entry(
@@ -602,6 +628,29 @@ void main() {
       check(mfpEntryIdOf(restarted, food.entryId)).equals('mfp-written');
       check(restarted.entries.entries()).length.equals(1);
     });
+
+    test(
+      'H1: sends the remembered Ekklo side of a row a Journal read adopted '
+      'first, and nothing for a row copied in',
+      () async {
+        final food = await unwritten(await services(), _draft());
+        backends.entries = [row('mfp-written'), entry('app-row', version: '1')];
+
+        final restarted = await services();
+        final (:replaced, :adopted) = restarted.journal.settleDay(
+          day,
+          diary: await restarted.journal.fetchDiary(day),
+          meals: await restarted.journal.fetchEkkloMeals(day),
+        );
+        restarted.background.settled(adopted: adopted, replaced: replaced);
+        await restarted.settle();
+
+        check(restarted.writes()).deepEquals(['POST ${ekkloUri.host}']);
+        check(
+          (await restarted.find(food.entryId, day))?.status,
+        ).isA<InEkklo>();
+      },
+    );
 
     test(
       'H1b: adopts the row of an add whose reply was lost, then sends Ekklo',
@@ -725,7 +774,7 @@ void main() {
       'sends its remembered Ekklo side on the new day',
       () async {
         final (writing, food) = await written();
-        backends.mfpReachable = false;
+        backends.mfpWritesFail = true;
         writing.editing.save(
           _draft(date: _nextDay),
           await writing.adding.plan(_draft(date: _nextDay)),
@@ -734,7 +783,7 @@ void main() {
         await writing.settle();
         check(ekkloQuantities()).isEmpty();
         backends
-          ..mfpReachable = true
+          ..mfpWritesFail = false
           ..requests.clear();
 
         final restarted = await services();
@@ -827,12 +876,12 @@ void main() {
       'removal',
       () async {
         final (writing, food) = await written();
-        backends.mfpReachable = false;
+        backends.mfpRemoveFails = true;
         writing.removing.remove(food.entryId);
         await writing.settle();
         check(ekkloQuantities()).isEmpty();
         backends
-          ..mfpReachable = true
+          ..mfpRemoveFails = false
           ..requests.clear();
 
         final restarted = await services();
@@ -1110,7 +1159,7 @@ void main() {
       check(backends.entries).contains(appOnly);
       check(writing.writes()).isEmpty();
 
-      roles = ConnectorRoles.defaults(ConnectorDomain.food);
+      roles = foodRoles;
       await writing.journal.readDay(day);
 
       check(

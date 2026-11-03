@@ -418,6 +418,25 @@ void main() {
       check(result.leaving.single.entry.id).equals('e-1');
     });
 
+    test('of a deletion MyFitnessPal still owes is dropped once its item is '
+        'gone', () {
+      final deleted = deletedIn('e-1', 'I-1');
+      final owed = deleted.copyWith(
+        mfpLink: MfpLink.of(
+          entry('mfp-1'),
+          id: 'l-1',
+          entryId: 'e-1',
+          mfpEntryId: 'mfp-1',
+          updatedAt: now,
+        ),
+      );
+
+      final result = compare([], [], deleted: [owed], owed: [owed]);
+
+      check(result.changes).equals(changes(dropped: ['k-e-1']));
+      check(result.leaving.single.ekkloLink).isNull();
+    });
+
     test('turns the same food in the same meal into a quantity update', () {
       final orphan = deletedIn('e-1', 'I-1');
 

@@ -55,7 +55,6 @@ abstract final class AddShortcut {
       added,
       onUndo: () => remover.remove(
         EntryRemoval(
-          entryId: added.entryId,
           entry: added.entry,
           reason: RemovalReason.undoAdd,
         ),

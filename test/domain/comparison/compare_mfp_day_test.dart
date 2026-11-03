@@ -21,7 +21,7 @@ import '../../support/fixtures.dart';
 DayDraft read(
   List<LoggedEntry> stored,
   List<MfpFoodEntry> diary, {
-  Food? Function(String mfpFoodId) foodOf = knownFood,
+  Food? Function(String mfpFoodId) foodOf = storedFood,
   List<LoggedEntry> owed = const [],
   DateTime? readAt,
   Role role = Role.twoWay,
@@ -475,6 +475,29 @@ void main() {
         DayChanges(date: day, changedMfpLinks: [linkTo(row)]),
       );
     });
+
+    test(
+      "moves the link of an entry moved to another day to the app's row",
+      () {
+        final logged = loggedEntry(entry('E-1'));
+        final moved = logged.copyWith(
+          entry: logged.entry.copyWith(date: day.add(const Duration(days: 1))),
+        );
+        final row = entry('M-1', servings: 3);
+
+        final draft = read([], [row], owed: [moved]);
+
+        final kept = moved.copyWith(mfpLink: linkTo(row));
+        check(draft.owed).deepEquals([kept]);
+        check(draft.entries).isEmpty();
+        check(draft.replaced).deepEquals([
+          ReplacedEdit(kept, before: linkTo(row)),
+        ]);
+        check(draft.changes).equals(
+          DayChanges(date: day, changedMfpLinks: [linkTo(row)]),
+        );
+      },
+    );
 
     test('gives an edit the row before an owed deletion', () {
       final row = entry('M-1', servings: 3);

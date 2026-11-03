@@ -8,6 +8,7 @@ import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/pill_size.dart';
 import 'package:fujin/pages/common/sheet_frame.dart';
 import 'package:fujin/pages/common/status_pill.dart';
@@ -49,7 +50,7 @@ class _OwnCopySheet extends StatelessWidget {
     }
 
     return SheetFrame(
-      title: entry.foodName ?? '',
+      title: FoodText.name(context.intl, entry.foodName),
       subtitle: context.intl.entryDetail(
         EntryText.serving(context.intl, entry),
         energy,

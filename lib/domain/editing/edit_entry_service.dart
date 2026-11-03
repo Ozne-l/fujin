@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
@@ -19,7 +20,7 @@ import 'package:fujin/domain/writing/ekklo_job.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 final class EditEntryService {
-  EditEntryService({
+  const EditEntryService({
     required this._mfp,
     required this._sending,
     required this._memory,
@@ -43,7 +44,6 @@ final class EditEntryService {
       null => null,
     };
     if (food == null) return const FoodUnreadable();
-    _foods.fill(food);
     final draft = AddDraft.forEntry(logged, food);
     if (draft == null) return const ServingMissing();
     return switch (logged.mfpLink?.foodVersion) {
@@ -62,19 +62,16 @@ final class EditEntryService {
       return NotEdited(StateError('Entry $entryId is gone'));
     }
     final stored = _writer.store(draft, entryId: entryId);
-    final edited = EditedFood(
-      original: original,
-      draft: draft,
-      entry: stored,
-      planned: switch (planned) {
+    _holdSend(
+      entryId,
+      switch (planned) {
         final planned? => rescalePlanned(planned, stored, _memory.load()),
         null => null,
       },
       link: original.ekkloLink,
     );
-    _holdSend(entryId, edited.planned, link: original.ekkloLink);
     unawaited(_background.run());
-    return Edited(edited);
+    return Edited(EditedFood(original: original, entry: stored));
   }
 
   Future<EditOutcome> revert(EditedFood edited) async {
@@ -82,15 +79,7 @@ final class EditEntryService {
     final replanned = await _replanned(stored);
     _holdSend(stored.entry.id, replanned, link: stored.ekkloLink);
     unawaited(_background.run());
-    return Edited(
-      EditedFood(
-        original: edited.entry,
-        draft: edited.draft,
-        entry: stored,
-        planned: replanned,
-        link: stored.ekkloLink,
-      ),
-    );
+    return Edited(EditedFood(original: edited.entry, entry: stored));
   }
 
   Future<PlannedEntry?> _replanned(LoggedEntry stored) async {
@@ -100,7 +89,7 @@ final class EditEntryService {
         stored,
         _memory.load(),
       );
-    } on Object catch (_) {
+    } on EkkloException {
       return null;
     }
   }

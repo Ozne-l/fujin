@@ -23,10 +23,6 @@ DayDraft compareMfpDay(
   required IdSource ids,
   required Role role,
 }) {
-  final receiving = switch (role) {
-    Role.twoWay => false,
-    Role.receiveOnly => true,
-  };
   final catalog = DayCatalog(
     foodOf: foodOf,
     mealOf: mealOf,
@@ -149,7 +145,9 @@ DayDraft compareMfpDay(
   bool gone(MfpLink link) =>
       !fresh(link) && !inDiary.containsKey(link.mfpEntryId);
   bool keepsFujin(LoggedEntry logged) =>
-      receiving || MfpWrite.of(logged) is MfpEdit;
+      !role.copiesIn || MfpWrite.of(logged) is MfpEdit;
+  final owedById = [...day.owed]
+    ..sort((first, second) => first.entry.id.compareTo(second.entry.id));
   final editsGone = [
     for (final logged in byId)
       if (logged.mfpLink case final link?
@@ -157,15 +155,12 @@ DayDraft compareMfpDay(
               gone(link) &&
               sameDay(link.date, logged.entry.date))
         logged,
-  ];
+    for (final logged in owedById)
+      if (MfpWrite.of(logged) case MfpEdit(:final link) when gone(link)) logged,
+  ]..sort((first, second) => first.entry.id.compareTo(second.entry.id));
   final deletionsGone = [
-    for (final logged in [
-      ...day.owed,
-    ]..sort((first, second) => first.entry.id.compareTo(second.entry.id)))
-      if ((MfpWrite.of(logged), logged.mfpLink) case (
-        MfpDeletion(),
-        final link?,
-      ) when gone(link))
+    for (final logged in owedById)
+      if (MfpWrite.of(logged) case MfpDeletion(:final link) when gone(link))
         logged,
   ];
   MfpLink movedTo(MfpLink link, MfpFoodEntry row, String mfpEntryId) =>
@@ -270,7 +265,14 @@ DayDraft compareMfpDay(
       case (_, final link?):
         final kept = logged.copyWith(mfpLink: link);
         owed.add(kept);
-        replaced.add(ReplacedDeletion(kept));
+        switch (MfpWrite.of(logged)) {
+          case MfpDeletion():
+            replaced.add(ReplacedDeletion(kept));
+          case MfpEdit():
+            replacedEdit(kept, link);
+          case MfpAdd() || null:
+            continue;
+        }
       case (final link?, null) when gone(link):
         owed.add(logged.copyWith(mfpLink: null));
       case _:
@@ -278,7 +280,7 @@ DayDraft compareMfpDay(
     }
   }
   final unstored = <LoggedEntry>[];
-  for (final entry in [if (!receiving) ...diary]) {
+  for (final entry in [if (role.copiesIn) ...diary]) {
     switch (entry.id) {
       case final mfpEntryId? when !held.contains(mfpEntryId):
         final logged = copied(
@@ -294,7 +296,7 @@ DayDraft compareMfpDay(
               mfpEntryId: mfpEntryId,
               updatedAt: now,
             ),
-            ekkloLink: pending[logged.entry.id],
+            ekkloLink: pending.remove(logged.entry.id),
           ),
         );
       case _?:
@@ -312,7 +314,7 @@ DayDraft compareMfpDay(
     foods: catalog.foods,
     meals: catalog.meals,
     plannedEntryIds: const {},
-    pendingLinks: const [],
+    pendingLinks: [...pending.values],
     replaced: [...day.replaced, ...replaced],
   );
 }

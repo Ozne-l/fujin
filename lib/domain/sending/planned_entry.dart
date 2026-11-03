@@ -6,6 +6,7 @@ import 'package:fujin/domain/comparison/entry_quantity.dart';
 import 'package:fujin/domain/comparison/expected_item.dart';
 import 'package:fujin/domain/comparison/gram_unit.dart';
 import 'package:fujin/domain/sending/ekklo_candidate.dart';
+import 'package:fujin/domain/sending/food_words.dart';
 import 'package:fujin/domain/sending/review_reason.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/domain/sending/unit_weight.dart';
@@ -42,6 +43,7 @@ final class PlannedEntry with PlannedEntryMappable {
 
   bool get sends => switch (choice) {
     SkipEntry() => false,
+    SendAsOwnCopy(reuse: null) => productName(entry).isNotEmpty,
     SendToEkkloFood() || SendAsOwnCopy() => true,
   };
 

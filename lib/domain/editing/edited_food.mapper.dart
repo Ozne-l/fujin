@@ -16,9 +16,6 @@ class EditedFoodMapper extends ClassMapperBase<EditedFood> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = EditedFoodMapper._());
       LoggedEntryMapper.ensureInitialized();
-      AddDraftMapper.ensureInitialized();
-      PlannedEntryMapper.ensureInitialized();
-      EkkloLinkMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -31,33 +28,16 @@ class EditedFoodMapper extends ClassMapperBase<EditedFood> {
     'original',
     _$original,
   );
-  static AddDraft _$draft(EditedFood v) => v.draft;
-  static const Field<EditedFood, AddDraft> _f$draft = Field('draft', _$draft);
   static LoggedEntry _$entry(EditedFood v) => v.entry;
   static const Field<EditedFood, LoggedEntry> _f$entry = Field(
     'entry',
     _$entry,
   );
-  static PlannedEntry? _$planned(EditedFood v) => v.planned;
-  static const Field<EditedFood, PlannedEntry> _f$planned = Field(
-    'planned',
-    _$planned,
-    opt: true,
-  );
-  static EkkloLink? _$link(EditedFood v) => v.link;
-  static const Field<EditedFood, EkkloLink> _f$link = Field(
-    'link',
-    _$link,
-    opt: true,
-  );
 
   @override
   final MappableFields<EditedFood> fields = const {
     #original: _f$original,
-    #draft: _f$draft,
     #entry: _f$entry,
-    #planned: _f$planned,
-    #link: _f$link,
   };
   @override
   final bool ignoreNull = true;
@@ -65,10 +45,7 @@ class EditedFoodMapper extends ClassMapperBase<EditedFood> {
   static EditedFood _instantiate(DecodingData data) {
     return EditedFood(
       original: data.dec(_f$original),
-      draft: data.dec(_f$draft),
       entry: data.dec(_f$entry),
-      planned: data.dec(_f$planned),
-      link: data.dec(_f$link),
     );
   }
 
@@ -133,17 +110,8 @@ extension EditedFoodValueCopy<$R, $Out>
 abstract class EditedFoodCopyWith<$R, $In extends EditedFood, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get original;
-  AddDraftCopyWith<$R, AddDraft, AddDraft> get draft;
   LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get entry;
-  PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry>? get planned;
-  EkkloLinkCopyWith<$R, EkkloLink, EkkloLink>? get link;
-  $R call({
-    LoggedEntry? original,
-    AddDraft? draft,
-    LoggedEntry? entry,
-    PlannedEntry? planned,
-    EkkloLink? link,
-  });
+  $R call({LoggedEntry? original, LoggedEntry? entry});
   EditedFoodCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -159,40 +127,19 @@ class _EditedFoodCopyWithImpl<$R, $Out>
   LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get original =>
       $value.original.copyWith.$chain((v) => call(original: v));
   @override
-  AddDraftCopyWith<$R, AddDraft, AddDraft> get draft =>
-      $value.draft.copyWith.$chain((v) => call(draft: v));
-  @override
   LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get entry =>
       $value.entry.copyWith.$chain((v) => call(entry: v));
   @override
-  PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry>? get planned =>
-      $value.planned?.copyWith.$chain((v) => call(planned: v));
-  @override
-  EkkloLinkCopyWith<$R, EkkloLink, EkkloLink>? get link =>
-      $value.link?.copyWith.$chain((v) => call(link: v));
-  @override
-  $R call({
-    LoggedEntry? original,
-    AddDraft? draft,
-    LoggedEntry? entry,
-    Object? planned = $none,
-    Object? link = $none,
-  }) => $apply(
+  $R call({LoggedEntry? original, LoggedEntry? entry}) => $apply(
     FieldCopyWithData({
       if (original != null) #original: original,
-      if (draft != null) #draft: draft,
       if (entry != null) #entry: entry,
-      if (planned != $none) #planned: planned,
-      if (link != $none) #link: link,
     }),
   );
   @override
   EditedFood $make(CopyWithData data) => EditedFood(
     original: data.get(#original, or: $value.original),
-    draft: data.get(#draft, or: $value.draft),
     entry: data.get(#entry, or: $value.entry),
-    planned: data.get(#planned, or: $value.planned),
-    link: data.get(#link, or: $value.link),
   );
 
   @override

@@ -17,6 +17,7 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 final day = DateTime.utc(2026, 10, 7);
 final now = DateTime.utc(2026, 10, 7, 20);
+final sentAt = DateTime.utc(2026, 10, 7, 9);
 
 const breakfast = 'Breakfast';
 const lunch = 'Lunch';
@@ -144,7 +145,7 @@ SentLink link(
   mfpServingUnit: unit,
   ekkloMealId: ekkloMeal,
   ekkloItemId: itemId,
-  sentAt: DateTime.utc(2026, 10, 7, 9),
+  sentAt: sentAt,
 );
 
 UnattendedItem unattendedItem(
@@ -232,7 +233,7 @@ LinkedItem linkedItem(
   servings: servings,
   servingValue: servingValue,
   servingUnit: unit,
-  sentAt: DateTime.utc(2026, 10, 7, 9),
+  sentAt: sentAt,
 );
 
 UnattendedExpectation expectation({
@@ -377,7 +378,7 @@ String fujinFoodId(String mfpFoodId) => 'food-$mfpFoodId';
 
 String fujinMealId(String mfpMealName) => 'meal-$mfpMealName';
 
-Food? knownFood(String mfpFoodId) => switch (mfpFoodId) {
+Food? storedFood(String mfpFoodId) => switch (mfpFoodId) {
   oats || rice => Food(
     id: fujinFoodId(mfpFoodId),
     name: mfpFoodId,

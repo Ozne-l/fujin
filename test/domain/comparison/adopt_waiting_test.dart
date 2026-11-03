@@ -8,6 +8,7 @@ import 'package:fujin/data/entries/entry.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/entries/stored_day.dart';
 import 'package:fujin/data/links/sent_link.dart';
+import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/unattended/unattended_item.dart';
 import 'package:fujin/domain/comparison/adopt_waiting.dart';
 import 'package:fujin/domain/comparison/compare_ekklo_day.dart';
@@ -31,7 +32,7 @@ DayDraft adopt(
   diary: diary,
   links: links,
   unattended: unattended,
-  foodOf: knownFood,
+  foodOf: storedFood,
   mealOf: knownMeal,
   now: now,
   ids: ids,
@@ -42,12 +43,14 @@ DayComparison read(
   List<MfpFoodEntry> diary, {
   required List<SentLink> links,
   required IdSource ids,
+  List<LoggedEntry> stored = const [],
   List<UnattendedItem> unattended = const [],
+  Memory known = memory,
   Role role = Role.twoWay,
 }) => compareEkkloDay(
   compareMfpDay(
     adopt(
-      [],
+      stored,
       diary,
       links: links,
       unattended: unattended,
@@ -55,7 +58,7 @@ DayComparison read(
       role: role,
     ),
     diary: diary,
-    foodOf: knownFood,
+    foodOf: storedFood,
     mealOf: knownMeal,
     now: now,
     readAt: now,
@@ -65,10 +68,13 @@ DayComparison read(
   meals: [
     meal('meal-1', [item('I-1')]),
   ],
-  memory: memory,
+  memory: known,
   now: now,
   ids: ids,
 );
+
+LoggedEntry unlinked(String id) =>
+    loggedEntry(entry(id)).copyWith(mfpLink: null);
 
 EkkloLink waitingLink(String id, String entryId) =>
     ekkloLinkRow(id, entryId: entryId, item: sentItem('I-1'));
@@ -99,7 +105,7 @@ void main() {
       final draft = compareMfpDay(
         adopt([], diary, links: [link('E-1', 'I-1')], ids: ids),
         diary: diary,
-        foodOf: knownFood,
+        foodOf: storedFood,
         mealOf: knownMeal,
         now: now,
         readAt: now,
@@ -162,6 +168,18 @@ void main() {
           forgetsWaiting: true,
         ),
       );
+    });
+
+    test('of a row a stored entry claims keeps the day waiting', () {
+      final result = read(
+        [entry('X-1')],
+        stored: [unlinked('U-1')],
+        links: [link('X-1', 'I-1')],
+        known: const Memory(),
+        ids: idsFrom('w'),
+      );
+
+      check(result.changes.forgetsWaiting).isFalse();
     });
 
     test('is refused next to an Ekklo link of its entry', () {

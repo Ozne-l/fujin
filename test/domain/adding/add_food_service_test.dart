@@ -444,7 +444,7 @@ void main() {
       ).isA<ScanUnknown>().has((it) => it.barcode, 'barcode').equals(_barcode);
     });
 
-    test('links the code to the food once it is in MyFitnessPal', () async {
+    test('links the code to the food when the food is saved', () async {
       final services = await writeServices();
       final draft = _draft(_basmati);
 
