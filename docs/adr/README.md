@@ -7,9 +7,9 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0001](0001-recompute-statuses-from-both-sides.md) | Recompute statuses from both sides, with a send-link registry and no queue | Accepted (own-copy expectation settled by 0018; unattended items added by 0025; updates reviewed on screen 10 by 0018; extended to every connector by 0044) |
 | [0002](0002-write-ordering.md) | Write ordering for add, undo, send and own copies | Accepted (sending implemented by 0018, add and undo by 0026, edit and delete by 0043; Fūjin's database written first, and sends run one at a time, by 0044) |
 | [0003](0003-refresh-on-foreground-and-pull.md) | Refresh on foreground return and pull to refresh | Accepted (pull indicator drawn by 0028; selection re-read added by 0029) |
-| [0004](0004-one-sqlite-file.md) | One SQLite file, schema and migrations | Accepted (cache file, ids and stamps added by 0044) |
+| [0004](0004-one-sqlite-file.md) | One SQLite file, schema and migrations | Accepted (ids and stamps added by 0044; cache file planned by 0044, not built) |
 | [0005](0005-backup.md) | Backup: Auto Backup whitelist, manual JSON file | Accepted (B implemented, C implemented by 0021) |
-| [0006](0006-riverpod-notifiers-as-presenters.md) | Riverpod notifiers as presenters | Accepted (undo and delete notifier built by 0026 and 0043, edit notifier by 0043, import and export by 0021) |
+| [0006](0006-riverpod-notifiers-as-presenters.md) | Riverpod notifiers as presenters | Accepted (undo and delete notifier built by 0026 and 0043, edit notifier by 0043, replaced by the background writer's notifier in 0044, import and export by 0021) |
 | [0007](0007-dart-mappable-models.md) | dart_mappable models | Accepted |
 | [0008](0008-theme-from-design-tokens.md) | Theme from design tokens, motion with motor | Accepted, amended by 0035 and 0043 (goal rings built by 0022, send progress by 0018; pill, sheet and snackbar motion built; reduced motion added by 0031; `hai-light` darkened by 0032) |
 | [0009](0009-french-only-copy.md) | French-only copy | Superseded by 0015 |

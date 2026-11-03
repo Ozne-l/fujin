@@ -4,7 +4,7 @@ Date: 2026-10-10
 
 ## Status
 
-Accepted. Implements part C of [0005](0005-backup.md), with the format changes below. [0027](0027-barcode-scanner.md) adds version 2 with the barcode links; version 1 still imports. [0044](0044-connector-model.md) plans version 3 for the connector model; versions 1 and 2 will be converted on import. Its step 2 (2026-10-30) writes version 4, adding the entries, MyFitnessPal links and Ekklo links; versions 3, 2 and 1 still import, their send links waiting in `sent_link` until each day is read.
+Accepted. Implements part C of [0005](0005-backup.md), with the format changes below. [0027](0027-barcode-scanner.md) adds version 2 with the barcode links; version 1 still imports. [0044](0044-connector-model.md) adds version 3 for the connector model (step 1, 2026-10-29); versions 1 and 2 are converted on import. Its step 2 (2026-10-30) writes version 4, adding the entries, MyFitnessPal links and Ekklo links; versions 3, 2 and 1 still import, their send links waiting in `sent_link` until each day is read.
 
 ## Context
 
