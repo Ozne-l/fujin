@@ -25,7 +25,7 @@ const _oil = OwnCopy(
 
 const _memory = Memory(matches: [_crepe], ownCopies: [_oil]);
 
-List<String> _found(String query) => [
+List<String?> _found(String query) => [
   for (final food in rememberedFoods(_memory, query)) food.mfpDescription,
 ];
 

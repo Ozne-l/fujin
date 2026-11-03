@@ -298,6 +298,22 @@ void main() {
     check(_count('Ajout annulé')).equals(1);
   });
 
+  testWidgets('returns once to Mémoire when a food just added is forgotten', (
+    tester,
+  ) async {
+    await _openMemory(tester, _riceBackends());
+    await _tap(tester, _thaiRiceName);
+    await _tap(tester, 'Ajouter');
+    await _tap(tester, 'Ajouter à MFP et Ekklo');
+
+    await _tap(tester, 'Oublier cet aliment');
+    await _tap(tester, 'Oublier');
+
+    check(tester.takeException()).isNull();
+    check(_count('Aliments (1)')).equals(1);
+    check(_count(_thaiRiceName)).equals(0);
+  });
+
   testWidgets('returns to Mémoire with the confirmation when the add replaced '
       'the food by an own copy', (tester) async {
     final backends = _riceBackends();

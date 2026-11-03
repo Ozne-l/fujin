@@ -1,6 +1,6 @@
 import 'package:ekklo_client/ekklo_client.dart';
-import 'package:fujin/data/connectors/connector_domain.dart';
 import 'package:fujin/data/connectors/connector_roles.dart';
+import 'package:fujin/data/connectors/role.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_id.dart';
 import 'package:fujin/data/entries/entry.dart';
@@ -38,8 +38,22 @@ RecentFoodRepository recentsOf(FujinDatabase database) =>
 GoalsRepository goalsOf(FujinDatabase database) =>
     GoalsRepository(database, () => now);
 
-EntryRepository entriesOf(FujinDatabase database) =>
-    EntryRepository(database, () => now);
+EntryRepository entriesOf(
+  FujinDatabase database, {
+  DateTime Function()? clock,
+}) {
+  final time = clock ?? () => now;
+  return EntryRepository(
+    database: database,
+    foods: FoodRepository(database, time),
+    meals: MealRepository(database, time),
+    links: SentLinkRepository(database),
+    unattended: UnattendedItemRepository(database),
+    clock: time,
+  );
+}
+
+const foodRoles = ConnectorRoles(mfp: Role.twoWay, ekklo: Role.receiveOnly);
 
 String storeEntry(FujinDatabase database, MfpFoodEntry entry, String id) {
   final foodId = foodsOf(database).copiedMfpFood(
@@ -76,7 +90,7 @@ JournalService journalOver(
   required EkkloClient ekklo,
   ConnectorRoles Function()? roles,
 }) => JournalService(
-  roles: roles ?? () => ConnectorRoles.defaults(ConnectorDomain.food),
+  roles: roles ?? () => foodRoles,
   mfp: mfp,
   ekklo: ekklo,
   entries: entriesOf(database),

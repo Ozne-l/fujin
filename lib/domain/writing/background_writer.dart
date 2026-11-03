@@ -43,6 +43,7 @@ final class BackgroundWriter {
   final _states = StreamController<WriterState>.broadcast();
   final Map<String, EkkloJob> _held = {};
   final List<Replacement> _replaced = [];
+  final List<Replacement> _readReplaced = [];
   WriterState _state = const WriterIdle();
   Future<void>? _running;
   bool _again = false;
@@ -62,6 +63,14 @@ final class BackgroundWriter {
     if (_held.remove(entryId) != null) _emit(_state);
   }
 
+  void settled({
+    required List<String> adopted,
+    required List<Replacement> replaced,
+  }) {
+    adopted.forEach(_derive);
+    _readReplaced.addAll(replaced);
+  }
+
   Future<void> run() {
     if (_running case final running?) {
       _again = true;
@@ -78,10 +87,14 @@ final class BackgroundWriter {
   }
 
   Future<void> _once() async {
-    _replaced.clear();
+    _replaced
+      ..clear()
+      ..addAll(_readReplaced);
+    _readReplaced.clear();
     final failures = {
       for (final failure in _state.failures) failure.entryId: failure,
     };
+    _emit(WriterRunning(current: null, failures: [...failures.values]));
     try {
       final ids = {
         for (final write in _entries.pendingMfp()) write.logged.entry.id,
@@ -132,34 +145,27 @@ final class BackgroundWriter {
   Future<WriteFailure?> _toMfp(LoggedEntry logged, MfpEdit? edit) async {
     final id = logged.entry.id;
     final date = logged.entry.date;
-    if ((edit, logged.ekkloLink) case (
-      MfpEdit(:final link),
-      final ekkloLink?,
-    ) when !sameDay(link.date, date) && ekkloLink.item != null) {
-      try {
-        await _sending.removeLinked(ekkloLink);
-      } on Object catch (error) {
-        return EkkloNotWritten(logged, error);
-      }
-    }
+    final AddDraft draft;
+    final String? written;
+    final String? original;
     try {
       final food = switch (logged.mfpFoodId) {
         final mfpFoodId? => await _mfp.foods.byId(mfpFoodId),
         null => null,
       };
-      final draft = switch (food) {
+      draft = switch (food) {
         final food? =>
           AddDraft.forEntry(logged, food) ??
               (throw StateError('Serving of ${food.id} is gone')),
         null => throw StateError('Food ${logged.mfpFoodId} is unreadable'),
       };
       final diary = (await _mfp.diary.forDate(date)).entries;
-      final written = writtenRow(
+      written = writtenRow(
         logged,
         diary,
         _entries.heldMfpEntryIds(date),
       )?.id;
-      final original = switch (edit) {
+      original = switch (edit) {
         MfpEdit(:final link) => await _original(
           logged,
           _entries.findAny(id)?.mfpLink ?? link,
@@ -172,6 +178,20 @@ final class BackgroundWriter {
         ),
         null => null,
       };
+    } on Object catch (error) {
+      return MfpNotWritten(logged, error);
+    }
+    if ((edit, logged.ekkloLink) case (
+      MfpEdit(:final link),
+      final ekkloLink?,
+    ) when !sameDay(link.date, date) && ekkloLink.item != null) {
+      try {
+        await _sending.removeLinked(ekkloLink);
+      } on Object catch (error) {
+        return EkkloNotWritten(logged, error);
+      }
+    }
+    try {
       final mfpEntryId =
           written ??
           await _mfp.diary.addFood(
@@ -208,6 +228,16 @@ final class BackgroundWriter {
       EkkloRemoval(:final link) => link,
       EkkloSend() || null => logged.ekkloLink,
     };
+    final String? original;
+    try {
+      original = await _original(
+        logged,
+        _entries.findAny(id)?.mfpLink ?? link,
+        replaced: (_) => ReplacedDeletion(logged),
+      );
+    } on Object catch (error) {
+      return MfpNotWritten(logged, error);
+    }
     if (ekkloLink case EkkloLink(item: _?)) {
       try {
         await _sending.removeLinked(ekkloLink);
@@ -217,12 +247,7 @@ final class BackgroundWriter {
     }
     if (held case final EkkloRemoval removal) _done(id, removal);
     try {
-      if (await _original(
-            logged,
-            _entries.findAny(id)?.mfpLink ?? link,
-            replaced: (_) => ReplacedDeletion(logged),
-          )
-          case final original?) {
+      if (original case final original?) {
         await _mfp.diary.remove(original);
       }
       _entries.unlinkMfp(id);

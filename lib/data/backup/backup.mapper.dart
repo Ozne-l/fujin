@@ -63,7 +63,11 @@ class BackupMapper extends ClassMapperBase<Backup> {
   final bool ignoreNull = true;
 
   static Backup _instantiate(DecodingData data) {
-    throw MapperException.missingConstructor('Backup');
+    throw MapperException.missingSubclass(
+      'Backup',
+      'version',
+      '${data.value['version']}',
+    );
   }
 
   @override
@@ -99,14 +103,14 @@ abstract class BackupCopyWith<$R, $In extends Backup, $Out>
   BackupCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class BackupV4Mapper extends ClassMapperBase<BackupV4> {
+class BackupV4Mapper extends SubClassMapperBase<BackupV4> {
   BackupV4Mapper._();
 
   static BackupV4Mapper? _instance;
   static BackupV4Mapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = BackupV4Mapper._());
-      BackupMapper.ensureInitialized();
+      BackupMapper.ensureInitialized().addSubMapper(_instance!);
       SentLinkMapper.ensureInitialized();
       FoodMapper.ensureInitialized();
       FoodServingMapper.ensureInitialized();
@@ -229,6 +233,13 @@ class BackupV4Mapper extends ClassMapperBase<BackupV4> {
   };
   @override
   final bool ignoreNull = true;
+
+  @override
+  final String discriminatorKey = 'version';
+  @override
+  final dynamic discriminatorValue = BackupV4.currentVersion;
+  @override
+  late final ClassMapperBase superMapper = BackupMapper.ensureInitialized();
 
   static BackupV4 _instantiate(DecodingData data) {
     return BackupV4(
@@ -530,14 +541,14 @@ class _BackupV4CopyWithImpl<$R, $Out>
   ) => _BackupV4CopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
-class BackupV3Mapper extends ClassMapperBase<BackupV3> {
+class BackupV3Mapper extends SubClassMapperBase<BackupV3> {
   BackupV3Mapper._();
 
   static BackupV3Mapper? _instance;
   static BackupV3Mapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = BackupV3Mapper._());
-      BackupMapper.ensureInitialized();
+      BackupMapper.ensureInitialized().addSubMapper(_instance!);
       SentLinkMapper.ensureInitialized();
       FoodMapper.ensureInitialized();
       FoodServingMapper.ensureInitialized();
@@ -599,8 +610,6 @@ class BackupV3Mapper extends ClassMapperBase<BackupV3> {
     _$mealMappings,
     key: r'meal_mappings',
   );
-  static int _$version(BackupV3 v) => v.version;
-  static const Field<BackupV3, int> _f$version = Field('version', _$version);
   static Goals? _$goals(BackupV3 v) => v.goals;
   static const Field<BackupV3, Goals> _f$goals = Field(
     'goals',
@@ -614,6 +623,13 @@ class BackupV3Mapper extends ClassMapperBase<BackupV3> {
     opt: true,
     def: Backup.formatName,
   );
+  static int _$version(BackupV3 v) => v.version;
+  static const Field<BackupV3, int> _f$version = Field(
+    'version',
+    _$version,
+    opt: true,
+    def: BackupV3.foodsVersion,
+  );
 
   @override
   final MappableFields<BackupV3> fields = const {
@@ -626,12 +642,19 @@ class BackupV3Mapper extends ClassMapperBase<BackupV3> {
     #barcodeLinks: _f$barcodeLinks,
     #meals: _f$meals,
     #mealMappings: _f$mealMappings,
-    #version: _f$version,
     #goals: _f$goals,
     #format: _f$format,
+    #version: _f$version,
   };
   @override
   final bool ignoreNull = true;
+
+  @override
+  final String discriminatorKey = 'version';
+  @override
+  final dynamic discriminatorValue = BackupV3.foodsVersion;
+  @override
+  late final ClassMapperBase superMapper = BackupMapper.ensureInitialized();
 
   static BackupV3 _instantiate(DecodingData data) {
     return BackupV3(
@@ -644,9 +667,9 @@ class BackupV3Mapper extends ClassMapperBase<BackupV3> {
       barcodeLinks: data.dec(_f$barcodeLinks),
       meals: data.dec(_f$meals),
       mealMappings: data.dec(_f$mealMappings),
-      version: data.dec(_f$version),
       goals: data.dec(_f$goals),
       format: data.dec(_f$format),
+      version: data.dec(_f$version),
     );
   }
 
@@ -751,9 +774,9 @@ abstract class BackupV3CopyWith<$R, $In extends BackupV3, $Out>
     List<FoodBarcode>? barcodeLinks,
     List<Meal>? meals,
     List<ConnectorMeal>? mealMappings,
-    int? version,
     Goals? goals,
     String? format,
+    int? version,
   });
   BackupV3CopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -852,9 +875,9 @@ class _BackupV3CopyWithImpl<$R, $Out>
     List<FoodBarcode>? barcodeLinks,
     List<Meal>? meals,
     List<ConnectorMeal>? mealMappings,
-    int? version,
     Object? goals = $none,
     String? format,
+    int? version,
   }) => $apply(
     FieldCopyWithData({
       if (exportedAt != null) #exportedAt: exportedAt,
@@ -866,9 +889,9 @@ class _BackupV3CopyWithImpl<$R, $Out>
       if (barcodeLinks != null) #barcodeLinks: barcodeLinks,
       if (meals != null) #meals: meals,
       if (mealMappings != null) #mealMappings: mealMappings,
-      if (version != null) #version: version,
       if (goals != $none) #goals: goals,
       if (format != null) #format: format,
+      if (version != null) #version: version,
     }),
   );
   @override
@@ -882,9 +905,9 @@ class _BackupV3CopyWithImpl<$R, $Out>
     barcodeLinks: data.get(#barcodeLinks, or: $value.barcodeLinks),
     meals: data.get(#meals, or: $value.meals),
     mealMappings: data.get(#mealMappings, or: $value.mealMappings),
-    version: data.get(#version, or: $value.version),
     goals: data.get(#goals, or: $value.goals),
     format: data.get(#format, or: $value.format),
+    version: data.get(#version, or: $value.version),
   );
 
   @override
@@ -893,14 +916,14 @@ class _BackupV3CopyWithImpl<$R, $Out>
   ) => _BackupV3CopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
-class BackupV2Mapper extends ClassMapperBase<BackupV2> {
+class BackupV2Mapper extends SubClassMapperBase<BackupV2> {
   BackupV2Mapper._();
 
   static BackupV2Mapper? _instance;
   static BackupV2Mapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = BackupV2Mapper._());
-      BackupMapper.ensureInitialized();
+      BackupMapper.ensureInitialized().addSubMapper(_instance!);
       SentLinkMapper.ensureInitialized();
       MatchedFoodMapper.ensureInitialized();
       OwnCopyMapper.ensureInitialized();
@@ -984,6 +1007,13 @@ class BackupV2Mapper extends ClassMapperBase<BackupV2> {
   };
   @override
   final bool ignoreNull = true;
+
+  @override
+  final String discriminatorKey = 'version';
+  @override
+  final dynamic discriminatorValue = BackupV2.isMemoryFile;
+  @override
+  late final ClassMapperBase superMapper = BackupMapper.ensureInitialized();
 
   static BackupV2 _instantiate(DecodingData data) {
     return BackupV2(

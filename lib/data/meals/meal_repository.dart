@@ -60,7 +60,7 @@ final class MealRepository {
     'AND mfp.deleted_at IS NULL AND meal.deleted_at IS NULL',
     [mfpMealName],
   )) {
-    [final row] => row[_id] as String,
+    [{_id: final String id}] => id,
     _ => null,
   };
 
@@ -78,10 +78,10 @@ final class MealRepository {
     };
     final order = [
       ...named,
-      for (final row in _database.select(
+      for (final {_id: String id} in _database.select(
         'SELECT id FROM meal WHERE deleted_at IS NULL ORDER BY position, id',
       ))
-        if (!named.contains(row[_id])) row[_id] as String,
+        if (!named.contains(id)) id,
     ];
     final at = now.toIso8601String();
     for (final (position, id) in order.indexed) {
@@ -93,14 +93,12 @@ final class MealRepository {
     }
   });
 
-  void forgetEkkloMappings() {
-    final at = _now().toIso8601String();
-    _database.execute(
-      'UPDATE meal_mapping SET deleted_at = ?, updated_at = ? '
-      "WHERE connector = 'ekklo' AND deleted_at IS NULL",
-      [at, at],
-    );
-  }
+  void forgetEkkloMappings() => _database.softDelete(
+    FujinTable.mealMapping,
+    "connector = 'ekklo'",
+    const [],
+    _now(),
+  );
 
   List<Meal> meals() => [
     for (final row in _database.select('SELECT * FROM meal ORDER BY id'))

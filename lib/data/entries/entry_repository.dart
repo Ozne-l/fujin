@@ -17,9 +17,20 @@ import 'package:fujin/data/meals/meal_repository.dart';
 import 'package:fujin/data/unattended/unattended_item_repository.dart';
 
 final class EntryRepository {
-  const EntryRepository(this._database, this._clock);
+  const EntryRepository({
+    required this._database,
+    required this._foods,
+    required this._meals,
+    required this._links,
+    required this._unattended,
+    required this._clock,
+  });
 
   final FujinDatabase _database;
+  final FoodRepository _foods;
+  final MealRepository _meals;
+  final SentLinkRepository _links;
+  final UnattendedItemRepository _unattended;
   final DateTime Function() _clock;
 
   StoredDay forDate(DateTime date) {
@@ -41,16 +52,11 @@ final class EntryRepository {
     );
   }
 
-  List<MfpWrite> pendingMfp() =>
-      [
-        for (final logged in _logged('entry.id IN ($_pendingIds)', const []))
-          MfpWrite.of(logged) ??
-              (throw StateError('Entry ${logged.entry.id} is not pending')),
-      ]..sort(
-        (first, second) => first.logged.entry.id.compareTo(
-          second.logged.entry.id,
-        ),
-      );
+  List<MfpWrite> pendingMfp() => [
+    for (final logged in _logged('entry.id IN ($_pendingIds)', const []))
+      MfpWrite.of(logged) ??
+          (throw StateError('Entry ${logged.entry.id} is not pending')),
+  ];
 
   LoggedEntry? findAny(String entryId) =>
       switch (_logged('entry.id = ?', [entryId])) {
@@ -59,11 +65,11 @@ final class EntryRepository {
       };
 
   Set<String> heldMfpEntryIds(DateTime date) => {
-    for (final row in _database.select(
+    for (final {_mfpEntryId: String id} in _database.select(
       'SELECT mfp_entry_id FROM mfp_link WHERE deleted_at IS NULL AND date = ?',
       [CalendarDateHook.format(date)],
     ))
-      row[_mfpEntryId] as String,
+      id,
   };
 
   LoggedEntry? find(String entryId) => switch (_logged(
@@ -105,13 +111,13 @@ final class EntryRepository {
       updatedAt: now,
     );
     for (final id in changes.droppedEkkloLinkIds) {
-      _softDelete(FujinTable.ekkloLink, 'id = ?', [id], now);
+      _database.softDelete(FujinTable.ekkloLink, 'id = ?', [id], now);
     }
     for (final id in changes.deletedMfpLinkIds) {
-      _softDelete(FujinTable.mfpLink, 'id = ?', [id], now);
+      _database.softDelete(FujinTable.mfpLink, 'id = ?', [id], now);
     }
     for (final id in changes.deletedEntryIds) {
-      _softDelete(FujinTable.entry, 'id = ?', [id], now);
+      _database.softDelete(FujinTable.entry, 'id = ?', [id], now);
     }
     for (final entry in changes.addedEntries) {
       _database.insert(FujinTable.entry, resolvedEntry(entry).toMap());
@@ -135,8 +141,8 @@ final class EntryRepository {
       _database.insert(FujinTable.ekkloLink, resolvedLink(link).toMap());
     }
     if (changes.forgetsWaiting) {
-      SentLinkRepository(_database).forgetDate(changes.date);
-      UnattendedItemRepository(_database).forgetDate(changes.date);
+      _links.forgetDate(changes.date);
+      _unattended.forgetDate(changes.date);
     }
   });
 
@@ -161,18 +167,24 @@ final class EntryRepository {
   });
 
   void unlinkMfp(String entryId) => _database.transaction(
-    () => _softDelete(FujinTable.mfpLink, 'entry_id = ?', [entryId], _now()),
+    () => _database.softDelete(
+      FujinTable.mfpLink,
+      'entry_id = ?',
+      [entryId],
+      _now(),
+    ),
   );
 
   void remove(String entryId) => _database.transaction(() {
     final now = _now();
-    _softDelete(FujinTable.entry, 'id = ?', [entryId], now);
-    _softDelete(
-      FujinTable.ekkloLink,
-      'entry_id = ? AND ekklo_item_id IS NULL',
-      [entryId],
-      now,
-    );
+    _database
+      ..softDelete(FujinTable.entry, 'id = ?', [entryId], now)
+      ..softDelete(
+        FujinTable.ekkloLink,
+        'entry_id = ? AND ekklo_item_id IS NULL',
+        [entryId],
+        now,
+      );
   });
 
   void linkItem(
@@ -216,7 +228,7 @@ final class EntryRepository {
       case EkkloLink(unattended: _?) && final link:
         _saveEkkloLink(link.copyWith(item: null, updatedAt: now));
       case final link?:
-        _softDelete(FujinTable.ekkloLink, 'id = ?', [link.id], now);
+        _database.softDelete(FujinTable.ekkloLink, 'id = ?', [link.id], now);
       case null:
         return;
     }
@@ -248,7 +260,9 @@ final class EntryRepository {
         for (final entryId in entryIds) {
           switch (_ekkloLinkOf(entryId)) {
             case EkkloLink(item: null) && final link:
-              _softDelete(FujinTable.ekkloLink, 'id = ?', [link.id], now);
+              _database.softDelete(FujinTable.ekkloLink, 'id = ?', [
+                link.id,
+              ], now);
             case EkkloLink(unattended: _?) && final link:
               _saveEkkloLink(link.copyWith(unattended: null, updatedAt: now));
             case EkkloLink() || null:
@@ -291,10 +305,6 @@ final class EntryRepository {
       _database.insert(FujinTable.ekkloLink, link.toMap());
     }
   });
-
-  FoodRepository get _foods => FoodRepository(_database, _clock);
-
-  MealRepository get _meals => MealRepository(_database, _clock);
 
   DateTime _now() => _clock().toUtc();
 
@@ -377,8 +387,9 @@ final class EntryRepository {
     required String by,
     required DateTime now,
   }) {
-    _softDelete(FujinTable.entry, 'id = ?', [copyId], now);
-    _softDelete(FujinTable.mfpLink, 'entry_id = ?', [copyId], now);
+    _database
+      ..softDelete(FujinTable.entry, 'id = ?', [copyId], now)
+      ..softDelete(FujinTable.mfpLink, 'entry_id = ?', [copyId], now);
     switch ((_ekkloLinkOf(copyId), _ekkloLinkOf(by))) {
       case (null, _):
         return;
@@ -386,7 +397,7 @@ final class EntryRepository {
         _saveEkkloLink(copied.copyWith(entryId: by, updatedAt: now));
       case (final copied?, final own?)
           when copied.item != null && own.item == null:
-        _softDelete(FujinTable.ekkloLink, 'id = ?', [own.id], now);
+        _database.softDelete(FujinTable.ekkloLink, 'id = ?', [own.id], now);
         _saveEkkloLink(
           copied.copyWith(
             entryId: by,
@@ -395,22 +406,8 @@ final class EntryRepository {
           ),
         );
       case (final copied?, _):
-        _softDelete(FujinTable.ekkloLink, 'id = ?', [copied.id], now);
+        _database.softDelete(FujinTable.ekkloLink, 'id = ?', [copied.id], now);
     }
-  }
-
-  void _softDelete(
-    FujinTable table,
-    String where,
-    List<Object?> parameters,
-    DateTime now,
-  ) {
-    final at = now.toIso8601String();
-    _database.execute(
-      'UPDATE ${table.sqlName} SET deleted_at = ?, updated_at = ? '
-      'WHERE deleted_at IS NULL AND $where',
-      [at, at, ...parameters],
-    );
   }
 
   void _saveEntry(Entry entry) =>

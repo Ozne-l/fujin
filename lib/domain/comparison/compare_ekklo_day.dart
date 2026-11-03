@@ -114,20 +114,36 @@ DayComparison compareEkkloDay(
     for (final logged in day.owed)
       if (MfpWrite.of(logged) case MfpDeletion()) logged.entry.id,
   };
+  final itemsGone = <String, EkkloLink?>{};
   for (final logged in day.deleted) {
     if (logged.ekkloLink case EkkloLink(item: final item?) && final link) {
-      if (placements[item.ekkloItemId] case final placement?) {
-        claimed.add(item.ekkloItemId);
-        if (owed.contains(logged.entry.id)) continue;
-        orphans.add((
-          deleted: logged,
-          link: link,
-          item: item,
-          placement: placement,
-        ));
+      switch ((placements[item.ekkloItemId], owed.contains(logged.entry.id))) {
+        case (_?, true):
+          claimed.add(item.ekkloItemId);
+        case (final placement?, false):
+          claimed.add(item.ekkloItemId);
+          orphans.add((
+            deleted: logged,
+            link: link,
+            item: item,
+            placement: placement,
+          ));
+        case (null, true):
+          itemsGone[logged.entry.id] = switch (link.unattended) {
+            _? => link.copyWith(item: null),
+            null => null,
+          };
+        case (null, false):
+          continue;
       }
     }
   }
+
+  LoggedEntry withoutGoneItem(LoggedEntry logged) =>
+      switch (itemsGone.containsKey(logged.entry.id)) {
+        true => logged.copyWith(ekkloLink: itemsGone[logged.entry.id]),
+        false => logged,
+      };
 
   Iterable<(int, LoggedEntry)> unresolved() sync* {
     for (final (index, logged) in entries.indexed) {
@@ -209,8 +225,9 @@ DayComparison compareEkkloDay(
     entries: entries,
     deleted: [
       for (final logged in day.deleted)
-        if (kept.contains(logged.entry.id)) logged,
+        if (kept.contains(logged.entry.id)) withoutGoneItem(logged),
     ],
+    owed: [for (final logged in day.owed) withoutGoneItem(logged)],
   );
   return DayComparison(
     entries: [

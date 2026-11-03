@@ -28,7 +28,7 @@ class RoleRow extends StatelessWidget {
   static const _nameFlex = 2;
   static const _choiceFlex = 3;
 
-  static String label(AppLocalizations intl, Role role) => switch (role) {
+  static String _label(AppLocalizations intl, Role role) => switch (role) {
     Role.twoWay => intl.roleTwoWay,
     Role.receiveOnly => intl.roleReceiveOnly,
   };
@@ -68,7 +68,8 @@ class RoleRow extends StatelessWidget {
                     position: offered.indexOf(role).toDouble(),
                     motion: FujinMotion.tabSlide,
                     labels: [
-                      for (final choice in offered) label(context.intl, choice),
+                      for (final choice in offered)
+                        _label(context.intl, choice),
                     ],
                     onSelect: (index, _) => onChoose(offered[index]),
                   ),

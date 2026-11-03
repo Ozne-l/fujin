@@ -1476,6 +1476,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mealEmpty => 'Nothing yet';
 
   @override
+  String get unnamedFood => 'Unnamed food';
+
+  @override
   String get mealAddFood => 'Add a food';
 
   @override

@@ -88,7 +88,7 @@ Future<void> pumpFujin(
         appEnvironmentProvider.overrideWithValue(environment),
         databaseProvider.overrideWithValue(database),
         clockProvider.overrideWithValue(() => now),
-        connectivityProvider.overrideWithValue(connectivity),
+        connectivityProvider.overrideWith((ref) => connectivity),
         mfpClientProvider.overrideWithValue(signedInMfp),
         ekkloClientProvider.overrideWithValue(signedInEkklo),
         appVersionProvider.overrideWithValue(appVersion),

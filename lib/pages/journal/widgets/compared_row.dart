@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fujin/app/providers.dart';
 import 'package:fujin/data/connectors/connector.dart';
 import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
@@ -9,10 +8,9 @@ import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
-import 'package:fujin/pages/journal/background_write_notifier.dart';
 import 'package:fujin/pages/journal/widgets/connector_pill.dart';
 import 'package:fujin/pages/journal/widgets/entry_row.dart';
-import 'package:fujin/pages/journal/writer_state_ids.dart';
+import 'package:fujin/pages/journal/widgets/row_write.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ComparedRow extends ConsumerWidget {
@@ -23,16 +21,9 @@ class ComparedRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final entry = compared.logged;
-    final id = entry.entry.id;
-    final environment = ref.watch(appEnvironmentProvider);
-    final (:mfpFailed, :failed, :sending) = ref.watch(
-      backgroundWriteProvider.select(
-        (state) => (
-          mfpFailed: state.mfpFailedIds(environment).contains(id),
-          failed: state.failedIds(environment).contains(id),
-          sending: state.ekkloSendIds.contains(id),
-        ),
-      ),
+    final (:mfpFailed, :failed, :sending, removing: _) = RowWrite.watch(
+      ref,
+      entry.entry.id,
     );
     final detail = switch (compared.status) {
       ToUpdate(link: EkkloLink(:final item?)) => EntryText.linkedServing(
@@ -67,11 +58,8 @@ class ComparedRow extends ConsumerWidget {
       entry: entry,
       detail: detail,
       pills: [
-        if (compared.mfp case final mfp?)
-          ConnectorPill(
-            connector: Connector.mfp,
-            failed: mfp is MfpFailed || mfpFailed,
-          ),
+        if (compared.mfp case MfpPending())
+          ConnectorPill(connector: Connector.mfp, failed: mfpFailed),
         status,
       ],
     );

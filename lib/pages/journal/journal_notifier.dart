@@ -6,9 +6,7 @@ import 'package:fujin/domain/journal/calendar_week.dart';
 import 'package:fujin/domain/journal/fetch.dart';
 import 'package:fujin/domain/journal/journal_read.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
-import 'package:fujin/pages/journal/background_write_notifier.dart';
 import 'package:fujin/pages/journal/refresh_outcome.dart';
-import 'package:fujin/pages/journal/replaced_notifier.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
@@ -114,6 +112,7 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
       ),
       _ => _firstRead(
         service,
+        _settler(ref.watch, thenWrite: true),
         ref.watch(mfpDiaryProvider(date).future),
         ref.watch(ekkloMealsProvider(date).future),
         ref.watch(mealNamesProvider.future),
@@ -166,33 +165,41 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
   Future<(Fetch<MfpDiaryDay>, Fetch<List<EkkloDailyMeal>>)> _readSides({
     required bool thenWrite,
   }) async {
-    final service = ref.read(journalServiceProvider);
+    final settle = _settler(ref.read, thenWrite: thenWrite);
     final diary = Fetch.of(ref.read(mfpDiaryProvider(date).future));
     final meals = Fetch.of(ref.read(ekkloMealsProvider(date).future));
     final (diaryRead, mealsRead) = (await diary, await meals);
-    _settle(service, diaryRead, mealsRead, thenWrite: thenWrite);
+    settle(diaryRead, mealsRead);
     return (diaryRead, mealsRead);
   }
 
-  void _settle(
-    JournalService service,
-    Fetch<MfpDiaryDay> diary,
-    Fetch<List<EkkloDailyMeal>> meals, {
+  void Function(Fetch<MfpDiaryDay> diary, Fetch<List<EkkloDailyMeal>> meals)
+  _settler(
+    T Function<T>(ProviderListenable<T> provider) use, {
     required bool thenWrite,
   }) {
-    ref
-        .read(replacedProvider.notifier)
-        .settled(service.settleDay(date, diary: diary, meals: meals));
-    if (diary case Fetched()) {
-      unawaited(ref.read(foodCompletionServiceProvider).complete());
-    }
-    if ((thenWrite, diary) case (true, Fetched())) {
-      ref.read(backgroundWriteProvider.notifier).run();
-    }
+    final service = use(journalServiceProvider);
+    final completion = use(foodCompletionServiceProvider);
+    final writer = use(backgroundWriterProvider);
+    return (diary, meals) {
+      final (:replaced, :adopted) = service.settleDay(
+        date,
+        diary: diary,
+        meals: meals,
+      );
+      writer.settled(adopted: adopted, replaced: replaced);
+      if (diary case Fetched()) {
+        unawaited(completion.complete());
+        if (thenWrite || adopted.isNotEmpty || replaced.isNotEmpty) {
+          unawaited(writer.run());
+        }
+      }
+    };
   }
 
   Future<JournalRead> _firstRead(
     JournalService service,
+    void Function(Fetch<MfpDiaryDay>, Fetch<List<EkkloDailyMeal>>) settle,
     Future<Fetched<MfpDiaryDay>> diary,
     Future<Fetched<List<EkkloDailyMeal>>> meals,
     Future<List<String>> mealNames,
@@ -203,7 +210,7 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
       (Object error) => const <String>[],
     );
     final (diaryFetch, mealsFetch) = (await diaryRead, await mealsRead);
-    _settle(service, diaryFetch, mealsFetch, thenWrite: true);
+    settle(diaryFetch, mealsFetch);
     return service.journalOf(
       date,
       diary: diaryFetch,

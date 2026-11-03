@@ -88,7 +88,7 @@ class _FoodRow extends StatelessWidget {
                   spacing: FujinSize.textGap,
                   children: [
                     Text(
-                      food.mfpDescription,
+                      food.mfpDescription ?? context.intl.unnamedFood,
                       style: FujinText.inter15Medium.copyWith(
                         color: context.colors.textPrimary,
                       ),

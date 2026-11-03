@@ -46,10 +46,7 @@ DayDraft adoptWaiting(
   required Role role,
 }) {
   if (links.isEmpty && unattended.isEmpty) return day;
-  final copiesIn = switch (role) {
-    Role.twoWay => true,
-    Role.receiveOnly => false,
-  };
+  final copiesIn = role.copiesIn;
   final catalog = DayCatalog(
     foodOf: foodOf,
     mealOf: mealOf,

@@ -787,6 +787,7 @@
     "placeholders": {"goals": {"type": "String"}}
   },
   "mealEmpty": "Rien pour l’instant",
+  "unnamedFood": "Aliment sans nom",
   "mealAddFood": "Ajouter un aliment",
   "mealFolded": "{inEkklo}/{total} · {foods}",
   "@mealFolded": {

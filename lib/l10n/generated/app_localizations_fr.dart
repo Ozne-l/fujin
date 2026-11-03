@@ -1478,6 +1478,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get mealEmpty => 'Rien pour l’instant';
 
   @override
+  String get unnamedFood => 'Aliment sans nom';
+
+  @override
   String get mealAddFood => 'Ajouter un aliment';
 
   @override

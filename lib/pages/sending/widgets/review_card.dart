@@ -10,6 +10,7 @@ import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/glass_fill.dart';
 import 'package:fujin/pages/common/glass_finish.dart';
 import 'package:fujin/pages/common/status_pill.dart';
@@ -70,7 +71,7 @@ class ReviewCard extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  entry.foodName ?? '',
+                  FoodText.name(context.intl, entry.foodName),
                   style: FujinText.inter16Medium.copyWith(
                     color: context.colors.textPrimary,
                   ),

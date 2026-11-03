@@ -1,8 +1,8 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/app/app_environment.dart';
-import 'package:fujin/data/http/read_only_http_client.dart';
 import 'package:fujin/domain/sending/send_interruption.dart';
+import 'package:fujin/domain/writing/network_down.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 part 'send_failure.mapper.dart';
@@ -21,11 +21,8 @@ enum SendFailure {
   static SendFailure of(Object error, AppEnvironment environment) =>
       switch ((error, environment)) {
         (SendInterruption(:final cause), _) => of(cause, environment),
-        (EkkloNetworkException(:final method), AppEnvironment.dev)
-            when !ReadOnlyHttpClient.reads(method) =>
-          blockedInDev,
-        (MfpNetworkException(:final method), AppEnvironment.dev)
-            when !ReadOnlyHttpClient.reads(method) =>
+        (EkkloNetworkException() || MfpNetworkException(), AppEnvironment.dev)
+            when !networkDown(error) =>
           blockedInDev,
         (EkkloNetworkException() || MfpNetworkException(), _) => network,
         (EkkloAuthException(), _) => ekkloSession,

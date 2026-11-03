@@ -23,7 +23,7 @@ import 'package:fujin/pages/common/food_roles_notifier.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
 import 'package:fujin/pages/common/goals_text.dart';
-import 'package:fujin/pages/common/info_pictogram.dart';
+import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/scroll_edge_blur.dart';
 import 'package:fujin/pages/common/scroll_extent_listener.dart';
 import 'package:fujin/pages/common/text_inset.dart';
@@ -146,36 +146,39 @@ class SettingsPage extends HookConsumerWidget {
         Connector.mfp => (colors.sourceMfp, context.intl.sourceMyFitnessPal),
         Connector.ekklo => (colors.sourceEkklo, context.intl.sourceEkklo),
       };
-      final (title, message, confirmLabel) = (
-        context.intl.roleToReceiveOnlyTitle(app),
-        context.intl.roleToReceiveOnlyDetail(app),
-        context.intl.roleToReceiveOnlyConfirm(app),
-      );
       return RoleRow(
         dot: dot,
         name: app,
         offered: ConnectorRoles.offered(connector, ConnectorDomain.food),
         role: roles.of(connector),
         detail: detail,
-        onChoose: (role) => unawaited(
-          showConfirmSheet(
-            context,
-            glyph: const InfoPictogram(icon: _alertIcon),
-            title: switch (role) {
-              Role.twoWay => context.intl.roleToTwoWayTitle(app),
-              Role.receiveOnly => title,
-            },
-            message: switch (role) {
-              Role.twoWay => context.intl.roleToTwoWayDetail(app),
-              Role.receiveOnly => message,
-            },
-            confirmLabel: switch (role) {
-              Role.twoWay => context.intl.roleToTwoWayConfirm(app),
-              Role.receiveOnly => confirmLabel,
-            },
-            onConfirm: () => unawaited(becomes(connector, role)),
-          ),
-        ),
+        onChoose: (role) {
+          final (title, message, confirmLabel) = switch (role) {
+            Role.twoWay => (
+              context.intl.roleToTwoWayTitle(app),
+              context.intl.roleToTwoWayDetail(app),
+              context.intl.roleToTwoWayConfirm(app),
+            ),
+            Role.receiveOnly => (
+              context.intl.roleToReceiveOnlyTitle(app),
+              context.intl.roleToReceiveOnlyDetail(app),
+              context.intl.roleToReceiveOnlyConfirm(app),
+            ),
+          };
+          unawaited(
+            showConfirmSheet(
+              context,
+              glyph: const AlertPictogram(
+                icon: _alertIcon,
+                tone: PillTone.info,
+              ),
+              title: title,
+              message: message,
+              confirmLabel: confirmLabel,
+              onConfirm: () => unawaited(becomes(connector, role)),
+            ),
+          );
+        },
       );
     }
 

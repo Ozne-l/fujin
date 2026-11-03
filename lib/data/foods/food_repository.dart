@@ -72,7 +72,9 @@ final class FoodRepository {
     switch ((_mfpReference(mfpFood.id), foodOfMfp(mfpFood.id))) {
       case (final reference?, final food?)
           when reference.version != mfpFood.version || !_hasServings(food.id):
-        _softDelete(FujinTable.foodServing, 'food_id = ?', [food.id], now);
+        _database.softDelete(FujinTable.foodServing, 'food_id = ?', [
+          food.id,
+        ], now);
         _saveFood(
           food.copyWith(
             name: mfpFood.description,
@@ -121,7 +123,7 @@ final class FoodRepository {
   );
 
   List<String> mfpFoodsWithoutServings() => [
-    for (final row in _database.select(
+    for (final {_mfpFoodId: String mfpFoodId} in _database.select(
       'SELECT mfp.external_id AS mfp_food_id FROM food '
       'JOIN food_reference mfp ON mfp.food_id = food.id '
       "AND mfp.kind = 'mfp' AND mfp.deleted_at IS NULL "
@@ -130,7 +132,7 @@ final class FoodRepository {
       'WHERE serving.food_id = food.id AND serving.deleted_at IS NULL '
       ') ORDER BY mfp.external_id',
     ))
-      row[_mfpFoodId] as String,
+      mfpFoodId,
   ];
 
   List<MatchedFood> matches() => [
@@ -199,7 +201,7 @@ final class FoodRepository {
     'WHERE link.barcode = ? AND link.deleted_at IS NULL',
     [barcode],
   )) {
-    [final row] => row[_mfpFoodId] as String,
+    [{_mfpFoodId: final String mfpFoodId}] => mfpFoodId,
     _ => null,
   };
 
@@ -211,7 +213,7 @@ final class FoodRepository {
     required String name,
   }) => _database.transaction(() {
     final now = _now();
-    _softDelete(
+    _database.softDelete(
       FujinTable.foodReference,
       "food_id = ? AND kind = 'own_copy'",
       [foodId],
@@ -269,7 +271,7 @@ final class FoodRepository {
   void forgetMatch(String foodId) =>
       _database.transaction(() => _forgetMatch(foodId, _now()));
 
-  void forgetOwnCopy(String foodId, String unit) => _softDelete(
+  void forgetOwnCopy(String foodId, String unit) => _database.softDelete(
     FujinTable.foodReference,
     "food_id = ? AND kind = 'own_copy' AND unit = ?",
     [foodId, unit],
@@ -322,14 +324,15 @@ final class FoodRepository {
 
   void forgetMemory() => _database.transaction(() {
     final now = _now();
-    _softDelete(
-      FujinTable.foodReference,
-      "kind IN ('ekklo', 'own_copy')",
-      const [],
-      now,
-    );
-    _softDelete(FujinTable.foodUnit, 'TRUE', const [], now);
-    _softDelete(FujinTable.barcodeLink, 'TRUE', const [], now);
+    _database
+      ..softDelete(
+        FujinTable.foodReference,
+        "kind IN ('ekklo', 'own_copy')",
+        const [],
+        now,
+      )
+      ..softDelete(FujinTable.foodUnit, 'TRUE', const [], now)
+      ..softDelete(FujinTable.barcodeLink, 'TRUE', const [], now);
   });
 
   List<Food> foods() => [
@@ -516,27 +519,14 @@ final class FoodRepository {
   ).isNotEmpty;
 
   void _forgetMatch(String foodId, DateTime now) {
-    _softDelete(
-      FujinTable.foodReference,
-      "food_id = ? AND kind = 'ekklo'",
-      [foodId],
-      now,
-    );
-    _softDelete(FujinTable.foodUnit, 'food_id = ?', [foodId], now);
-  }
-
-  void _softDelete(
-    FujinTable table,
-    String where,
-    List<Object?> parameters,
-    DateTime now,
-  ) {
-    final at = now.toIso8601String();
-    _database.execute(
-      'UPDATE ${table.sqlName} SET deleted_at = ?, updated_at = ? '
-      'WHERE deleted_at IS NULL AND $where',
-      [at, at, ...parameters],
-    );
+    _database
+      ..softDelete(
+        FujinTable.foodReference,
+        "food_id = ? AND kind = 'ekklo'",
+        [foodId],
+        now,
+      )
+      ..softDelete(FujinTable.foodUnit, 'food_id = ?', [foodId], now);
   }
 
   void _saveFood(Food food) =>

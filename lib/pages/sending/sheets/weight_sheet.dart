@@ -6,6 +6,7 @@ import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/grams_input.dart';
 import 'package:fujin/pages/common/sheet_frame.dart';
 import 'package:fujin/pages/sending/entry_choices.dart';
@@ -54,9 +55,9 @@ class _WeightSheet extends HookWidget {
       title: context.intl.weightQuestion(unit),
       titleStyle: FujinText.hina26,
       subtitle: switch (entry.brand?.trim()) {
-        null || '' => entry.foodName ?? '',
+        null || '' => FoodText.name(context.intl, entry.foodName),
         final brand => context.intl.weightFoodBrand(
-          entry.foodName ?? '',
+          FoodText.name(context.intl, entry.foodName),
           brand,
         ),
       },

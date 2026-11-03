@@ -10,6 +10,7 @@ import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/breeze_indicator.dart';
 import 'package:fujin/pages/common/breeze_streaks.dart';
 import 'package:fujin/pages/common/entry_text.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
 import 'package:fujin/pages/sending/send_text.dart';
@@ -35,25 +36,25 @@ class PlanRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final (name, detail, detailColor, trailing) = switch (_row) {
       _Planned(:final planned) => (
-        planned.entry.foodName ?? '',
+        FoodText.name(context.intl, planned.entry.foodName),
         SendText.target(context.intl, planned),
         context.colors.textSecondary,
         _plannedPill(context.intl, planned),
       ),
       _Pending(:final entry, searching: true) => (
-        entry.foodName ?? '',
+        FoodText.name(context.intl, entry.foodName),
         context.intl.rowSearching,
         context.colors.textInfo,
         const BreezeIndicator(streaks: BreezeStreaks.searching),
       ),
       _Pending(:final entry, searching: false) => (
-        entry.foodName ?? '',
+        FoodText.name(context.intl, entry.foodName),
         context.intl.rowWaiting,
         context.colors.textTertiary,
         null,
       ),
       _InEkkloRow(:final entry, :final item) => (
-        entry.foodName ?? '',
+        FoodText.name(context.intl, entry.foodName),
         EntryText.linkedServing(context.intl, item),
         context.colors.textSecondary,
         StatusPill(label: context.intl.statusInEkklo, tone: PillTone.validated),

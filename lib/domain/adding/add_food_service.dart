@@ -71,7 +71,7 @@ final class AddFoodService {
     if (_memory.barcodeFood(barcode) case final foodId?) {
       if (await knownFood(foodId, mfp: _mfp, foods: _foods) case final food?
           when food.servingSizes.isNotEmpty) {
-        return ScanFound(barcode, _filled(food), remembered: true);
+        return ScanFound(barcode, food, remembered: true);
       }
     }
     return switch (await byBarcode(barcode)) {
@@ -133,7 +133,7 @@ final class AddFoodService {
     required DateTime date,
     required (MfpServingSize?, double) Function(MfpFood food) serving,
   }) async => switch (await knownFood(mfpFoodId, mfp: _mfp, foods: _foods)) {
-    final food? => switch (serving(_filled(food))) {
+    final food? => switch (serving(food)) {
       (final servingSize, final servings) => AddDraft.of(
         food,
         mfpMealName: mfpMealName,
@@ -164,7 +164,7 @@ final class AddFoodService {
       entryId: _writer.newEntryId(),
       alongside: () {
         _recents.record(
-          RecentFood.forEntry(draft.mfpEntry, addedAt: _clock()),
+          RecentFood.forMfpEntry(draft.mfpEntry, addedAt: _clock()),
         );
         _foods.fill(draft.food);
         if (barcodeToLink case final barcode?) {

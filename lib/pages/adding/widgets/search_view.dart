@@ -27,6 +27,7 @@ import 'package:fujin/pages/adding/widgets/scanned_banner.dart';
 import 'package:fujin/pages/adding/widgets/suggestion_row.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/flow_header.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/glass_layer.dart';
 import 'package:fujin/pages/common/header_layout.dart';
 import 'package:fujin/pages/common/scan_button.dart';
@@ -172,7 +173,7 @@ class SearchView extends HookConsumerWidget {
           rows: [
             for (final food in foods)
               (
-                title: food.mfpDescription,
+                title: FoodText.name(context.intl, food.mfpDescription),
                 detail: AddText.remembered(context.intl, food),
                 verified: false,
                 energy: null,

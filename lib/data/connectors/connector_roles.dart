@@ -9,11 +9,6 @@ part 'connector_roles.mapper.dart';
 final class ConnectorRoles with ConnectorRolesMappable {
   const ConnectorRoles({required this.mfp, required this.ekklo});
 
-  factory ConnectorRoles.defaults(ConnectorDomain domain) => ConnectorRoles(
-    mfp: defaultOf(Connector.mfp, domain),
-    ekklo: defaultOf(Connector.ekklo, domain),
-  );
-
   final Role mfp;
   final Role ekklo;
 

@@ -1,5 +1,6 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/domain/comparison/mfp_status.dart';
 import 'package:fujin/domain/journal/day_nutrients.dart';
 import 'package:fujin/domain/journal/diary_meal.dart';
 import 'package:fujin/domain/journal/journal_day.dart';
@@ -32,6 +33,10 @@ final class BothSides extends JournalRead with BothSidesMappable {
       DiaryMeal(
         name: meal.name,
         entries: [for (final compared in meal.entries) compared.logged],
+        mfpPending: {
+          for (final compared in meal.entries)
+            if (compared.mfp case MfpPending()) compared.logged.entry.id,
+        },
       ),
   ];
 }

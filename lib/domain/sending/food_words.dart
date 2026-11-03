@@ -65,8 +65,8 @@ String productName(LoggedEntry entry) {
 
 String searchTerms(LoggedEntry entry) => descriptionTerms(productName(entry));
 
-String descriptionTerms(String description) =>
-    _words(description).take(_searchWords).join(' ');
+String descriptionTerms(String? description) =>
+    _words(description ?? '').take(_searchWords).join(' ');
 
 String folded(String text) => _normalize(text.toLowerCase());
 

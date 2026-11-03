@@ -65,6 +65,20 @@ final class FujinDatabase {
     );
   }
 
+  void softDelete(
+    FujinTable table,
+    String where,
+    List<Object?> parameters,
+    DateTime now,
+  ) {
+    final at = now.toIso8601String();
+    _db.execute(
+      'UPDATE ${table.sqlName} SET deleted_at = ?, updated_at = ? '
+      'WHERE deleted_at IS NULL AND $where',
+      [at, at, ...parameters],
+    );
+  }
+
   T transaction<T>(T Function() body) {
     if (!_db.autocommit) return body();
     _db.execute('BEGIN IMMEDIATE');

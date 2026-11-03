@@ -12,7 +12,7 @@ sealed class RememberedFood with RememberedFoodMappable {
   });
 
   final String mfpFoodId;
-  final String mfpDescription;
+  final String? mfpDescription;
   final String ekkloFoodId;
   final String ekkloFoodName;
 }

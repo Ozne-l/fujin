@@ -11,8 +11,3 @@ sealed class MfpStatus with MfpStatusMappable {
 final class MfpPending extends MfpStatus with MfpPendingMappable {
   const MfpPending();
 }
-
-@MappableClass(discriminatorValue: 'failed')
-final class MfpFailed extends MfpStatus with MfpFailedMappable {
-  const MfpFailed();
-}

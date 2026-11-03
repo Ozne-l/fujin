@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/app/theme/instant_motion.dart';
@@ -9,11 +8,10 @@ import 'package:fujin/data/connectors/connector.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/l10n/intl_context.dart';
-import 'package:fujin/pages/journal/background_write_notifier.dart';
 import 'package:fujin/pages/journal/widgets/connector_pill.dart';
 import 'package:fujin/pages/journal/widgets/entry_row.dart';
+import 'package:fujin/pages/journal/widgets/row_write.dart';
 import 'package:fujin/pages/journal/widgets/swipe_row.dart';
-import 'package:fujin/pages/journal/writer_state_ids.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:motor/motor.dart';
 
@@ -290,16 +288,9 @@ class _LeavingRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final id = logged.entry.id;
-    final environment = ref.watch(appEnvironmentProvider);
-    final (:mfpFailed, :failed, :removing) = ref.watch(
-      backgroundWriteProvider.select(
-        (state) => (
-          mfpFailed: state.mfpFailedIds(environment).contains(id),
-          failed: state.failedIds(environment).contains(id),
-          removing: state.ekkloRemovalIds.contains(id),
-        ),
-      ),
+    final (:mfpFailed, :failed, sending: _, :removing) = RowWrite.watch(
+      ref,
+      logged.entry.id,
     );
     return EntryRow(
       entry: logged,

@@ -50,41 +50,47 @@ final class BackupRepository {
     _foods.deleteAll();
     _meals.deleteAll();
     switch (backup) {
-      case BackupV4():
+      case BackupV4(
+            :final foods,
+            :final foodServings,
+            :final foodUnits,
+            :final foodReferences,
+            :final barcodeLinks,
+            :final meals,
+            :final mealMappings,
+          ) ||
+          BackupV3(
+            :final foods,
+            :final foodServings,
+            :final foodUnits,
+            :final foodReferences,
+            :final barcodeLinks,
+            :final meals,
+            :final mealMappings,
+          ):
         _foods.restore(
-          foods: backup.foods,
-          servings: backup.foodServings,
-          units: backup.foodUnits,
-          references: backup.foodReferences,
-          barcodes: backup.barcodeLinks,
+          foods: foods,
+          servings: foodServings,
+          units: foodUnits,
+          references: foodReferences,
+          barcodes: barcodeLinks,
         );
-        _meals.restore(
-          meals: backup.meals,
-          connectorMeals: backup.mealMappings,
-        );
-        _entries.restore(
-          entries: backup.entries,
-          mfpLinks: backup.mfpLinks,
-          ekkloLinks: backup.ekkloLinks,
-        );
-        recents.forEach(_recents.record);
-      case BackupV3():
-        _foods.restore(
-          foods: backup.foods,
-          servings: backup.foodServings,
-          units: backup.foodUnits,
-          references: backup.foodReferences,
-          barcodes: backup.barcodeLinks,
-        );
-        _meals.restore(
-          meals: backup.meals,
-          connectorMeals: backup.mealMappings,
-        );
-        recents.forEach(_recents.record);
+        _meals.restore(meals: meals, connectorMeals: mealMappings);
       case BackupV2():
         _memory.restore(backup.memory);
-        recents.forEach(_recents.record);
     }
+    if (backup case BackupV4(
+      :final entries,
+      :final mfpLinks,
+      :final ekkloLinks,
+    )) {
+      _entries.restore(
+        entries: entries,
+        mfpLinks: mfpLinks,
+        ekkloLinks: ekkloLinks,
+      );
+    }
+    recents.forEach(_recents.record);
     _links.replaceAll(backup.links);
     _goals.replace(backup.goals);
   });

@@ -197,21 +197,6 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('shows MyFitnessPal two-way and Ekklo receive only, without '
-        'a choice, with what each role does', (tester) async {
-      await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
-      await _tap(tester, 'Réglages');
-
-      check(_count('RÔLE DES APPS · ALIMENTATION')).equals(1);
-      check(_count('Deux sens')).equals(1);
-      check(_count('Réception')).equals(2);
-      check(
-        find.textContaining('Deux sens : ce que tu ajoutes').evaluate(),
-      ).length.equals(1);
-      check(roleOf(tester, 'MyFitnessPal')).equals(Role.twoWay);
-      check(roleOf(tester, 'Ekklo')).equals(Role.receiveOnly);
-    });
-
     testWidgets('asks before MyFitnessPal goes receive only, and Annuler '
         'leaves it two-way', (tester) async {
       await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));

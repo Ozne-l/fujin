@@ -223,7 +223,9 @@ final class SendService {
   }
 
   Future<void> keep(PlannedEntry planned) async {
-    if (planned.choice case SendAsOwnCopy()) await _ownCopy(planned.entry);
+    if (planned.choice case SendAsOwnCopy() when planned.sends) {
+      await _ownCopy(planned.entry);
+    }
     _remember([planned]);
     if ((
           ExpectedItem.forEntry(planned.entry, _memory.load()),
@@ -277,7 +279,7 @@ final class SendService {
           ))
             MatchedFood(
               mfpFoodId: mfpFoodId,
-              mfpDescription: productName(planned.entry),
+              mfpDescription: planned.entry.foodName,
               ekkloFoodId: ekkloFoodId,
               ekkloFoodName: ekkloFoodName,
             ),
@@ -413,7 +415,7 @@ final class SendService {
           _memory.saveFood(
             OwnCopy(
               mfpFoodId: mfpFoodId,
-              mfpDescription: productName(entry),
+              mfpDescription: entry.foodName,
               ekkloFoodId: created.id,
               ekkloFoodName: created.name,
               mfpUnit: unit,

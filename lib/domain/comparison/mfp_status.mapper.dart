@@ -16,7 +16,6 @@ class MfpStatusMapper extends ClassMapperBase<MfpStatus> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = MfpStatusMapper._());
       MfpPendingMapper.ensureInitialized();
-      MfpFailedMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -174,119 +173,5 @@ class _MfpPendingCopyWithImpl<$R, $Out>
   MfpPendingCopyWith<$R2, MfpPending, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
   ) => _MfpPendingCopyWithImpl<$R2, $Out2>($value, $cast, t);
-}
-
-class MfpFailedMapper extends SubClassMapperBase<MfpFailed> {
-  MfpFailedMapper._();
-
-  static MfpFailedMapper? _instance;
-  static MfpFailedMapper ensureInitialized() {
-    if (_instance == null) {
-      MapperContainer.globals.use(_instance = MfpFailedMapper._());
-      MfpStatusMapper.ensureInitialized().addSubMapper(_instance!);
-    }
-    return _instance!;
-  }
-
-  @override
-  final String id = 'MfpFailed';
-
-  @override
-  final MappableFields<MfpFailed> fields = const {};
-  @override
-  final bool ignoreNull = true;
-
-  @override
-  final String discriminatorKey = 'mfp';
-  @override
-  final dynamic discriminatorValue = 'failed';
-  @override
-  late final ClassMapperBase superMapper = MfpStatusMapper.ensureInitialized();
-
-  static MfpFailed _instantiate(DecodingData data) {
-    return MfpFailed();
-  }
-
-  @override
-  final Function instantiate = _instantiate;
-
-  static MfpFailed fromMap(Map<String, dynamic> map) {
-    return ensureInitialized().decodeMap<MfpFailed>(map);
-  }
-
-  static MfpFailed fromJson(String json) {
-    return ensureInitialized().decodeJson<MfpFailed>(json);
-  }
-}
-
-mixin MfpFailedMappable {
-  String toJson() {
-    return MfpFailedMapper.ensureInitialized().encodeJson<MfpFailed>(
-      this as MfpFailed,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return MfpFailedMapper.ensureInitialized().encodeMap<MfpFailed>(
-      this as MfpFailed,
-    );
-  }
-
-  MfpFailedCopyWith<MfpFailed, MfpFailed, MfpFailed> get copyWith =>
-      _MfpFailedCopyWithImpl<MfpFailed, MfpFailed>(
-        this as MfpFailed,
-        $identity,
-        $identity,
-      );
-  @override
-  String toString() {
-    return MfpFailedMapper.ensureInitialized().stringifyValue(
-      this as MfpFailed,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return MfpFailedMapper.ensureInitialized().equalsValue(
-      this as MfpFailed,
-      other,
-    );
-  }
-
-  @override
-  int get hashCode {
-    return MfpFailedMapper.ensureInitialized().hashValue(this as MfpFailed);
-  }
-}
-
-extension MfpFailedValueCopy<$R, $Out> on ObjectCopyWith<$R, MfpFailed, $Out> {
-  MfpFailedCopyWith<$R, MfpFailed, $Out> get $asMfpFailed =>
-      $base.as((v, t, t2) => _MfpFailedCopyWithImpl<$R, $Out>(v, t, t2));
-}
-
-abstract class MfpFailedCopyWith<$R, $In extends MfpFailed, $Out>
-    implements MfpStatusCopyWith<$R, $In, $Out> {
-  @override
-  $R call();
-  MfpFailedCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
-}
-
-class _MfpFailedCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, MfpFailed, $Out>
-    implements MfpFailedCopyWith<$R, MfpFailed, $Out> {
-  _MfpFailedCopyWithImpl(super.value, super.then, super.then2);
-
-  @override
-  late final ClassMapperBase<MfpFailed> $mapper =
-      MfpFailedMapper.ensureInitialized();
-  @override
-  $R call() => $apply(FieldCopyWithData({}));
-  @override
-  MfpFailed $make(CopyWithData data) => MfpFailed();
-
-  @override
-  MfpFailedCopyWith<$R2, MfpFailed, $Out2> $chain<$R2, $Out2>(
-    Then<$Out2, $R2> t,
-  ) => _MfpFailedCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 

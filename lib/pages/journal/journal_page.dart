@@ -32,7 +32,6 @@ import 'package:fujin/pages/journal/refresh_outcome.dart';
 import 'package:fujin/pages/journal/removal_reason.dart';
 import 'package:fujin/pages/journal/remove_entry_notifier.dart';
 import 'package:fujin/pages/journal/remove_entry_state.dart';
-import 'package:fujin/pages/journal/replaced_notifier.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:fujin/pages/journal/widgets/day_detail_sheet.dart';
 import 'package:fujin/pages/journal/widgets/day_summary_card.dart';
@@ -92,21 +91,6 @@ class JournalPage extends HookConsumerWidget {
       scheduleMicrotask(() => unawaited(notifier.revalidate()));
       return null;
     }, [day]);
-
-    useEffect(() {
-      bool? connected;
-      final network = ref.read(connectivityProvider).listen((now) {
-        if ((connected, now) case (false, true)) {
-          unawaited(
-            ref
-                .read(journalProvider(ref.read(selectedDayProvider)).notifier)
-                .reload(),
-          );
-        }
-        connected = now;
-      });
-      return network.cancel;
-    }, const []);
 
     useEffect(() {
       final retrying = switch ((offline, lifecycle)) {
@@ -174,8 +158,14 @@ class JournalPage extends HookConsumerWidget {
             break;
         }
       })
-      ..listen(replacedProvider, (previous, next) {
-        JournalSnackBar.replaced(context, next);
+      ..listen(connectivityProvider, (previous, next) {
+        if ((previous?.value, next.value) case (false, true)) {
+          unawaited(
+            ref
+                .read(journalProvider(ref.read(selectedDayProvider)).notifier)
+                .reload(),
+          );
+        }
       })
       ..listen(backgroundWriteProvider, (previous, next) {
         if ((previous, next) case (
@@ -187,14 +177,10 @@ class JournalPage extends HookConsumerWidget {
             if (written.mfpLink case final link?) link.date,
           ]);
         }
-        if ((previous, next) case (
-          WriterRunning(),
-          WriterIdle(:final failures, :final replaced),
-        )) {
-          JournalSnackBar.replaced(context, replaced);
-          JournalSnackBar.notWritten(
+        if ((previous, next) case (WriterRunning(), final WriterIdle idle)) {
+          JournalSnackBar.written(
             context,
-            failures,
+            idle,
             ref.read(appEnvironmentProvider),
             onRetry: ref.read(backgroundWriteProvider.notifier).run,
           );
@@ -205,7 +191,6 @@ class JournalPage extends HookConsumerWidget {
       showRemoveSheet(
         context,
         removal: EntryRemoval(
-          entryId: logged.entry.id,
           entry: logged,
           reason: RemovalReason.delete,
         ),
