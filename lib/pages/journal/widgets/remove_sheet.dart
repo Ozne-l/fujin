@@ -7,6 +7,7 @@ import 'package:fujin/domain/sending/food_words.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/alert_pictogram.dart';
 import 'package:fujin/pages/common/entry_text.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/glass_finish.dart';
 import 'package:fujin/pages/common/sheet_frame.dart';
 import 'package:fujin/pages/common/trash_icon.dart';
@@ -43,7 +44,7 @@ class _RemoveSheet extends ConsumerWidget {
     };
     return SheetFrame(
       glyph: const AlertPictogram(icon: TrashIcon.asset),
-      title: intl.deleteFoodTitle(productName(entry)),
+      title: intl.deleteFoodTitle(FoodText.name(intl, productName(entry))),
       titleStyle: FujinText.hina24,
       subtitle: detail(
         EntryText.serving(intl, entry),

@@ -43,6 +43,7 @@ class _OwnCopySheet extends StatelessWidget {
     final entry = planned.entry;
     final navigator = Navigator.of(context);
     final energy = EntryText.energy(context.intl, entry);
+    final creates = planned.asOwnCopy().sends;
 
     void chooseCandidate() {
       navigator.pop();
@@ -71,7 +72,7 @@ class _OwnCopySheet extends StatelessWidget {
                 ),
               ),
               Text(
-                productName(entry),
+                FoodText.name(context.intl, productName(entry)),
                 style: FujinText.inter15Medium.copyWith(
                   color: context.colors.textPrimary,
                 ),
@@ -111,12 +112,21 @@ class _OwnCopySheet extends StatelessWidget {
         if (planned.candidates.isNotEmpty)
           _Rejected(candidates: planned.candidates, onTap: chooseCandidate),
       ],
-      primaryLabel: context.intl.createOwnCopy,
-      onPrimary: () {
-        choices.ownCopy();
-        navigator.pop();
+      primaryLabel: switch (creates) {
+        true => context.intl.createOwnCopy,
+        false => context.intl.chooseCandidate,
       },
-      secondaryLabel: context.intl.chooseCandidate,
+      onPrimary: switch (creates) {
+        true => () {
+          choices.ownCopy();
+          navigator.pop();
+        },
+        false => chooseCandidate,
+      },
+      secondaryLabel: switch (creates) {
+        true => context.intl.chooseCandidate,
+        false => null,
+      },
       onSecondary: chooseCandidate,
       onSkip: switch (choices.skip) {
         final skip? => () {

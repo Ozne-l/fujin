@@ -17,7 +17,6 @@ import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/comparison/compared_entry_lookup.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
-import 'package:fujin/domain/comparison/mfp_status.dart';
 import 'package:fujin/domain/comparison/replacement.dart';
 import 'package:fujin/domain/journal/fetch.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
@@ -624,7 +623,9 @@ void main() {
       final restarted = await services();
       final read = await restarted.journal.readDay(day);
 
-      check(read.comparison.entryWithId(food.entryId)?.mfp).isNull();
+      check(
+        read.comparison.entryWithId(food.entryId)?.mfpPending,
+      ).equals(false);
       check(mfpEntryIdOf(restarted, food.entryId)).equals('mfp-written');
       check(restarted.entries.entries()).length.equals(1);
     });
@@ -648,6 +649,36 @@ void main() {
         check(restarted.writes()).deepEquals(['POST ${ekkloUri.host}']);
         check(
           (await restarted.find(food.entryId, day))?.status,
+        ).isA<InEkklo>();
+      },
+    );
+
+    test(
+      'H1: sends the remembered Ekklo side of a row the read of an earlier '
+      'Ekklo send adopted',
+      () async {
+        final writing = await services();
+        backends.mfpReachable = false;
+        final first = await writing.add(_draft(servings: 2));
+        clock = clock.add(const Duration(seconds: 1));
+        final second = await writing.add(_draft());
+        await writing.settle();
+        backends
+          ..mfpReachable = true
+          ..entries = [row('mfp-written')]
+          ..requests.clear();
+
+        final restarted = await services();
+        await restarted.settle();
+
+        check(mfpEntryIdOf(restarted, second.entryId)).equals('mfp-written');
+        check(restarted.entries.pendingMfp()).isEmpty();
+        check(ekkloQuantities()).unorderedEquals([200, 150]);
+        check(
+          (await restarted.find(first.entryId, day))?.status,
+        ).isA<InEkklo>();
+        check(
+          (await restarted.find(second.entryId, day))?.status,
         ).isA<InEkklo>();
       },
     );
@@ -717,8 +748,8 @@ void main() {
 
         check(restarted.entries.entries()).length.equals(1);
         check(
-          read.comparison.entryWithId(food.entryId)?.mfp,
-        ).isA<MfpPending>();
+          read.comparison.entryWithId(food.entryId)?.mfpPending,
+        ).equals(true);
 
         backends.requests.clear();
         await restarted.settle();
@@ -836,6 +867,25 @@ void main() {
         check(
           restarted.entries.find(food.entryId)?.ekkloLink?.item,
         ).isNotNull();
+      },
+    );
+
+    test(
+      'H4c: keeps the Ekklo item of a change of date while MyFitnessPal '
+      'cannot be read',
+      () async {
+        final (writing, food) = await written();
+        backends.mfpReachable = false;
+
+        writing.editing.save(
+          _draft(date: _nextDay),
+          await writing.adding.plan(_draft(date: _nextDay)),
+          entryId: food.entryId,
+        );
+        await writing.settle();
+
+        check(writing.writes()).isEmpty();
+        check(ekkloQuantities()).isNotEmpty();
       },
     );
 

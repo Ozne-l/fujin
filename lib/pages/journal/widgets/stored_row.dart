@@ -16,10 +16,7 @@ class StoredRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final (:mfpFailed, failed: _, sending: _, removing: _) = RowWrite.watch(
-      ref,
-      logged.entry.id,
-    );
+    final mfpFailed = RowWrite.watch(ref, logged.entry.id).mfpFailed;
     return EntryRow(
       entry: logged,
       detail: EntryText.macros(context.intl, logged.entry.nutrients),

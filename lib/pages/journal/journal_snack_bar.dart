@@ -10,6 +10,7 @@ import 'package:fujin/domain/writing/writer_state.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/snack_bar_content.dart';
 import 'package:fujin/pages/common/snack_bar_glyph.dart';
@@ -40,7 +41,9 @@ abstract final class JournalSnackBar {
       duration: undoWindow,
       content: SnackBarContent(
         glyph: SnackBarGlyph.done,
-        title: context.intl.foodAdded(productName(entry)),
+        title: context.intl.foodAdded(
+          FoodText.name(context.intl, productName(entry)),
+        ),
         detail: entry.mealName,
         action: (context.intl.undoAdd, onUndo),
       ),
@@ -58,7 +61,7 @@ abstract final class JournalSnackBar {
       ),
       RemovalReason.delete => (
         SnackBarGlyph.done,
-        intl.foodDeleted(productName(entry)),
+        intl.foodDeleted(FoodText.name(intl, productName(entry))),
         entry.mealName,
       ),
     };
@@ -77,7 +80,7 @@ abstract final class JournalSnackBar {
   }) {
     final intl = context.intl;
     final entry = edited.entry;
-    final food = productName(entry);
+    final food = FoodText.name(intl, productName(entry));
     final (title, detail, action) = switch ((
       SelectedDay.calendarDay(entry.entry.date) ==
           SelectedDay.calendarDay(edited.original.entry.date),
@@ -140,7 +143,7 @@ abstract final class JournalSnackBar {
     final detail = switch (replaced) {
       [] => null,
       [ReplacedDeletion(:final logged)] => intl.replacedDeletion(
-        productName(logged),
+        FoodText.name(intl, productName(logged)),
       ),
       [ReplacedEdit(:final logged, :final before)] => switch ((
         intl.servingLine(
@@ -151,12 +154,12 @@ abstract final class JournalSnackBar {
         EntryText.serving(intl, logged),
       )) {
         (final was, final now) when was != now => intl.replacedChange(
-          productName(logged),
+          FoodText.name(intl, productName(logged)),
           was,
           now,
         ),
         _ => intl.replacedChange(
-          productName(logged),
+          FoodText.name(intl, productName(logged)),
           before.mealName,
           logged.mealName,
         ),
@@ -202,7 +205,7 @@ abstract final class JournalSnackBar {
           detail: switch ((blocked, reported)) {
             (true, _) => intl.writeBlockedInDev,
             (false, [final failure]) => intl.foodStillPending(
-              productName(failure.logged),
+              FoodText.name(intl, productName(failure.logged)),
             ),
             (false, _) => intl.foodsStillPending(reported.length),
           },

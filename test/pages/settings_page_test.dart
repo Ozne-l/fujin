@@ -24,7 +24,6 @@ import '../support/pump_fujin.dart';
 import '../support/sent_food.dart';
 
 const _space = '\u202f';
-const _versionWithMemory = 2;
 const _scrolledPast = 120.0;
 const _width = 800.0;
 const _shortHeight = 900.0;
@@ -424,7 +423,7 @@ void main() {
     final files = FakeBackupFiles()
       ..picked = utf8.encode(
         BackupV2(
-          version: _versionWithMemory,
+          version: BackupV2.memoryVersion,
           exportedAt: DateTime(day.year, day.month, day.day, 12),
           matches: [memory.matches.first],
           ownCopies: const [],

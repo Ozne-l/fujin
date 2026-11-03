@@ -51,6 +51,23 @@ void main() {
       check(_found(' huile ')).deepEquals(['Huile d’olive']);
       check(_found('riz')).isEmpty();
     });
+
+    test('list a food with no MyFitnessPal name last', () {
+      const nameless = MatchedFood(
+        mfpFoodId: 'mfp-nameless',
+        mfpDescription: null,
+        ekkloFoodId: 'ekklo-nameless',
+        ekkloFoodName: 'Avoine',
+      );
+
+      check([
+        for (final food in rememberedFoods(
+          const Memory(matches: [nameless, _crepe], ownCopies: [_oil]),
+          '',
+        ))
+          food.mfpFoodId,
+      ]).deepEquals([_crepe.mfpFoodId, _oil.mfpFoodId, nameless.mfpFoodId]);
+    });
   });
 
   group('the foods on the phone', () {

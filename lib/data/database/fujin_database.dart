@@ -111,11 +111,11 @@ final class FujinDatabase {
     ..._tableColumns.putIfAbsent(
       table,
       () => [
-        for (final column in _db.select(
+        for (final {'name': String name} in _db.select(
           'SELECT name FROM pragma_table_info(?)',
           [table.sqlName],
         ))
-          column.columnAt(0) as String,
+          name,
       ],
     ),
   }.toList();

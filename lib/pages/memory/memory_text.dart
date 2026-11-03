@@ -1,6 +1,7 @@
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/common/entry_text.dart';
 
 abstract final class MemoryText {
   static String target(AppLocalizations intl, RememberedFood food) =>
@@ -13,10 +14,10 @@ abstract final class MemoryText {
       units.map(intl.memoryUnitQuoted).join(intl.listSeparator);
 
   static String macros(AppLocalizations intl, EkkloFood food) => intl.macros(
-    intl.macroValue(food.proteins),
-    intl.macroValue(food.carbs),
-    intl.macroValue(food.fats),
-    intl.macroValue(food.fiber),
+    EntryText.macro(intl, food.proteins),
+    EntryText.macro(intl, food.carbs),
+    EntryText.macro(intl, food.fats),
+    EntryText.macro(intl, food.fiber),
   );
 
   static String portion(AppLocalizations intl, EkkloFood food) =>

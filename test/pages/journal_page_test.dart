@@ -869,6 +869,36 @@ void main() {
     check(find.text('Tes objectifs').evaluate()).length.equals(1);
   });
 
+  testWidgets('rounds the macros of a food row to one decimal', (
+    tester,
+  ) async {
+    await pumpFujin(
+      tester,
+      FakeBackends(
+        mealNames: [breakfast],
+        entries: [
+          entry(
+            'E-1',
+            nutrients: nutrients(
+              kcal: 300,
+              protein: 12.34,
+              carbs: 40.06,
+              fat: 7,
+              fiber: 2.5,
+            ),
+          ),
+        ],
+      ),
+      goals: _goals,
+    );
+
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
+    await tester.pumpAndSettle();
+    check(
+      find.text('P 12,3 · G 40,1 · L 7 · F 2,5').evaluate(),
+    ).length.equals(1);
+  });
+
   testWidgets('says each meal is empty on a day with nothing logged', (
     tester,
   ) async {
@@ -1031,6 +1061,65 @@ void main() {
     check(find.text('Ekklo indisponible').evaluate()).length.equals(1);
     check(find.text(oats).evaluate()).length.equals(1);
     check(find.text('À envoyer').evaluate()).isEmpty();
+  });
+
+  testWidgets('shows a MyFitnessPal row without id with nothing left to write '
+      'when Ekklo is unreadable', (tester) async {
+    _stillClocks(tester);
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [entry(null)],
+    );
+    final store = InMemoryEkkloTokenStore();
+    await store.write(FakeBackends.staleEkkloTokens);
+    await pumpFujin(tester, backends, ekklo: backends.ekkloWith(store));
+
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
+    await tester.pumpAndSettle();
+    check(find.text('Ekklo indisponible').evaluate()).length.equals(1);
+    check(find.text(oats).evaluate()).length.equals(1);
+    check(_pill(Connector.mfp).evaluate()).isEmpty();
+  });
+
+  testWidgets('shows a food still waiting for MyFitnessPal next to a row '
+      'without id when Ekklo is unreadable', (tester) async {
+    _stillClocks(tester);
+    final gratin = mfpFood(
+      'mfp-gratin',
+      description: 'Gratin dauphinois',
+      nutrients: nutrients(kcal: 320),
+    );
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [entry(null)],
+      mfpFoods: [gratin],
+      mfpSearches: {
+        'gratin': [gratin],
+      },
+    )..mfpAddGate = Completer<void>();
+    final store = await backends.ekkloTokenStore();
+    await pumpFujin(tester, backends, ekklo: backends.ekkloWith(store));
+
+    await _tap(tester, find.text('Ajouter un aliment').last);
+    await tester.enterText(find.byType(TextField), 'gratin');
+    await tester.pump(AddSearchNotifier.typingPause);
+    await tester.pumpAndSettle();
+    await _tap(tester, find.text('Gratin dauphinois').first);
+    await _tap(tester, find.text('Ajouter à MFP et Ekklo'));
+    tester
+        .state<ScaffoldMessengerState>(find.byType(ScaffoldMessenger))
+        .clearSnackBars();
+    await store.write(FakeBackends.staleEkkloTokens);
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, 2000));
+    await tester.pumpAndSettle();
+    await _pullToRefresh(tester);
+
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
+    await tester.pumpAndSettle();
+    check(find.text('Ekklo indisponible').evaluate()).length.equals(1);
+    check(find.text(oats).evaluate()).length.equals(1);
+    check(find.text('Gratin dauphinois').evaluate()).length.equals(1);
+    check(_pill(Connector.mfp).evaluate()).length.equals(1);
   });
 
   testWidgets('keeps Ekklo readable when the MyFitnessPal session expired', (
@@ -1717,5 +1806,33 @@ void main() {
       ).read(databaseProvider),
     );
     check(entries.findByMfpEntryId('E-2')).isNotNull();
+  });
+
+  testWidgets('keeps the first read of a day when another day is shown '
+      'before it ends', (tester) async {
+    final backends = FakeBackends(mealNames: [breakfast]);
+    await pumpFujin(tester, backends);
+    final diaryGate = Completer<void>();
+    final mealsGate = Completer<void>();
+    backends
+      ..diaryGate = diaryGate
+      ..mealsGate = mealsGate
+      ..entries = [entry('E-1', date: DateTime.utc(2026, 9, 23))];
+    await _swipeWeekBack(tester);
+    await _swipeWeekBack(tester);
+    check(_ring(tester, '23').selected).isTrue();
+
+    await tester.tap(find.text('22'));
+    await tester.pump();
+    diaryGate.complete();
+    mealsGate.complete();
+    await tester.pumpAndSettle();
+
+    final entries = entriesOf(
+      ProviderScope.containerOf(
+        tester.element(find.byType(JournalHeader)),
+      ).read(databaseProvider),
+    );
+    check(entries.findByMfpEntryId('E-1')).isNotNull();
   });
 }

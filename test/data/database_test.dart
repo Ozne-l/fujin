@@ -537,7 +537,7 @@ void main() {
       check(read.entries).every(
         (compared) => compared
           ..has((it) => it.status, 'status').isA<InEkklo>()
-          ..has((it) => it.mfp, 'mfp').isNull(),
+          ..has((it) => it.mfpPending, 'mfpPending').isFalse(),
       );
       check({
         for (final sent in sentOnDay)

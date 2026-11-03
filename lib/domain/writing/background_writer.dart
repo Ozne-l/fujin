@@ -96,15 +96,20 @@ final class BackgroundWriter {
     };
     _emit(WriterRunning(current: null, failures: [...failures.values]));
     try {
+      final pending = _entries.pendingMfp();
+      final adds = {
+        for (final write in pending)
+          if (write case MfpAdd(:final logged)) logged.entry.id,
+      };
       final ids = {
-        for (final write in _entries.pendingMfp()) write.logged.entry.id,
+        for (final write in pending) write.logged.entry.id,
         ..._held.keys,
       }.toList()..sort();
       failures.removeWhere((id, _) => !ids.contains(id));
       for (final id in ids) {
         final logged = _entries.findAny(id);
         _emit(WriterRunning(current: logged, failures: [...failures.values]));
-        switch (await _write(id, logged)) {
+        switch (await _write(id, logged, added: adds.contains(id))) {
           case final failure? when networkDown(failure.error):
             failures[id] = failure;
             return;
@@ -126,16 +131,20 @@ final class BackgroundWriter {
     _states.add(next);
   }
 
-  Future<WriteFailure?> _write(String id, LoggedEntry? logged) async =>
-      switch (logged) {
-        null => _dropped(id),
-        final logged => switch (MfpWrite.of(logged)) {
-          MfpAdd() => _toMfp(logged, null),
-          final MfpEdit edit => _toMfp(logged, edit),
-          MfpDeletion(:final link) => _deleted(logged, link),
-          null => _job(logged),
-        },
-      };
+  Future<WriteFailure?> _write(
+    String id,
+    LoggedEntry? logged, {
+    required bool added,
+  }) async => switch (logged) {
+    null => _dropped(id),
+    final logged => switch (MfpWrite.of(logged)) {
+      MfpAdd() => _toMfp(logged, null),
+      final MfpEdit edit => _toMfp(logged, edit),
+      MfpDeletion(:final link) => _deleted(logged, link),
+      null when added => _derivedJob(logged),
+      null => _job(logged),
+    },
+  };
 
   WriteFailure? _dropped(String id) {
     drop(id);
@@ -209,7 +218,11 @@ final class BackgroundWriter {
     } on Object catch (error) {
       return MfpNotWritten(logged, error);
     }
-    _derive(id);
+    return _derivedJob(logged);
+  }
+
+  Future<WriteFailure?> _derivedJob(LoggedEntry logged) {
+    _derive(logged.entry.id);
     return _job(logged);
   }
 

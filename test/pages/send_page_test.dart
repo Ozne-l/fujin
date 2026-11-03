@@ -10,6 +10,7 @@ import 'package:fujin/pages/sending/send_notifier.dart';
 import 'package:fujin/pages/sending/send_state.dart';
 import 'package:fujin/pages/sending/widgets/automatic_sent_view.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
@@ -18,6 +19,8 @@ import '../support/pump_fujin.dart';
 import '../support/sent_food.dart';
 
 const double _middle = 0.5;
+const _nameless = '';
+final MfpNutrients _kcal = nutrients(kcal: 80);
 
 Future<void> _tap(WidgetTester tester, String text) async {
   final target = find.text(text);
@@ -296,6 +299,24 @@ void main() {
     check(backends.ekkloItems.single)
       ..has((item) => item.foodId, 'food').equals(ownCopy.id)
       ..has((item) => item.quantity, 'quantity').equals(250);
+  });
+
+  testWidgets('names a nameless entry and offers no own copy for it', (
+    tester,
+  ) async {
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [
+        entry('E-1', food: skyr, description: _nameless, nutrients: _kcal),
+      ],
+    );
+    await pumpFujin(tester, backends);
+    await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
+    _sees('Aliment sans nom');
+
+    await _tap(tester, 'Changer ›');
+    _sees('Choisir un candidat');
+    check(find.text('Créer l’aliment perso').evaluate()).isEmpty();
   });
 
   testWidgets('shows a new unit for a food copied in another unit', (
