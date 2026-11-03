@@ -1,10 +1,10 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
+import 'package:fujin/data/entries/unattended_expectation.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
-import 'package:fujin/data/unattended/unattended_item.dart';
 import 'package:fujin/domain/comparison/entry_quantity.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 part 'expected_item.mapper.dart';
 
@@ -29,7 +29,7 @@ final class ExpectedItem with ExpectedItemMappable {
     quantityType: quantityType,
   );
 
-  factory ExpectedItem.unattended(UnattendedItem item) => ExpectedItem(
+  factory ExpectedItem.unattended(UnattendedExpectation item) => ExpectedItem(
     ekkloMealName: item.ekkloMealName,
     ekkloFoodId: item.ekkloFoodId,
     quantity: item.quantity,
@@ -45,10 +45,14 @@ final class ExpectedItem with ExpectedItemMappable {
   final double quantity;
   final EkkloQuantityType quantityType;
 
-  static ExpectedItem? forEntry(MfpFoodEntry entry, Memory memory) {
-    final mealName = memory.ekkloMealName(entry.mealName);
-    final unit = entry.servingSize.unit;
-    final food = memory.food(entry.food.id, unit);
+  static ExpectedItem? forEntry(LoggedEntry logged, Memory memory) {
+    final entry = logged.entry;
+    final mealName = memory.ekkloMealName(logged.mealName);
+    final unit = entry.servingUnit;
+    final food = switch (logged.mfpFoodId) {
+      final mfpFoodId? => memory.food(mfpFoodId, unit),
+      null => null,
+    };
     final quantity = switch (food) {
       null => null,
       MatchedFood(:final mfpFoodId) => switch (entryGrams(
@@ -94,13 +98,10 @@ final class ExpectedItem with ExpectedItemMappable {
   bool _near(double other) =>
       (other - quantity).abs() <= quantityTolerance + _epsilon;
 
-  UnattendedItem unattendedFor(String mfpEntryId, DateTime date) =>
-      UnattendedItem(
-        mfpEntryId: mfpEntryId,
-        date: date,
-        ekkloMealName: ekkloMealName,
-        ekkloFoodId: ekkloFoodId,
-        quantity: quantity,
-        quantityType: quantityType,
-      );
+  UnattendedExpectation get asUnattended => UnattendedExpectation(
+    ekkloMealName: ekkloMealName,
+    ekkloFoodId: ekkloFoodId,
+    quantity: quantity,
+    quantityType: quantityType,
+  );
 }

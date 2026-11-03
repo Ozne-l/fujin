@@ -8,6 +8,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/sending/food_words.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/sheet_frame.dart';
 import 'package:fujin/pages/memory/ekklo_food_search_notifier.dart';
 import 'package:fujin/pages/memory/memory_notifier.dart';
@@ -43,7 +44,7 @@ class _ChangeFoodSheet extends HookConsumerWidget {
     final navigator = Navigator.of(context);
 
     return SheetFrame(
-      title: food.mfpDescription,
+      title: FoodText.name(context.intl, food.mfpDescription),
       subtitle: context.intl.memoryChangeSubtitle,
       initialQuery: terms,
       onSearch: (text) => unawaited(

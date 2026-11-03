@@ -6,17 +6,24 @@ import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/backup/backup.dart';
+import 'package:fujin/data/connectors/connector.dart';
+import 'package:fujin/data/connectors/connector_domain.dart';
+import 'package:fujin/data/connectors/connector_roles.dart';
+import 'package:fujin/data/connectors/role.dart';
 import 'package:fujin/domain/accounts/account.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/alert_pictogram.dart';
 import 'package:fujin/pages/common/appearance_corner.dart';
 import 'package:fujin/pages/common/appearance_header.dart';
 import 'package:fujin/pages/common/appearance_notifier.dart';
 import 'package:fujin/pages/common/automatic_mode_notifier.dart';
 import 'package:fujin/pages/common/confirm_sheet.dart';
 import 'package:fujin/pages/common/delete_icon.dart';
+import 'package:fujin/pages/common/food_roles_notifier.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
 import 'package:fujin/pages/common/goals_text.dart';
+import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/scroll_edge_blur.dart';
 import 'package:fujin/pages/common/scroll_extent_listener.dart';
 import 'package:fujin/pages/common/text_inset.dart';
@@ -29,6 +36,7 @@ import 'package:fujin/pages/settings/backup_state.dart';
 import 'package:fujin/pages/settings/sessions_notifier.dart';
 import 'package:fujin/pages/settings/widgets/account_row.dart';
 import 'package:fujin/pages/settings/widgets/appearance_row.dart';
+import 'package:fujin/pages/settings/widgets/role_row.dart';
 import 'package:fujin/pages/settings/widgets/settings_row.dart';
 import 'package:fujin/pages/settings/widgets/settings_section.dart';
 import 'package:fujin/pages/settings/widgets/settings_switch_row.dart';
@@ -39,6 +47,7 @@ class SettingsPage extends HookConsumerWidget {
   const SettingsPage({super.key});
 
   static const _lockIcon = 'assets/icons/lock.svg';
+  static const _alertIcon = 'assets/icons/alert.svg';
   static const _copyIcon = 'assets/icons/copy.svg';
   static const TextStyle _largeTitle = FujinText.hina30;
   static const TextStyle _barTitle = FujinText.hina22;
@@ -54,6 +63,7 @@ class SettingsPage extends HookConsumerWidget {
     final colors = context.colors;
     final automaticMode = ref.watch(automaticModeProvider);
     final appearance = ref.watch(appearanceProvider);
+    final roles = ref.watch(foodRolesProvider);
     final version = ref.watch(appVersionProvider);
     final backup = ref.watch(backupProvider);
     final backups = ref.read(backupProvider.notifier);
@@ -117,13 +127,60 @@ class SettingsPage extends HookConsumerWidget {
     }) => unawaited(
       showConfirmSheet(
         context,
-        icon: icon,
+        glyph: AlertPictogram(icon: icon),
         title: title,
         message: message,
         confirmLabel: confirmLabel,
         onConfirm: onConfirm,
       ),
     );
+
+    Future<void> becomes(Connector connector, Role role) async {
+      await ref.read(foodRolesProvider.notifier).choose(connector, role);
+      if (!context.mounted) return;
+      ref.invalidate(journalProvider);
+    }
+
+    Widget roleRow(Connector connector, {String? detail}) {
+      final (dot, app) = switch (connector) {
+        Connector.mfp => (colors.sourceMfp, context.intl.sourceMyFitnessPal),
+        Connector.ekklo => (colors.sourceEkklo, context.intl.sourceEkklo),
+      };
+      return RoleRow(
+        dot: dot,
+        name: app,
+        offered: ConnectorRoles.offered(connector, ConnectorDomain.food),
+        role: roles.of(connector),
+        detail: detail,
+        onChoose: (role) {
+          final (title, message, confirmLabel) = switch (role) {
+            Role.twoWay => (
+              context.intl.roleToTwoWayTitle(app),
+              context.intl.roleToTwoWayDetail(app),
+              context.intl.roleToTwoWayConfirm(app),
+            ),
+            Role.receiveOnly => (
+              context.intl.roleToReceiveOnlyTitle(app),
+              context.intl.roleToReceiveOnlyDetail(app),
+              context.intl.roleToReceiveOnlyConfirm(app),
+            ),
+          };
+          unawaited(
+            showConfirmSheet(
+              context,
+              glyph: const AlertPictogram(
+                icon: _alertIcon,
+                tone: PillTone.info,
+              ),
+              title: title,
+              message: message,
+              confirmLabel: confirmLabel,
+              onConfirm: () => unawaited(becomes(connector, role)),
+            ),
+          );
+        },
+      );
+    }
 
     return Scaffold(
       body: AppearanceCorner(
@@ -178,6 +235,16 @@ class SettingsPage extends HookConsumerWidget {
                               leave(() => sessions.signOut(Account.ekklo)),
                             ),
                           ),
+                        ),
+                      ],
+                    ),
+                    SettingsSection(
+                      label: context.intl.settingsRolesFood,
+                      rows: [
+                        roleRow(Connector.mfp),
+                        roleRow(
+                          Connector.ekklo,
+                          detail: context.intl.settingsRolesDetail,
                         ),
                       ],
                     ),
@@ -319,13 +386,13 @@ class SettingsPage extends HookConsumerWidget {
   ) {
     return showConfirmSheet(
       context,
-      icon: _copyIcon,
+      glyph: const AlertPictogram(icon: _copyIcon),
       title: context.intl.importTitle,
       message: context.intl.importDetail(
         backup.exportedAt.toLocal(),
         backup.foodCount,
-        backup.meals.length,
-        backup.links.length,
+        backup.mealCount,
+        backup.linkCount,
       ),
       confirmLabel: context.intl.importConfirm,
       onConfirm: onConfirm,

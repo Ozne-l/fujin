@@ -1,3 +1,4 @@
+import 'package:fujin/data/database/fujin_id.dart';
 import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/database/schema.dart';
 import 'package:sqlite3/sqlite3.dart';
@@ -6,7 +7,12 @@ final class FujinDatabase {
   FujinDatabase._(this._db) {
     _db
       ..execute('PRAGMA journal_mode = DELETE')
-      ..execute('PRAGMA foreign_keys = ON');
+      ..execute('PRAGMA foreign_keys = ON')
+      ..createFunction(
+        functionName: FujinId.sqlFunction,
+        function: (_) => FujinId.at(DateTime.timestamp()),
+        argumentCount: const AllowedArgumentCount(0),
+      );
     _migrate();
   }
 
@@ -59,6 +65,20 @@ final class FujinDatabase {
     );
   }
 
+  void softDelete(
+    FujinTable table,
+    String where,
+    List<Object?> parameters,
+    DateTime now,
+  ) {
+    final at = now.toIso8601String();
+    _db.execute(
+      'UPDATE ${table.sqlName} SET deleted_at = ?, updated_at = ? '
+      'WHERE deleted_at IS NULL AND $where',
+      [at, at, ...parameters],
+    );
+  }
+
   T transaction<T>(T Function() body) {
     if (!_db.autocommit) return body();
     _db.execute('BEGIN IMMEDIATE');
@@ -91,11 +111,11 @@ final class FujinDatabase {
     ..._tableColumns.putIfAbsent(
       table,
       () => [
-        for (final column in _db.select(
+        for (final {'name': String name} in _db.select(
           'SELECT name FROM pragma_table_info(?)',
           [table.sqlName],
         ))
-          column.columnAt(0) as String,
+          name,
       ],
     ),
   }.toList();

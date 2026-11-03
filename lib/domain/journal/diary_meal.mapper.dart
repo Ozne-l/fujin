@@ -15,7 +15,7 @@ class DiaryMealMapper extends ClassMapperBase<DiaryMeal> {
   static DiaryMealMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = DiaryMealMapper._());
-      MfpFoodEntryMapper.ensureInitialized();
+      LoggedEntryMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -25,24 +25,46 @@ class DiaryMealMapper extends ClassMapperBase<DiaryMeal> {
 
   static String _$name(DiaryMeal v) => v.name;
   static const Field<DiaryMeal, String> _f$name = Field('name', _$name);
-  static List<MfpFoodEntry> _$entries(DiaryMeal v) => v.entries;
-  static const Field<DiaryMeal, List<MfpFoodEntry>> _f$entries = Field(
+  static List<LoggedEntry> _$entries(DiaryMeal v) => v.entries;
+  static const Field<DiaryMeal, List<LoggedEntry>> _f$entries = Field(
     'entries',
     _$entries,
     opt: true,
     def: const [],
+  );
+  static List<LoggedEntry> _$leaving(DiaryMeal v) => v.leaving;
+  static const Field<DiaryMeal, List<LoggedEntry>> _f$leaving = Field(
+    'leaving',
+    _$leaving,
+    opt: true,
+    def: const [],
+  );
+  static Set<String> _$mfpPending(DiaryMeal v) => v.mfpPending;
+  static const Field<DiaryMeal, Set<String>> _f$mfpPending = Field(
+    'mfpPending',
+    _$mfpPending,
+    key: r'mfp_pending',
+    opt: true,
+    def: const {},
   );
 
   @override
   final MappableFields<DiaryMeal> fields = const {
     #name: _f$name,
     #entries: _f$entries,
+    #leaving: _f$leaving,
+    #mfpPending: _f$mfpPending,
   };
   @override
   final bool ignoreNull = true;
 
   static DiaryMeal _instantiate(DecodingData data) {
-    return DiaryMeal(name: data.dec(_f$name), entries: data.dec(_f$entries));
+    return DiaryMeal(
+      name: data.dec(_f$name),
+      entries: data.dec(_f$entries),
+      leaving: data.dec(_f$leaving),
+      mfpPending: data.dec(_f$mfpPending),
+    );
   }
 
   @override
@@ -106,11 +128,22 @@ abstract class DiaryMealCopyWith<$R, $In extends DiaryMeal, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   ListCopyWith<
     $R,
-    MfpFoodEntry,
-    MfpFoodEntryCopyWith<$R, MfpFoodEntry, MfpFoodEntry>
+    LoggedEntry,
+    LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry>
   >
   get entries;
-  $R call({String? name, List<MfpFoodEntry>? entries});
+  ListCopyWith<
+    $R,
+    LoggedEntry,
+    LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry>
+  >
+  get leaving;
+  $R call({
+    String? name,
+    List<LoggedEntry>? entries,
+    List<LoggedEntry>? leaving,
+    Set<String>? mfpPending,
+  });
   DiaryMealCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -125,8 +158,8 @@ class _DiaryMealCopyWithImpl<$R, $Out>
   @override
   ListCopyWith<
     $R,
-    MfpFoodEntry,
-    MfpFoodEntryCopyWith<$R, MfpFoodEntry, MfpFoodEntry>
+    LoggedEntry,
+    LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry>
   >
   get entries => ListCopyWith(
     $value.entries,
@@ -134,16 +167,36 @@ class _DiaryMealCopyWithImpl<$R, $Out>
     (v) => call(entries: v),
   );
   @override
-  $R call({String? name, List<MfpFoodEntry>? entries}) => $apply(
+  ListCopyWith<
+    $R,
+    LoggedEntry,
+    LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry>
+  >
+  get leaving => ListCopyWith(
+    $value.leaving,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(leaving: v),
+  );
+  @override
+  $R call({
+    String? name,
+    List<LoggedEntry>? entries,
+    List<LoggedEntry>? leaving,
+    Set<String>? mfpPending,
+  }) => $apply(
     FieldCopyWithData({
       if (name != null) #name: name,
       if (entries != null) #entries: entries,
+      if (leaving != null) #leaving: leaving,
+      if (mfpPending != null) #mfpPending: mfpPending,
     }),
   );
   @override
   DiaryMeal $make(CopyWithData data) => DiaryMeal(
     name: data.get(#name, or: $value.name),
     entries: data.get(#entries, or: $value.entries),
+    leaving: data.get(#leaving, or: $value.leaving),
+    mfpPending: data.get(#mfpPending, or: $value.mfpPending),
   );
 
   @override

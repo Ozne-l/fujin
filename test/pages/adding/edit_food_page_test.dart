@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/pages/common/day_picker_sheet.dart';
+import 'package:fujin/pages/journal/widgets/connector_pill.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -22,8 +23,9 @@ const _deleteMfp = 'Supprimer de MFP';
 const _other = 'Autre';
 const _edited = 'Riz basmati modifié';
 const _retry = 'Réessayer';
+const _mfp = 'MFP';
+const _mfpNotWritten = 'Pas écrit dans MyFitnessPal';
 const _oldRice = 'ekklo-old-rice';
-const _resavedBasmati = 'e-basmati-before';
 const _reloaded =
     'Valeurs rechargées : 200 → 210 kcal / 100 g. Ce qui a '
     'bougé est surligné en jaune.';
@@ -148,7 +150,11 @@ void main() {
 
     _missing(_title);
     _sees(_edited);
-    _sees('MyFitnessPal et Ekklo · 2 × 100 g');
+    check(
+      find
+          .descendant(of: find.byType(SnackBar), matching: find.text(lunch))
+          .evaluate(),
+    ).length.equals(1);
     check(
       backends.entries.where((entry) => entry.food.id == rice).single.servings,
     ).equals(2);
@@ -169,44 +175,59 @@ void main() {
     check(backends.ekkloItems.single.quantity).equals(150);
   });
 
-  testWidgets('says Ekklo was not updated, and finishes on Réessayer', (
-    tester,
-  ) async {
+  testWidgets('says Pas écrit dans Ekklo once the fiche closed, with the '
+      'Ekklo clock still instead of À mettre à jour, and '
+      'updates it on Réessayer', (tester) async {
     final backends = LoggedJournal.backends()..ekkloItemWritesFail = true;
     await _open(tester, backends, LoggedJournal.basmati);
     await _servings(tester, '2');
 
     await _tap(tester, _saveBoth);
 
-    _sees('Ekklo pas mis à jour');
-    _sees('À mettre à jour');
+    _missing(_title);
+    _sees('Pas écrit dans Ekklo');
+    _sees('Riz basmati reste en attente');
+    _missing('À mettre à jour');
+    _missing(_mfp);
+    check(find.byType(ConnectorPill).evaluate()).length.equals(1);
 
     backends.ekkloItemWritesFail = false;
     await _tap(tester, _retry);
 
-    _sees(_edited);
     check(backends.ekkloItems.single.quantity).equals(200);
+    _missing('À mettre à jour');
+    check(find.byType(ConnectorPill).evaluate()).isEmpty();
   });
 
-  testWidgets('says the food is twice in MyFitnessPal when the original '
-      'stayed, and removes it on Réessayer', (tester) async {
+  testWidgets('shows the food once while its original stays in '
+      'MyFitnessPal, and removes the original on Réessayer', (tester) async {
     final backends = LoggedJournal.backends()..mfpRemoveFails = true;
     await _open(tester, backends, LoggedJournal.basmati);
     await _servings(tester, '2');
 
     await _tap(tester, _saveBoth);
 
-    _sees('Riz basmati en double dans MyFitnessPal');
-    _sees('L’ancienne entrée n’a pas pu être retirée.');
-    check(find.text(LoggedJournal.basmati).evaluate()).length.equals(2);
+    _sees(_mfpNotWritten);
+    _sees('Riz basmati reste en attente');
+    check(find.text(LoggedJournal.basmati).evaluate()).length.equals(1);
+    _sees(_mfp);
+    check(
+      backends.entries.where((entry) => entry.food.id == rice),
+    ).length.equals(2);
 
     backends.mfpRemoveFails = false;
     await _tap(tester, _retry);
 
-    _sees(_edited);
     check(
-      backends.entries.where((entry) => entry.food.id == rice),
+      backends.entries.where((entry) => entry.food.id == rice).single.servings,
+    ).equals(2);
+    check(
+      backends.requests.where(
+        (request) =>
+            request.method == 'POST' && request.url.path == '/v2/diary',
+      ),
     ).length.equals(1);
+    _missing(_mfp);
   });
 
   testWidgets('offers MyFitnessPal only for a food not in Ekklo yet', (
@@ -276,8 +297,9 @@ void main() {
     _missing(_saveBoth);
   });
 
-  testWidgets('says why it cannot edit when the connection dropped since '
-      'the Journal was read', (tester) async {
+  testWidgets('says it cannot open a food not on the phone offline', (
+    tester,
+  ) async {
     final backends = LoggedJournal.backends();
     await LoggedJournal.pump(tester, backends);
     backends
@@ -287,9 +309,85 @@ void main() {
     await tester.tap(find.text(LoggedJournal.basmati));
     await tester.pumpAndSettle();
 
-    _sees('Hors ligne : modifier ou supprimer attendra le réseau.');
+    _sees('Pas de connexion internet.');
     _missing(_saveBoth);
     _missing(_deleteBoth);
+  });
+
+  testWidgets('edits a food offline from its copy on the phone', (
+    tester,
+  ) async {
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(disableAnimations: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    final backends = LoggedJournal.backends(
+      foods: [
+        mfpFood(
+          rice,
+          description: LoggedJournal.basmati,
+          nutrients: nutrients(kcal: 350),
+        ),
+      ],
+    );
+    await _open(tester, backends, LoggedJournal.basmati);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    await LoggedJournal.goOffline(
+      tester,
+      backends,
+      showing: LoggedJournal.basmati,
+    );
+    await tester.tap(find.text(LoggedJournal.basmati));
+    await tester.pumpAndSettle();
+
+    check(_enabled(tester, _deleteBoth)).isTrue();
+    await _servings(tester, '2');
+    await _tap(tester, _saveBoth);
+
+    _missing(_title);
+    _sees(_edited);
+    _missing(_mfpNotWritten);
+    check(find.byType(ConnectorPill).evaluate()).length.equals(1);
+    check(
+      backends.entries.where((entry) => entry.food.id == rice).single.servings,
+    ).equals(1.5);
+  });
+
+  testWidgets('keeps the edit and says Remplacé dans MyFitnessPal when the '
+      'MyFitnessPal app changed the food before it was written', (
+    tester,
+  ) async {
+    final backends = LoggedJournal.backends()..mfpWritesFail = true;
+    await _open(tester, backends, LoggedJournal.basmati);
+    await _servings(tester, '2');
+    await _tap(tester, _saveBoth);
+    backends
+      ..mfpWritesFail = false
+      ..entries = [
+        for (final logged in backends.entries)
+          switch (logged.id) {
+            LoggedJournal.basmatiId => logged.copyWith(servings: 3),
+            _ => logged,
+          },
+      ];
+    tester
+        .state<ScaffoldMessengerState>(find.byType(ScaffoldMessenger))
+        .clearSnackBars();
+    tester.view.reset();
+    await tester.pumpAndSettle();
+
+    await tester.fling(
+      find.byType(CustomScrollView),
+      const Offset(0, 400),
+      1000,
+    );
+    await tester.pumpAndSettle();
+
+    _sees('Remplacé dans MyFitnessPal');
+    _sees('Riz basmati : 3 × 100 g → 2 × 100 g');
+    check(
+      backends.entries.where((entry) => entry.food.id == rice).single.servings,
+    ).equals(2);
   });
 
   testWidgets('returns to the Journal when the food is no longer in the day '
@@ -490,7 +588,7 @@ void main() {
     await LoggedJournal.pump(
       tester,
       backends,
-      linked: LoggedJournal.basmatiLink(entryId: _resavedBasmati, servings: 1),
+      sent: LoggedJournal.basmatiSent(servings: 1),
     );
     _sees('À mettre à jour');
     await tester.tap(find.text(LoggedJournal.basmati));
@@ -504,17 +602,19 @@ void main() {
     check(backends.ekkloItems.single.quantity).equals(200);
   });
 
-  testWidgets('stays on the fiche and says why when MyFitnessPal refuses the '
-      'edit', (tester) async {
+  testWidgets('closes the fiche and says the edit is waiting when '
+      'MyFitnessPal refuses it', (tester) async {
     final backends = LoggedJournal.backends()..mfpWritesFail = true;
     await _open(tester, backends, LoggedJournal.basmati);
     await _servings(tester, '2');
 
     await _tap(tester, _saveBoth);
 
-    _sees('MyFitnessPal ne répond pas.');
-    _sees(_title);
-    check(_enabled(tester, _saveBoth)).isTrue();
+    _missing(_title);
+    _sees(_mfpNotWritten);
+    _sees('Riz basmati reste en attente');
+    _sees(_retry);
+    _sees(_mfp);
     check(backends.ekkloItems.single.quantity).equals(150);
   });
 
@@ -529,8 +629,10 @@ void main() {
 
     await _tap(tester, _saveBoth);
 
+    _sees(_mfpNotWritten);
     _sees(_blockedInDev);
-    _sees(_title);
+    _missing(_title);
+    _missing(_retry);
     check(
       backends.entries.where((entry) => entry.food.id == rice).single.servings,
     ).equals(1.5);

@@ -280,7 +280,7 @@ void main() {
       'confirms it and undoes it on request', (tester) async {
     final backends = _riceBackends();
     await _openMemory(tester, backends);
-    await _tap(tester, rice);
+    await _tap(tester, _thaiRiceName);
 
     await _tap(tester, 'Ajouter');
     check(_count('Ajouter à $breakfast')).equals(1);
@@ -298,11 +298,27 @@ void main() {
     check(_count('Ajout annulé')).equals(1);
   });
 
+  testWidgets('returns once to Mémoire when a food just added is forgotten', (
+    tester,
+  ) async {
+    await _openMemory(tester, _riceBackends());
+    await _tap(tester, _thaiRiceName);
+    await _tap(tester, 'Ajouter');
+    await _tap(tester, 'Ajouter à MFP et Ekklo');
+
+    await _tap(tester, 'Oublier cet aliment');
+    await _tap(tester, 'Oublier');
+
+    check(tester.takeException()).isNull();
+    check(_count('Aliments (1)')).equals(1);
+    check(_count(_thaiRiceName)).equals(0);
+  });
+
   testWidgets('returns to Mémoire with the confirmation when the add replaced '
       'the food by an own copy', (tester) async {
     final backends = _riceBackends();
     await _openMemory(tester, backends);
-    await _tap(tester, rice);
+    await _tap(tester, _thaiRiceName);
     await _tap(tester, 'Ajouter');
 
     await tester.tap(find.textContaining('Ekklo : '));
@@ -322,7 +338,7 @@ void main() {
   ) async {
     final backends = _riceBackends();
     await _openMemory(tester, backends);
-    await _tap(tester, rice);
+    await _tap(tester, _thaiRiceName);
     await _tap(tester, 'Ajouter');
     check(_count('Ajouter à MFP et Ekklo')).equals(1);
 
@@ -333,9 +349,7 @@ void main() {
     check(backends.entries).isEmpty();
   });
 
-  testWidgets('greys out Ajouter while adding is not possible', (
-    tester,
-  ) async {
+  testWidgets('keeps Ajouter usable offline', (tester) async {
     final backends = _riceBackends();
     await pumpFujin(tester, backends, units: memory.units);
     backends
@@ -348,13 +362,13 @@ void main() {
     );
     await tester.pumpAndSettle();
     await _tap(tester, 'Mémoire');
-    await _tap(tester, rice);
+    await _tap(tester, _thaiRiceName);
 
     check(
       tester
           .widget<FilledButton>(find.widgetWithText(FilledButton, 'Ajouter'))
           .onPressed,
-    ).isNull();
+    ).isNotNull();
   });
 
   testWidgets('closes the open meal menu on back and stays on Mémoire', (

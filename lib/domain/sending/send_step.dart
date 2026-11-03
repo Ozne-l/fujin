@@ -15,14 +15,14 @@ sealed class SendStep with SendStepMappable {
 @MappableClass(discriminatorValue: 'own_copy')
 final class OwnCopyStep extends SendStep with OwnCopyStepMappable {
   const OwnCopyStep({
-    required this.mfpFoodId,
-    required this.mfpUnit,
+    required this.foodId,
+    required this.unit,
     required this.name,
     super.state,
   });
 
-  final String mfpFoodId;
-  final String mfpUnit;
+  final String foodId;
+  final String unit;
   final String name;
 
   @override

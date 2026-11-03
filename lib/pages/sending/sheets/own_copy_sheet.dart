@@ -8,6 +8,7 @@ import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/pill_size.dart';
 import 'package:fujin/pages/common/sheet_frame.dart';
 import 'package:fujin/pages/common/status_pill.dart';
@@ -42,6 +43,7 @@ class _OwnCopySheet extends StatelessWidget {
     final entry = planned.entry;
     final navigator = Navigator.of(context);
     final energy = EntryText.energy(context.intl, entry);
+    final creates = planned.asOwnCopy().sends;
 
     void chooseCandidate() {
       navigator.pop();
@@ -49,7 +51,7 @@ class _OwnCopySheet extends StatelessWidget {
     }
 
     return SheetFrame(
-      title: entry.food.description,
+      title: FoodText.name(context.intl, entry.foodName),
       subtitle: context.intl.entryDetail(
         EntryText.serving(context.intl, entry),
         energy,
@@ -70,7 +72,7 @@ class _OwnCopySheet extends StatelessWidget {
                 ),
               ),
               Text(
-                productName(entry.food),
+                FoodText.name(context.intl, productName(entry)),
                 style: FujinText.inter15Medium.copyWith(
                   color: context.colors.textPrimary,
                 ),
@@ -85,7 +87,7 @@ class _OwnCopySheet extends StatelessWidget {
                 ),
               ),
               Text(
-                EntryText.macros(context.intl, entry.nutrients),
+                EntryText.macros(context.intl, entry.entry.nutrients),
                 style: FujinText.inter12Medium.copyWith(
                   color: context.colors.textTertiary,
                 ),
@@ -110,12 +112,21 @@ class _OwnCopySheet extends StatelessWidget {
         if (planned.candidates.isNotEmpty)
           _Rejected(candidates: planned.candidates, onTap: chooseCandidate),
       ],
-      primaryLabel: context.intl.createOwnCopy,
-      onPrimary: () {
-        choices.ownCopy();
-        navigator.pop();
+      primaryLabel: switch (creates) {
+        true => context.intl.createOwnCopy,
+        false => context.intl.chooseCandidate,
       },
-      secondaryLabel: context.intl.chooseCandidate,
+      onPrimary: switch (creates) {
+        true => () {
+          choices.ownCopy();
+          navigator.pop();
+        },
+        false => chooseCandidate,
+      },
+      secondaryLabel: switch (creates) {
+        true => context.intl.chooseCandidate,
+        false => null,
+      },
       onSecondary: chooseCandidate,
       onSkip: switch (choices.skip) {
         final skip? => () {

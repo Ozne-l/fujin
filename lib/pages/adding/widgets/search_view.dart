@@ -20,12 +20,14 @@ import 'package:fujin/pages/adding/widgets/add_section_label.dart';
 import 'package:fujin/pages/adding/widgets/add_state_panel.dart';
 import 'package:fujin/pages/adding/widgets/barcode_card.dart';
 import 'package:fujin/pages/adding/widgets/food_list.dart';
+import 'package:fujin/pages/adding/widgets/food_list_row.dart';
 import 'package:fujin/pages/adding/widgets/offline_card.dart';
 import 'package:fujin/pages/adding/widgets/open_draft.dart';
 import 'package:fujin/pages/adding/widgets/scanned_banner.dart';
 import 'package:fujin/pages/adding/widgets/suggestion_row.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/flow_header.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/glass_layer.dart';
 import 'package:fujin/pages/common/header_layout.dart';
 import 'package:fujin/pages/common/scan_button.dart';
@@ -121,6 +123,17 @@ class SearchView extends HookConsumerWidget {
       if (signedIn case true) await notifier.search(search.query);
     }
 
+    FoodListRow foodRow(MfpFood food) => (
+      title: food.description,
+      detail: AddText.result(context.intl, food),
+      verified: food.verified ?? false,
+      energy: switch (AddText.kilocalories(food)) {
+        final energy? => context.intl.kilocalories(energy),
+        null => null,
+      },
+      onTap: () => open(food),
+    );
+
     List<Widget> recentList(String trailing) => [
       _box(AddSectionLabel(label: context.intl.addRecents, trailing: trailing)),
       switch (recents) {
@@ -160,7 +173,7 @@ class SearchView extends HookConsumerWidget {
           rows: [
             for (final food in foods)
               (
-                title: food.mfpDescription,
+                title: FoodText.name(context.intl, food.mfpDescription),
                 detail: AddText.remembered(context.intl, food),
                 verified: false,
                 energy: null,
@@ -245,19 +258,7 @@ class SearchView extends HookConsumerWidget {
               ),
             ),
             FoodList(
-              rows: [
-                for (final food in foodsBesideRemembered)
-                  (
-                    title: food.description,
-                    detail: AddText.result(context.intl, food),
-                    verified: food.verified ?? false,
-                    energy: switch (AddText.kilocalories(food)) {
-                      final energy? => context.intl.kilocalories(energy),
-                      null => null,
-                    },
-                    onTap: () => open(food),
-                  ),
-              ],
+              rows: [for (final food in foodsBesideRemembered) foodRow(food)],
             ),
           ],
         ],
@@ -276,10 +277,45 @@ class SearchView extends HookConsumerWidget {
       ],
       AddSearchFailed(
         problem: ReadProblem.offline,
+        :final query,
+        :final onPhone,
+      )
+          when query.isNotEmpty && barcode == null =>
+        [
+          if (onPhone.isNotEmpty) ...[
+            _box(
+              AddSectionLabel(
+                label: context.intl.addOnPhoneFoods,
+                trailing: context.intl.addRememberedFound(onPhone.length),
+              ),
+            ),
+            FoodList(rows: [for (final food in onPhone) foodRow(food)]),
+          ],
+          _box(
+            AddSectionLabel(
+              label: context.intl.addMfpResults,
+              trailing: context.intl.addMfpOffline,
+              dot: context.colors.sourceMfp,
+            ),
+          ),
+          _box(
+            OfflineCard(
+              detail: context.intl.addOfflineSearchDetail,
+              onRetry: retry,
+            ),
+          ),
+        ],
+      AddSearchFailed(
+        problem: ReadProblem.offline,
         :final rememberedBesideRecents,
       ) =>
         [
-          _box(OfflineCard(onRetry: retry)),
+          _box(
+            OfflineCard(
+              detail: context.intl.addOfflineDetail,
+              onRetry: retry,
+            ),
+          ),
           ...recentList(context.intl.addRecentsOnPhone),
           ...rememberedList(rememberedBesideRecents),
         ],

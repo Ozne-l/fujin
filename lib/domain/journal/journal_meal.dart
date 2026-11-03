@@ -1,27 +1,28 @@
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/journal/status_counts.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 part 'journal_meal.mapper.dart';
 
 @MappableClass()
 final class JournalMeal with JournalMealMappable {
-  const JournalMeal({required this.name, this.entries = const []});
+  const JournalMeal({
+    required this.name,
+    this.entries = const [],
+    this.leaving = const [],
+  });
 
   final String name;
   final List<ComparedEntry> entries;
+  final List<LoggedEntry> leaving;
 
-  StatusCounts get counts => StatusCounts.of(entries);
+  StatusCounts counts({Set<String> sending = const {}}) =>
+      StatusCounts.of(entries, sending: sending);
 
   double get kilocalories => entries.fold(
     0,
     (total, compared) =>
-        total + (compared.entry.nutrients.energy?.kilocalories ?? 0),
+        total + (compared.logged.entry.nutrients.kilocalories ?? 0),
   );
-
-  static List<String> namesOf(
-    List<String> mealNames,
-    Iterable<MfpFoodEntry> entries,
-  ) => {...mealNames, for (final entry in entries) entry.mealName}.toList();
 }

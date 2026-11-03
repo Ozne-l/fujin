@@ -16,7 +16,7 @@ final class RecentFood with RecentFoodMappable {
     this.kilocalories,
   });
 
-  factory RecentFood.forEntry(
+  factory RecentFood.forMfpEntry(
     MfpFoodEntry entry, {
     required DateTime addedAt,
   }) => RecentFood(

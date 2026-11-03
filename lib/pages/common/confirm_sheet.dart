@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
-import 'package:fujin/pages/common/alert_pictogram.dart';
 import 'package:fujin/pages/common/sheet_frame.dart';
 
 Future<void> showConfirmSheet(
   BuildContext context, {
-  required String icon,
+  required Widget glyph,
   required String title,
   required String message,
   required String confirmLabel,
@@ -16,7 +15,7 @@ Future<void> showConfirmSheet(
   builder: (context) {
     final navigator = Navigator.of(context);
     return SheetFrame(
-      glyph: AlertPictogram(icon: icon),
+      glyph: glyph,
       title: title,
       titleStyle: FujinText.hina24,
       subtitle: message,

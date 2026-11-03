@@ -1,17 +1,15 @@
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 part 'added_food.mapper.dart';
 
 @MappableClass()
 final class AddedFood with AddedFoodMappable {
-  const AddedFood({required this.planned, required this.ekkloWritten});
+  const AddedFood({required this.entry, this.planned});
 
-  final PlannedEntry planned;
-  final bool ekkloWritten;
+  final LoggedEntry entry;
+  final PlannedEntry? planned;
 
-  String get entryId => planned.entryId;
-
-  MfpFoodEntry get entry => planned.entry;
+  String get entryId => entry.entry.id;
 }

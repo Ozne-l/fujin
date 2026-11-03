@@ -5,8 +5,8 @@ import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/domain/goals/goal_amounts.dart';
 import 'package:fujin/domain/goals/goal_status.dart';
 import 'package:fujin/domain/journal/day_nutrients.dart';
-import 'package:fujin/domain/journal/journal_day.dart';
 import 'package:fujin/domain/journal/journal_read.dart';
+import 'package:fujin/domain/journal/status_counts.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
@@ -14,8 +14,11 @@ import 'package:fujin/pages/common/goals_text.dart';
 import 'package:fujin/pages/common/progress_bar.dart';
 import 'package:fujin/pages/common/send_label.dart';
 import 'package:fujin/pages/common/source_dot.dart';
+import 'package:fujin/pages/journal/background_write_notifier.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
 import 'package:fujin/pages/journal/widgets/nutrient_ring.dart';
+import 'package:fujin/pages/journal/writer_state_ids.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 TextSpan _strong(String text) =>
     TextSpan(text: text, style: FujinText.inter13Semibold);
@@ -30,7 +33,7 @@ TextSpan _faint(FujinColors colors, String text) => TextSpan(
   style: FujinText.inter13Regular.copyWith(color: colors.textTertiary),
 );
 
-class DaySummaryCard extends StatelessWidget {
+class DaySummaryCard extends ConsumerWidget {
   const DaySummaryCard({
     required this.read,
     required this.goals,
@@ -47,35 +50,43 @@ class DaySummaryCard extends StatelessWidget {
   final VoidCallback onDetail;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sending = ref.watch(
+      backgroundWriteProvider.select((state) => state.ekkloSendIds),
+    );
     final fresh = switch ((read, stale)) {
-      (BothSides(:final day), false) => day,
+      (BothSides(:final day), false) => (
+        ekklo: day.ekkloNutrients,
+        counts: day.counts(sending: sending),
+      ),
       _ => null,
     };
     final mfp = switch (read) {
       BothSides(:final day) => day.nutrients,
-      MfpOnly(:final nutrients) => nutrients,
+      MfpOnly(:final diaryNutrients) ||
+      FujinOnly(:final diaryNutrients) => diaryNutrients,
       EkkloOnly() => null,
     };
     final rings = switch ((mfp, goals, stale)) {
       (final mfp?, final goals?, false) => (mfp, goals),
       _ => null,
     };
-    final (sendLabel, onPressed) = switch (fresh) {
-      final day? => switch (SendLabel.of(
+    final (sendLabel, onPressed) = switch ((fresh, read)) {
+      ((ekklo: _, :final counts)?, _) => switch (SendLabel.of(
         context.intl,
-        day.counts.toSend,
-        day.counts.toUpdate,
+        counts.toSend,
+        counts.toUpdate,
       )) {
         final label? => (label, onSend),
         null => (null, null),
       },
-      null => (context.intl.sendToEkklo, null),
+      (null, FujinOnly()) => (null, null),
+      (null, _) => (context.intl.sendToEkklo, null),
     };
     final colors = context.colors;
     return GestureDetector(
       onTap: switch (fresh) {
-        JournalDay() => onDetail,
+        _? => onDetail,
         null => null,
       },
       child: Container(
@@ -115,14 +126,19 @@ class DaySummaryCard extends StatelessWidget {
               children: [
                 if (rings != null) const Divider(),
                 ...switch ((fresh, read)) {
-                  (final day?, _) => _progress(context.intl, colors, day),
+                  ((:final ekklo, :final counts)?, _) => _progress(
+                    context.intl,
+                    colors,
+                    ekklo,
+                    counts,
+                  ),
                   (null, BothSides(:final day)) => [
                     _counted(context.intl, colors, day.ekkloMeals),
                   ],
                   (null, EkkloOnly(:final ekkloMeals)) => [
                     _counted(context.intl, colors, ekkloMeals),
                   ],
-                  (null, MfpOnly()) => [
+                  (null, MfpOnly() || FujinOnly()) => [
                     _SourceLine(
                       dot: colors.sourceEkklo,
                       label: context.intl.sourceEkklo,
@@ -150,25 +166,24 @@ class DaySummaryCard extends StatelessWidget {
   static List<Widget> _progress(
     AppLocalizations intl,
     FujinColors colors,
-    JournalDay day,
+    DayNutrients ekklo,
+    StatusCounts counts,
   ) => [
     _SourceLine(
       dot: colors.sourceEkklo,
       label: intl.sourceEkklo,
       trailing: [
-        _strong(
-          intl.kilocalories(day.ekkloNutrients.amount(Nutrient.kilocalories)),
-        ),
-        _soft(colors, switch (day.counts.total) {
+        _strong(intl.kilocalories(ekklo.amount(Nutrient.kilocalories))),
+        _soft(colors, switch (counts.total) {
           0 => ' ${intl.ekkloNoFood}',
-          final total => ' ${intl.ekkloProgress(day.counts.inEkklo, total)}',
+          final total => ' ${intl.ekkloProgress(counts.inEkklo, total)}',
         }),
       ],
     ),
     ProgressBar(
-      fraction: switch (day.counts.total) {
+      fraction: switch (counts.total) {
         0 => 0,
-        final total => day.counts.inEkklo / total,
+        final total => counts.inEkklo / total,
       },
       color: colors.backgroundAccent,
     ),

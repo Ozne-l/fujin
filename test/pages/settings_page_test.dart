@@ -7,11 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/backup/backup.dart';
-import 'package:fujin/data/backup/backup_codec.dart';
+import 'package:fujin/data/connectors/role.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/preferences/fujin_preferences.dart';
 import 'package:fujin/pages/common/fujin_switch.dart';
 import 'package:fujin/pages/common/switch_lens.dart';
+import 'package:fujin/pages/settings/widgets/role_row.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 import '../support/fake_backends.dart';
@@ -20,6 +21,7 @@ import '../support/fixtures.dart';
 import '../support/gestures.dart';
 import '../support/phone_brightness.dart';
 import '../support/pump_fujin.dart';
+import '../support/sent_food.dart';
 
 const _space = '\u202f';
 const _scrolledPast = 120.0;
@@ -175,6 +177,72 @@ void main() {
     }
   });
 
+  group('the RÔLE DES APPS card', () {
+    const toReceiveOnly = 'MyFitnessPal en réception ?';
+
+    Role roleOf(WidgetTester tester, String name) => tester
+        .widget<RoleRow>(
+          find.byWidgetPredicate(
+            (widget) => widget is RoleRow && widget.name == name,
+          ),
+        )
+        .role;
+
+    Future<void> tapMfpReceiveOnly(WidgetTester tester) async {
+      final segment = find.text('Réception').first;
+      await tester.ensureVisible(segment);
+      await tester.pumpAndSettle();
+      await tester.tap(segment);
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('asks before MyFitnessPal goes receive only, and Annuler '
+        'leaves it two-way', (tester) async {
+      await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+      await _tap(tester, 'Réglages');
+
+      await tapMfpReceiveOnly(tester);
+      check(_count(toReceiveOnly)).equals(1);
+      check(_count('Passer MyFitnessPal en réception')).equals(1);
+
+      await _tap(tester, 'Annuler');
+      check(_count(toReceiveOnly)).equals(0);
+      check(roleOf(tester, 'MyFitnessPal')).equals(Role.twoWay);
+    });
+
+    testWidgets('offers no choice for Ekklo, whose only role is receive only', (
+      tester,
+    ) async {
+      await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+      await _tap(tester, 'Réglages');
+      final ekklo = find.text('Réception').last;
+      await tester.ensureVisible(ekklo);
+      await tester.pumpAndSettle();
+
+      check(ekklo.hitTestable().evaluate()).isEmpty();
+      check(roleOf(tester, 'Ekklo')).equals(Role.receiveOnly);
+    });
+
+    testWidgets('keeps MyFitnessPal receive only once confirmed, across '
+        'launches', (tester) async {
+      await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+      await _tap(tester, 'Réglages');
+
+      await tapMfpReceiveOnly(tester);
+      await _tap(tester, 'Passer MyFitnessPal en réception');
+      check(roleOf(tester, 'MyFitnessPal')).equals(Role.receiveOnly);
+
+      await tester.pumpWidget(const SizedBox());
+      await pumpFujin(
+        tester,
+        FakeBackends(mealNames: [breakfast]),
+        preferences: await FujinPreferences.open(),
+      );
+      await _tap(tester, 'Réglages');
+      check(roleOf(tester, 'MyFitnessPal')).equals(Role.receiveOnly);
+    });
+  });
+
   group('the APPARENCE card', () {
     const label = 'APPARENCE';
 
@@ -291,9 +359,13 @@ void main() {
     ).equals(1);
   });
 
-  testWidgets('clears the memory but keeps the sent links, so the Journal '
+  testWidgets('clears the memory but keeps the Ekklo links, so the Journal '
       'still shows what is in Ekklo', (tester) async {
-    await pumpFujin(tester, _diary(), links: [link('E-1', 'I-1')]);
+    await pumpFujin(
+      tester,
+      _diary(),
+      sent: [SentFood(entry('E-1'), itemId: 'I-1')],
+    );
     check(_count('1/2 dans Ekklo')).equals(1);
 
     await _tap(tester, 'Réglages');
@@ -349,8 +421,9 @@ void main() {
   testWidgets('shows the date and counts of a backup before replacing '
       'everything with it', (tester) async {
     final files = FakeBackupFiles()
-      ..picked = BackupCodec.encode(
-        Backup(
+      ..picked = utf8.encode(
+        BackupV2(
+          version: BackupV2.memoryVersion,
           exportedAt: DateTime(day.year, day.month, day.day, 12),
           matches: [memory.matches.first],
           ownCopies: const [],
@@ -359,7 +432,7 @@ void main() {
           links: [link('E-1', 'I-1')],
           barcodeLinks: const [],
           goals: const Goals(kilocalories: 2500),
-        ),
+        ).toJson(),
       );
     await pumpFujin(
       tester,

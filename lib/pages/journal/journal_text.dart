@@ -2,6 +2,7 @@ import 'package:fujin/domain/journal/day_nutrients.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
+import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/title_text.dart';
 
 abstract final class JournalText {
@@ -42,7 +43,7 @@ abstract final class JournalText {
       intl,
       nutrients,
       nutrient,
-      intl.macroValue(nutrients.amount(nutrient)),
+      EntryText.macro(intl, nutrients.amount(nutrient)),
     );
     return intl.macros(
       amount(Nutrient.protein),

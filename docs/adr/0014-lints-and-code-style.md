@@ -22,7 +22,7 @@ Tools:
 Owner style (checked in review):
 
 - No comments. Names and small functions carry the meaning.
-- No `!` null assertion. Use patterns instead, for example `if (match case final _Placement placement)` in `lib/domain/comparison/compare_day.dart`.
+- No `!` null assertion. Use patterns instead, for example `if (planned.choice case final SendToEkkloFood choice)` in `lib/pages/sending/sheets/weight_sheet.dart`.
 - No magic strings or numbers: enums or named constants (`FujinTable` in `lib/data/database/fujin_table.dart`, `SessionKey` in `lib/data/sessions/session_key.dart`, `ExpectedItem.quantityTolerance`, `JournalPage._nothingNewDuration`).
 - `switch` over if-chains, exhaustive on sealed types and enums without a default where possible (`StatusCounts.of` in `lib/domain/journal/status_counts.dart`, the lifecycle switch in `lib/pages/journal/journal_page.dart`).
 - `null` for absence, not sentinel values (`Memory.gramsPerUnit` returns `double?`, `ExpectedItem.forEntry` returns `ExpectedItem?`).

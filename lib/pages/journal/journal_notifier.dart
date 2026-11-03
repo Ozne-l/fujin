@@ -112,6 +112,7 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
       ),
       _ => _firstRead(
         service,
+        _settler(ref.watch, thenWrite: true),
         ref.watch(mfpDiaryProvider(date).future),
         ref.watch(ekkloMealsProvider(date).future),
         ref.watch(mealNamesProvider.future),
@@ -120,21 +121,17 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
   }
 
   Future<RefreshOutcome> refresh() async {
-    final before = state.value;
-    final (diary, meals) = await _reread();
+    final before = ref.read(mfpDiaryProvider(date)).value?.value;
+    final (diary, meals) = await _reread(thenWrite: true);
     return switch ((before, diary, meals)) {
-      (
-        BothSides(diary: final before),
-        Fetched(value: final after),
-        Fetched(),
-      )
+      (final before?, Fetched(value: final after), Fetched())
           when before == after =>
         RefreshOutcome.nothingNew,
       _ => RefreshOutcome.changed,
     };
   }
 
-  Future<void> reload() => _reread();
+  Future<void> reload({bool thenWrite = true}) => _reread(thenWrite: thenWrite);
 
   Future<void> revalidate() async {
     if (!ref.mounted) return;
@@ -144,10 +141,12 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
     ];
     if (held.isEmpty) return;
     held.forEach(ref.invalidate);
-    await _readSides();
+    await _readSides(thenWrite: true);
   }
 
-  Future<(Fetch<MfpDiaryDay>, Fetch<List<EkkloDailyMeal>>)> _reread() {
+  Future<(Fetch<MfpDiaryDay>, Fetch<List<EkkloDailyMeal>>)> _reread({
+    required bool thenWrite,
+  }) {
     switch (ref.read(mealNamesProvider)) {
       case AsyncError():
         ref.invalidate(mealNamesProvider);
@@ -160,33 +159,47 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
       if (ref.exists(meals) && ref.read(meals).hasError) ref.invalidate(meals);
     }
     ref.invalidate(ekkloMealsProvider(date));
-    return _readSides();
+    return _readSides(thenWrite: thenWrite);
   }
 
-  Future<(Fetch<MfpDiaryDay>, Fetch<List<EkkloDailyMeal>>)> _readSides() async {
-    final service = ref.read(journalServiceProvider);
+  Future<(Fetch<MfpDiaryDay>, Fetch<List<EkkloDailyMeal>>)> _readSides({
+    required bool thenWrite,
+  }) async {
+    final settle = _settler(ref.read, thenWrite: thenWrite);
     final diary = Fetch.of(ref.read(mfpDiaryProvider(date).future));
     final meals = Fetch.of(ref.read(ekkloMealsProvider(date).future));
     final (diaryRead, mealsRead) = (await diary, await meals);
-    _settle(service, diaryRead, mealsRead);
+    settle(diaryRead, mealsRead);
     return (diaryRead, mealsRead);
   }
 
-  void _settle(
-    JournalService service,
-    Fetch<MfpDiaryDay> diary,
-    Fetch<List<EkkloDailyMeal>> meals,
-  ) {
-    if ((diary, meals) case (
-      Fetched(value: final diary),
-      Fetched(value: final meals),
-    )) {
-      service.settleLinks(date, diary: diary, meals: meals);
-    }
+  void Function(Fetch<MfpDiaryDay> diary, Fetch<List<EkkloDailyMeal>> meals)
+  _settler(
+    T Function<T>(ProviderListenable<T> provider) use, {
+    required bool thenWrite,
+  }) {
+    final service = use(journalServiceProvider);
+    final completion = use(foodCompletionServiceProvider);
+    final writer = use(backgroundWriterProvider);
+    return (diary, meals) {
+      final (:replaced, :adopted) = service.settleDay(
+        date,
+        diary: diary,
+        meals: meals,
+      );
+      writer.settled(adopted: adopted, replaced: replaced);
+      if (diary case Fetched()) {
+        unawaited(completion.complete());
+        if (thenWrite || adopted.isNotEmpty || replaced.isNotEmpty) {
+          unawaited(writer.run());
+        }
+      }
+    };
   }
 
   Future<JournalRead> _firstRead(
     JournalService service,
+    void Function(Fetch<MfpDiaryDay>, Fetch<List<EkkloDailyMeal>>) settle,
     Future<Fetched<MfpDiaryDay>> diary,
     Future<Fetched<List<EkkloDailyMeal>>> meals,
     Future<List<String>> mealNames,
@@ -197,14 +210,13 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
       (Object error) => const <String>[],
     );
     final (diaryFetch, mealsFetch) = (await diaryRead, await mealsRead);
-    final read = service.journalOf(
+    settle(diaryFetch, mealsFetch);
+    return service.journalOf(
       date,
       diary: diaryFetch,
       meals: mealsFetch,
       mealNames: names,
     );
-    _settle(service, diaryFetch, mealsFetch);
-    return read;
   }
 
   static Fetch<T>? _held<T>(AsyncValue<Fetched<T>> side) => switch (side) {

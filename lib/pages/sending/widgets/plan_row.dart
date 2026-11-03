@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
-import 'package:fujin/data/links/sent_link.dart';
+import 'package:fujin/data/entries/linked_item.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/domain/sending/own_copy_renewal.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
@@ -9,22 +10,22 @@ import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/breeze_indicator.dart';
 import 'package:fujin/pages/common/breeze_streaks.dart';
 import 'package:fujin/pages/common/entry_text.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
 import 'package:fujin/pages/sending/send_text.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 class PlanRow extends StatelessWidget {
   PlanRow.planned(PlannedEntry planned)
     : _row = _Planned(planned),
       super(key: ValueKey(planned.entry));
 
-  PlanRow.pending(MfpFoodEntry entry, {required bool searching})
+  PlanRow.pending(LoggedEntry entry, {required bool searching})
     : _row = _Pending(entry, searching: searching),
       super(key: ValueKey(entry));
 
-  PlanRow.inEkklo(MfpFoodEntry entry, SentLink link)
-    : _row = _InEkkloRow(entry, link),
+  PlanRow.inEkklo(LoggedEntry entry, LinkedItem item)
+    : _row = _InEkkloRow(entry, item),
       super(key: ValueKey(entry));
 
   final _RowKind _row;
@@ -35,26 +36,26 @@ class PlanRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final (name, detail, detailColor, trailing) = switch (_row) {
       _Planned(:final planned) => (
-        planned.entry.food.description,
+        FoodText.name(context.intl, planned.entry.foodName),
         SendText.target(context.intl, planned),
         context.colors.textSecondary,
         _plannedPill(context.intl, planned),
       ),
       _Pending(:final entry, searching: true) => (
-        entry.food.description,
+        FoodText.name(context.intl, entry.foodName),
         context.intl.rowSearching,
         context.colors.textInfo,
         const BreezeIndicator(streaks: BreezeStreaks.searching),
       ),
       _Pending(:final entry, searching: false) => (
-        entry.food.description,
+        FoodText.name(context.intl, entry.foodName),
         context.intl.rowWaiting,
         context.colors.textTertiary,
         null,
       ),
-      _InEkkloRow(:final entry, :final link) => (
-        entry.food.description,
-        EntryText.linkedServing(context.intl, link),
+      _InEkkloRow(:final entry, :final item) => (
+        FoodText.name(context.intl, entry.foodName),
+        EntryText.linkedServing(context.intl, item),
         context.colors.textSecondary,
         StatusPill(label: context.intl.statusInEkklo, tone: PillTone.validated),
       ),
@@ -126,15 +127,15 @@ final class _Planned extends _RowKind {
 final class _Pending extends _RowKind {
   const _Pending(this.entry, {required this.searching});
 
-  final MfpFoodEntry entry;
+  final LoggedEntry entry;
   final bool searching;
 }
 
 final class _InEkkloRow extends _RowKind {
-  const _InEkkloRow(this.entry, this.link);
+  const _InEkkloRow(this.entry, this.item);
 
-  final MfpFoodEntry entry;
-  final SentLink link;
+  final LoggedEntry entry;
+  final LinkedItem item;
 }
 
 class _PlanCard extends StatelessWidget {

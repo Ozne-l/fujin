@@ -1,4 +1,7 @@
-import 'package:ekklo_client/ekklo_client.dart';
+import 'dart:async';
+
+import 'package:fujin/data/entries/logged_entry.dart';
+import 'package:fujin/data/foods/food_repository.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
@@ -6,34 +9,39 @@ import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/recents/recent_food.dart';
 import 'package:fujin/data/recents/recent_food_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
-import 'package:fujin/domain/adding/add_outcome.dart';
-import 'package:fujin/domain/adding/add_stage.dart';
 import 'package:fujin/domain/adding/added_food.dart';
+import 'package:fujin/domain/adding/entry_writer.dart';
+import 'package:fujin/domain/adding/known_food.dart';
 import 'package:fujin/domain/adding/remembered_serving.dart';
 import 'package:fujin/domain/adding/rescale_planned.dart';
 import 'package:fujin/domain/adding/scan_outcome.dart';
+import 'package:fujin/domain/memory/memory_rules.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/send_service.dart';
+import 'package:fujin/domain/writing/background_writer.dart';
+import 'package:fujin/domain/writing/ekklo_job.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 final class AddFoodService {
   AddFoodService({
     required this._mfp,
-    required this._ekklo,
     required this._sending,
     required this._memory,
+    required this._foods,
     required this._recents,
+    required this._writer,
+    required this._background,
     required this._clock,
   });
 
   final MyFitnessPalClient _mfp;
-  final EkkloClient _ekklo;
   final SendService _sending;
   final MemoryRepository _memory;
+  final FoodRepository _foods;
   final RecentFoodRepository _recents;
+  final EntryWriter _writer;
+  final BackgroundWriter _background;
   final DateTime Function() _clock;
-
-  Future<AddOutcome>? _writing;
 
   Future<List<MfpFood>> search(
     String query, {
@@ -43,7 +51,7 @@ final class AddFoodService {
       query,
       verifiedOnly: verifiedOnly,
     ))
-      if (food.servingSizes.isNotEmpty) food,
+      if (food.servingSizes.isNotEmpty) _filled(food),
   ];
 
   Future<MfpBarcodeResult> byBarcode(String barcode) async =>
@@ -55,12 +63,13 @@ final class AddFoodService {
             description: food.description,
             brandName: food.brandName,
           ),
+        MfpBarcodeFound(:final food) => MfpBarcodeFound(barcode, _filled(food)),
         final result => result,
       };
 
   Future<ScanOutcome> scan(String barcode) async {
     if (_memory.barcodeFood(barcode) case final foodId?) {
-      if (await _mfp.foods.byId(foodId) case final food?
+      if (await knownFood(foodId, mfp: _mfp, foods: _foods) case final food?
           when food.servingSizes.isNotEmpty) {
         return ScanFound(barcode, food, remembered: true);
       }
@@ -96,6 +105,9 @@ final class AddFoodService {
 
   Memory memory() => _memory.load();
 
+  List<MfpFood> onPhone(String query) =>
+      foodsOnPhone(_foods.onPhoneFoods(), query);
+
   Future<AddDraft?> openRemembered(
     RememberedFood remembered, {
     required String mfpMealName,
@@ -120,7 +132,7 @@ final class AddFoodService {
     required String mfpMealName,
     required DateTime date,
     required (MfpServingSize?, double) Function(MfpFood food) serving,
-  }) async => switch (await _mfp.foods.byId(mfpFoodId)) {
+  }) async => switch (await knownFood(mfpFoodId, mfp: _mfp, foods: _foods)) {
     final food? => switch (serving(food)) {
       (final servingSize, final servings) => AddDraft.of(
         food,
@@ -136,78 +148,57 @@ final class AddFoodService {
   Future<PlannedEntry> plan(AddDraft draft, {PlannedEntry? previous}) async {
     final entry = draft.entry;
     return switch (previous) {
-      final previous?
-          when previous.entry.food == entry.food &&
-              previous.entry.servingSize == entry.servingSize =>
+      final previous? when _sameServing(previous.entry, entry) =>
         rescalePlanned(previous, entry, _memory.load()),
-      _ => _sending.planOne(entry, entryId: AddDraft.pendingEntryId),
+      _ => _sending.planOne(entry),
     };
   }
 
-  Future<AddOutcome> add(
+  AddedFood add(
     AddDraft draft,
-    PlannedEntry planned, {
-    void Function(AddStage stage)? onStage,
+    PlannedEntry? planned, {
     String? barcodeToLink,
-  }) => _writing ??= _add(
-    draft,
-    planned,
-    onStage,
-    barcodeToLink,
-  ).whenComplete(() => _writing = null);
-
-  Future<AddOutcome> retryEkklo(AddedFood added) =>
-      _writing ??= _toEkklo(added).whenComplete(() => _writing = null);
-
-  Future<AddOutcome> _add(
-    AddDraft draft,
-    PlannedEntry planned,
-    void Function(AddStage stage)? onStage,
-    String? barcodeToLink,
-  ) async {
-    final String entryId;
-    try {
-      final current = await _mfp.foods.byId(draft.food.id);
-      await _ekklo.meals.forDate(draft.date);
-      if (current case final current?
-          when current.version != draft.food.version) {
-        return FoodChanged(before: draft.food, after: current);
-      }
-      onStage?.call(AddStage.mfp);
-      entryId =
-          await _mfp.diary.addFood(
-            date: draft.date,
-            mealName: draft.mfpMealName,
-            food: draft.food,
-            servingSize: draft.servingSize,
-            servings: draft.servings,
-          ) ??
-          (throw StateError('MyFitnessPal returned no entry id'));
-    } on Object catch (error) {
-      return NotAdded(error);
-    }
-    final entry = draft.entry.copyWith(id: entryId);
-    _recents.record(RecentFood.forEntry(entry, addedAt: _clock()));
-    if (barcodeToLink case final barcode?) {
-      _memory.saveBarcodeLink(
-        BarcodeLink(barcode: barcode, mfpFoodId: draft.food.id),
-      );
-    }
-    final added = AddedFood(
-      planned: rescalePlanned(
-        planned,
-        entry,
-        _memory.load(),
-      ).copyWith(entryId: entryId),
-      ekkloWritten: false,
+  }) {
+    final stored = _writer.store(
+      draft,
+      entryId: _writer.newEntryId(),
+      alongside: () {
+        _recents.record(
+          RecentFood.forMfpEntry(draft.mfpEntry, addedAt: _clock()),
+        );
+        _foods.fill(draft.food);
+        if (barcodeToLink case final barcode?) {
+          _memory.saveBarcodeLink(
+            BarcodeLink(barcode: barcode, mfpFoodId: draft.food.id),
+          );
+        }
+      },
     );
-    onStage?.call(AddStage.ekklo);
-    return _toEkklo(added);
+    final added = AddedFood(
+      entry: stored,
+      planned: switch (planned) {
+        final planned? => rescalePlanned(planned, stored, _memory.load()),
+        null => null,
+      },
+    );
+    if (added.planned case final planned? when planned.sends) {
+      _background.hold(added.entryId, EkkloSend(planned));
+    }
+    unawaited(_background.run());
+    return added;
   }
 
-  Future<AddOutcome> _toEkklo(AddedFood added) async =>
-      switch (await _sending.sendOne(added.planned)) {
-        null => Added(added.copyWith(ekkloWritten: true)),
-        final error => EkkloFailed(added, error),
-      };
+  static bool _sameServing(LoggedEntry before, LoggedEntry after) =>
+      before.mfpFoodId == after.mfpFoodId &&
+      before.foodName == after.foodName &&
+      before.brand == after.brand &&
+      before.mfpLink?.foodVersion == after.mfpLink?.foodVersion &&
+      before.entry.servingValue == after.entry.servingValue &&
+      before.entry.servingUnit == after.entry.servingUnit &&
+      before.entry.nutritionMultiplier == after.entry.nutritionMultiplier;
+
+  MfpFood _filled(MfpFood food) {
+    _foods.fill(food);
+    return food;
+  }
 }

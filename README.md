@@ -6,7 +6,7 @@
 
 **Log your day once in MyFitnessPal. Your coach sees it in Ekklo.**
 
-A personal Flutter app that copies its owner's MyFitnessPal food diary into Ekklo, the nutrition app his coach follows.
+A personal Flutter app that keeps its owner's food Journal on the phone and writes each entry to MyFitnessPal and to Ekklo, the nutrition app his coach follows, according to each app's role.
 
 [![Flutter 3.47.7](https://img.shields.io/badge/Flutter-3.47.7-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart 3.13.5](https://img.shields.io/badge/Dart-3.13.5-0175C2?logo=dart&logoColor=white)](https://dart.dev)
@@ -40,7 +40,7 @@ A personal Flutter app that copies its owner's MyFitnessPal food diary into Ekkl
 
 ## How it works
 
-Fūjin keeps no queue and no sync state of its own. Each time a day is shown it reads both services, recomputes every status from what it finds ([ADR 0001](docs/adr/0001-recompute-statuses-from-both-sides.md)), and only writes after the owner has reviewed the foods, or straight away in automatic mode.
+Fūjin's entries live in `fujin.db`, the source of truth ([ADR 0044](docs/adr/0044-connector-model.md)). Each time a day is shown it reads both services, recomputes every status from what it finds ([ADR 0001](docs/adr/0001-recompute-statuses-from-both-sides.md)), and only sends to Ekklo after the owner has reviewed the foods, or straight away in automatic mode.
 
 ```mermaid
 flowchart LR
@@ -64,13 +64,13 @@ flowchart LR
 | **À envoyer** | The entry is not in Ekklo yet. |
 | **À mettre à jour** | The entry changed in MyFitnessPal after it was sent. |
 
-Adding a food goes the other way: one draft, written to MyFitnessPal first and then to Ekklo, with an "Annuler" snackbar that removes it from both ([ADR 0002](docs/adr/0002-write-ordering.md)).
+Adding a food goes the other way: the entry is saved in Fūjin first, with or without network, then a background writer writes it to MyFitnessPal and, when its Ekklo food is remembered, to Ekklo, with an "Annuler" snackbar that removes it ([ADR 0002](docs/adr/0002-write-ordering.md), [ADR 0044](docs/adr/0044-connector-model.md)).
 
 ## Features
 
 | Feature | What it does | Decision |
 | --- | --- | --- |
-| **Journal** | Swipeable week band with a goal ring per day; MyFitnessPal kilocalories and macros against the goals; Ekklo progress; meals with a status per entry. Pull to refresh, re-read on return to the foreground, neighbour weeks read ahead. When one app fails the other stays readable; offline, the last figures stay on screen. | [0022](docs/adr/0022-journal-states-and-goal-rings.md), [0003](docs/adr/0003-refresh-on-foreground-and-pull.md), [0029](docs/adr/0029-journal-reads-held-for-display.md) |
+| **Journal** | Swipeable week band with a goal ring per day; MyFitnessPal kilocalories and macros against the goals; Ekklo progress; meals with a status per entry. Pull to refresh, re-read on return to the foreground, neighbour weeks read ahead. When one app fails the other stays readable; offline, it shows Fūjin's entries from `fujin.db`. | [0022](docs/adr/0022-journal-states-and-goal-rings.md), [0003](docs/adr/0003-refresh-on-foreground-and-pull.md), [0029](docs/adr/0029-journal-reads-held-for-display.md) |
 | **Send** | Ekklo search and ranking of candidates, sheets to choose a food, set a unit's weight or create an own copy, then one write per Ekklo meal with progress, a summary and an interrupted state. Entries edited in MyFitnessPal are updated. | [0018](docs/adr/0018-send-flow.md) |
 | **Automatic mode** | Sends without review, remembers none of the choices it made alone, and lists them with "Revoir" to keep them. | [0025](docs/adr/0025-automatic-mode.md) |
 | **Add a food** | MyFitnessPal search, foods recently added through Fūjin, serving, meal, date and nutrients against the day's goals, with the send flow's Ekklo sheets. Each failure has its own screen. | [0026](docs/adr/0026-adding-a-food.md) |

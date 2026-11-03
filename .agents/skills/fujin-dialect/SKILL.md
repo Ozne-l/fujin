@@ -13,7 +13,7 @@ Each rule: what to do, why, where the repo already does it.
 
 1. **Write no comments; let names and types say it.**
    Why: a comment is text the analyzer never checks, so it drifts from the code it describes.
-   Example: no hand-written file under `lib/` carries a comment, even the densest one (`lib/domain/comparison/compare_day.dart`). The only `//` lines are generator headers, as in `lib/app/theme/fujin_tokens.g.dart`.
+   Example: no hand-written file under `lib/` carries a comment, even the densest one (`lib/domain/comparison/compare_ekklo_day.dart`). The only `//` lines are generator headers, as in `lib/app/theme/fujin_tokens.g.dart`.
 
 2. **Never use the `!` null assertion; pattern-match the nullable value instead.**
    Why: `!` moves a type error to runtime; a pattern makes the null branch visible and exhaustive.
@@ -32,13 +32,13 @@ Each rule: what to do, why, where the repo already does it.
 
 3. **Give every identifier-like string or number a name: an enum carrying the value, or a `static const`.**
    Why: one spelling, one place to change it, and the compiler finds every use.
-   Examples: table names in `FujinTable` (`lib/data/database/fujin_table.dart`), secure storage keys in `SessionKey` (`lib/data/sessions/session_key.dart`), route paths in `FujinRoute` (`lib/app/fujin_route.dart`), conflict keys `MemoryRepository._mfpFoodId` (`lib/data/memory/memory_repository.dart`), `ExpectedItem.quantityTolerance` (`lib/domain/comparison/expected_item.dart`), `JournalPage._nothingNewDuration` (`lib/pages/journal/journal_page.dart`), `CalendarWeek._daysPerWeek` (`lib/domain/journal/calendar_week.dart`).
+   Examples: table names in `FujinTable` (`lib/data/database/fujin_table.dart`), secure storage keys in `SessionKey` (`lib/data/sessions/session_key.dart`), route paths in `FujinRoute` (`lib/app/fujin_route.dart`), conflict keys `FoodRepository._id` (`lib/data/foods/food_repository.dart`), `ExpectedItem.quantityTolerance` (`lib/domain/comparison/expected_item.dart`), `JournalPage._nothingNewDuration` (`lib/pages/journal/journal_page.dart`), `CalendarWeek._daysPerWeek` (`lib/domain/journal/calendar_week.dart`).
    ```dart
    enum FujinTable {
-     memoryFood('memory_food'),
-     memoryOwnCopy('memory_own_copy'),
-     memoryUnit('memory_unit'),
-     memoryMeal('memory_meal'),
+     food('food'),
+     foodReference('food_reference'),
+     meal('meal'),
+     mealMapping('meal_mapping'),
      sentLink('sent_link');
 
      const FujinTable(this.sqlName);
@@ -51,14 +51,20 @@ Each rule: what to do, why, where the repo already does it.
 4. **Branch with `switch` expressions or statements, not if/else chains; keep them exhaustive, without `default`, on sealed types, enums and records.**
    Why: when a case is added (a new `EntryStatus`, a new lifecycle state), the compiler lists every place that must handle it (Dart language docs, dart.dev, "Patterns" and "Branches").
    Examples:
-   - sealed type: `StatusCounts.of` over `EntryStatus` (`lib/domain/journal/status_counts.dart`), `MemoryRepository.saveFood` over `RememberedFood` (`lib/data/memory/memory_repository.dart`);
-   - record: the link triage in `compareDay` switches on `(placements[link.ekkloItemId], entryIds.contains(link.mfpEntryId))` (`lib/domain/comparison/compare_day.dart`), `JournalNotifier.refresh` switches on `(before, next?.diary)` with a guard (`lib/pages/journal/journal_notifier.dart`);
+   - sealed type: `MemoryRepository.saveFood` over `RememberedFood` (`lib/data/memory/memory_repository.dart`);
+   - record: `StatusCounts.of` switches on `(compared.status, sending.contains(...))` over `EntryStatus` (`lib/domain/journal/status_counts.dart`), the item triage in `compareEkkloDay` switches on `(placements[item.ekkloItemId], logged.mfpLink)` (`lib/domain/comparison/compare_ekklo_day.dart`), `JournalNotifier.refresh` switches on `(before, diary, meals)` with a guard (`lib/pages/journal/journal_notifier.dart`);
    - enum, every value listed: the `AppLifecycleState` switch in `JournalPage.build` (`lib/pages/journal/journal_page.dart`).
    ```dart
-   (counts, compared) => switch (compared.status) {
-     InEkklo() => counts.copyWith(inEkklo: counts.inEkklo + 1),
-     ToSend() => counts.copyWith(toSend: counts.toSend + 1),
-     ToUpdate() => counts.copyWith(toUpdate: counts.toUpdate + 1),
+   (counts, compared) => switch ((
+     compared.status,
+     sending.contains(compared.logged.entry.id),
+   )) {
+     (InEkklo(), _) => counts.copyWith(inEkklo: counts.inEkklo + 1),
+     (ToSend() || ToUpdate(), true) => counts.copyWith(
+       sending: counts.sending + 1,
+     ),
+     (ToSend(), false) => counts.copyWith(toSend: counts.toSend + 1),
+     (ToUpdate(), false) => counts.copyWith(toUpdate: counts.toUpdate + 1),
    },
    ```
    A single `if (x case Pattern)` or an early `return` guard is fine (`if (!context.mounted) return;` in `JournalPage.build`).
@@ -69,7 +75,7 @@ Each rule: what to do, why, where the repo already does it.
 
 6. **Keep one public type per file, named after the file; a sealed family shares one file.**
    Why: the file tree is the type index. Dart requires the subtypes of a `sealed` class to live in its library.
-   Examples: `lib/pages/journal/refresh_outcome.dart` holds only `RefreshOutcome`; `lib/domain/comparison/entry_status.dart` holds `EntryStatus` with `InEkklo`, `ToSend`, `ToUpdate`; `lib/data/memory/remembered_food.dart` holds `RememberedFood` with `MatchedFood`, `OwnCopy`. A provider sits in the file of the type it builds (`journalProvider` in `lib/pages/journal/journal_notifier.dart`). Helpers used by one file stay private there (`_Placement`, `_Orphan` in `lib/domain/comparison/compare_day.dart`).
+   Examples: `lib/pages/journal/refresh_outcome.dart` holds only `RefreshOutcome`; `lib/domain/comparison/entry_status.dart` holds `EntryStatus` with `InEkklo`, `ToSend`, `ToUpdate`; `lib/data/foods/food_reference.dart` holds `FoodReference` with `MfpReference`, `EkkloReference`, `OwnCopyReference`. A provider sits in the file of the type it builds (`journalProvider` in `lib/pages/journal/journal_notifier.dart`). Helpers used by one file stay private there (`_Orphan` in `lib/domain/comparison/compare_ekklo_day.dart`, `_Holder` in `lib/domain/comparison/adopt_waiting.dart`).
 
 7. **Inject collaborators through private initializing formals.**
    Why: the dependency stays private without a second field declaration or an initializer list.
@@ -78,9 +84,15 @@ Each rule: what to do, why, where the repo already does it.
    const JournalService({
      required this._mfp,
      required this._ekklo,
+     required this._entries,
      required this._links,
+     required this._unattended,
      required this._memory,
+     required this._foods,
+     required this._meals,
+     required this._database,
      required this._clock,
+     required this._roles,
    });
    ```
    Positional form in repositories: `const SentLinkRepository(this._database);` (`lib/data/links/sent_link_repository.dart`).
@@ -91,10 +103,10 @@ Each rule: what to do, why, where the repo already does it.
 
 9. **Make every model a `dart_mappable` class; sealed unions carry a discriminator key and one value per subtype.**
    Why: one generated encoding serves SQLite rows, equality, `copyWith` and test assertions. `build.yaml` sets `caseStyle: snakeCase` (so `mfpEntryId` maps to `mfp_entry_id`, the column name) and `ignoreNull: true`.
-   Examples: `SentLink` (`lib/data/links/sent_link.dart`); `RememberedFood` uses `discriminatorKey: 'kind'` with `'ekklo'` and `'own_copy'`, the same values as the `CHECK` constraint in `lib/data/database/schema.dart`; `EntryStatus` uses `discriminatorKey: 'status'`; enums use `@MappableEnum()` (`UpdateKind` in `lib/domain/comparison/update_kind.dart`).
+   Examples: `SentLink` (`lib/data/links/sent_link.dart`); `FoodReference` (`lib/data/foods/food_reference.dart`) uses `discriminatorKey: 'kind'` with `'mfp'`, `'ekklo'` and `'own_copy'`, the same values as the `CHECK` constraint on `food_reference` in `lib/data/database/schema.dart`; `Backup` (`lib/data/backup/backup.dart`) uses `discriminatorKey: Backup.versionKey`, one value per subtype, or a predicate when a subtype reads several versions (`BackupV2.isMemoryFile`, versions 1 and 2); `EntryStatus` uses `discriminatorKey: 'status'`; enums use `@MappableEnum()` (`UpdateKind` in `lib/domain/comparison/update_kind.dart`).
    ```dart
    @MappableClass(discriminatorKey: 'kind')
-   sealed class RememberedFood with RememberedFoodMappable {
+   sealed class FoodReference with FoodReferenceMappable {
    ```
    Regenerate with `dart run build_runner build`; never edit a `*.mapper.dart`.
 

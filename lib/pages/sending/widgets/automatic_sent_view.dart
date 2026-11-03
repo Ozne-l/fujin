@@ -8,6 +8,7 @@ import 'package:fujin/domain/sending/review_reason.dart';
 import 'package:fujin/domain/sending/send_report.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
@@ -94,7 +95,7 @@ class _ChoiceRow extends ConsumerWidget {
               spacing: FujinSpace.s1,
               children: [
                 Text(
-                  sent.entry.food.description,
+                  FoodText.name(context.intl, sent.entry.foodName),
                   style: FujinText.inter15Medium.copyWith(
                     color: context.colors.textPrimary,
                   ),
@@ -142,7 +143,7 @@ class _ChoiceRow extends ConsumerWidget {
   }
 
   void _review(BuildContext context, WidgetRef ref) {
-    final kept = ref.read(keptChoicesProvider(sent.entry.date).notifier);
+    final kept = ref.read(keptChoicesProvider(sent.entry.entry.date).notifier);
     final messenger = ScaffoldMessenger.of(context);
     final router = GoRouter.of(context);
     final intl = context.intl;
@@ -204,7 +205,7 @@ class _ChoiceRow extends ConsumerWidget {
         SendFailure.ekkloSession => intl.ekkloSessionExpired,
         SendFailure.mfpSession => intl.mfpSessionExpired,
         SendFailure.blockedInDev => intl.interruptedDev(
-          sent.entry.food.description,
+          FoodText.name(intl, sent.entry.foodName),
         ),
         SendFailure.refused || SendFailure.other => intl.keepFailed,
       };

@@ -20,8 +20,7 @@ EntryPlanning plan(
   EkkloFood? rememberedFood,
   List<EkkloFood>? searchResults,
 }) => planEntry(
-  entry: entry,
-  entryId: entry.id ?? '',
+  entry: loggedEntry(entry),
   memory: remembered,
   rememberedFood: rememberedFood,
   searchResults: searchResults,

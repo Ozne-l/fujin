@@ -5,10 +5,10 @@ import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_test/flutter_test.dart'
     show group, setUp, tearDown, test;
 import 'package:fujin/data/database/fujin_database.dart';
-import 'package:fujin/data/links/sent_link_repository.dart';
+import 'package:fujin/data/entries/ekklo_link.dart';
+import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
-import 'package:fujin/data/unattended/unattended_item_repository.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/sending/review_reason.dart';
@@ -24,41 +24,41 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../../support/fake_backends.dart';
 import '../../support/fixtures.dart';
+import '../../support/repositories.dart';
 
 const _gratin = 'mfp-gratin';
 const _gratinName = 'Gratin dauphinois maison';
 const _portion = 'portion';
+const _nameless = '';
 
 void main() {
   late FujinDatabase database;
-  late SentLinkRepository links;
+  late EntryRepository entries;
   late MemoryRepository memoryRepository;
   late FakeBackends backends;
 
   Future<(JournalService, SendService)> services() async {
     final ekklo = await backends.ekklo();
-    final unattended = UnattendedItemRepository(database);
-    final journal = JournalService(
+    final journal = journalOver(
+      database,
       mfp: await backends.mfp(),
       ekklo: ekklo,
-      links: links,
-      unattended: unattended,
-      memory: memoryRepository,
-      database: database,
-      clock: () => now,
     );
-    return (
-      journal,
-      SendService(
-        journal: journal,
-        ekklo: ekklo,
-        memory: memoryRepository,
-        links: links,
-        unattended: unattended,
-        database: database,
-        clock: () => now,
-      ),
-    );
+    return (journal, sendingOver(database, journal: journal, ekklo: ekklo));
+  }
+
+  List<EkkloLink> linked() => [
+    for (final link in entries.ekkloLinks())
+      if (link.deletedAt == null && link.item != null) link,
+  ];
+
+  String? entryOf(String mfpEntryId) =>
+      entries.findByMfpEntryId(mfpEntryId)?.entry.id;
+
+  String sentEarlier(String mfpEntryId, String itemId) {
+    final id = storeEntry(database, entry(mfpEntryId), 'e-$mfpEntryId');
+    entries.linkItem(id, ekkloMealId: 'meal-1', ekkloItemId: itemId);
+    return id;
   }
 
   Future<SendPlan> planDay(SendService sending) =>
@@ -84,8 +84,8 @@ void main() {
 
   setUp(() {
     database = FujinDatabase.inMemory();
-    links = SentLinkRepository(database);
-    memoryRepository = MemoryRepository(database);
+    entries = entriesOf(database);
+    memoryRepository = memoryOf(database);
     memory.matches.forEach(memoryRepository.saveFood);
     memory.units.forEach(memoryRepository.saveUnit);
     memory.meals.forEach(memoryRepository.saveMeal);
@@ -109,8 +109,8 @@ void main() {
     check(
       [for (final item in backends.ekkloItems) item.quantity],
     ).deepEquals([100, 180, 50]);
-    check(links.forDate(day)).length.equals(3);
-    check((await journal.readDay(day)).counts.inEkklo).equals(3);
+    check(linked()).length.equals(3);
+    check((await journal.readDay(day)).counts().inEkklo).equals(3);
     check(report)
       ..has((it) => it.sent, 'sent').equals(3)
       ..has((it) => it.reused, 'reused').equals(3);
@@ -147,13 +147,86 @@ void main() {
     ).isNotNull().isCloseTo(80 * 100 / 62, 1e-9);
     check(remembered.ekkloMealName(snacks)).equals(snacks);
     check(appendedMeals()).deepEquals([snacks]);
-    check((await journal.readDay(day)).counts.inEkklo).equals(1);
+    check((await journal.readDay(day)).counts().inEkklo).equals(1);
     check(report)
       ..has((it) => it.newAssociations, 'associations').deepEquals([
         'Skyr nature',
       ])
       ..has((it) => it.weights.length, 'weights').equals(1)
       ..has((it) => it.reused, 'reused').equals(0);
+  });
+
+  test('keeps the full MyFitnessPal name of a food it sends', () async {
+    backends = FakeBackends(
+      entries: [
+        entry(
+          'E-1',
+          food: skyr,
+          description: 'Isey - Skyr nature',
+          brand: 'Isey',
+          meal: snacks,
+          unit: pot,
+          servingValue: 1,
+          nutrients: nutrients(kcal: 80, protein: 12.5, carbs: 5, fat: 0.25),
+        ),
+      ],
+      ekkloSearches: {
+        'skyr': [isey],
+      },
+    );
+    final (_, sending) = await services();
+
+    await send(sending, await planDay(sending));
+
+    check(
+      foodsOf(database).foodOfMfp(skyr)?.name,
+    ).equals('Isey - Skyr nature');
+  });
+
+  test('keeps the full MyFitnessPal name of a food it copies', () async {
+    backends = FakeBackends(
+      entries: [
+        entry(
+          'E-1',
+          food: skyr,
+          description: 'Isey - Skyr nature',
+          brand: 'Isey',
+          nutrients: nutrients(kcal: 64, protein: 10),
+        ),
+      ],
+    );
+    final (_, sending) = await services();
+
+    await send(sending, await planDay(sending));
+
+    check(backends.ekkloFoods).length.equals(1);
+    check(
+      foodsOf(database).foodOfMfp(skyr)?.name,
+    ).equals('Isey - Skyr nature');
+  });
+
+  test('never creates an own copy for a food with no name', () async {
+    backends = FakeBackends(
+      entries: [
+        entry(
+          'E-1',
+          food: _gratin,
+          description: _nameless,
+          nutrients: nutrients(kcal: 300),
+        ),
+      ],
+    );
+    final (_, sending) = await services();
+    final plan = await planDay(sending);
+
+    check(plan.entries.single)
+      ..has((it) => it.choice, 'choice').equals(const SendAsOwnCopy())
+      ..has((it) => it.sends, 'sends').isFalse();
+
+    await send(sending, plan);
+
+    check(backends.ekkloFoods).isEmpty();
+    check(backends.ekkloItems).isEmpty();
   });
 
   test(
@@ -189,7 +262,7 @@ void main() {
       check(memoryRepository.load().food(_gratin, _portion)).isA<OwnCopy>()
         ..has((it) => it.ekkloFoodId, 'food').equals(copy.id)
         ..has((it) => it.mfpUnit, 'unit').equals(_portion);
-      check((await journal.readDay(day)).counts.inEkklo).equals(1);
+      check((await journal.readDay(day)).counts().inEkklo).equals(1);
       check(report.ownCopies).deepEquals([_gratinName]);
     },
   );
@@ -238,10 +311,11 @@ void main() {
       _portion: EkkloQuantityType.portion,
       grams: EkkloQuantityType.grams,
     });
-    for (final link in links.forDate(day)) {
-      links.remove(link.mfpEntryId);
+    for (final link in linked()) {
+      entries.unlinkItem(link.entryId);
     }
-    check((await journal.readDay(day)).counts.inEkklo).equals(2);
+    check(linked()).isEmpty();
+    check((await journal.readDay(day)).counts().inEkklo).equals(2);
   });
 
   test('reuses the own copy created before an interruption', () async {
@@ -268,7 +342,7 @@ void main() {
     final copy = backends.ekkloFoods.single;
     check(backends.ekkloItems.single.foodId).equals(copy.id);
     check(report.ownCopies).isEmpty();
-    check((await journal.readDay(day)).counts.inEkklo).equals(1);
+    check((await journal.readDay(day)).counts().inEkklo).equals(1);
   });
 
   test('reads the remembered Ekklo food to weigh a new unit', () async {
@@ -305,7 +379,7 @@ void main() {
   });
 
   test('changes only the quantity of an item whose servings changed', () async {
-    links.add(link('E-1', 'I-1'));
+    final before = sentEarlier('E-1', 'I-1');
     backends = FakeBackends(
       entries: [entry('E-2', servings: 2)],
       ekkloMeals: [
@@ -322,16 +396,20 @@ void main() {
     check(backends.ekkloItems.single)
       ..has((it) => it.id, 'id').equals('I-1')
       ..has((it) => it.quantity, 'quantity').equals(200);
+    check(entries.find(before)).isNull();
+    check([for (final link in linked()) link.entryId]).deepEquals([
+      ?entryOf('E-2'),
+    ]);
     check(
-      [for (final sent in links.forDate(day)) sent.mfpEntryId],
-    ).deepEquals(['E-2']);
-    check((await journal.readDay(day)).counts.inEkklo).equals(1);
+      linked().single.item,
+    ).isNotNull().has((item) => item.servings, 'servings').equals(2);
+    check((await journal.readDay(day)).counts().inEkklo).equals(1);
     check(report.updated).equals(1);
   });
 
   test('moves an item to the Ekklo meal of an entry moved in '
       'MyFitnessPal', () async {
-    links.add(link('E-1', 'I-1'));
+    sentEarlier('E-1', 'I-1');
     backends = FakeBackends(
       entries: [entry('E-2', meal: lunch)],
       ekkloMeals: [
@@ -346,7 +424,10 @@ void main() {
     check(appendedMeals()).deepEquals([dejeuner]);
     check(backends.ekkloItems.single.id).not((it) => it.equals('I-1'));
     final read = await journal.readDay(day);
-    check(read.comparison.entries.single.status).isA<InEkklo>();
+    check(read.entries.single.status).isA<InEkklo>();
+    check([for (final link in linked()) link.entryId]).deepEquals([
+      ?entryOf('E-2'),
+    ]);
   });
 
   test('never sends twice a meal whose reply was lost', () async {
@@ -374,7 +455,7 @@ void main() {
 
     check(appendedMeals()).deepEquals([petitDejeuner, dejeuner]);
     check(backends.ekkloItems).length.equals(2);
-    check((await journal.readDay(day)).counts.inEkklo).equals(2);
+    check((await journal.readDay(day)).counts().inEkklo).equals(2);
   });
 
   test('sends again only the meal that failed', () async {
@@ -394,7 +475,7 @@ void main() {
 
     check(appendedMeals()).deepEquals([petitDejeuner, dejeuner, dejeuner]);
     check(backends.ekkloItems).length.equals(2);
-    check(links.forDate(day)).length.equals(2);
+    check(linked()).length.equals(2);
   });
 
   group('in automatic mode', () {
@@ -441,14 +522,14 @@ void main() {
         ..has(
           (it) => [for (final planned in it.unattended) planned.entryId],
           'unattended',
-        ).deepEquals(['E-2', 'E-3']);
+        ).deepEquals([?entryOf('E-2'), ?entryOf('E-3')]);
       final remembered = memoryRepository.load();
       check(remembered.food(skyr, pot)).isNull();
       check(remembered.gramsPerUnit(skyr, pot)).isNull();
       check(remembered.ekkloMealName(snacks)).isNull();
       check(remembered.food(_gratin, _portion)).isA<OwnCopy>();
       check(backends.ekkloItems).length.equals(3);
-      check((await journal.readDay(day)).counts.inEkklo).equals(3);
+      check((await journal.readDay(day)).counts().inEkklo).equals(3);
     });
 
     test('never sends twice an item or an own copy whose reply was '
@@ -464,7 +545,7 @@ void main() {
       final plan = await planDay(sending);
       await check(sendAutomatically(sending, plan)).throws<SendInterruption>();
 
-      check((await journal.readDay(day)).counts.inEkklo).equals(2);
+      check((await journal.readDay(day)).counts().inEkklo).equals(2);
       backends.lostReplies.clear();
       await sendAutomatically(sending, plan);
       await sendAutomatically(sending, await planDay(sending));
@@ -493,11 +574,12 @@ void main() {
       final next = await planDay(sending);
 
       check(
-        (await journal.readDay(day)).comparison.entries.first.status,
+        (await journal.readDay(day)).entries
+            .singleWhere((row) => row.logged.mfpLink?.mfpEntryId == 'E-2')
+            .status,
       ).isA<InEkklo>();
-      check(next.entries.single)
-        ..has((it) => it.entryId, 'entry').equals('E-4')
-        ..has((it) => it.reviewed, 'reviewed').isFalse();
+      check(next.entries.single.reviewed).isFalse();
+      check(entryOf('E-4')).equals(next.entries.single.entryId);
     });
 
     test(
@@ -530,13 +612,13 @@ void main() {
         backends.ekkloReachable = true;
 
         check(
-          (await journal.readDay(day)).comparison.entries.single.status,
+          (await journal.readDay(day)).entries.single.status,
         ).isA<ToUpdate>();
 
         await send(sending, await planDay(sending));
 
         check(backends.ekkloItems.single.quantity).equals(1998);
-        check((await journal.readDay(day)).counts.inEkklo).equals(1);
+        check((await journal.readDay(day)).counts().inEkklo).equals(1);
       },
     );
 
@@ -560,14 +642,14 @@ void main() {
         await sending.keep(sent.choose(other));
 
         check(
-          (await journal.readDay(day)).comparison.entries.single.status,
+          (await journal.readDay(day)).entries.single.status,
         ).isA<ToUpdate>();
         check(backends.ekkloItems.single.foodId).equals(isey.id);
 
         await send(sending, await planDay(sending));
 
         check(backends.ekkloItems.single.foodId).equals(siggis.id);
-        check((await journal.readDay(day)).counts.inEkklo).equals(1);
+        check((await journal.readDay(day)).counts().inEkklo).equals(1);
       },
     );
   });

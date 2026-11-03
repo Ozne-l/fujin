@@ -647,6 +647,11 @@
       "$type": "dimension",
       "$value": "20px"
     },
+    "pill-small-icon": {
+      "$type": "dimension",
+      "$value": "14px",
+      "$description": "Icon in a small pill, such as the MyFitnessPal clock."
+    },
     "motif-band": {
       "$type": "dimension",
       "$value": "252px",

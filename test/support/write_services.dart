@@ -1,32 +1,36 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:flutter_test/flutter_test.dart' show addTearDown;
+import 'package:fujin/data/connectors/connector_roles.dart';
 import 'package:fujin/data/database/fujin_database.dart';
-import 'package:fujin/data/links/sent_link_repository.dart';
-import 'package:fujin/data/memory/memory_repository.dart';
-import 'package:fujin/data/recents/recent_food_repository.dart';
-import 'package:fujin/data/unattended/unattended_item_repository.dart';
+import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_food_service.dart';
-import 'package:fujin/domain/adding/add_outcome.dart';
+import 'package:fujin/domain/adding/added_food.dart';
+import 'package:fujin/domain/adding/entry_writer.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/compared_entry_lookup.dart';
 import 'package:fujin/domain/editing/edit_entry_service.dart';
 import 'package:fujin/domain/editing/remove_entry_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/sending/send_service.dart';
+import 'package:fujin/domain/writing/background_writer.dart';
 import 'package:http/http.dart' as http;
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import 'fake_backends.dart';
 import 'fixtures.dart';
+import 'repositories.dart';
 
 final class WriteServices {
   WriteServices._(
     this.backends,
-    this.links,
+    this.entries,
     this.journal,
+    this.sending,
     this.adding,
     this.removing,
     this.editing,
+    this.background,
   );
 
   static Future<WriteServices> over(
@@ -35,6 +39,7 @@ final class WriteServices {
     http.Client? httpClient,
     EkkloTokenStore? ekkloTokens,
     DateTime Function()? clock,
+    ConnectorRoles Function()? roles,
   }) async {
     final mfp = backends.mfpWith(
       InMemoryMfpSessionStore(),
@@ -45,59 +50,74 @@ final class WriteServices {
       ekkloTokens ?? await backends.ekkloTokenStore(),
       client: httpClient,
     );
-    final links = SentLinkRepository(database);
-    final memoryRepository = MemoryRepository(database);
-    final unattended = UnattendedItemRepository(database);
-    final journal = JournalService(
+    final entries = entriesOf(database);
+    final foods = foodsOf(database);
+    final memoryRepository = memoryOf(database);
+    final journal = journalOver(
+      database,
       mfp: mfp,
       ekklo: ekklo,
-      links: links,
-      unattended: unattended,
-      memory: memoryRepository,
-      database: database,
-      clock: () => now,
+      roles: roles,
     );
-    final sending = SendService(
-      journal: journal,
-      ekklo: ekklo,
-      memory: memoryRepository,
-      links: links,
-      unattended: unattended,
+    final sending = sendingOver(database, journal: journal, ekklo: ekklo);
+    final writeClock = clock ?? () => now;
+    final writer = EntryWriter(
       database: database,
-      clock: () => now,
+      foods: foods,
+      meals: mealsOf(database),
+      entries: entries,
+      clock: writeClock,
     );
+    final background = BackgroundWriter(
+      mfp: mfp,
+      sending: sending,
+      memory: memoryRepository,
+      entries: entries,
+      writer: writer,
+    );
+    addTearDown(background.run);
     return WriteServices._(
       backends,
-      links,
+      entries,
       journal,
+      sending,
       AddFoodService(
         mfp: mfp,
-        ekklo: ekklo,
         sending: sending,
         memory: memoryRepository,
-        recents: RecentFoodRepository(database),
-        clock: clock ?? () => now,
+        foods: foods,
+        recents: recentsOf(database),
+        writer: writer,
+        background: background,
+        clock: writeClock,
       ),
-      RemoveEntryService(mfp: mfp, journal: journal, sending: sending),
+      RemoveEntryService(entries: entries, background: background),
       EditEntryService(
         mfp: mfp,
-        ekklo: ekklo,
-        journal: journal,
         sending: sending,
         memory: memoryRepository,
+        foods: foods,
+        entries: entries,
+        writer: writer,
+        background: background,
       ),
+      background,
     );
   }
 
   final FakeBackends backends;
-  final SentLinkRepository links;
+  final EntryRepository entries;
   final JournalService journal;
+  final SendService sending;
   final AddFoodService adding;
   final RemoveEntryService removing;
   final EditEntryService editing;
+  final BackgroundWriter background;
 
-  Future<AddOutcome> add(AddDraft draft) async =>
+  Future<AddedFood> add(AddDraft draft) async =>
       adding.add(draft, await adding.plan(draft));
+
+  Future<void> settle() => background.run();
 
   Future<ComparedEntry?> find(String entryId, DateTime date) async =>
       (await journal.readDay(date)).comparison.entryWithId(entryId);

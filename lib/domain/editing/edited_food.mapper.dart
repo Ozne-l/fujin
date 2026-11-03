@@ -15,9 +15,7 @@ class EditedFoodMapper extends ClassMapperBase<EditedFood> {
   static EditedFoodMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = EditedFoodMapper._());
-      MfpFoodEntryMapper.ensureInitialized();
-      PlannedEntryMapper.ensureInitialized();
-      SentLinkMapper.ensureInitialized();
+      LoggedEntryMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -25,53 +23,29 @@ class EditedFoodMapper extends ClassMapperBase<EditedFood> {
   @override
   final String id = 'EditedFood';
 
-  static String _$originalId(EditedFood v) => v.originalId;
-  static const Field<EditedFood, String> _f$originalId = Field(
-    'originalId',
-    _$originalId,
-    key: r'original_id',
-  );
-  static MfpFoodEntry _$original(EditedFood v) => v.original;
-  static const Field<EditedFood, MfpFoodEntry> _f$original = Field(
+  static LoggedEntry _$original(EditedFood v) => v.original;
+  static const Field<EditedFood, LoggedEntry> _f$original = Field(
     'original',
     _$original,
   );
-  static PlannedEntry _$planned(EditedFood v) => v.planned;
-  static const Field<EditedFood, PlannedEntry> _f$planned = Field(
-    'planned',
-    _$planned,
-  );
-  static bool _$ekkloWritten(EditedFood v) => v.ekkloWritten;
-  static const Field<EditedFood, bool> _f$ekkloWritten = Field(
-    'ekkloWritten',
-    _$ekkloWritten,
-    key: r'ekklo_written',
-  );
-  static SentLink? _$link(EditedFood v) => v.link;
-  static const Field<EditedFood, SentLink> _f$link = Field(
-    'link',
-    _$link,
-    opt: true,
+  static LoggedEntry _$entry(EditedFood v) => v.entry;
+  static const Field<EditedFood, LoggedEntry> _f$entry = Field(
+    'entry',
+    _$entry,
   );
 
   @override
   final MappableFields<EditedFood> fields = const {
-    #originalId: _f$originalId,
     #original: _f$original,
-    #planned: _f$planned,
-    #ekkloWritten: _f$ekkloWritten,
-    #link: _f$link,
+    #entry: _f$entry,
   };
   @override
   final bool ignoreNull = true;
 
   static EditedFood _instantiate(DecodingData data) {
     return EditedFood(
-      originalId: data.dec(_f$originalId),
       original: data.dec(_f$original),
-      planned: data.dec(_f$planned),
-      ekkloWritten: data.dec(_f$ekkloWritten),
-      link: data.dec(_f$link),
+      entry: data.dec(_f$entry),
     );
   }
 
@@ -135,16 +109,9 @@ extension EditedFoodValueCopy<$R, $Out>
 
 abstract class EditedFoodCopyWith<$R, $In extends EditedFood, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  MfpFoodEntryCopyWith<$R, MfpFoodEntry, MfpFoodEntry> get original;
-  PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry> get planned;
-  SentLinkCopyWith<$R, SentLink, SentLink>? get link;
-  $R call({
-    String? originalId,
-    MfpFoodEntry? original,
-    PlannedEntry? planned,
-    bool? ekkloWritten,
-    SentLink? link,
-  });
+  LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get original;
+  LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get entry;
+  $R call({LoggedEntry? original, LoggedEntry? entry});
   EditedFoodCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -157,37 +124,22 @@ class _EditedFoodCopyWithImpl<$R, $Out>
   late final ClassMapperBase<EditedFood> $mapper =
       EditedFoodMapper.ensureInitialized();
   @override
-  MfpFoodEntryCopyWith<$R, MfpFoodEntry, MfpFoodEntry> get original =>
+  LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get original =>
       $value.original.copyWith.$chain((v) => call(original: v));
   @override
-  PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry> get planned =>
-      $value.planned.copyWith.$chain((v) => call(planned: v));
+  LoggedEntryCopyWith<$R, LoggedEntry, LoggedEntry> get entry =>
+      $value.entry.copyWith.$chain((v) => call(entry: v));
   @override
-  SentLinkCopyWith<$R, SentLink, SentLink>? get link =>
-      $value.link?.copyWith.$chain((v) => call(link: v));
-  @override
-  $R call({
-    String? originalId,
-    MfpFoodEntry? original,
-    PlannedEntry? planned,
-    bool? ekkloWritten,
-    Object? link = $none,
-  }) => $apply(
+  $R call({LoggedEntry? original, LoggedEntry? entry}) => $apply(
     FieldCopyWithData({
-      if (originalId != null) #originalId: originalId,
       if (original != null) #original: original,
-      if (planned != null) #planned: planned,
-      if (ekkloWritten != null) #ekkloWritten: ekkloWritten,
-      if (link != $none) #link: link,
+      if (entry != null) #entry: entry,
     }),
   );
   @override
   EditedFood $make(CopyWithData data) => EditedFood(
-    originalId: data.get(#originalId, or: $value.originalId),
     original: data.get(#original, or: $value.original),
-    planned: data.get(#planned, or: $value.planned),
-    ekkloWritten: data.get(#ekkloWritten, or: $value.ekkloWritten),
-    link: data.get(#link, or: $value.link),
+    entry: data.get(#entry, or: $value.entry),
   );
 
   @override

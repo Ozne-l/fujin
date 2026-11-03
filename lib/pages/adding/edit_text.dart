@@ -1,5 +1,5 @@
 import 'package:ekklo_client/ekklo_client.dart';
-import 'package:fujin/data/links/sent_link.dart';
+import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/comparison/entry_quantity.dart';
 import 'package:fujin/domain/editing/ekklo_edit.dart';
@@ -56,9 +56,9 @@ abstract final class EditText {
 
   static String? readOnly(AppLocalizations intl, ReadProblem? problem) =>
       switch (problem) {
-        ReadProblem.offline => intl.editOffline,
         ReadProblem.mfpSessionExpired => intl.editMfpSessionExpired,
         ReadProblem.ekkloSessionExpired => intl.editEkkloSessionExpired,
+        ReadProblem.offline ||
         ReadProblem.mfpUnavailable ||
         ReadProblem.ekkloUnavailable ||
         ReadProblem.unknown ||
@@ -66,7 +66,7 @@ abstract final class EditText {
       };
 
   static String _amount(AppLocalizations intl, PlannedEntry planned) =>
-      switch ((planned.choice, entryGrams(planned.entry))) {
+      switch ((planned.choice, entryGrams(planned.entry.entry))) {
         (SendToEkkloFood(:final grams), _) => SendText.grams(intl, grams),
         (_, final grams?) => SendText.grams(intl, grams),
         (_, null) => EntryText.serving(intl, planned.entry),
@@ -75,9 +75,12 @@ abstract final class EditText {
   static String _itemAmount(
     AppLocalizations intl,
     EkkloDailyMealItem item,
-    SentLink link,
-  ) => switch (item.quantityType == EkkloQuantityType.grams) {
-    true => SendText.grams(intl, item.quantity),
-    false => EntryText.linkServing(intl, link),
+    EkkloLink link,
+  ) => switch ((item.quantityType, link.item)) {
+    (EkkloQuantityType.grams, _) || (_, null) => SendText.grams(
+      intl,
+      item.quantity,
+    ),
+    (_, final linked?) => EntryText.linkServing(intl, linked),
   };
 }

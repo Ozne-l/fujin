@@ -9,6 +9,7 @@ import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/sheet_frame.dart';
 import 'package:fujin/pages/common/source_dot.dart';
 import 'package:fujin/pages/sending/ekklo_search_notifier.dart';
@@ -73,7 +74,7 @@ class _MatchSheet extends HookConsumerWidget {
     final navigator = Navigator.of(context);
 
     return SheetFrame(
-      title: entry.food.description,
+      title: FoodText.name(context.intl, entry.foodName),
       subtitle: EntryText.brandedServing(context.intl, entry),
       lead: [_MfpReference(planned: planned)],
       initialQuery: search.query,
@@ -205,7 +206,7 @@ class _MfpReference extends StatelessWidget {
             ],
           ),
           Text(
-            EntryText.macros(context.intl, planned.entry.nutrients),
+            EntryText.macros(context.intl, planned.entry.entry.nutrients),
             style: FujinText.inter12Medium.copyWith(
               color: context.colors.textTertiary,
             ),

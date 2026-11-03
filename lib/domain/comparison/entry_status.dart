@@ -1,5 +1,5 @@
 import 'package:dart_mappable/dart_mappable.dart';
-import 'package:fujin/data/links/sent_link.dart';
+import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/domain/comparison/update_kind.dart';
 
 part 'entry_status.mapper.dart';
@@ -13,7 +13,7 @@ sealed class EntryStatus with EntryStatusMappable {
 final class InEkklo extends EntryStatus with InEkkloMappable {
   const InEkklo(this.link);
 
-  final SentLink link;
+  final EkkloLink link;
 }
 
 @MappableClass(discriminatorValue: 'to_send')
@@ -25,6 +25,6 @@ final class ToSend extends EntryStatus with ToSendMappable {
 final class ToUpdate extends EntryStatus with ToUpdateMappable {
   const ToUpdate(this.link, this.kind);
 
-  final SentLink link;
+  final EkkloLink link;
   final UpdateKind kind;
 }

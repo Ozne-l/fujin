@@ -1,4 +1,12 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/data/database/id_source.dart';
+import 'package:fujin/data/entries/ekklo_link.dart';
+import 'package:fujin/data/entries/entry.dart';
+import 'package:fujin/data/entries/linked_item.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
+import 'package:fujin/data/entries/mfp_link.dart';
+import 'package:fujin/data/entries/unattended_expectation.dart';
+import 'package:fujin/data/foods/food.dart';
 import 'package:fujin/data/links/sent_link.dart';
 import 'package:fujin/data/memory/meal_mapping.dart';
 import 'package:fujin/data/memory/memory.dart';
@@ -9,6 +17,7 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 final day = DateTime.utc(2026, 10, 7);
 final now = DateTime.utc(2026, 10, 7, 20);
+final sentAt = DateTime.utc(2026, 10, 7, 9);
 
 const breakfast = 'Breakfast';
 const lunch = 'Lunch';
@@ -136,7 +145,7 @@ SentLink link(
   mfpServingUnit: unit,
   ekkloMealId: ekkloMeal,
   ekkloItemId: itemId,
-  sentAt: DateTime.utc(2026, 10, 7, 9),
+  sentAt: sentAt,
 );
 
 UnattendedItem unattendedItem(
@@ -148,6 +157,91 @@ UnattendedItem unattendedItem(
 }) => UnattendedItem(
   mfpEntryId: entryId,
   date: day,
+  ekkloMealName: ekkloMeal,
+  ekkloFoodId: food,
+  quantity: quantity,
+  quantityType: type,
+);
+
+Entry entryRow(
+  String id, {
+  required String foodId,
+  required String mealId,
+  double servings = 1,
+  double servingValue = 100,
+  String unit = grams,
+  DateTime? date,
+}) => Entry(
+  id: id,
+  date: date ?? day,
+  mealId: mealId,
+  foodId: foodId,
+  servingValue: servingValue,
+  servingUnit: unit,
+  servings: servings,
+  updatedAt: now,
+);
+
+MfpLink mfpLinkRow(
+  String id, {
+  required String entryId,
+  required String mfpEntryId,
+  String food = oats,
+  String meal = breakfast,
+  double servings = 1,
+  double servingValue = 100,
+  String unit = grams,
+}) => MfpLink(
+  id: id,
+  entryId: entryId,
+  mfpEntryId: mfpEntryId,
+  date: day,
+  mealName: meal,
+  foodId: food,
+  servings: servings,
+  servingValue: servingValue,
+  servingUnit: unit,
+  updatedAt: now,
+);
+
+EkkloLink ekkloLinkRow(
+  String id, {
+  required String entryId,
+  LinkedItem? item,
+  UnattendedExpectation? unattended,
+}) => EkkloLink(
+  id: id,
+  entryId: entryId,
+  item: item,
+  unattended: unattended,
+  updatedAt: now,
+);
+
+LinkedItem linkedItem(
+  String itemId, {
+  required String mealId,
+  required String foodId,
+  String ekkloMeal = 'meal-1',
+  double servings = 1,
+  double servingValue = 100,
+  String unit = grams,
+}) => LinkedItem(
+  ekkloMealId: ekkloMeal,
+  ekkloItemId: itemId,
+  mealId: mealId,
+  foodId: foodId,
+  servings: servings,
+  servingValue: servingValue,
+  servingUnit: unit,
+  sentAt: sentAt,
+);
+
+UnattendedExpectation expectation({
+  String food = oatsInEkklo,
+  String ekkloMeal = petitDejeuner,
+  double quantity = 100,
+  EkkloQuantityType type = EkkloQuantityType.grams,
+}) => UnattendedExpectation(
   ekkloMealName: ekkloMeal,
   ekkloFoodId: food,
   quantity: quantity,
@@ -254,4 +348,69 @@ MfpFood mfpFood(
   verified: verified,
   servingSizes: servingSizes,
   nutrients: nutrients,
+);
+
+LoggedEntry loggedEntry(MfpFoodEntry entry) {
+  final id = entry.id ?? 'entry';
+  return LoggedEntry(
+    entry: Entry.copyOf(
+      entry,
+      id: id,
+      mealId: fujinMealId(entry.mealName),
+      foodId: fujinFoodId(entry.food.id),
+      updatedAt: now,
+    ),
+    mealName: entry.mealName,
+    foodName: entry.food.description,
+    brand: entry.food.brandName,
+    mfpFoodId: entry.food.id,
+    mfpLink: MfpLink.of(
+      entry,
+      id: 'mfp-link-$id',
+      entryId: id,
+      mfpEntryId: id,
+      updatedAt: now,
+    ),
+  );
+}
+
+String fujinFoodId(String mfpFoodId) => 'food-$mfpFoodId';
+
+String fujinMealId(String mfpMealName) => 'meal-$mfpMealName';
+
+Food? storedFood(String mfpFoodId) => switch (mfpFoodId) {
+  oats || rice => Food(
+    id: fujinFoodId(mfpFoodId),
+    name: mfpFoodId,
+    updatedAt: now,
+  ),
+  _ => null,
+};
+
+String? knownMeal(String mfpMealName) => switch (mfpMealName) {
+  breakfast || lunch => fujinMealId(mfpMealName),
+  _ => null,
+};
+
+IdSource idsFrom(String prefix) {
+  var next = 0;
+  return () => '$prefix-${++next}';
+}
+
+LinkedItem sentItem(
+  String itemId, {
+  String food = oats,
+  String meal = breakfast,
+  String ekkloMeal = 'meal-1',
+  double servings = 1,
+  double servingValue = 100,
+  String unit = grams,
+}) => linkedItem(
+  itemId,
+  mealId: fujinMealId(meal),
+  foodId: fujinFoodId(food),
+  ekkloMeal: ekkloMeal,
+  servings: servings,
+  servingValue: servingValue,
+  unit: unit,
 );

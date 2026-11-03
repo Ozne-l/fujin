@@ -1,17 +1,20 @@
-import 'package:fujin/data/links/sent_link.dart';
+import 'package:fujin/data/entries/linked_item.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
+import 'package:fujin/data/foods/food_nutrients.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 abstract final class EntryText {
-  static String serving(AppLocalizations intl, MfpFoodEntry entry) =>
+  static const _macroDecimals = 1;
+
+  static String serving(AppLocalizations intl, LoggedEntry logged) =>
       intl.servingLine(
-        entry.servings,
-        entry.servingSize.value,
-        entry.servingSize.unit,
+        logged.entry.servings,
+        logged.entry.servingValue,
+        logged.entry.servingUnit,
       );
 
-  static String brandedServing(AppLocalizations intl, MfpFoodEntry entry) =>
-      branded(intl, entry.food.brandName, serving(intl, entry));
+  static String brandedServing(AppLocalizations intl, LoggedEntry logged) =>
+      branded(intl, logged.brand, serving(intl, logged));
 
   static String branded(
     AppLocalizations intl,
@@ -22,23 +25,22 @@ abstract final class EntryText {
     final brand => intl.brandedServingLine(brand, serving),
   };
 
-  static String linkServing(AppLocalizations intl, SentLink link) =>
-      intl.servingLine(
-        link.mfpServings,
-        link.mfpServingValue,
-        link.mfpServingUnit,
-      );
+  static String linkServing(AppLocalizations intl, LinkedItem item) =>
+      intl.servingLine(item.servings, item.servingValue, item.servingUnit);
 
-  static String linkedServing(AppLocalizations intl, SentLink link) =>
-      intl.inEkkloAs(linkServing(intl, link));
+  static String linkedServing(AppLocalizations intl, LinkedItem item) =>
+      intl.inEkkloAs(linkServing(intl, item));
 
-  static String energy(AppLocalizations intl, MfpFoodEntry entry) =>
-      intl.kilocalories(entry.nutrients.energy?.kilocalories ?? 0);
+  static String energy(AppLocalizations intl, LoggedEntry logged) =>
+      intl.kilocalories(logged.entry.nutrients.kilocalories ?? 0);
 
-  static String macros(AppLocalizations intl, MfpNutrients nutrients) {
+  static String macro(AppLocalizations intl, double grams) =>
+      intl.macroValue(double.parse(grams.toStringAsFixed(_macroDecimals)));
+
+  static String macros(AppLocalizations intl, FoodNutrients nutrients) {
     String amount(double? grams) => switch (grams) {
       null => intl.macroUnknown,
-      final grams => intl.macroValue(grams),
+      final grams => macro(intl, grams),
     };
     return intl.macros(
       amount(nutrients.protein),

@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/adding/added_food.dart';
+import 'package:fujin/domain/comparison/replacement.dart';
 import 'package:fujin/domain/editing/edited_food.dart';
 import 'package:fujin/domain/sending/food_words.dart';
+import 'package:fujin/domain/writing/write_failure.dart';
+import 'package:fujin/domain/writing/writer_state.dart';
+import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/snack_bar_content.dart';
 import 'package:fujin/pages/common/snack_bar_glyph.dart';
-import 'package:fujin/pages/journal/journal_text.dart';
 import 'package:fujin/pages/journal/removal_reason.dart';
 import 'package:fujin/pages/journal/remove_entry_state.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
+import 'package:fujin/pages/journal/writer_state_ids.dart';
+import 'package:fujin/pages/sending/send_failure.dart';
 
 abstract final class JournalSnackBar {
   static const undoWindow = Duration(seconds: 8);
@@ -34,11 +41,10 @@ abstract final class JournalSnackBar {
       duration: undoWindow,
       content: SnackBarContent(
         glyph: SnackBarGlyph.done,
-        title: context.intl.foodAdded(productName(entry.food)),
-        detail: switch (added.ekkloWritten) {
-          true => context.intl.foodAddedBothSides(entry.mealName),
-          false => context.intl.foodAddedMfpOnly(entry.mealName),
-        },
+        title: context.intl.foodAdded(
+          FoodText.name(context.intl, productName(entry)),
+        ),
+        detail: entry.mealName,
         action: (context.intl.undoAdd, onUndo),
       ),
     );
@@ -51,61 +57,18 @@ abstract final class JournalSnackBar {
       RemovalReason.undoAdd => (
         SnackBarGlyph.undone,
         intl.addUndone,
-        intl.addUndoneDetail,
+        entry.mealName,
       ),
       RemovalReason.delete => (
         SnackBarGlyph.done,
-        intl.foodDeleted(productName(entry.food)),
-        switch (done.ekkloRemoved) {
-          true => intl.foodDeletedDetail(entry.mealName),
-          false => intl.foodDeletedMfpOnlyDetail(entry.mealName),
-        },
+        intl.foodDeleted(FoodText.name(intl, productName(entry))),
+        entry.mealName,
       ),
     };
     show(
       context,
       duration: _settledDuration,
       content: SnackBarContent(glyph: glyph, title: title, detail: detail),
-    );
-  }
-
-  static void removeFailed(
-    BuildContext context,
-    RemoveEntryFailed failed, {
-    required VoidCallback onRetry,
-  }) {
-    final intl = context.intl;
-    final food = productName(failed.removal.entry.food);
-    final reason = switch (failed.blockedInDev) {
-      true => intl.writeBlockedInDev,
-      false => JournalText.problemHeadline(intl, failed.problem),
-    };
-    final (title, detail) = switch ((
-      failed.removedFromEkklo,
-      failed.removal.reason,
-    )) {
-      (true, _) => (intl.addStillInMfp, intl.addStillInMfpDetail(food)),
-      (false, RemovalReason.undoAdd) => (intl.addNotUndone, reason),
-      (false, RemovalReason.delete) => (
-        intl.foodNotDeleted(food),
-        switch (failed.blockedInDev) {
-          true => reason,
-          false => intl.foodNotDeletedDetail,
-        },
-      ),
-    };
-    show(
-      context,
-      duration: undoWindow,
-      content: SnackBarContent(
-        glyph: SnackBarGlyph.alert,
-        title: title,
-        detail: detail,
-        action: switch (failed.blockedInDev) {
-          true => null,
-          false => (intl.tryAgain, onRetry),
-        },
-      ),
     );
   }
 
@@ -117,32 +80,25 @@ abstract final class JournalSnackBar {
   }) {
     final intl = context.intl;
     final entry = edited.entry;
-    final food = productName(entry.food);
-    final serving = EntryText.serving(intl, entry);
+    final food = FoodText.name(intl, productName(entry));
     final (title, detail, action) = switch ((
-      SelectedDay.calendarDay(entry.date) ==
-          SelectedDay.calendarDay(edited.original.date),
+      SelectedDay.calendarDay(entry.entry.date) ==
+          SelectedDay.calendarDay(edited.original.entry.date),
       entry.mealName == edited.original.mealName,
     )) {
       (false, _) => (
         intl.foodMoved(food),
-        intl.foodMovedToDayDetail(entry.mealName, entry.date),
+        intl.foodMovedToDayDetail(entry.mealName, entry.entry.date),
         (intl.foodMovedSee, onSee),
       ),
       (true, false) => (
         intl.foodMoved(food),
-        switch (edited.ekkloWritten) {
-          true => intl.foodMovedToMealDetail(entry.mealName),
-          false => intl.foodAddedMfpOnly(entry.mealName),
-        },
+        entry.mealName,
         null,
       ),
       (true, true) => (
         intl.foodEdited(food),
-        switch (edited.ekkloWritten) {
-          true => intl.foodEditedDetail(serving),
-          false => intl.foodEditedMfpOnlyDetail(serving),
-        },
+        entry.mealName,
         (intl.undoAdd, onUndo),
       ),
     };
@@ -158,50 +114,111 @@ abstract final class JournalSnackBar {
     );
   }
 
-  static void ekkloNotUpdated(
+  static void written(
     BuildContext context,
-    EditedFood edited, {
+    WriterIdle idle,
+    AppEnvironment environment, {
     required VoidCallback onRetry,
   }) {
-    final intl = context.intl;
-    final kept = switch (edited.link) {
-      final link? => EntryText.linkServing(intl, link),
-      null => EntryText.serving(intl, edited.original),
-    };
-    _failed(
-      context,
-      title: intl.ekkloNotUpdated,
-      detail: intl.ekkloNotUpdatedDetail(productName(edited.entry.food), kept),
-      onRetry: onRetry,
-    );
+    final notices = [
+      ?_replaced(context.intl, idle.replaced),
+      ?_notWritten(
+        context.intl,
+        [...idle.stopped(environment)],
+        environment,
+        onRetry: onRetry,
+      ),
+    ];
+    if (notices.isEmpty) return;
+    final messenger = ScaffoldMessenger.of(context)..clearSnackBars();
+    for (final (content, duration) in notices) {
+      messenger.showFujinSnackBar(_snackBar(content, duration));
+    }
   }
 
-  static void oldEntryKept(
-    BuildContext context,
-    EditedFood edited, {
-    required VoidCallback onRetry,
-  }) => _failed(
-    context,
-    title: context.intl.editOldEntryKept(productName(edited.entry.food)),
-    detail: context.intl.editOldEntryKeptDetail,
-    onRetry: onRetry,
-  );
+  static (Widget, Duration)? _replaced(
+    AppLocalizations intl,
+    List<Replacement> replaced,
+  ) {
+    final detail = switch (replaced) {
+      [] => null,
+      [ReplacedDeletion(:final logged)] => intl.replacedDeletion(
+        FoodText.name(intl, productName(logged)),
+      ),
+      [ReplacedEdit(:final logged, :final before)] => switch ((
+        intl.servingLine(
+          before.servings,
+          before.servingValue,
+          before.servingUnit,
+        ),
+        EntryText.serving(intl, logged),
+      )) {
+        (final was, final now) when was != now => intl.replacedChange(
+          FoodText.name(intl, productName(logged)),
+          was,
+          now,
+        ),
+        _ => intl.replacedChange(
+          FoodText.name(intl, productName(logged)),
+          before.mealName,
+          logged.mealName,
+        ),
+      },
+      _ => intl.replacedMany(replaced.length),
+    };
+    return switch (detail) {
+      final detail? => (
+        SnackBarContent(
+          glyph: SnackBarGlyph.refresh,
+          title: intl.replacedTitle,
+          detail: detail,
+        ),
+        _settledDuration,
+      ),
+      null => null,
+    };
+  }
 
-  static void _failed(
-    BuildContext context, {
-    required String title,
-    required String detail,
+  static (Widget, Duration)? _notWritten(
+    AppLocalizations intl,
+    List<WriteFailure> failures,
+    AppEnvironment environment, {
     required VoidCallback onRetry,
-  }) => show(
-    context,
-    duration: undoWindow,
-    content: SnackBarContent(
-      glyph: SnackBarGlyph.alert,
-      title: title,
-      detail: detail,
-      action: (context.intl.tryAgain, onRetry),
-    ),
-  );
+  }) {
+    final mfp = [...failures.whereType<MfpNotWritten>()];
+    final ekklo = [...failures.whereType<EkkloNotWritten>()];
+    final notice = switch ((mfp, ekklo)) {
+      ([_, ...], _) => (intl.mfpNotWritten, mfp),
+      (_, [_, ...]) => (intl.ekkloNotWritten, ekklo),
+      _ => null,
+    };
+    if (notice case (final title, final List<WriteFailure> reported)) {
+      final blocked = reported.every(
+        (failure) =>
+            SendFailure.of(failure.error, environment) ==
+            SendFailure.blockedInDev,
+      );
+      return (
+        SnackBarContent(
+          glyph: SnackBarGlyph.alert,
+          title: title,
+          detail: switch ((blocked, reported)) {
+            (true, _) => intl.writeBlockedInDev,
+            (false, [final failure]) => intl.foodStillPending(
+              FoodText.name(intl, productName(failure.logged)),
+            ),
+            (false, _) => intl.foodsStillPending(reported.length),
+          },
+          action: switch (blocked) {
+            true => null,
+            false => (intl.tryAgain, onRetry),
+          },
+        ),
+        undoWindow,
+      );
+    }
+    return null;
+  }
 
   static void show(
     BuildContext context, {
@@ -209,9 +226,10 @@ abstract final class JournalSnackBar {
     required Duration duration,
   }) {
     ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showFujinSnackBar(
-        SnackBar(duration: duration, padding: _padding, content: content),
-      );
+      ..clearSnackBars()
+      ..showFujinSnackBar(_snackBar(content, duration));
   }
+
+  static SnackBar _snackBar(Widget content, Duration duration) =>
+      SnackBar(duration: duration, padding: _padding, content: content);
 }

@@ -35,14 +35,6 @@ final MfpFood _oats = mfpFood(
   nutrients: nutrients(kcal: 370, protein: 13, carbs: 60, fat: 7, fiber: 10),
 );
 
-final MfpFood _oatsChanged = mfpFood(
-  oats,
-  description: _oatsName,
-  brand: 'Quaker',
-  version: '2',
-  nutrients: nutrients(kcal: 380, protein: 13, carbs: 62, fat: 7, fiber: 10),
-);
-
 FakeBackends _backends({List<MfpFood>? stored}) => FakeBackends(
   mealNames: [breakfast, lunch],
   mfpFoods: stored ?? [_oats],
@@ -149,20 +141,6 @@ Future<void> _signInToEkklo(WidgetTester tester) async {
   await _tap(tester, 'Se connecter');
 }
 
-Future<void> _signInToMfp(
-  WidgetTester tester,
-  InMemoryMfpSessionStore store,
-) async {
-  await tester.tap(find.text('Se reconnecter à MyFitnessPal'));
-  await tester.pump();
-  tester.takeException();
-  await store.write(FakeBackends.mfpSession);
-  ProviderScope.containerOf(
-    tester.element(find.byType(FujinApp)),
-  ).read(routerProvider).pop(true);
-  await tester.pumpAndSettle();
-}
-
 Iterable<Object> _ekkloSearches(FakeBackends backends) => backends.requests
     .where((request) => request.url.path.endsWith('/food-items/search'));
 
@@ -184,8 +162,8 @@ void main() {
       ..devicePixelRatio = 1;
   });
 
-  testWidgets('adds a searched food to MyFitnessPal, then Ekklo, and returns '
-      'it to the Journal', (tester) async {
+  testWidgets('closes the fiche at once, then writes MyFitnessPal before '
+      'Ekklo', (tester) async {
     final backends = _backends();
     await pumpFujin(tester, backends);
     final result = await _openAdd(tester);
@@ -195,12 +173,20 @@ void main() {
     _sees('Ekklo : $oatsInEkklo, 100 g');
     _sees('mémorisé');
 
+    final gate = backends.mfpAddGate = Completer<void>();
     await _tap(tester, _addToBoth);
 
     final added = await result;
     check(
       added,
-    ).isNotNull().has((added) => added.ekkloWritten, 'ekklo').isTrue();
+    ).isNotNull().has((added) => added.planned?.sends, 'sends').equals(true);
+    check(find.text('Ajouter à Breakfast').evaluate()).isEmpty();
+    check(backends.entries).isEmpty();
+
+    gate.complete();
+    backends.mfpAddGate = null;
+    await tester.pumpAndSettle();
+
     check(backends.entries).length.equals(1);
     check(backends.ekkloItems).length.equals(1);
     check(
@@ -214,11 +200,16 @@ void main() {
     await _openAdd(tester);
     await _openOats(tester);
 
-    final button = find.text(_addToBoth);
-    await tester.ensureVisible(button);
-    await tester.pumpAndSettle();
-    await tester.tap(button);
-    await tester.tap(button);
+    final press = tester
+        .widget<FilledButton>(
+          find.ancestor(
+            of: find.text(_addToBoth),
+            matching: find.byType(FilledButton),
+          ),
+        )
+        .onPressed;
+    press?.call();
+    press?.call();
     await tester.pumpAndSettle();
 
     check(backends.entries).length.equals(1);
@@ -230,38 +221,21 @@ void main() {
     ).length.equals(1);
   });
 
-  testWidgets('reloads a food changed in MyFitnessPal and adds it only once '
-      'confirmed', (tester) async {
-    final backends = _backends(stored: [_oatsChanged]);
+  testWidgets('closes the fiche and says the food is waiting when '
+      'MyFitnessPal does not answer', (tester) async {
+    final backends = _backends()..mfpWritesFail = true;
     await pumpFujin(tester, backends);
     final result = await _openAdd(tester);
     await _openOats(tester);
 
     await _tap(tester, _addToBoth);
-    _sees('Cet aliment a changé dans MyFitnessPal');
-    check(backends.entries).isEmpty();
 
-    await _tap(tester, 'Confirmer et ajouter');
     check(await result).isNotNull();
-    check(backends.entries.single.nutrients.energy?.value).equals(380);
-  });
-
-  testWidgets('keeps the entry when MyFitnessPal does not answer', (
-    tester,
-  ) async {
-    final backends = _backends()..mfpWritesFail = true;
-    await pumpFujin(tester, backends);
-    await _openAdd(tester);
-    await _openOats(tester);
-
-    await _tap(tester, _addToBoth);
-    _sees('MyFitnessPal n’a pas répondu');
-    _sees('Pas envoyé');
+    _sees('Pas écrit dans MyFitnessPal');
+    _sees('$_oatsName reste en attente');
+    _sees('Réessayer');
+    check(backends.entries).isEmpty();
     check(backends.ekkloItems).isEmpty();
-
-    await _tap(tester, 'Modifier la saisie');
-    _sees(_addToBoth);
-    _sees(_oatsName);
   });
 
   testWidgets('says Fūjin DEV writes nothing instead of offline, without '
@@ -273,6 +247,7 @@ void main() {
 
     await _tap(tester, _addToBoth);
 
+    _sees('Pas écrit dans MyFitnessPal');
     _sees(
       'Fūjin DEV n’écrit ni dans MyFitnessPal ni dans Ekklo : rien n’a '
       'changé.',
@@ -280,44 +255,6 @@ void main() {
     check(find.text('Pas de connexion internet.').evaluate()).isEmpty();
     check(find.text('Réessayer').evaluate()).isEmpty();
     check(backends.ekkloItems).isEmpty();
-  });
-
-  testWidgets('keeps the MyFitnessPal entry when Ekklo fails, and undoes it '
-      'on request', (tester) async {
-    final backends = _backends();
-    backends.failingMeals.add(petitDejeuner);
-    await pumpFujin(tester, backends);
-    await _openAdd(tester);
-    await _openOats(tester);
-
-    await _tap(tester, _addToBoth);
-    _sees('Ekklo n’a pas répondu');
-    _sees('Non écrit');
-    check(backends.entries).length.equals(1);
-
-    await _tap(tester, 'Annuler l’entrée MFP');
-    check(backends.entries).isEmpty();
-    _sees(_addToBoth);
-  });
-
-  testWidgets('retries Ekklo without writing MyFitnessPal twice', (
-    tester,
-  ) async {
-    final backends = _backends();
-    backends.failingMeals.add(petitDejeuner);
-    await pumpFujin(tester, backends);
-    final result = await _openAdd(tester);
-    await _openOats(tester);
-    await _tap(tester, _addToBoth);
-
-    backends.failingMeals.clear();
-    await _tap(tester, 'Réessayer Ekklo');
-
-    check(
-      await result,
-    ).isNotNull().has((added) => added.ekkloWritten, 'ekklo').isTrue();
-    check(backends.entries).length.equals(1);
-    check(backends.ekkloItems).length.equals(1);
   });
 
   testWidgets('lists a food added through Fūjin among the recents', (
@@ -386,15 +323,87 @@ void main() {
     _sees(_oatsName);
   });
 
-  testWidgets('keeps the recents on screen when offline', (tester) async {
+  testWidgets('lists the foods already in Fūjin above the offline '
+      'MyFitnessPal results when the search is offline (02b)', (tester) async {
+    final backends = _backends();
+    await pumpFujin(tester, backends);
+    await _openAdd(tester);
+    await _search(tester, _query);
+    backends.mfpReachable = false;
+
+    await _search(tester, 'avoine');
+
+    _sees('DÉJÀ DANS FŪJIN');
+    _sees('1 trouvé');
+    _sees(_oatsName);
+    _sees('RÉSULTATS MYFITNESSPAL');
+    _sees('hors ligne');
+    _sees('Pas de connexion');
+    _sees('La recherche dans MyFitnessPal a besoin du réseau.');
+    _sees('Réessayer');
+    check(find.text('RÉCENTS').evaluate()).isEmpty();
+    check(
+      tester.getTopLeft(find.text('DÉJÀ DANS FŪJIN')).dy,
+    ).isLessThan(tester.getTopLeft(find.text('RÉSULTATS MYFITNESSPAL')).dy);
+  });
+
+  testWidgets('lists a remembered food never opened in Fūjin in the offline '
+      'search once the Journal has read MyFitnessPal', (tester) async {
     final backends = _backends();
     await pumpFujin(tester, backends);
     await _openAdd(tester);
     backends.mfpReachable = false;
 
+    await _search(tester, 'avoine');
+
+    _sees('DÉJÀ DANS FŪJIN');
+    _sees(_oatsName);
+  });
+
+  testWidgets('opens the fiche of a food already in Fūjin while the search '
+      'is offline', (tester) async {
+    final backends = _backends();
+    await pumpFujin(tester, backends);
+    await _openAdd(tester);
     await _search(tester, _query);
-    _sees('Pas de connexion');
-    _sees('RÉCENTS');
+    backends.mfpReachable = false;
+    await _search(tester, 'avoine');
+
+    await _tap(tester, _oatsName);
+
+    _sees('Ajouter à Breakfast');
+  });
+
+  testWidgets('searches MyFitnessPal again from the offline banner once the '
+      'network is back', (tester) async {
+    final backends = _backends(stored: const []);
+    await pumpFujin(tester, backends);
+    await _openAdd(tester);
+    backends.mfpReachable = false;
+    await _search(tester, _query);
+    check(find.text('DÉJÀ DANS FŪJIN').evaluate()).isEmpty();
+    _sees('La recherche dans MyFitnessPal a besoin du réseau.');
+
+    backends.mfpReachable = true;
+    await _tap(tester, 'Réessayer');
+
+    _sees(_oatsName);
+    check(find.text('Pas de connexion').evaluate()).isEmpty();
+  });
+
+  testWidgets('reopens a recent food offline from the phone', (tester) async {
+    final backends = _backends();
+    await pumpFujin(tester, backends);
+    final first = await _openAdd(tester);
+    await _openOats(tester);
+    await _tap(tester, _addToBoth);
+    await first;
+    backends.mfpReachable = false;
+
+    await _openAdd(tester);
+    await _tap(tester, _oatsName);
+
+    _sees('Ajouter à Breakfast');
   });
 
   testWidgets('lists the remembered foods under the recents, without the '
@@ -536,7 +545,7 @@ void main() {
     await pumpFujin(tester, backends, units: memory.units);
     final result = await _openAdd(tester);
 
-    await _tap(tester, rice);
+    await _tap(tester, basmati.description);
     _sees('Ajouter à Breakfast');
     await _tap(tester, _addToBoth);
 
@@ -546,16 +555,34 @@ void main() {
     ).has((entry) => entry.servingSize.unit, 'unit').equals(cup);
   });
 
-  testWidgets('keeps the remembered foods on screen when offline', (
+  testWidgets('opens a remembered food offline from the phone', (
     tester,
   ) async {
+    final backends = _skyrBackends(_skyrInPots);
+    await pumpFujin(tester, backends, ownCopies: [_skyrInPotsCopy]);
+    await _openAdd(tester);
+    await _search(tester, 'skyr');
+    backends.mfpReachable = false;
+
+    await _tap(tester, _skyrName);
+
+    _sees(_addToBoth);
+  });
+
+  testWidgets('keeps the recents and the remembered foods under the offline '
+      'card when a remembered food is not on the phone (07c)', (tester) async {
     final backends = _backends();
     await pumpFujin(tester, backends);
     await _openAdd(tester);
     backends.mfpReachable = false;
 
-    await _search(tester, 'rice');
+    await _tap(tester, rice);
+
     _sees('Pas de connexion');
+    _sees(
+      'La recherche reprendra au retour du réseau. Tes récents restent là.',
+    );
+    _sees('RÉCENTS');
     _sees('MÉMORISÉS');
     _sees(rice);
   });
@@ -660,90 +687,6 @@ void main() {
     check(backends.entries).isEmpty();
   });
 
-  testWidgets('re-runs the add after reconnecting MyFitnessPal', (
-    tester,
-  ) async {
-    final backends = _backends();
-    final store = InMemoryMfpSessionStore();
-    await store.write(FakeBackends.mfpSession);
-    await pumpFujin(tester, backends, mfp: backends.mfpWith(store));
-    final result = await _openAdd(tester);
-    await _openOats(tester);
-    await store.write(FakeBackends.refusedMfpSession);
-
-    await _tap(tester, _addToBoth);
-    _sees('Session MyFitnessPal expirée');
-    check(backends.entries).isEmpty();
-
-    await _signInToMfp(tester, store);
-
-    check(await result).isNotNull();
-    check(backends.entries).length.equals(1);
-  });
-
-  testWidgets('retries Ekklo after reconnecting it once MyFitnessPal has the '
-      'entry', (tester) async {
-    final backends = _backends();
-    final store = await backends.ekkloTokenStore();
-    await pumpFujin(tester, backends, ekklo: backends.ekkloWith(store));
-    final result = await _openAdd(tester);
-    await _openOats(tester);
-    final gate = Completer<void>();
-    backends.diaryGate = gate;
-
-    final button = find.text(_addToBoth);
-    await tester.ensureVisible(button);
-    await tester.pumpAndSettle();
-    await tester.tap(button);
-    await tester.pump();
-    await store.write(FakeBackends.staleEkkloTokens);
-    gate.complete();
-    await tester.pumpAndSettle();
-    _sees('Session Ekklo expirée');
-    check(find.text('Réessayer Ekklo').evaluate()).isEmpty();
-
-    await _signInToEkklo(tester);
-
-    check(
-      await result,
-    ).isNotNull().has((added) => added.ekkloWritten, 'ekklo').isTrue();
-    check(backends.entries).length.equals(1);
-    check(backends.ekkloItems).length.equals(1);
-  });
-
-  testWidgets('does not blame MyFitnessPal when Ekklo cannot be read before '
-      'the write', (tester) async {
-    final backends = _backends();
-    await pumpFujin(tester, backends);
-    await _openAdd(tester);
-    await _openOats(tester);
-    backends.ekkloReachable = false;
-
-    await _tap(tester, _addToBoth);
-
-    _sees('Pas de connexion internet.');
-    check(find.text('MyFitnessPal n’a pas répondu').evaluate()).isEmpty();
-    check(find.text('Non écrit').evaluate()).isEmpty();
-    check(backends.entries).isEmpty();
-  });
-
-  testWidgets('names the side that kept an undo from finishing', (
-    tester,
-  ) async {
-    final backends = _backends();
-    backends.failingMeals.add(petitDejeuner);
-    await pumpFujin(tester, backends);
-    await _openAdd(tester);
-    await _openOats(tester);
-    await _tap(tester, _addToBoth);
-    backends.ekkloReachable = false;
-
-    await _tap(tester, 'Annuler l’entrée MFP');
-
-    _sees('Pas de connexion internet.');
-    check(find.text('MyFitnessPal ne répond pas.').evaluate()).isEmpty();
-  });
-
   testWidgets('shows the status code when MyFitnessPal answers a server '
       'error', (tester) async {
     final backends = _backends()..mfpSearchStatus = 503;
@@ -769,25 +712,6 @@ void main() {
     await _tap(tester, 'Réessayer');
 
     _sees('EAN $_barcode');
-  });
-
-  testWidgets('lists a food recorded by an add when coming back to search', (
-    tester,
-  ) async {
-    final backends = _backends();
-    backends.failingMeals.add(petitDejeuner);
-    await pumpFujin(tester, backends);
-    await _openAdd(tester);
-    await _openOats(tester);
-    await _tap(tester, _addToBoth);
-    await _tap(tester, 'Annuler l’entrée MFP');
-
-    await tester.tap(find.byTooltip('Retour'));
-    await tester.pumpAndSettle();
-    await _search(tester, '');
-
-    _sees('RÉCENTS');
-    _seesPart('ce soir');
   });
 
   testWidgets('releases the search field when the fiche opens', (

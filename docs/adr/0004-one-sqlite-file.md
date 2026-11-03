@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Accepted
+Accepted. [0044](0044-connector-model.md) plans a second file, `fujin-cache.db`, for re-fetchable data (not built), and gives the rows Fūjin owns a UUIDv7 id, `updated_at` and `deleted_at`.
 
 ## Context
 

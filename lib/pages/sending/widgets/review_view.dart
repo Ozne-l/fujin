@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
@@ -196,8 +197,10 @@ class _Review extends HookWidget {
                 _Section.inEkklo => [
                   PlanRow.card([
                     for (final compared in plan.inEkklo)
-                      if (compared.status case InEkklo(:final link))
-                        PlanRow.inEkklo(compared.entry, link),
+                      if (compared.status case InEkklo(
+                        link: EkkloLink(:final item?),
+                      ))
+                        PlanRow.inEkklo(compared.logged, item),
                   ]),
                 ],
               },

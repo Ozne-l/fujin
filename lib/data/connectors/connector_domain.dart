@@ -1,0 +1,1 @@
+enum ConnectorDomain { food }

@@ -18,7 +18,6 @@ class AddFormMapper extends ClassMapperBase<AddForm> {
       AddDraftMapper.ensureInitialized();
       PlannedEntryMapper.ensureInitialized();
       ReadProblemMapper.ensureInitialized();
-      MfpFoodMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -41,20 +40,12 @@ class AddFormMapper extends ClassMapperBase<AddForm> {
     key: r'plan_problem',
     opt: true,
   );
-  static MfpFood? _$changedFrom(AddForm v) => v.changedFrom;
-  static const Field<AddForm, MfpFood> _f$changedFrom = Field(
-    'changedFrom',
-    _$changedFrom,
-    key: r'changed_from',
-    opt: true,
-  );
 
   @override
   final MappableFields<AddForm> fields = const {
     #draft: _f$draft,
     #planned: _f$planned,
     #planProblem: _f$planProblem,
-    #changedFrom: _f$changedFrom,
   };
   @override
   final bool ignoreNull = true;
@@ -64,7 +55,6 @@ class AddFormMapper extends ClassMapperBase<AddForm> {
       draft: data.dec(_f$draft),
       planned: data.dec(_f$planned),
       planProblem: data.dec(_f$planProblem),
-      changedFrom: data.dec(_f$changedFrom),
     );
   }
 
@@ -127,13 +117,7 @@ abstract class AddFormCopyWith<$R, $In extends AddForm, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   AddDraftCopyWith<$R, AddDraft, AddDraft> get draft;
   PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry>? get planned;
-  MfpFoodCopyWith<$R, MfpFood, MfpFood>? get changedFrom;
-  $R call({
-    AddDraft? draft,
-    PlannedEntry? planned,
-    ReadProblem? planProblem,
-    MfpFood? changedFrom,
-  });
+  $R call({AddDraft? draft, PlannedEntry? planned, ReadProblem? planProblem});
   AddFormCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -152,20 +136,15 @@ class _AddFormCopyWithImpl<$R, $Out>
   PlannedEntryCopyWith<$R, PlannedEntry, PlannedEntry>? get planned =>
       $value.planned?.copyWith.$chain((v) => call(planned: v));
   @override
-  MfpFoodCopyWith<$R, MfpFood, MfpFood>? get changedFrom =>
-      $value.changedFrom?.copyWith.$chain((v) => call(changedFrom: v));
-  @override
   $R call({
     AddDraft? draft,
     Object? planned = $none,
     Object? planProblem = $none,
-    Object? changedFrom = $none,
   }) => $apply(
     FieldCopyWithData({
       if (draft != null) #draft: draft,
       if (planned != $none) #planned: planned,
       if (planProblem != $none) #planProblem: planProblem,
-      if (changedFrom != $none) #changedFrom: changedFrom,
     }),
   );
   @override
@@ -173,7 +152,6 @@ class _AddFormCopyWithImpl<$R, $Out>
     draft: data.get(#draft, or: $value.draft),
     planned: data.get(#planned, or: $value.planned),
     planProblem: data.get(#planProblem, or: $value.planProblem),
-    changedFrom: data.get(#changedFrom, or: $value.changedFrom),
   );
 
   @override

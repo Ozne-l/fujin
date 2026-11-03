@@ -10,8 +10,10 @@ import 'package:fujin/data/memory/remembered_unit.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/adding/add_shortcut.dart';
+import 'package:fujin/pages/common/alert_pictogram.dart';
 import 'package:fujin/pages/common/confirm_sheet.dart';
 import 'package:fujin/pages/common/delete_icon.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/fujin_icon_button.dart';
 import 'package:fujin/pages/common/glass_fill.dart';
 import 'package:fujin/pages/common/glass_finish.dart';
@@ -37,6 +39,13 @@ class MemoryFoodPage extends HookConsumerWidget {
     final memory = ref.watch(memoryProvider);
     final notifier = ref.read(memoryProvider.notifier);
     final shown = useRef<RememberedFood?>(null);
+    final wroteAdd = useRef(false);
+    ref.listen(memoryProvider, (previous, next) {
+      if (wroteAdd.value && next.food(mfpFoodId, mfpUnit) == null) {
+        wroteAdd.value = false;
+        context.pop();
+      }
+    });
     final food = memory.food(mfpFoodId, mfpUnit) ?? shown.value;
     shown.value = food;
     if (food == null) return const Scaffold();
@@ -57,8 +66,11 @@ class MemoryFoodPage extends HookConsumerWidget {
       switch (added) {
         case final added?:
           AddShortcut.added(context, ref, added);
-          if (ref.read(memoryProvider).food(mfpFoodId, mfpUnit) case null) {
-            context.pop();
+          switch (ref.read(memoryProvider).food(mfpFoodId, mfpUnit)) {
+            case null:
+              context.pop();
+            case _:
+              wroteAdd.value = true;
           }
         case null:
           ref.invalidate(memoryProvider);
@@ -89,7 +101,7 @@ class MemoryFoodPage extends HookConsumerWidget {
               top: FujinSpace.s3,
               bottom: FujinSpace.s6,
               child: Text(
-                food.mfpDescription,
+                FoodText.name(context.intl, food.mfpDescription),
                 style: FujinText.hina30.copyWith(
                   color: context.colors.textPrimary,
                 ),
@@ -98,7 +110,7 @@ class MemoryFoodPage extends HookConsumerWidget {
             _SourceCard(
               dot: context.colors.sourceMfp,
               source: context.intl.sourceMyFitnessPal,
-              name: food.mfpDescription,
+              name: FoodText.name(context.intl, food.mfpDescription),
               lines: [
                 if (servedIn.isNotEmpty)
                   _Line(
@@ -156,14 +168,15 @@ class MemoryFoodPage extends HookConsumerWidget {
                 onPressed: () => unawaited(
                   showConfirmSheet(
                     context,
-                    icon: DeleteIcon.asset,
+                    glyph: const AlertPictogram(icon: DeleteIcon.asset),
                     title: context.intl.memoryForgetTitle,
                     message: context.intl.memoryForgetDetail(
-                      food.mfpDescription,
+                      FoodText.name(context.intl, food.mfpDescription),
                       units.length,
                     ),
                     confirmLabel: context.intl.memoryForgetConfirm,
                     onConfirm: () {
+                      wroteAdd.value = false;
                       context.pop();
                       notifier.forget(food);
                     },

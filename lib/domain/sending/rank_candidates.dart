@@ -1,14 +1,14 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/domain/comparison/entry_quantity.dart';
 import 'package:fujin/domain/sending/ekklo_candidate.dart';
 import 'package:fujin/domain/sending/food_words.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:fujin/domain/sending/nutrient_deltas.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 List<EkkloCandidate> rankCandidates(
   Iterable<EkkloFood> foods,
-  MfpFoodEntry entry, {
+  LoggedEntry entry, {
   double? gramsPerUnit,
 }) =>
     [
@@ -23,12 +23,12 @@ List<EkkloCandidate> rankCandidates(
 
 EkkloCandidate? evaluateCandidate(
   EkkloFood food,
-  MfpFoodEntry entry, {
+  LoggedEntry entry, {
   double? gramsPerUnit,
 }) {
-  final nutrients = entry.nutrients;
-  final kilocalories = nutrients.energy?.kilocalories;
-  final knownGrams = entryGrams(entry, gramsPerUnit: gramsPerUnit);
+  final nutrients = entry.entry.nutrients;
+  final kilocalories = nutrients.kilocalories;
+  final knownGrams = entryGrams(entry.entry, gramsPerUnit: gramsPerUnit);
   final macrosKnown =
       nutrients.protein != null ||
       nutrients.carbohydrates != null ||
@@ -50,13 +50,13 @@ EkkloCandidate? evaluateCandidate(
 
 EkkloCandidate _candidate(
   EkkloFood food,
-  MfpFoodEntry entry,
+  LoggedEntry entry,
   double kilocalories,
   double grams, {
   required bool gramsInferred,
 }) {
   final scale = grams / food.portion;
-  final nutrients = entry.nutrients;
+  final nutrients = entry.entry.nutrients;
   double? macro(Nutrient nutrient, double ekklo, double? mfp) =>
       switch ((mfp, nutrient.kilocaloriesPerGram)) {
         (final mfp?, final perGram?) =>
@@ -67,7 +67,7 @@ EkkloCandidate _candidate(
     food: food,
     grams: grams,
     gramsInferred: gramsInferred,
-    nameMatch: nameMatchOf(food, entry.food),
+    nameMatch: nameMatchOf(food, entry),
     deltas: NutrientDeltas(
       entryKilocalories: kilocalories,
       kilocalories: (food.calories * scale - kilocalories) / kilocalories,

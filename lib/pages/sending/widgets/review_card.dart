@@ -10,6 +10,7 @@ import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/glass_fill.dart';
 import 'package:fujin/pages/common/glass_finish.dart';
 import 'package:fujin/pages/common/status_pill.dart';
@@ -70,7 +71,7 @@ class ReviewCard extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  entry.food.description,
+                  FoodText.name(context.intl, entry.foodName),
                   style: FujinText.inter16Medium.copyWith(
                     color: context.colors.textPrimary,
                   ),
@@ -150,7 +151,7 @@ class ReviewCard extends ConsumerWidget {
   };
 
   EntryChoices _choices(WidgetRef ref) {
-    final plan = ref.read(sendPlanProvider(planned.entry.date).notifier);
+    final plan = ref.read(sendPlanProvider(planned.entry.entry.date).notifier);
     final entryId = planned.entryId;
     return (
       choose: (candidate) => plan.choose(entryId, candidate),
@@ -171,7 +172,7 @@ class ReviewCard extends ConsumerWidget {
           ReviewReason.skipped ||
           ReviewReason.confirmed:
         ref
-            .read(sendPlanProvider(planned.entry.date).notifier)
+            .read(sendPlanProvider(planned.entry.entry.date).notifier)
             .confirm(planned.entryId);
     }
   }

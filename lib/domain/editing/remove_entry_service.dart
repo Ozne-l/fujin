@@ -1,59 +1,28 @@
 import 'dart:async';
 
-import 'package:fujin/domain/comparison/compared_entry_lookup.dart';
-import 'package:fujin/domain/comparison/entry_status_link.dart';
-import 'package:fujin/domain/editing/remove_outcome.dart';
-import 'package:fujin/domain/journal/journal_day.dart';
-import 'package:fujin/domain/journal/journal_service.dart';
-import 'package:fujin/domain/sending/send_service.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
+import 'package:fujin/data/entries/entry_repository.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
+import 'package:fujin/domain/writing/background_writer.dart';
+import 'package:fujin/domain/writing/ekklo_job.dart';
 
 final class RemoveEntryService {
-  RemoveEntryService({
-    required this._mfp,
-    required this._journal,
-    required this._sending,
+  const RemoveEntryService({
+    required this._entries,
+    required this._background,
   });
 
-  final MyFitnessPalClient _mfp;
-  final JournalService _journal;
-  final SendService _sending;
+  final EntryRepository _entries;
+  final BackgroundWriter _background;
 
-  final Map<String, Future<RemoveOutcome>> _removing = {};
-
-  Future<RemoveOutcome> remove({
-    required String entryId,
-    required DateTime date,
-  }) => _removing[entryId] ??= _remove(
-    entryId,
-    date,
-  ).whenComplete(() => unawaited(_removing.remove(entryId)));
-
-  Future<RemoveOutcome> _remove(String entryId, DateTime date) async {
-    final JournalDay day;
-    try {
-      day = await _journal.readDay(date);
-    } on Object catch (error) {
-      return NotRemoved(error);
+  LoggedEntry? remove(String entryId) {
+    final logged = _entries.find(entryId);
+    if (logged == null) return null;
+    _background.drop(entryId);
+    if (logged.ekkloLink case final link? when link.item != null) {
+      _background.hold(entryId, EkkloRemoval(link));
     }
-    final status = day.comparison.entryWithId(entryId)?.status;
-    final ekkloRemoved = status?.sentLink;
-    if (ekkloRemoved case final link?) {
-      try {
-        await _sending.removeLinked(link);
-      } on Object catch (error) {
-        return NotRemoved(error);
-      }
-    }
-    if (status == null) return const Removed(ekkloRemoved: false);
-    try {
-      await _mfp.diary.remove(entryId);
-    } on Object catch (error) {
-      return switch (ekkloRemoved) {
-        null => NotRemoved(error),
-        _ => StillInMfp(error),
-      };
-    }
-    return Removed(ekkloRemoved: ekkloRemoved != null);
+    _entries.remove(entryId);
+    unawaited(_background.run());
+    return logged;
   }
 }

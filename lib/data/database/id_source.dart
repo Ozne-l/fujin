@@ -1,0 +1,1 @@
+typedef IdSource = String Function();

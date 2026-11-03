@@ -1,5 +1,6 @@
 import 'package:ekklo_client/ekklo_client.dart';
-import 'package:fujin/data/links/sent_link.dart';
+import 'package:fujin/data/entries/ekklo_link.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/comparison/entry_quantity.dart';
@@ -12,26 +13,28 @@ import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/rank_candidates.dart';
 import 'package:fujin/domain/sending/send_choice.dart';
 import 'package:fujin/domain/sending/unit_weight.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 const _searchResultsKept = 8;
 
 EntryPlanning planEntry({
-  required MfpFoodEntry entry,
-  required String entryId,
+  required LoggedEntry entry,
   required Memory memory,
-  SentLink? replacing,
+  EkkloLink? replacing,
   EkkloFood? rememberedFood,
   List<EkkloFood>? searchResults,
 }) {
-  final remembered = memory.food(entry.food.id, entry.servingSize.unit);
-  final gramsPerUnit = memory.gramsPerUnit(
-    entry.food.id,
-    entry.servingSize.unit,
-  );
+  final unit = entry.entry.servingUnit;
+  final mfpFoodId = entry.mfpFoodId;
+  final remembered = switch (mfpFoodId) {
+    final id? => memory.food(id, unit),
+    null => null,
+  };
+  final gramsPerUnit = switch (mfpFoodId) {
+    final id? => memory.gramsPerUnit(id, unit),
+    null => null,
+  };
   final base = PlannedEntry(
     entry: entry,
-    entryId: entryId,
     ekkloMealName: ekkloMealFor(entry, memory),
     choice: const SendAsOwnCopy(),
     reviewed: false,
@@ -44,7 +47,7 @@ EntryPlanning planEntry({
   );
 
   EntryPlanning search() => switch (searchResults) {
-    null => NeedsSearch(searchTerms(entry.food)),
+    null => NeedsSearch(searchTerms(entry)),
     final results => Planned(
       _fromCandidates(
         base,
@@ -67,7 +70,7 @@ EntryPlanning planEntry({
       ),
     ),
     MatchedFood(:final ekkloFoodId, :final ekkloFoodName) => switch ((
-      entryGrams(entry, gramsPerUnit: gramsPerUnit),
+      entryGrams(entry.entry, gramsPerUnit: gramsPerUnit),
       rememberedFood,
     )) {
       (final grams?, _) => Planned(
@@ -77,7 +80,7 @@ EntryPlanning planEntry({
             ekkloFoodName: ekkloFoodName,
             grams: grams,
             remembered: true,
-            weight: switch (isGramUnit(entry.servingSize.unit)) {
+            weight: switch (isGramUnit(unit)) {
               true => UnitWeight.notNeeded,
               false => UnitWeight.remembered,
             },
@@ -93,7 +96,7 @@ EntryPlanning planEntry({
         null => search(),
       },
     },
-    null when memory.hasOwnCopy(entry.food.id) => Planned(
+    null when mfpFoodId != null && memory.hasOwnCopy(mfpFoodId) => Planned(
       base.copyWith(
         choice: const SendAsOwnCopy(renewal: OwnCopyRenewal.newUnit),
       ),
@@ -102,11 +105,11 @@ EntryPlanning planEntry({
   };
 }
 
-String ekkloMealFor(MfpFoodEntry entry, Memory memory) =>
+String ekkloMealFor(LoggedEntry entry, Memory memory) =>
     memory.ekkloMealName(entry.mealName) ?? entry.mealName;
 
-bool isFresh(OwnCopy copy, MfpFoodEntry entry) =>
-    switch ((copy.mfpFoodVersion, entry.food.version)) {
+bool isFresh(OwnCopy copy, LoggedEntry entry) =>
+    switch ((copy.mfpFoodVersion, entry.mfpLink?.foodVersion)) {
       (final copied?, final logged?) => copied == logged,
       _ => true,
     };

@@ -1,43 +1,37 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/data/database/calendar_date_hook.dart';
+import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/day_comparison.dart';
 import 'package:fujin/domain/journal/day_nutrients.dart';
 import 'package:fujin/domain/journal/journal_meal.dart';
 import 'package:fujin/domain/journal/status_counts.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 part 'journal_day.mapper.dart';
 
 @MappableClass()
 final class JournalDay with JournalDayMappable {
   const JournalDay({
-    required this.diary,
+    required this.date,
     required this.comparison,
-    this.mealNames = const [],
+    this.meals = const [],
     this.ekkloMeals = const [],
   });
 
-  final MfpDiaryDay diary;
-  final List<String> mealNames;
-  final List<EkkloDailyMeal> ekkloMeals;
+  @MappableField(hook: CalendarDateHook())
+  final DateTime date;
   final DayComparison comparison;
+  final List<JournalMeal> meals;
+  final List<EkkloDailyMeal> ekkloMeals;
 
-  DateTime get date => diary.date;
+  List<ComparedEntry> get entries => comparison.entries;
 
-  StatusCounts get counts => StatusCounts.of(comparison.entries);
+  StatusCounts counts({Set<String> sending = const {}}) =>
+      StatusCounts.of(entries, sending: sending);
 
-  List<JournalMeal> get meals => [
-    for (final name in JournalMeal.namesOf(mealNames, diary.entries))
-      JournalMeal(
-        name: name,
-        entries: [
-          for (final compared in comparison.entries)
-            if (compared.entry.mealName == name) compared,
-        ],
-      ),
-  ];
-
-  DayNutrients get nutrients => DayNutrients.ofEntries(diary.entries);
+  DayNutrients get nutrients => DayNutrients.ofEntries([
+    for (final compared in entries) compared.logged,
+  ]);
 
   DayNutrients get ekkloNutrients => DayNutrients.ofEkklo(ekkloMeals);
 }

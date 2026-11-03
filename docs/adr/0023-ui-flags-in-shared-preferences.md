@@ -4,7 +4,7 @@ Date: 2026-10-10
 
 ## Status
 
-Accepted. Narrows [0004](0004-one-sqlite-file.md): `fujin.db` holds the owner's data; UI flags live beside it, in shared preferences. Builds the hint S5 that [0022](0022-journal-states-and-goal-rings.md) left out. [0025](0025-automatic-mode.md) adds the first setting beside the flags and moves `HintRepository.openPreferences` to `FujinPreferences.open`.
+Accepted. Narrows [0004](0004-one-sqlite-file.md): `fujin.db` holds the owner's data; UI flags live beside it, in shared preferences. Builds the hint S5 that [0022](0022-journal-states-and-goal-rings.md) left out. [0025](0025-automatic-mode.md) adds the first setting beside the flags and moves `HintRepository.openPreferences` to `FujinPreferences.open`. [0044](0044-connector-model.md) keeps the connector roles there, as settings of this phone.
 
 ## Context
 

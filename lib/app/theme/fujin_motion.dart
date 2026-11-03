@@ -19,6 +19,13 @@ abstract final class FujinMotion {
     loop: LoopMode.seamless,
   );
 
+  static const Motion clockTurn = LinearMotion(Duration(seconds: 4));
+  static const clockTurns = StepSequence<double>(
+    [0, 1],
+    motion: clockTurn,
+    loop: LoopMode.seamless,
+  );
+
   static double driftPhase(double cycle, int index, int count) =>
       (cycle + index / count) % 1;
 

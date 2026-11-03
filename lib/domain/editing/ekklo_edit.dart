@@ -1,5 +1,5 @@
 import 'package:ekklo_client/ekklo_client.dart';
-import 'package:fujin/data/links/sent_link.dart';
+import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
@@ -20,9 +20,9 @@ sealed class EkkloEdit {
     required List<EkkloDailyMeal> ekkloMeals,
     required bool changed,
   }) {
-    final link = original.status.sentLink;
-    final placement = switch (link) {
-      final link? => placementsOf(ekkloMeals)[link.ekkloItemId],
+    final link = original.status.ekkloLink;
+    final placement = switch (link?.item) {
+      final item? => placementsOf(ekkloMeals)[item.ekkloItemId],
       null => null,
     };
     return switch ((original.status, link, placement)) {
@@ -30,14 +30,14 @@ sealed class EkkloEdit {
         planned,
       ),
       (InEkklo(), _, _) when !changed => AlreadyInEkklo(planned),
-      (_, final SentLink link, (:final meal, :final item)) => switch ((
-        sameDay(original.entry.date, planned.entry.date),
+      (_, final EkkloLink link, (:final meal, :final item)) => switch ((
+        sameDay(original.logged.entry.date, planned.entry.entry.date),
         _targetFood(planned),
       )) {
         (false, _) => DayMove(
           planned,
-          from: original.entry.date,
-          to: planned.entry.date,
+          from: original.logged.entry.date,
+          to: planned.entry.entry.date,
         ),
         (true, final target?) when target != item.foodId => Replaced(
           planned,
@@ -71,7 +71,7 @@ final class QuantityInPlace extends EkkloEdit {
   });
 
   final EkkloDailyMealItem from;
-  final SentLink link;
+  final EkkloLink link;
 }
 
 final class MealMove extends EkkloEdit {

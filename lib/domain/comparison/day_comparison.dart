@@ -1,21 +1,35 @@
 import 'package:dart_mappable/dart_mappable.dart';
-import 'package:fujin/data/links/sent_link.dart';
-import 'package:fujin/data/unattended/unattended_item.dart';
+import 'package:fujin/data/entries/day_changes.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
+import 'package:fujin/domain/comparison/replacement.dart';
 
 part 'day_comparison.mapper.dart';
 
 @MappableClass()
 final class DayComparison with DayComparisonMappable {
   const DayComparison({
+    required this.changes,
     this.entries = const [],
-    this.linksToAdopt = const [],
-    this.linksToDrop = const [],
-    this.unattendedToAdopt = const [],
+    this.leaving = const [],
+    this.replaced = const [],
   });
 
   final List<ComparedEntry> entries;
-  final List<SentLink> linksToAdopt;
-  final List<SentLink> linksToDrop;
-  final List<UnattendedItem> unattendedToAdopt;
+  final List<LoggedEntry> leaving;
+  final DayChanges changes;
+  final List<Replacement> replaced;
+
+  DayComparison held() {
+    final copied = {for (final entry in changes.addedEntries) entry.id};
+    return copyWith(
+      entries: [
+        for (final compared in entries)
+          switch (copied.contains(compared.logged.entry.id)) {
+            true => compared.copyWith(stored: false),
+            false => compared,
+          },
+      ],
+    );
+  }
 }

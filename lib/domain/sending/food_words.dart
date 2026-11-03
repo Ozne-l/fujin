@@ -1,6 +1,6 @@
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/domain/sending/name_match.dart';
-import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 const _brandSeparator = ' - ';
 const _searchWords = 3;
@@ -48,10 +48,10 @@ const _accents = {
   'ç': 'c',
 };
 
-String productName(MfpEntryFood food) {
-  final description = food.description.trim();
+String productName(LoggedEntry entry) {
+  final description = (entry.foodName ?? '').trim();
   final separator = description.indexOf(_brandSeparator);
-  return switch ((food.brandName?.trim().toLowerCase(), separator)) {
+  return switch ((entry.brand?.trim().toLowerCase(), separator)) {
     (null, _) || (_, < 0) => description,
     (final brand?, _) => switch ((
       description.substring(0, separator).trim().toLowerCase() == brand,
@@ -63,14 +63,16 @@ String productName(MfpEntryFood food) {
   };
 }
 
-String searchTerms(MfpEntryFood food) => descriptionTerms(productName(food));
+String searchTerms(LoggedEntry entry) => descriptionTerms(productName(entry));
 
-String descriptionTerms(String description) =>
-    _words(description).take(_searchWords).join(' ');
+String descriptionTerms(String? description) => switch (description) {
+  final description? => _words(description).take(_searchWords).join(' '),
+  null => '',
+};
 
 String folded(String text) => _normalize(text.toLowerCase());
 
-NameMatch nameMatchOf(EkkloFood candidate, MfpEntryFood food) {
+NameMatch nameMatchOf(EkkloFood candidate, LoggedEntry entry) {
   final candidateWords = [
     ..._words(candidate.name),
     ..._words(candidate.brands ?? ''),
@@ -78,7 +80,7 @@ NameMatch nameMatchOf(EkkloFood candidate, MfpEntryFood food) {
   bool shares(String text) => _words(
     text,
   ).map(_normalize).any((word) => candidateWords.any((c) => _similar(word, c)));
-  return switch ((shares(productName(food)), shares(food.brandName ?? ''))) {
+  return switch ((shares(productName(entry)), shares(entry.brand ?? ''))) {
     (true, _) => NameMatch.product,
     (false, true) => NameMatch.brand,
     (false, false) => NameMatch.none,

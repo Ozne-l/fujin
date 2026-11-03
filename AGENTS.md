@@ -1,6 +1,6 @@
 # Working in Fūjin
 
-Fūjin is a Flutter app, tested on Android with an iOS project ready, that copies the owner's MyFitnessPal diary into Ekklo. Read `GLOSSARY.md` for the vocabulary and `docs/adr/` for the decisions before changing behaviour. This file is for coding agents.
+Fūjin is a Flutter app, tested on Android with an iOS project ready, that keeps the owner's food Journal: its own entries, stored on the phone first, then written to MyFitnessPal and Ekklo according to each app's role. Read `GLOSSARY.md` for the vocabulary and `docs/adr/` for the decisions before changing behaviour. This file is for coding agents.
 
 ## Commands
 
@@ -59,7 +59,7 @@ clients       package:ekklo_client, package:myfitnesspal_client
 | Screen and its presenter | `lib/pages/<screen>/` | `journal_page.dart`, `journal_notifier.dart` |
 | Widget shared by screens | `lib/pages/common/` | `progress_bar.dart` |
 | Pure rule | `lib/domain/<area>/` | `compare_day.dart` |
-| Use case doing I/O | `lib/domain/<area>/*_service.dart` | `journal_service.dart` |
+| Use case doing I/O | `lib/domain/<area>/*_service.dart`; writers live there too | `journal_service.dart`; `BackgroundWriter` (`lib/domain/writing/`, writes the apps), `EntryWriter` (`lib/domain/adding/`, stores Fūjin's entry first) |
 | Table change | append a script to `schemaMigrations` | `lib/data/database/schema.dart` |
 | Repository (one per aggregate) | `lib/data/<aggregate>/` | `sent_link_repository.dart` |
 | User-facing text | `lib/l10n/app_fr.arb` (template, Figma wording) and `lib/l10n/app_en.arb` | `nothingNewTitle` |

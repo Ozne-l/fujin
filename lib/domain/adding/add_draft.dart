@@ -1,4 +1,7 @@
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:fujin/data/entries/entry.dart';
+import 'package:fujin/data/entries/logged_entry.dart';
+import 'package:fujin/data/entries/mfp_link.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 part 'add_draft.mapper.dart';
@@ -13,8 +16,8 @@ final class AddDraft with AddDraftMappable {
     required this.date,
   });
 
-  static const pendingEntryId = '';
   static const oneServing = 1.0;
+  static const _unstoredId = '';
   static const _baseMultiplier = 1.0;
   static const _mealPosition = 0;
 
@@ -41,7 +44,45 @@ final class AddDraft with AddDraftMappable {
     null => null,
   };
 
-  MfpFoodEntry get entry => MfpFoodEntry(
+  static AddDraft? forEntry(LoggedEntry logged, MfpFood food) {
+    final entry = logged.entry;
+    return switch (_serving(food, entry.servingUnit, entry.servingValue)) {
+      final serving? => AddDraft(
+        food: food,
+        servingSize: serving,
+        servings: entry.servings,
+        mfpMealName: logged.mealName,
+        date: entry.date,
+      ),
+      null => null,
+    };
+  }
+
+  LoggedEntry get entry {
+    final written = mfpEntry;
+    return LoggedEntry(
+      entry: Entry.copyOf(
+        written,
+        id: _unstoredId,
+        mealId: _unstoredId,
+        foodId: _unstoredId,
+        updatedAt: date,
+      ),
+      mealName: mfpMealName,
+      foodName: food.description,
+      brand: food.brandName,
+      mfpFoodId: food.id,
+      mfpLink: MfpLink.of(
+        written,
+        id: _unstoredId,
+        entryId: _unstoredId,
+        mfpEntryId: _unstoredId,
+        updatedAt: date,
+      ),
+    );
+  }
+
+  MfpFoodEntry get mfpEntry => MfpFoodEntry(
     date: date,
     mealName: mfpMealName,
     mealPosition: _mealPosition,
@@ -59,19 +100,13 @@ final class AddDraft with AddDraftMappable {
     ),
   );
 
-  AddDraft withFood(MfpFood food) => copyWith(
-    food: food,
-    servingSize: _servingLike(food, servingSize) ?? servingSize,
-  );
-
   static MfpServingSize? _servingLike(MfpFood food, MfpServingSize? like) =>
+      _serving(food, like?.unit, like?.value) ?? food.servingSizes.firstOrNull;
+
+  static MfpServingSize? _serving(MfpFood food, String? unit, double? value) =>
       food.servingSizes
-          .where(
-            (serving) =>
-                serving.unit == like?.unit && serving.value == like?.value,
-          )
-          .firstOrNull ??
-      food.servingSizes.firstOrNull;
+          .where((serving) => serving.unit == unit && serving.value == value)
+          .firstOrNull;
 
   static MfpNutrients _scaled(MfpNutrients nutrients, double factor) {
     double? scale(double? amount) => switch (amount) {
