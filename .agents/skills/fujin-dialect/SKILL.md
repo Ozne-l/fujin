@@ -103,7 +103,7 @@ Each rule: what to do, why, where the repo already does it.
 
 9. **Make every model a `dart_mappable` class; sealed unions carry a discriminator key and one value per subtype.**
    Why: one generated encoding serves SQLite rows, equality, `copyWith` and test assertions. `build.yaml` sets `caseStyle: snakeCase` (so `mfpEntryId` maps to `mfp_entry_id`, the column name) and `ignoreNull: true`.
-   Examples: `SentLink` (`lib/data/links/sent_link.dart`); `FoodReference` (`lib/data/foods/food_reference.dart`) uses `discriminatorKey: 'kind'` with `'mfp'`, `'ekklo'` and `'own_copy'`, the same values as the `CHECK` constraint on `food_reference` in `lib/data/database/schema.dart`; `Backup` (`lib/data/backup/backup.dart`) uses `discriminatorKey: Backup.versionKey`, one value per file version; `EntryStatus` uses `discriminatorKey: 'status'`; enums use `@MappableEnum()` (`UpdateKind` in `lib/domain/comparison/update_kind.dart`).
+   Examples: `SentLink` (`lib/data/links/sent_link.dart`); `FoodReference` (`lib/data/foods/food_reference.dart`) uses `discriminatorKey: 'kind'` with `'mfp'`, `'ekklo'` and `'own_copy'`, the same values as the `CHECK` constraint on `food_reference` in `lib/data/database/schema.dart`; `Backup` (`lib/data/backup/backup.dart`) uses `discriminatorKey: Backup.versionKey`, one value per subtype, or a predicate when a subtype reads several versions (`BackupV2.isMemoryFile`, versions 1 and 2); `EntryStatus` uses `discriminatorKey: 'status'`; enums use `@MappableEnum()` (`UpdateKind` in `lib/domain/comparison/update_kind.dart`).
    ```dart
    @MappableClass(discriminatorKey: 'kind')
    sealed class FoodReference with FoodReferenceMappable {
