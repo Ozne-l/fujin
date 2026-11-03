@@ -6,7 +6,7 @@
 
 **Log your day once in MyFitnessPal. Your coach sees it in Ekklo.**
 
-A personal Flutter app that copies its owner's MyFitnessPal food diary into Ekklo, the nutrition app his coach follows.
+A personal Flutter app that keeps its owner's food Journal on the phone and writes each entry to MyFitnessPal and to Ekklo, the nutrition app his coach follows, according to each app's role.
 
 [![Flutter 3.47.7](https://img.shields.io/badge/Flutter-3.47.7-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart 3.13.5](https://img.shields.io/badge/Dart-3.13.5-0175C2?logo=dart&logoColor=white)](https://dart.dev)

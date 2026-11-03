@@ -41,6 +41,6 @@ An adopted link takes `sentAt` from the Ekklo item's `createdAt`, or `now` when 
 - A send interrupted after Ekklo was written but before the link was stored is adopted on the next read instead of being sent twice (`test/domain/journal/journal_service_test.dart`, "keeps the item of an interrupted send instead of sending it ...").
 - An entry re-saved in MyFitnessPal with nothing that matters to Ekklo keeps its "Dans Ekklo" status under its new id (same test file, "moves a link to the new id of an entry re-saved in ...").
 - Reading a day writes to the database. That is acceptable because the writes only reconcile the registry with what both services show.
-- Every rule is tested as a pure function in `test/domain/comparison/compare_day_test.dart`, with no doubles at all.
+- Every rule is tested as a pure function, with no doubles at all: since [0044](0044-connector-model.md), in `compare_ekklo_day_test.dart`, `compare_mfp_day_test.dart` and `adopt_waiting_test.dart` (`test/domain/comparison/`).
 - Updates (`ToUpdate`) will skip the matching screens 10 to 13 and go straight to screen 14 once the send flow exists (planned, see [0002](0002-write-ordering.md)).
 - Adoption depends on Memory: a day sent before Memory knew a food or meal is not adopted until Memory learns it.
