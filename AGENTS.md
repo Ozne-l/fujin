@@ -59,7 +59,7 @@ clients       package:ekklo_client, package:myfitnesspal_client
 | Screen and its presenter | `lib/pages/<screen>/` | `journal_page.dart`, `journal_notifier.dart` |
 | Widget shared by screens | `lib/pages/common/` | `progress_bar.dart` |
 | Pure rule | `lib/domain/<area>/` | `compare_day.dart` |
-| Use case doing I/O | `lib/domain/<area>/*_service.dart`; background writers doing I/O live there too | `journal_service.dart`; `BackgroundWriter` (`lib/domain/writing/`), `EntryWriter` (`lib/domain/adding/`) |
+| Use case doing I/O | `lib/domain/<area>/*_service.dart`; writers live there too | `journal_service.dart`; `BackgroundWriter` (`lib/domain/writing/`, writes the apps), `EntryWriter` (`lib/domain/adding/`, stores Fūjin's entry first) |
 | Table change | append a script to `schemaMigrations` | `lib/data/database/schema.dart` |
 | Repository (one per aggregate) | `lib/data/<aggregate>/` | `sent_link_repository.dart` |
 | User-facing text | `lib/l10n/app_fr.arb` (template, Figma wording) and `lib/l10n/app_en.arb` | `nothingNewTitle` |
