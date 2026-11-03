@@ -3,7 +3,6 @@ import 'package:fujin/data/connectors/connector.dart';
 import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
-import 'package:fujin/domain/comparison/mfp_status.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
@@ -58,7 +57,7 @@ class ComparedRow extends ConsumerWidget {
       entry: entry,
       detail: detail,
       pills: [
-        if (compared.mfp case MfpPending())
+        if (compared.mfpPending)
           ConnectorPill(connector: Connector.mfp, failed: mfpFailed),
         status,
       ],

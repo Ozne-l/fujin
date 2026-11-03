@@ -5,7 +5,9 @@ import 'package:fujin/domain/sending/send_plan.dart';
 import 'package:fujin/domain/sending/send_progress.dart';
 import 'package:fujin/domain/sending/send_step.dart';
 import 'package:fujin/domain/sending/step_state.dart';
+import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/sending/widgets/progress_card.dart';
 import 'package:fujin/pages/sending/widgets/send_header.dart';
 import 'package:fujin/pages/sending/widgets/step_list.dart';
@@ -37,7 +39,7 @@ class SendingView extends StatelessWidget {
               const SizedBox(height: FujinSpace.s5),
               StepList(steps: progress.steps),
               const SizedBox(height: FujinSpace.s6),
-              TransitCard(names: _inTransit()),
+              TransitCard(names: _inTransit(context.intl)),
             ],
           ),
         ),
@@ -45,14 +47,17 @@ class SendingView extends StatelessWidget {
     );
   }
 
-  List<String> _inTransit() => switch (progress.steps
+  List<String> _inTransit(AppLocalizations intl) => switch (progress.steps
       .where((step) => step.state == StepState.running)
       .firstOrNull) {
     MealStep(:final entryIds) => [
       for (final entryId in entryIds)
-        if (plan.entry(entryId) case final planned?) productName(planned.entry),
+        if (plan.entry(entryId) case final planned?)
+          FoodText.name(intl, productName(planned.entry)),
     ],
-    OwnCopyStep(:final name) || QuantityUpdateStep(:final name) => [name],
+    OwnCopyStep(:final name) || QuantityUpdateStep(:final name) => [
+      FoodText.name(intl, name),
+    ],
     null => const [],
   };
 }

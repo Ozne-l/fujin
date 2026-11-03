@@ -13,6 +13,7 @@ import 'package:fujin/pages/adding/add_shortcut.dart';
 import 'package:fujin/pages/common/alert_pictogram.dart';
 import 'package:fujin/pages/common/confirm_sheet.dart';
 import 'package:fujin/pages/common/delete_icon.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/fujin_icon_button.dart';
 import 'package:fujin/pages/common/glass_fill.dart';
 import 'package:fujin/pages/common/glass_finish.dart';
@@ -100,7 +101,7 @@ class MemoryFoodPage extends HookConsumerWidget {
               top: FujinSpace.s3,
               bottom: FujinSpace.s6,
               child: Text(
-                food.mfpDescription ?? context.intl.unnamedFood,
+                FoodText.name(context.intl, food.mfpDescription),
                 style: FujinText.hina30.copyWith(
                   color: context.colors.textPrimary,
                 ),
@@ -109,7 +110,7 @@ class MemoryFoodPage extends HookConsumerWidget {
             _SourceCard(
               dot: context.colors.sourceMfp,
               source: context.intl.sourceMyFitnessPal,
-              name: food.mfpDescription ?? context.intl.unnamedFood,
+              name: FoodText.name(context.intl, food.mfpDescription),
               lines: [
                 if (servedIn.isNotEmpty)
                   _Line(
@@ -170,7 +171,7 @@ class MemoryFoodPage extends HookConsumerWidget {
                     glyph: const AlertPictogram(icon: DeleteIcon.asset),
                     title: context.intl.memoryForgetTitle,
                     message: context.intl.memoryForgetDetail(
-                      food.mfpDescription ?? context.intl.unnamedFood,
+                      FoodText.name(context.intl, food.mfpDescription),
                       units.length,
                     ),
                     confirmLabel: context.intl.memoryForgetConfirm,

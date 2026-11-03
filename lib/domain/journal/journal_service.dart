@@ -5,7 +5,6 @@ import 'package:fujin/data/database/fujin_id.dart';
 import 'package:fujin/data/entries/day_changes.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
-import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/data/entries/stored_day.dart';
 import 'package:fujin/data/foods/food.dart';
 import 'package:fujin/data/foods/food_repository.dart';
@@ -18,6 +17,7 @@ import 'package:fujin/data/unattended/unattended_item_repository.dart';
 import 'package:fujin/domain/comparison/adopt_waiting.dart';
 import 'package:fujin/domain/comparison/compare_day.dart';
 import 'package:fujin/domain/comparison/compare_mfp_day.dart';
+import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/day_comparison.dart';
 import 'package:fujin/domain/comparison/day_draft.dart';
 import 'package:fujin/domain/comparison/replacement.dart';
@@ -307,7 +307,7 @@ final class JournalService {
         leaving: _inMeal(name, leaving, _itself),
         mfpPending: {
           for (final logged in _inMeal(name, stored, _itself))
-            if (MfpWrite.of(logged) case MfpAdd() || MfpEdit()) logged.entry.id,
+            if (ComparedEntry.mfpPendingOf(logged)) logged.entry.id,
         },
       ),
   ];

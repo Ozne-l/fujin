@@ -29,6 +29,7 @@ import '../../support/repositories.dart';
 const _gratin = 'mfp-gratin';
 const _gratinName = 'Gratin dauphinois maison';
 const _portion = 'portion';
+const _nameless = '';
 
 void main() {
   late FujinDatabase database;
@@ -180,6 +181,52 @@ void main() {
     check(
       foodsOf(database).foodOfMfp(skyr)?.name,
     ).equals('Isey - Skyr nature');
+  });
+
+  test('keeps the full MyFitnessPal name of a food it copies', () async {
+    backends = FakeBackends(
+      entries: [
+        entry(
+          'E-1',
+          food: skyr,
+          description: 'Isey - Skyr nature',
+          brand: 'Isey',
+          nutrients: nutrients(kcal: 64, protein: 10),
+        ),
+      ],
+    );
+    final (_, sending) = await services();
+
+    await send(sending, await planDay(sending));
+
+    check(backends.ekkloFoods).length.equals(1);
+    check(
+      foodsOf(database).foodOfMfp(skyr)?.name,
+    ).equals('Isey - Skyr nature');
+  });
+
+  test('never creates an own copy for a food with no name', () async {
+    backends = FakeBackends(
+      entries: [
+        entry(
+          'E-1',
+          food: _gratin,
+          description: _nameless,
+          nutrients: nutrients(kcal: 300),
+        ),
+      ],
+    );
+    final (_, sending) = await services();
+    final plan = await planDay(sending);
+
+    check(plan.entries.single)
+      ..has((it) => it.choice, 'choice').equals(const SendAsOwnCopy())
+      ..has((it) => it.sends, 'sends').isFalse();
+
+    await send(sending, plan);
+
+    check(backends.ekkloFoods).isEmpty();
+    check(backends.ekkloItems).isEmpty();
   });
 
   test(

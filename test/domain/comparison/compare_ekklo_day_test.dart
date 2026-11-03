@@ -15,7 +15,6 @@ import 'package:fujin/domain/comparison/compare_ekklo_day.dart';
 import 'package:fujin/domain/comparison/day_comparison.dart';
 import 'package:fujin/domain/comparison/day_draft.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
-import 'package:fujin/domain/comparison/mfp_status.dart';
 import 'package:fujin/domain/comparison/update_kind.dart';
 
 import '../../support/fixtures.dart';
@@ -207,8 +206,8 @@ void main() {
       );
 
       check([
-        for (final compared in result.entries) compared.mfp,
-      ]).deepEquals([const MfpPending(), const MfpPending(), null]);
+        for (final compared in result.entries) compared.mfpPending,
+      ]).deepEquals([true, true, false]);
     });
 
     test('keeps the Ekklo link of an entry moved to another day until it is '

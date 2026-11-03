@@ -36,8 +36,10 @@ DayDraft compareMfpDay(
     for (final logged in [...day.entries, ...day.owed])
       ?logged.mfpLink?.mfpEntryId,
   };
-  final byId = [...day.entries]
-    ..sort((first, second) => first.entry.id.compareTo(second.entry.id));
+  int byEntryId(LoggedEntry first, LoggedEntry second) =>
+      first.entry.id.compareTo(second.entry.id);
+
+  final byId = [...day.entries]..sort(byEntryId);
 
   bool fresh(MfpLink link) => link.updatedAt.isAfter(readAt);
 
@@ -146,8 +148,7 @@ DayDraft compareMfpDay(
       !fresh(link) && !inDiary.containsKey(link.mfpEntryId);
   bool keepsFujin(LoggedEntry logged) =>
       !role.copiesIn || MfpWrite.of(logged) is MfpEdit;
-  final owedById = [...day.owed]
-    ..sort((first, second) => first.entry.id.compareTo(second.entry.id));
+  final owedById = [...day.owed]..sort(byEntryId);
   final editsGone = [
     for (final logged in byId)
       if (logged.mfpLink case final link?
@@ -157,7 +158,7 @@ DayDraft compareMfpDay(
         logged,
     for (final logged in owedById)
       if (MfpWrite.of(logged) case MfpEdit(:final link) when gone(link)) logged,
-  ]..sort((first, second) => first.entry.id.compareTo(second.entry.id));
+  ]..sort(byEntryId);
   final deletionsGone = [
     for (final logged in owedById)
       if (MfpWrite.of(logged) case MfpDeletion(:final link) when gone(link))

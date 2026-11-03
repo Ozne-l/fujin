@@ -29,9 +29,6 @@ import '../../support/repositories.dart';
 const _fileName = 'fujin-backup-2026-10-07.json';
 const _skyrBarcode = '3033490004521';
 const _barcodeLinks = 'barcode_links';
-const _versionWithFoods = 3;
-const _versionWithMemory = 2;
-const _versionWithoutBarcodeLinks = 1;
 const _goals = Goals(kilocalories: 3000, protein: 160, fat: 70);
 const _ownCopy = OwnCopy(
   mfpFoodId: skyr,
@@ -247,6 +244,32 @@ void main() {
     check(file?.mealCount).equals(memory.meals.length);
   });
 
+  test('reads a version 4 file whose foods store verified as a number, '
+      'as written by an earlier build', () async {
+    await backups.export();
+    final json = exportedJson();
+    final foods = switch (json['foods']) {
+      final List<Object?> foods => foods,
+      _ => throw StateError('export has no foods'),
+    };
+    switch (foods.first) {
+      case final Map<String, Object?> food:
+        food['verified'] = 1;
+      default:
+        throw StateError('food is not an object');
+    }
+
+    final file = backups.read(_json(json));
+
+    check(file)
+        .isA<BackupV4>()
+        .has(
+          (file) => file.foods.first.verified,
+          'verified',
+        )
+        .equals(true);
+  });
+
   test('imports a version 4 file in place of everything recorded '
       'since', () async {
     final file = await exported();
@@ -285,7 +308,7 @@ void main() {
     final file = backups.read(
       _json({
         ...versionThree,
-        'version': _versionWithFoods,
+        'version': BackupV3.foodsVersion,
         'links': [link('E-1', 'I-1').toMap()],
       }),
     );
@@ -340,7 +363,7 @@ void main() {
       'recent ones and ordering its meals by name', () {
     recents.record(_recentOats);
 
-    final file = backups.read(_json(_fileOfRelease040(_versionWithMemory)));
+    final file = backups.read(_json(_fileOfRelease040(BackupV2.memoryVersion)));
     backups.restore(file ?? (throw StateError('version 2 is unreadable')));
 
     check(memories.load()).equals(_memoryOfRelease040);
@@ -354,7 +377,7 @@ void main() {
 
   test('imports a version 1 file, which has no barcode link', () {
     recents.record(_recentOats);
-    final versionOne = _fileOfRelease040(_versionWithoutBarcodeLinks)
+    final versionOne = _fileOfRelease040(BackupV2.versionWithoutBarcodeLinks)
       ..remove(_barcodeLinks);
 
     final file = backups.read(_json(versionOne));
@@ -370,7 +393,7 @@ void main() {
     test('a file of another format or version, or missing a table', () async {
       await backups.export();
       final file = exportedJson();
-      final versionTwo = _fileOfRelease040(_versionWithMemory);
+      final versionTwo = _fileOfRelease040(BackupV2.memoryVersion);
 
       for (final changed in [
         {...file, 'format': 'other-backup'},

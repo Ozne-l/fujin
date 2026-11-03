@@ -11,7 +11,6 @@ import 'package:fujin/domain/comparison/day_draft.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/comparison/entry_status_link.dart';
 import 'package:fujin/domain/comparison/expected_item.dart';
-import 'package:fujin/domain/comparison/mfp_status.dart';
 import 'package:fujin/domain/comparison/placement.dart';
 import 'package:fujin/domain/comparison/update_kind.dart';
 import 'package:fujin/domain/journal/same_day.dart';
@@ -90,6 +89,11 @@ DayComparison compareEkkloDay(
     entries[index] = logged.copyWith(ekkloLink: status.ekkloLink);
   }
 
+  EkkloLink? withoutItem(EkkloLink link) => switch (link.unattended) {
+    _? => link.copyWith(item: null),
+    null => null,
+  };
+
   for (final (index, logged) in day.entries.indexed) {
     if (logged.ekkloLink case EkkloLink(item: final item?) && final link) {
       switch ((placements[item.ekkloItemId], logged.mfpLink)) {
@@ -101,10 +105,7 @@ DayComparison compareEkkloDay(
           settle(index, logged, ToUpdate(link, UpdateKind.mealChanged));
         case (null, _):
           entries[index] = logged.copyWith(
-            ekkloLink: switch (link.unattended) {
-              _? => link.copyWith(item: null),
-              null => null,
-            },
+            ekkloLink: withoutItem(link),
           );
       }
     }
@@ -129,10 +130,7 @@ DayComparison compareEkkloDay(
             placement: placement,
           ));
         case (null, true):
-          itemsGone[logged.entry.id] = switch (link.unattended) {
-            _? => link.copyWith(item: null),
-            null => null,
-          };
+          itemsGone[logged.entry.id] = withoutItem(link);
         case (null, false):
           continue;
       }
@@ -235,10 +233,7 @@ DayComparison compareEkkloDay(
         ComparedEntry(
           logged,
           statuses[index] ?? const ToSend(),
-          mfp: switch (MfpWrite.of(logged)) {
-            MfpAdd() || MfpEdit() => const MfpPending(),
-            MfpDeletion() || null => null,
-          },
+          mfpPending: ComparedEntry.mfpPendingOf(logged),
         ),
       for (final logged in day.unstored)
         ComparedEntry(logged, const ToSend(), stored: false),

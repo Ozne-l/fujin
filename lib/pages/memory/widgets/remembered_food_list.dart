@@ -3,6 +3,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/status_pill.dart';
 import 'package:fujin/pages/memory/memory_text.dart';
@@ -88,7 +89,7 @@ class _FoodRow extends StatelessWidget {
                   spacing: FujinSize.textGap,
                   children: [
                     Text(
-                      food.mfpDescription ?? context.intl.unnamedFood,
+                      FoodText.name(context.intl, food.mfpDescription),
                       style: FujinText.inter15Medium.copyWith(
                         color: context.colors.textPrimary,
                       ),
