@@ -51,7 +51,6 @@ class FoodMapper extends ClassMapperBase<Food> {
     'verified',
     _$verified,
     opt: true,
-    hook: SqliteBoolHook(),
   );
   static DateTime? _$deletedAt(Food v) => v.deletedAt;
   static const Field<Food, DateTime> _f$deletedAt = Field(

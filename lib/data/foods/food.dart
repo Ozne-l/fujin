@@ -1,5 +1,4 @@
 import 'package:dart_mappable/dart_mappable.dart';
-import 'package:fujin/data/database/sqlite_bool_hook.dart';
 import 'package:fujin/data/foods/flat_nutrients_hook.dart';
 import 'package:fujin/data/foods/food_nutrients.dart';
 
@@ -21,7 +20,6 @@ final class Food with FoodMappable {
   final String? name;
   final String? brand;
   final FoodNutrients nutrients;
-  @MappableField(hook: SqliteBoolHook())
   final bool? verified;
   final DateTime updatedAt;
   final DateTime? deletedAt;
