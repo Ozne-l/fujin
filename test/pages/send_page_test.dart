@@ -313,6 +313,9 @@ void main() {
     await pumpFujin(tester, backends);
     await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
     _sees('Aliment sans nom');
+    _sees('→ Choisir l’aliment Ekklo');
+    _sees('Reste hors de cet envoi.');
+    check(find.text('→ Aliment perso à créer').evaluate()).isEmpty();
 
     await _tap(tester, 'Changer ›');
     _sees('Choisir un candidat');

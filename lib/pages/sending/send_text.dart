@@ -93,7 +93,10 @@ abstract final class SendText {
       switch (planned.choice) {
         SendToEkkloFood(:final ekkloFoodName, :final grams) =>
           intl.towardsAmount(ekkloFoodName, SendText.grams(intl, grams)),
-        SendAsOwnCopy(reuse: null) => intl.towards(intl.ownCopyToCreate),
+        SendAsOwnCopy(reuse: null) when planned.sends => intl.towards(
+          intl.ownCopyToCreate,
+        ),
+        SendAsOwnCopy(reuse: null) => intl.towards(intl.addChooseEkkloFood),
         SendAsOwnCopy() => intl.towards(intl.ownCopy),
         SkipEntry() => intl.skippedDetail,
       };
