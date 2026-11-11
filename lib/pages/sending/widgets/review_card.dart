@@ -281,9 +281,14 @@ class _Proposal extends StatelessWidget {
               )?.deltas,
             },
           ),
-        SendAsOwnCopy(reuse: null) => (
+        SendAsOwnCopy(reuse: null) when planned.sends => (
           intl.towards(intl.ownCopyToCreate),
           intl.ownCopyExact,
+          null,
+        ),
+        SendAsOwnCopy(reuse: null) => (
+          intl.towards(intl.addChooseEkkloFood),
+          intl.skippedDetail,
           null,
         ),
         SendAsOwnCopy() => (
