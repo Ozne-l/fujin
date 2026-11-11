@@ -4,7 +4,7 @@ Date: 2026-10-08
 
 ## Status
 
-Accepted. [0027](0027-barcode-scanner.md) lets the MyFitnessPal barcode lookup (`POST /iphone_api/synchronize` on the sync origin) through the guard.
+Accepted. [0027](0027-barcode-scanner.md) lets the MyFitnessPal barcode lookup (`POST /iphone_api/synchronize` on the sync origin) through the guard. [0045](0045-ekklo-chat.md) blocks every Ekklo chat and upload request in dev, reads included, and gives dev a fake chat instead (not built).
 
 ## Context
 

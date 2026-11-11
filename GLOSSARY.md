@@ -144,6 +144,14 @@ The words below have one meaning in Fūjin's code, docs and conversations. Frenc
 
 **Fake backends.** The test stand-in for both services: an `http` `MockClient` that serves MyFitnessPal and Ekklo routes from in-memory data and records requests, MyFitnessPal food search, food reads, barcode lookups and diary writes included. For runs on a device, separate local fake servers play the same role through `--dart-define`. Code: `FakeBackends` (`test/support/fake_backends.dart`).
 
+**Chat.** The owner's conversation with his coach in Ekklo's messaging, read and written by Fūjin as a client of it: texts, photos, videos, voice messages, replies, reactions and deletion of his own messages. Part of the Ekklo connector, with no Role; there only when Ekklo is connected and its messaging is enabled. Kept in `fujin-cache.db`, which Ekklo can always fill again. Not built. ADR 0045.
+
+**Fake chat.** The made-up Ekklo conversation Fūjin DEV talks to instead of the owner's: every kind of message, seeded again at each launch, sends accepted, served inside the dev app. The tests use the same fake. Not built. ADR 0045.
+
+**Media edit.** What the owner changes on a photo or a video before sending it in the chat: a crop and quarter turns for a photo; kept passages, a crop and the sound on or off for a video. Applied in the same pass that compresses the file. Not built. ADR 0046.
+
+**Upload relay.** The background task that creates a media message in the chat once its files are uploaded, when the app is no longer there to do it. Like every path that creates a media message, it first checks that no message of the conversation already holds the file's URL, so a message is never sent twice. Not built. ADR 0046.
+
 ## Screens
 
 Codes from the Figma file "Fūjin · Maquettes", as used in the docs.
