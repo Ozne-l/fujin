@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Accepted. [0044](0044-connector-model.md) plans a second file, `fujin-cache.db`, for re-fetchable data (not built), and gives the rows Fūjin owns a UUIDv7 id, `updated_at` and `deleted_at`.
+Accepted. [0044](0044-connector-model.md) plans a second file, `fujin-cache.db`, for re-fetchable data (not built), and gives the rows Fūjin owns a UUIDv7 id, `updated_at` and `deleted_at`. [0045](0045-ekklo-chat.md) amends it (not built): `FujinDatabase` opens either file with its own schema and table enum, the cache file uses WAL and is recreated instead of migrated, every connection sets a busy timeout, and WorkManager's own Android SQLite database is outside the rule.
 
 ## Context
 
