@@ -55,6 +55,9 @@ EntryRepository entriesOf(
 
 const foodRoles = ConnectorRoles(mfp: Role.twoWay, ekklo: Role.receiveOnly);
 
+Entry storedEntry(EntryRepository entries, String entryId) =>
+    entries.findAny(entryId)?.entry ?? (throw StateError('No entry $entryId'));
+
 String storeEntry(FujinDatabase database, MfpFoodEntry entry, String id) {
   final foodId = foodsOf(database).copiedMfpFood(
     entry.food.id,

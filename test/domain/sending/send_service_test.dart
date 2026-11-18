@@ -57,7 +57,12 @@ void main() {
 
   String sentEarlier(String mfpEntryId, String itemId) {
     final id = storeEntry(database, entry(mfpEntryId), 'e-$mfpEntryId');
-    entries.linkItem(id, ekkloMealId: 'meal-1', ekkloItemId: itemId);
+    entries.linkItem(
+      id,
+      ekkloMealId: 'meal-1',
+      ekkloItemId: itemId,
+      sent: storedEntry(entries, id),
+    );
     return id;
   }
 

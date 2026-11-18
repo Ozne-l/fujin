@@ -77,7 +77,12 @@ void main() {
     final path = _databasePath();
     final first = FujinDatabase.open(path);
     storeEntry(first, entry('E-1'), 'e-1');
-    entriesOf(first).linkItem('e-1', ekkloMealId: 'meal-1', ekkloItemId: 'I-1');
+    entriesOf(first).linkItem(
+      'e-1',
+      ekkloMealId: 'meal-1',
+      ekkloItemId: 'I-1',
+      sent: storedEntry(entriesOf(first), 'e-1'),
+    );
     final stored = entriesOf(first).find('e-1');
     first.close();
 
@@ -719,7 +724,12 @@ void main() {
       for (final id in ['E-1', 'E-2', 'E-3']) {
         storeEntry(database, entry(id), id.toLowerCase());
       }
-      entries.linkItem('e-1', ekkloMealId: 'meal-1', ekkloItemId: 'I-1');
+      entries.linkItem(
+        'e-1',
+        ekkloMealId: 'meal-1',
+        ekkloItemId: 'I-1',
+        sent: storedEntry(entries, 'e-1'),
+      );
     });
 
     tearDown(() => database.close());
@@ -911,8 +921,13 @@ void main() {
     test('clears every remembered food, unit, meal and barcode link but no '
         'Ekklo link', () {
       storeEntry(database, entry('E-1'), 'e-1');
-      final entries = entriesOf(database)
-        ..linkItem('e-1', ekkloMealId: 'meal-1', ekkloItemId: 'I-1');
+      final entries = entriesOf(database);
+      entries.linkItem(
+        'e-1',
+        ekkloMealId: 'meal-1',
+        ekkloItemId: 'I-1',
+        sent: storedEntry(entries, 'e-1'),
+      );
       final links = entries.ekkloLinks();
       repository
         ..saveFood(_ownRice(grams))

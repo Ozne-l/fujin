@@ -175,7 +175,12 @@ void main() {
     entries = entriesOf(database);
     storeEntry(database, entry('M-1'), 'e-1');
     entries
-      ..linkItem('e-1', ekkloMealId: 'meal-1', ekkloItemId: 'I-1')
+      ..linkItem(
+        'e-1',
+        ekkloMealId: 'meal-1',
+        ekkloItemId: 'I-1',
+        sent: storedEntry(entries, 'e-1'),
+      )
       ..expect({'e-1': expectation()});
     storeEntry(database, entry('M-2', food: rice), 'e-2');
     entries.remove('e-2');

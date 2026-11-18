@@ -59,7 +59,12 @@ void main() {
   }) {
     final id = storeEntry(database, entry(mfpEntryId), 'e-$mfpEntryId');
     if (itemId case final itemId?) {
-      entries.linkItem(id, ekkloMealId: 'meal-1', ekkloItemId: itemId);
+      entries.linkItem(
+        id,
+        ekkloMealId: 'meal-1',
+        ekkloItemId: itemId,
+        sent: storedEntry(entries, id),
+      );
     }
     if (unattended case final unattended?) entries.expect({id: unattended});
     return id;
