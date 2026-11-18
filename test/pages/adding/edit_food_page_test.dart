@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/fujin_route.dart';
+import 'package:fujin/pages/adding/add_search_notifier.dart';
 import 'package:fujin/pages/common/day_picker_sheet.dart';
 import 'package:fujin/pages/journal/widgets/connector_pill.dart';
 import 'package:go_router/go_router.dart';
@@ -14,6 +15,7 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 import '../../support/fake_backends.dart';
 import '../../support/fixtures.dart';
 import '../../support/logged_journal.dart';
+import '../../support/pump_fujin.dart';
 
 const _title = 'Modifier l’aliment';
 const _saveBoth = 'Enregistrer dans MFP et Ekklo';
@@ -617,6 +619,63 @@ void main() {
     _sees(_mfp);
     check(backends.ekkloItems.single.quantity).equals(150);
   });
+
+  testWidgets(
+    'offers to save in both apps while the Ekklo send of an add '
+    'MyFitnessPal refused is held, '
+    'and asks for the Ekklo food of a unit without a weight',
+    (
+      tester,
+    ) async {
+      final skyrFood = mfpFood(
+        skyr,
+        description: LoggedJournal.skyrNature,
+        brand: 'Isey',
+        servingSizes: const [
+          MfpServingSize(value: 100, unit: grams, nutritionMultiplier: 1),
+          MfpServingSize(value: 1, unit: pot, nutritionMultiplier: 1),
+        ],
+        nutrients: nutrients(kcal: 64, protein: 10, carbs: 4, fat: 0.2),
+      );
+      final backends = FakeBackends(
+        mealNames: [breakfast, lunch],
+        mfpFoods: [skyrFood],
+        mfpSearches: {
+          'skyr': [skyrFood],
+        },
+        ekkloSearches: {
+          'skyr': [isey],
+        },
+      )..mfpWritesFail = true;
+      await pumpFujin(tester, backends);
+      final addFood = find.text('Ajouter un aliment').last;
+      await tester.ensureVisible(addFood);
+      await tester.pumpAndSettle();
+      await tester.tap(addFood);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'skyr');
+      await tester.pump(AddSearchNotifier.typingPause);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(LoggedJournal.skyrNature).first);
+      await tester.pumpAndSettle();
+      await _tap(tester, 'Ajouter à MFP et Ekklo');
+      tester
+          .state<ScaffoldMessengerState>(find.byType(ScaffoldMessenger))
+          .clearSnackBars();
+      await tester.pumpAndSettle();
+      await _tap(tester, LoggedJournal.skyrNature);
+
+      await _servings(tester, '2');
+
+      _sees(_saveBoth);
+
+      await _tap(tester, '100 g');
+      await _tap(tester, '1 $pot');
+
+      _sees('Choisir l’aliment Ekklo');
+      _missing(_saveMfp);
+    },
+  );
 
   testWidgets('says Fūjin DEV writes nothing when an edit is blocked', (
     tester,

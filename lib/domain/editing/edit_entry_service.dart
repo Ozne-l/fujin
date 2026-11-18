@@ -7,6 +7,7 @@ import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/foods/food_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
+import 'package:fujin/domain/adding/ekklo_side.dart';
 import 'package:fujin/domain/adding/entry_writer.dart';
 import 'package:fujin/domain/adding/known_food.dart';
 import 'package:fujin/domain/adding/rescale_planned.dart';
@@ -101,7 +102,8 @@ final class EditEntryService {
   }) {
     final held = _background.heldFor(entryId) is EkkloSend;
     switch ((planned, link?.item != null || held)) {
-      case (final planned?, true) when planned.sends:
+      case (final planned?, true)
+          when planned.sends && EkkloSide.of(planned) != EkkloSide.toChoose:
         _background.hold(entryId, EkkloSend(planned));
       case (_, _) when held:
         _background.drop(entryId);
