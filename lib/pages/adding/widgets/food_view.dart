@@ -44,6 +44,7 @@ import 'package:fujin/pages/common/glass_fill.dart';
 import 'package:fujin/pages/common/glass_finish.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
 import 'package:fujin/pages/common/title_text.dart';
+import 'package:fujin/pages/journal/background_write_notifier.dart';
 import 'package:fujin/pages/journal/entry_removal.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
 import 'package:fujin/pages/journal/removal_reason.dart';
@@ -51,6 +52,7 @@ import 'package:fujin/pages/journal/remove_entry_notifier.dart';
 import 'package:fujin/pages/journal/remove_entry_state.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:fujin/pages/journal/widgets/remove_sheet.dart';
+import 'package:fujin/pages/journal/writer_state_ids.dart';
 import 'package:fujin/pages/sending/entry_choices.dart';
 import 'package:fujin/pages/sending/send_text.dart';
 import 'package:fujin/pages/sending/sheets/match_sheet.dart';
@@ -141,6 +143,12 @@ class FoodView extends HookConsumerWidget {
       EditingFood(status: null, :final original) =>
         original.ekkloLink?.item != null,
     };
+    final sendHeld = ref.watch(
+      backgroundWriteProvider.select(
+        (state) => state.ekkloSendIds.contains(editing?.entryId),
+      ),
+    );
+    final writesEkklo = linked || sendHeld;
     final changes = switch (original) {
       final original? => draftChanges(draft, original),
       null => true,
@@ -252,12 +260,12 @@ class FoodView extends HookConsumerWidget {
         context.intl.addChooseEkkloFood,
         () => unawaited(chooseEkklo()),
       ),
-      (EkkloSide.toChoose, EditingFood()) when linked => (
+      (EkkloSide.toChoose, EditingFood()) when writesEkklo => (
         context.intl.addChooseEkkloFood,
         () => unawaited(chooseEkklo()),
       ),
       (_, EditingFood()) => (
-        switch (linked && !mfpOnly) {
+        switch (writesEkklo && !mfpOnly) {
           true => context.intl.editSaveBoth,
           false => context.intl.editSaveMfpOnly,
         },

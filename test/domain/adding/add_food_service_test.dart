@@ -267,6 +267,32 @@ void main() {
         ..has((it) => it.foodId, 'food').equals(isey.id)
         ..has((it) => it.quantity, 'grams').equals(200);
     });
+
+    test(
+      'holds no estimated unit weight when an add still waiting is edited',
+      () async {
+        backends
+          ..ekkloSearches = {
+            'skyr': [isey],
+          }
+          ..mfpWritesFail = true;
+        final services = await writeServices();
+        final added = await services.add(_draft(_skyr));
+        await services.settle();
+        check(services.background.heldFor(added.entryId)).isA<EkkloSend>();
+
+        backends.mfpWritesFail = false;
+        final inPots = _draft(_skyr, serving: _onePot, servings: 1);
+        final planned = await services.adding.plan(inPots);
+        check(EkkloSide.of(planned)).equals(EkkloSide.toChoose);
+
+        services.editing.save(inPots, planned, entryId: added.entryId);
+        await services.settle();
+
+        check(backends.ekkloItems).isEmpty();
+        check(memoryRepository.load().gramsPerUnit(skyr, pot)).isNull();
+      },
+    );
   });
 
   group('the Ekklo side of the fiche', () {
