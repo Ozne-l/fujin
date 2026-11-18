@@ -227,7 +227,7 @@ final class EntryRepository {
   void unlinkItem(String entryId) => _database.transaction(() {
     final now = _now();
     switch (_ekkloLinkOf(entryId)) {
-      case EkkloLink(unattended: _?) && final link:
+      case EkkloLink(unattended: _?) && final link when find(entryId) != null:
         _saveEkkloLink(link.copyWith(item: null, updatedAt: now));
       case final link?:
         _database.softDelete(FujinTable.ekkloLink, 'id = ?', [link.id], now);

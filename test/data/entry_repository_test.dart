@@ -478,6 +478,29 @@ void main() {
       check(entries.find('e-2')?.ekkloLink).isNull();
     });
 
+    test(
+      'goes with its item once its entry is deleted, expectation included',
+      () {
+        storeEntry(database, entry('E-1'), 'e-1');
+        entries
+          ..expect({'e-1': expectation()})
+          ..linkItem(
+            'e-1',
+            ekkloMealId: 'meal-1',
+            ekkloItemId: 'I-1',
+            sent: storedEntry(entries, 'e-1'),
+          )
+          ..remove('e-1')
+          ..unlinkItem('e-1');
+
+        check(entries.forDate(day).deleted).isEmpty();
+        check([
+          for (final link in entries.ekkloLinks())
+            if (link.deletedAt == null) link.entryId,
+        ]).isEmpty();
+      },
+    );
+
     test('refreshes the values written to the entry edited since, keeping '
         'when it was sent', () {
       storeEntry(database, entry('E-1'), 'e-1');
