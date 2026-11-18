@@ -191,11 +191,11 @@ final class EntryRepository {
     String entryId, {
     required String ekkloMealId,
     required String ekkloItemId,
-    Entry? sent,
+    required Entry sent,
   }) => _database.transaction(() {
     final now = _now();
     final item = LinkedItem.of(
-      sent ?? _entryRow(entryId),
+      sent,
       ekkloMealId: ekkloMealId,
       ekkloItemId: ekkloItemId,
       sentAt: now,
@@ -211,16 +211,18 @@ final class EntryRepository {
     });
   });
 
-  void refreshLink(String entryId, {Entry? sent}) => _database.transaction(() {
-    if (_ekkloLinkOf(entryId) case EkkloLink(item: final item?) && final link) {
-      _saveEkkloLink(
-        link.copyWith(
-          item: item.refreshedFrom(sent ?? _entryRow(entryId)),
-          updatedAt: _now(),
-        ),
-      );
-    }
-  });
+  void refreshLink(String entryId, {required Entry sent}) =>
+      _database.transaction(() {
+        if (_ekkloLinkOf(entryId)
+            case EkkloLink(item: final item?) && final link) {
+          _saveEkkloLink(
+            link.copyWith(
+              item: item.refreshedFrom(sent),
+              updatedAt: _now(),
+            ),
+          );
+        }
+      });
 
   void unlinkItem(String entryId) => _database.transaction(() {
     final now = _now();
@@ -349,14 +351,6 @@ final class EntryRepository {
         ),
     ];
   }
-
-  Entry _entryRow(String entryId) => switch (_database.select(
-    'SELECT * FROM entry WHERE id = ?',
-    [entryId],
-  )) {
-    [final row] => EntryMapper.fromMap(row),
-    _ => throw StateError('No entry $entryId'),
-  };
 
   MfpLink? _mfpLinkOf(String entryId) => switch (_database.select(
     'SELECT * FROM mfp_link WHERE entry_id = ? AND deleted_at IS NULL',

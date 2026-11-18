@@ -52,7 +52,12 @@ void main() {
         entry('E-4', date: DateTime.utc(2026, 10, 8)),
         'e-4',
       );
-      entries.linkItem('e-3', ekkloMealId: 'meal-1', ekkloItemId: 'I-3');
+      entries.linkItem(
+        'e-3',
+        ekkloMealId: 'meal-1',
+        ekkloItemId: 'I-3',
+        sent: storedEntry(entries, 'e-3'),
+      );
 
       final stored = entries.forDate(day);
 
@@ -82,7 +87,12 @@ void main() {
       storeEntry(database, entry('E-2'), 'e-2');
       storeEntry(database, entry('E-3'), 'e-3');
       entries
-        ..linkItem('e-1', ekkloMealId: 'meal-1', ekkloItemId: 'I-1')
+        ..linkItem(
+          'e-1',
+          ekkloMealId: 'meal-1',
+          ekkloItemId: 'I-1',
+          sent: storedEntry(entries, 'e-1'),
+        )
         ..expect({'e-2': expectation()})
         ..remove('e-1')
         ..remove('e-2');
@@ -323,7 +333,12 @@ void main() {
     test('takes over the row a read copied in under its MyFitnessPal id, '
         'with its Ekklo link', () {
       storeEntry(database, entry('E-1'), 'e-copy');
-      entries.linkItem('e-copy', ekkloMealId: 'meal-1', ekkloItemId: 'I-1');
+      entries.linkItem(
+        'e-copy',
+        ekkloMealId: 'meal-1',
+        ekkloItemId: 'I-1',
+        sent: storedEntry(entries, 'e-copy'),
+      );
       final copy = entries.find('e-copy');
 
       entries.saveLink(
@@ -346,8 +361,18 @@ void main() {
       storeEntry(database, entry('E-1'), 'e-1');
       storeEntry(database, entry('E-2', servings: 2), 'e-copy');
       entries
-        ..linkItem('e-1', ekkloMealId: 'meal-1', ekkloItemId: 'I-1')
-        ..linkItem('e-copy', ekkloMealId: 'meal-1', ekkloItemId: 'I-2');
+        ..linkItem(
+          'e-1',
+          ekkloMealId: 'meal-1',
+          ekkloItemId: 'I-1',
+          sent: storedEntry(entries, 'e-1'),
+        )
+        ..linkItem(
+          'e-copy',
+          ekkloMealId: 'meal-1',
+          ekkloItemId: 'I-2',
+          sent: storedEntry(entries, 'e-copy'),
+        );
       final original = entries.find('e-1');
 
       entries
@@ -378,7 +403,12 @@ void main() {
       storeEntry(database, entry('E-2'), 'e-copy');
       entries
         ..expect({'e-1': expectation(quantity: 120)})
-        ..linkItem('e-copy', ekkloMealId: 'meal-1', ekkloItemId: 'I-2');
+        ..linkItem(
+          'e-copy',
+          ekkloMealId: 'meal-1',
+          ekkloItemId: 'I-2',
+          sent: storedEntry(entries, 'e-copy'),
+        );
       final original = entries.find('e-1');
 
       entries.saveLink(
@@ -405,7 +435,12 @@ void main() {
       storeEntry(database, entry('E-2'), 'e-2');
       entries
         ..expect({'e-1': expectation(), 'e-2': expectation()})
-        ..linkItem('e-1', ekkloMealId: 'meal-1', ekkloItemId: 'I-1');
+        ..linkItem(
+          'e-1',
+          ekkloMealId: 'meal-1',
+          ekkloItemId: 'I-1',
+          sent: storedEntry(entries, 'e-1'),
+        );
 
       check(entries.find('e-1')?.ekkloLink?.unattended).equals(expectation());
 
@@ -421,8 +456,18 @@ void main() {
       storeEntry(database, entry('E-1'), 'e-1');
       storeEntry(database, entry('E-2'), 'e-2');
       entries
-        ..linkItem('e-1', ekkloMealId: 'meal-1', ekkloItemId: 'I-1')
-        ..linkItem('e-2', ekkloMealId: 'meal-1', ekkloItemId: 'I-2')
+        ..linkItem(
+          'e-1',
+          ekkloMealId: 'meal-1',
+          ekkloItemId: 'I-1',
+          sent: storedEntry(entries, 'e-1'),
+        )
+        ..linkItem(
+          'e-2',
+          ekkloMealId: 'meal-1',
+          ekkloItemId: 'I-2',
+          sent: storedEntry(entries, 'e-2'),
+        )
         ..expect({'e-1': expectation()})
         ..unlinkItem('e-1')
         ..unlinkItem('e-2');
@@ -436,7 +481,12 @@ void main() {
     test('refreshes the values written to the entry edited since, keeping '
         'when it was sent', () {
       storeEntry(database, entry('E-1'), 'e-1');
-      entries.linkItem('e-1', ekkloMealId: 'meal-1', ekkloItemId: 'I-1');
+      entries.linkItem(
+        'e-1',
+        ekkloMealId: 'meal-1',
+        ekkloItemId: 'I-1',
+        sent: storedEntry(entries, 'e-1'),
+      );
       final original = entries.find('e-1');
       time = now.add(const Duration(hours: 1));
       entries.saveLink(
@@ -448,7 +498,7 @@ void main() {
         entries.find('e-1')?.ekkloLink?.item?.servings,
       ).equals(1);
 
-      entries.refreshLink('e-1');
+      entries.refreshLink('e-1', sent: storedEntry(entries, 'e-1'));
 
       check(entries.find('e-1')?.ekkloLink?.item)
         ..has((item) => item?.servings, 'servings').equals(2)
@@ -458,11 +508,20 @@ void main() {
     test('refuses a second live link on one item', () {
       storeEntry(database, entry('E-1'), 'e-1');
       storeEntry(database, entry('E-2'), 'e-2');
-      entries.linkItem('e-1', ekkloMealId: 'meal-1', ekkloItemId: 'I-1');
+      entries.linkItem(
+        'e-1',
+        ekkloMealId: 'meal-1',
+        ekkloItemId: 'I-1',
+        sent: storedEntry(entries, 'e-1'),
+      );
 
       check(
-        () =>
-            entries.linkItem('e-2', ekkloMealId: 'meal-1', ekkloItemId: 'I-1'),
+        () => entries.linkItem(
+          'e-2',
+          ekkloMealId: 'meal-1',
+          ekkloItemId: 'I-1',
+          sent: storedEntry(entries, 'e-2'),
+        ),
       ).throws<Object>();
       check(entries.find('e-2')?.ekkloLink).isNull();
     });

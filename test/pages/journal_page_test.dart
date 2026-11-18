@@ -329,7 +329,12 @@ void main() {
     );
     final entryId = entries.findByMfpEntryId('E-1')?.entry.id;
     if (entryId == null) throw StateError('E-1 was not copied in');
-    entries.linkItem(entryId, ekkloMealId: 'meal-1', ekkloItemId: 'I-1');
+    entries.linkItem(
+      entryId,
+      ekkloMealId: 'meal-1',
+      ekkloItemId: 'I-1',
+      sent: storedEntry(entries, entryId),
+    );
     final diaryGate = Completer<void>();
     final mealsGate = Completer<void>();
     backends
