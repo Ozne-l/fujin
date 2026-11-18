@@ -598,7 +598,7 @@ void main() {
         );
 
     test(
-      'H1: links the row of an add killed before its link, without adding '
+      'links the row of an add killed before its link, without adding '
       'again, then sends its remembered Ekklo side',
       () async {
         final food = await unwritten(await services(), _draft());
@@ -616,7 +616,7 @@ void main() {
       },
     );
 
-    test('H1: a Journal read adopts that row the same way', () async {
+    test('a Journal read adopts that row the same way', () async {
       final food = await unwritten(await services(), _draft());
       backends.entries = [row('mfp-written')];
 
@@ -631,7 +631,7 @@ void main() {
     });
 
     test(
-      'H1: sends the remembered Ekklo side of a row a Journal read adopted '
+      'sends the remembered Ekklo side of a row a Journal read adopted '
       'first, and nothing for a row copied in',
       () async {
         final food = await unwritten(await services(), _draft());
@@ -654,7 +654,7 @@ void main() {
     );
 
     test(
-      'H1: sends the remembered Ekklo side of a row the read of an earlier '
+      'sends the remembered Ekklo side of a row the read of an earlier '
       'Ekklo send adopted',
       () async {
         final writing = await services();
@@ -684,7 +684,7 @@ void main() {
     );
 
     test(
-      'H1b: adopts the row of an add whose reply was lost, then sends Ekklo',
+      'adopts the row of an add whose reply was lost, then sends Ekklo',
       () async {
         final losing = _LosingMfpAdd(backends.httpClient);
         final writing = await services(httpClient: losing);
@@ -716,7 +716,7 @@ void main() {
       },
     );
 
-    test('H2: leaves an add killed before Ekklo to send', () async {
+    test('leaves an add killed before Ekklo to send', () async {
       backends.failingMeals.add(dejeuner);
       final (_, food) = await written();
       backends.failingMeals.clear();
@@ -729,7 +729,7 @@ void main() {
     });
 
     test(
-      'H3: removes the original of an edit whose copy was added, and links '
+      'removes the original of an edit whose copy was added, and links '
       'the copy',
       () async {
         final (writing, food) = await written();
@@ -766,7 +766,7 @@ void main() {
     );
 
     test(
-      'H3b: finishes an edit whose original MyFitnessPal refused to remove',
+      'finishes an edit whose original MyFitnessPal refused to remove',
       () async {
         final (writing, food) = await written();
         final original = mfpEntryIdOf(writing, food.entryId);
@@ -801,7 +801,7 @@ void main() {
     );
 
     test(
-      'H4: copies a change of date killed after the Ekklo removal, then '
+      'copies a change of date killed after the Ekklo removal, then '
       'sends its remembered Ekklo side on the new day',
       () async {
         final (writing, food) = await written();
@@ -836,7 +836,7 @@ void main() {
     );
 
     test(
-      'H4b: writes nothing in MyFitnessPal when Ekklo refuses the removal of '
+      'writes nothing in MyFitnessPal when Ekklo refuses the removal of '
       'a change of date',
       () async {
         final (writing, food) = await written();
@@ -890,7 +890,7 @@ void main() {
     );
 
     test(
-      'H5: forgets the link of a deletion killed after the MyFitnessPal '
+      'forgets the link of a deletion killed after the MyFitnessPal '
       'removal',
       () async {
         backends.failingMeals.add(dejeuner);
@@ -906,7 +906,7 @@ void main() {
       },
     );
 
-    test('H5: a Journal read forgets that link the same way', () async {
+    test('a Journal read forgets that link the same way', () async {
       backends.failingMeals.add(dejeuner);
       final (writing, food) = await written();
       writing.entries.remove(food.entryId);
@@ -922,7 +922,7 @@ void main() {
     });
 
     test(
-      'H6: removes from MyFitnessPal a deletion killed after the Ekklo '
+      'removes from MyFitnessPal a deletion killed after the Ekklo '
       'removal',
       () async {
         final (writing, food) = await written();
@@ -943,7 +943,7 @@ void main() {
       },
     );
 
-    test('H7: removes an add undone while MyFitnessPal wrote it', () async {
+    test('removes an add undone while MyFitnessPal wrote it', () async {
       final writing = await services();
       final gate = backends.mfpAddGate = Completer<void>();
       final food = await writing.add(_draft());
@@ -958,7 +958,7 @@ void main() {
       check(ekkloQuantities()).isEmpty();
     });
 
-    test('H8: writes an edit saved while MyFitnessPal wrote the add', () async {
+    test('writes an edit saved while MyFitnessPal wrote the add', () async {
       final writing = await services();
       final gate = backends.mfpAddGate = Completer<void>();
       final planned = await writing.adding.plan(_draft(servings: 2));
@@ -979,7 +979,7 @@ void main() {
     });
 
     test(
-      'H8b: sends an edit saved while Ekklo took the add, after it',
+      'sends an edit saved while Ekklo took the add, after it',
       () async {
         final holding = _HeldEkkloAppend(backends.httpClient);
         final writing = await services(httpClient: holding);
@@ -1002,7 +1002,7 @@ void main() {
     );
 
     test(
-      'H9: writes the moved version and makes a new own copy of it',
+      'writes the moved version and makes a new own copy of it',
       () async {
         memoryRepository.saveFood(
           const OwnCopy(
@@ -1060,7 +1060,7 @@ void main() {
     );
 
     test(
-      'H10: writes nothing when the moved version lost the serving',
+      'writes nothing when the moved version lost the serving',
       () async {
         final writing = await services();
         final food = await unwritten(writing, _draft());
@@ -1082,7 +1082,7 @@ void main() {
     );
 
     test(
-      'H11: keeps an entry linked after a diary read before its write',
+      'keeps an entry linked after a diary read before its write',
       () async {
         final writing = await services();
         final food = await unwritten(writing, _draft());
