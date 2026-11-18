@@ -375,6 +375,24 @@ void main() {
       ).deepEquals([InEkklo(linkOf(sent)), const ToSend()]);
     });
 
+    test('cannot adopt the item of an entry moved to another day', () {
+      final sent = stored('e-1', item: sentItem('I-1'));
+      final movedAway = sent.copyWith(
+        entry: sent.entry.copyWith(date: day.add(const Duration(days: 1))),
+      );
+
+      final result = compare(
+        [stored('e-2')],
+        [
+          meal('meal-1', [item('I-1')]),
+        ],
+        owed: [movedAway],
+      );
+
+      check(statusesOf(result)).deepEquals([const ToSend()]);
+      check(result.changes).equals(changes());
+    });
+
     test("claims each item once, in Fūjin's order", () {
       final result = compare(
         [stored('e-1'), stored('e-2')],
