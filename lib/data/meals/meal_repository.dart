@@ -76,20 +76,22 @@ final class MealRepository {
     final named = <String>{
       for (final name in mfpMealNames) mfpMeal(name, id: FujinId.at(now)),
     };
-    final order = [
-      ...named,
-      for (final {_id: String id} in _database.select(
-        'SELECT id FROM meal WHERE deleted_at IS NULL ORDER BY position, id',
+    final live = [
+      for (final row in _database.select(
+        'SELECT * FROM meal WHERE deleted_at IS NULL ORDER BY position, id',
       ))
-        if (!named.contains(id)) id,
+        MealMapper.fromMap(row),
     ];
-    final at = now.toIso8601String();
-    for (final (position, id) in order.indexed) {
-      _database.execute(
-        'UPDATE meal SET position = ?, updated_at = ? '
-        'WHERE id = ? AND position <> ?',
-        [position, at, id, position],
-      );
+    final byId = {for (final meal in live) meal.id: meal};
+    final order = [
+      for (final id in named) ?byId[id],
+      for (final meal in live)
+        if (!named.contains(meal.id)) meal,
+    ];
+    for (final (position, meal) in order.indexed) {
+      if (meal.position != position) {
+        _saveMeal(meal.copyWith(position: position, updatedAt: now));
+      }
     }
   });
 
@@ -158,6 +160,9 @@ final class MealRepository {
     [{_next: final int next}] => next,
     _ => 0,
   };
+
+  void _saveMeal(Meal meal) =>
+      _database.upsert(FujinTable.meal, meal.toMap(), key: const [_id]);
 
   void _saveMapping(ConnectorMeal mapping) => _database.upsert(
     FujinTable.mealMapping,

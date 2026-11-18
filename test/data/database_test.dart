@@ -1047,6 +1047,31 @@ void main() {
       check(meals.mealOfMfp(breakfast)).isNotNull();
       check(meals.mealOfMfp(lunch)).equals('meal-$lunch');
     });
+
+    test('touch only the meals whose position changes', () {
+      final later = now.add(const Duration(hours: 1));
+      MealRepository(database, () => later).arrange([lunch]);
+
+      check({
+        for (final meal in meals.meals()) meal.name: meal.updatedAt,
+      }).deepEquals({snacks: later, dinner: later, lunch: later});
+
+      MealRepository(
+        database,
+        () => later.add(const Duration(hours: 1)),
+      ).arrange([lunch, snacks, dinner]);
+
+      check({
+        for (final meal in meals.meals()) meal.name: meal.updatedAt,
+      }).deepEquals({snacks: later, dinner: later, lunch: later});
+
+      final latest = later.add(const Duration(hours: 2));
+      MealRepository(database, () => latest).arrange([lunch, dinner, snacks]);
+
+      check({
+        for (final meal in meals.meals()) meal.name: meal.updatedAt,
+      }).deepEquals({snacks: latest, dinner: latest, lunch: later});
+    });
   });
 
   group('goals', () {
