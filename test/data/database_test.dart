@@ -887,7 +887,7 @@ void main() {
           ],
           units: const [RememberedUnit(mfpFoodId: oil, mfpUnit: pot, grams: 1)],
         ),
-      ).throws<Object>();
+      ).throws<StateError>();
 
       final loaded = repository.load();
       check(loaded.food(skyr, pot)).isNull();
