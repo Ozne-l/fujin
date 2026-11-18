@@ -115,12 +115,18 @@ DayComparison compareEkkloDay(
     for (final logged in day.owed)
       if (MfpWrite.of(logged) case MfpDeletion()) logged.entry.id,
   };
+  claimed.addAll([
+    for (final logged in day.owed)
+      if (logged.ekkloLink?.item case final item?
+          when placements.containsKey(item.ekkloItemId))
+        item.ekkloItemId,
+  ]);
   final itemsGone = <String, EkkloLink?>{};
   for (final logged in day.deleted) {
     if (logged.ekkloLink case EkkloLink(item: final item?) && final link) {
       switch ((placements[item.ekkloItemId], owed.contains(logged.entry.id))) {
         case (_?, true):
-          claimed.add(item.ekkloItemId);
+          continue;
         case (final placement?, false):
           claimed.add(item.ekkloItemId);
           orphans.add((

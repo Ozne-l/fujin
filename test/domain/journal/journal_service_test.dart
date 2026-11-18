@@ -318,6 +318,30 @@ void main() {
       check(entries.find(id)).isNotNull();
     });
 
+    test('keeps the item of an entry moved to another day away from an '
+        'identical entry left behind', () async {
+      final movedId = stored('E-1', itemId: 'I-1');
+      final moved = entries.find(movedId)?.entry;
+      if (moved == null) throw StateError('$movedId was not stored');
+      entries.saveEntry(
+        moved.copyWith(date: day.add(const Duration(days: 1))),
+      );
+      final leftId = stored('E-2');
+      backends = FakeBackends(
+        entries: [entry('E-1'), entry('E-2')],
+        ekkloMeals: [
+          meal('meal-1', [item('I-1')]),
+        ],
+      );
+
+      final read = await (await service()).readDay(day);
+
+      check(
+        read.entries.map((compared) => (compared.entryId, compared.status)),
+      ).deepEquals([(leftId, const ToSend())]);
+      check(entries.find(movedId)?.ekkloLink?.item?.ekkloItemId).equals('I-1');
+    });
+
     test('shows the entries a held diary would copy in without a '
         'fiche, and stores nothing', () async {
       backends = FakeBackends(entries: [entry('E-1')]);
