@@ -14,12 +14,11 @@ import 'package:fujin/data/meals/meal.dart';
 import 'package:fujin/data/meals/meal_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/unattended/unattended_item_repository.dart';
-import 'package:fujin/domain/comparison/adopt_waiting.dart';
 import 'package:fujin/domain/comparison/compare_day.dart';
-import 'package:fujin/domain/comparison/compare_mfp_day.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/day_comparison.dart';
 import 'package:fujin/domain/comparison/day_draft.dart';
+import 'package:fujin/domain/comparison/draft_mfp_day.dart';
 import 'package:fujin/domain/comparison/replacement.dart';
 import 'package:fujin/domain/journal/diary_meal.dart';
 import 'package:fujin/domain/journal/fetch.dart';
@@ -223,31 +222,20 @@ final class JournalService {
     StoredDay stored,
     Fetched<MfpDiaryDay> fetched,
   ) {
-    final diary = fetched.value;
-    final now = _clock();
-    final ids = FujinId.source(_clock);
-    final role = _roles().mfp;
     final links = _links.forDate(date);
-    final catalog = _catalogOf(diary.entries, links);
-    return compareMfpDay(
-      adoptWaiting(
-        DayDraft.of(stored, date: date),
-        diary: diary.entries,
-        links: links,
-        unattended: _unattended.forDate(date),
-        foodOf: catalog.foodOf,
-        mealOf: catalog.mealOf,
-        now: now,
-        ids: ids,
-        role: role,
-      ),
-      diary: diary.entries,
+    final catalog = _catalogOf(fetched.value.entries, links);
+    return draftMfpDay(
+      date: date,
+      stored: stored,
+      diary: fetched.value.entries,
+      waitingLinks: links,
+      waitingUnattended: _unattended.forDate(date),
       foodOf: catalog.foodOf,
       mealOf: catalog.mealOf,
-      now: now,
-      readAt: fetched.readAt,
-      ids: ids,
-      role: role,
+      now: _clock(),
+      diaryReadAt: fetched.readAt,
+      ids: FujinId.source(_clock),
+      role: _roles().mfp,
     );
   }
 
