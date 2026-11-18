@@ -6,11 +6,9 @@ import 'package:fujin/data/foods/food.dart';
 import 'package:fujin/data/links/sent_link.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/unattended/unattended_item.dart';
-import 'package:fujin/domain/comparison/adopt_waiting.dart';
 import 'package:fujin/domain/comparison/compare_ekklo_day.dart';
-import 'package:fujin/domain/comparison/compare_mfp_day.dart';
 import 'package:fujin/domain/comparison/day_comparison.dart';
-import 'package:fujin/domain/comparison/day_draft.dart';
+import 'package:fujin/domain/comparison/draft_mfp_day.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 DayComparison compareDay({
@@ -28,23 +26,16 @@ DayComparison compareDay({
   required IdSource ids,
   required ConnectorRoles roles,
 }) => compareEkkloDay(
-  compareMfpDay(
-    adoptWaiting(
-      DayDraft.of(stored, date: date),
-      diary: diary,
-      links: waitingLinks,
-      unattended: waitingUnattended,
-      foodOf: foodOf,
-      mealOf: mealOf,
-      now: now,
-      ids: ids,
-      role: roles.mfp,
-    ),
+  draftMfpDay(
+    date: date,
+    stored: stored,
     diary: diary,
+    waitingLinks: waitingLinks,
+    waitingUnattended: waitingUnattended,
     foodOf: foodOf,
     mealOf: mealOf,
     now: now,
-    readAt: diaryReadAt,
+    diaryReadAt: diaryReadAt,
     ids: ids,
     role: roles.mfp,
   ),
