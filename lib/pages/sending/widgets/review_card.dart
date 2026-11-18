@@ -110,7 +110,7 @@ class ReviewCard extends ConsumerWidget {
                     runSpacing: FujinSpace.s2,
                     children: [
                       StatusPill(label: reasonLabel, tone: reasonTone),
-                      if (_confirmable(planned.reason))
+                      if (planned.sends && _confirmable(planned.reason))
                         FilledButton(
                           onPressed: () => _confirm(context, ref),
                           style:
