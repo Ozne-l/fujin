@@ -109,13 +109,15 @@ class FoodView extends HookConsumerWidget {
     final waiting = form.planProblem == ReadProblem.offline;
     final mfpOnly = waiting || planned?.sends == false;
     final read = ref.watch(journalProvider(draft.date)).value;
-    final day = switch (read?.diaryMeals) {
-      final meals? => DayNutrients.ofEntries([
-        for (final meal in meals)
+    final day = switch (read) {
+      BothSides(:final diaryMeals) ||
+      MfpOnly(:final diaryMeals) ||
+      FujinOnly(:final diaryMeals) => DayNutrients.ofEntries([
+        for (final meal in diaryMeals)
           for (final logged in meal.entries)
             if (logged.entry.id != original?.entry.id) logged,
       ]),
-      null => null,
+      EkkloOnly() || null => null,
     };
     final mealNames =
         ref.watch(mealNamesProvider).value ??

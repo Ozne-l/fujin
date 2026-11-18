@@ -11,6 +11,7 @@ import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/router.dart';
 import 'package:fujin/app/theme/fujin_system_bars.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
 import 'package:fujin/pages/adding/add_search_notifier.dart';
 import 'package:fujin/pages/common/scan_button.dart';
@@ -679,6 +680,31 @@ void main() {
       check(_scanEnabled(tester)).isTrue();
       await _openScanner(tester);
       _sees(_scannerTitle);
+    });
+
+    testWidgets('shows no remaining kilocalories on the fiche when '
+        'MyFitnessPal could not be read', (tester) async {
+      final camera = FakeScanCamera();
+      final backends = _backends(barcodes: {_code: _oats})
+        ..mfpDiaryStatus = 503;
+      await pumpFujin(
+        tester,
+        backends,
+        camera: camera,
+        goals: const Goals(
+          kilocalories: 3000,
+          protein: 160,
+          carbohydrates: 400,
+          fat: 70,
+          fiber: 40,
+        ),
+      );
+      await _openScanner(tester);
+      await _read(tester, camera, _code);
+      await _tapText(tester, 'C’est bien ce produit');
+
+      check(find.textContaining('Il restera').evaluate()).isEmpty();
+      check(find.textContaining('Dépassera').evaluate()).isEmpty();
     });
 
     testWidgets('is greyed and opens nothing when the Ekklo session expired', (
