@@ -154,6 +154,34 @@ void main() {
       );
     });
 
+    test('takes the other food its row now holds under the same id', () {
+      final stored = loggedEntry(entry('E-1'));
+      final edited = entry('E-1', food: rice);
+
+      final draft = read([stored], [edited]);
+
+      check(draft.changes).equals(
+        DayChanges(
+          date: day,
+          changedEntries: [
+            stored.entry.copyWith(foodId: fujinFoodId(rice)),
+          ],
+          changedMfpLinks: [
+            MfpLink.of(
+              edited,
+              id: 'mfp-link-E-1',
+              entryId: 'E-1',
+              mfpEntryId: 'E-1',
+              updatedAt: now,
+            ),
+          ],
+        ),
+      );
+      check(
+        draft.entries.map((logged) => (logged.mfpFoodId, logged.foodName)),
+      ).deepEquals([(rice, rice)]);
+    });
+
     test('names a food without a name and keeps a named one', () {
       final draft = read(
         [],
