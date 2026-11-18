@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:checks/checks.dart';
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_test/flutter_test.dart'
@@ -286,6 +288,34 @@ void main() {
 
       journal.settleDay(day, diary: diary, meals: meals);
       check(linkedItemOf('E-1')).equals('I-1');
+    });
+
+    test('keeps an entry written to MyFitnessPal while the diary was being '
+        'read', () async {
+      var time = now.subtract(const Duration(seconds: 1));
+      backends = FakeBackends()..diaryGate = Completer<void>();
+      final journal = JournalService(
+        roles: () => foodRoles,
+        mfp: await backends.mfp(),
+        ekklo: await backends.ekklo(),
+        entries: entriesOf(database, clock: () => time),
+        links: SentLinkRepository(database),
+        unattended: UnattendedItemRepository(database),
+        memory: memoryOf(database),
+        foods: foodsOf(database),
+        meals: mealsOf(database),
+        database: database,
+        clock: () => time,
+      );
+      final diary = Fetch.of(journal.fetchDiary(day));
+      final meals = Fetch.of(journal.fetchEkkloMeals(day));
+      final id = stored('E-1');
+      time = now.add(const Duration(seconds: 1));
+      backends.diaryGate?.complete();
+
+      journal.settleDay(day, diary: await diary, meals: await meals);
+
+      check(entries.find(id)).isNotNull();
     });
 
     test('shows the entries a held diary would copy in without a '
