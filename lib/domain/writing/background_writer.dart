@@ -286,13 +286,7 @@ final class BackgroundWriter {
       held: {..._entries.heldMfpEntryIds(link.date), ?written},
     );
     if (row case MfpFoodEntry(id: final rowId?)) {
-      final moved = MfpLink.of(
-        row,
-        id: link.id,
-        entryId: link.entryId,
-        mfpEntryId: rowId,
-        updatedAt: link.updatedAt,
-      );
+      final moved = link.rewrittenFrom(row, mfpEntryId: rowId);
       _entries.saveLink(moved);
       _replaced.add(replaced(moved));
       return rowId;

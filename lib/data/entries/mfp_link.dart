@@ -54,4 +54,13 @@ final class MfpLink with MfpLinkMappable {
   final String servingUnit;
   final DateTime updatedAt;
   final DateTime? deletedAt;
+
+  MfpLink rewrittenFrom(MfpFoodEntry row, {required String mfpEntryId}) =>
+      MfpLink.of(
+        row,
+        id: id,
+        entryId: entryId,
+        mfpEntryId: mfpEntryId,
+        updatedAt: updatedAt,
+      );
 }

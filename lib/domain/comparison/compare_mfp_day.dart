@@ -66,13 +66,9 @@ DayDraft compareMfpDay(
           date: logged.entry.date,
           deletedAt: logged.entry.deletedAt,
         );
-    final written = MfpLink.of(
-      entry,
-      id: link.id,
-      entryId: link.entryId,
-      mfpEntryId: link.mfpEntryId,
-      updatedAt: link.updatedAt,
-    ).copyWith(date: link.date, deletedAt: link.deletedAt);
+    final written = link
+        .rewrittenFrom(entry, mfpEntryId: link.mfpEntryId)
+        .copyWith(date: link.date, deletedAt: link.deletedAt);
     return switch (values == logged.entry && written == link) {
       true => logged,
       false => logged.copyWith(
@@ -164,21 +160,13 @@ DayDraft compareMfpDay(
       if (MfpWrite.of(logged) case MfpDeletion(:final link) when gone(link))
         logged,
   ];
-  MfpLink movedTo(MfpLink link, MfpFoodEntry row, String mfpEntryId) =>
-      MfpLink.of(
-        row,
-        id: link.id,
-        entryId: link.entryId,
-        mfpEntryId: mfpEntryId,
-        updatedAt: link.updatedAt,
-      );
   final moved = <String, MfpLink>{
     for (final logged in editsGone)
       if ((logged.mfpLink, editCopies[logged.entry.id]) case (
         final link?,
         MfpFoodEntry(id: final mfpEntryId?) && final row,
       ))
-        logged.entry.id: movedTo(link, row, mfpEntryId),
+        logged.entry.id: link.rewrittenFrom(row, mfpEntryId: mfpEntryId),
   };
   for (final candidates in [editsGone, deletionsGone]) {
     for (final sameMeal in const [true, false]) {
@@ -196,7 +184,10 @@ DayDraft compareMfpDay(
         );
         if (row case MfpFoodEntry(id: final mfpEntryId?)) {
           held.add(mfpEntryId);
-          moved[logged.entry.id] = movedTo(link, row, mfpEntryId);
+          moved[logged.entry.id] = link.rewrittenFrom(
+            row,
+            mfpEntryId: mfpEntryId,
+          );
         }
       }
     }
@@ -226,12 +217,9 @@ DayDraft compareMfpDay(
     }
     switch ((keepsFujin(logged), inDiary[link.mfpEntryId], logged.ekkloLink)) {
       case (true, final row?, _):
-        final refreshed = MfpLink.of(
+        final refreshed = link.rewrittenFrom(
           row,
-          id: link.id,
-          entryId: link.entryId,
           mfpEntryId: link.mfpEntryId,
-          updatedAt: link.updatedAt,
         );
         final kept = logged.copyWith(mfpLink: refreshed);
         entries.add(kept);
