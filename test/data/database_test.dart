@@ -557,6 +557,137 @@ void main() {
     });
   });
 
+  group('a 0.4.0 database with unit weights and portion units', () {
+    const cod = 'mfp-cod';
+    const stew = 'mfp-stew';
+    const oatDrink = 'mfp-oat-drink';
+    const almondDrink = 'mfp-almond-drink';
+    const duck = 'mfp-duck';
+    const quiche = 'mfp-quiche';
+    const flan = 'mfp-flan';
+    const drinkInEkklo = 'ekklo-plant-drink';
+    const skinless = 'g (sans peau)';
+    const millilitres = 'ml';
+    const leg = 'aile';
+    const slice = 'tranche (65g)';
+    const units = [
+      RememberedUnit(mfpFoodId: cod, mfpUnit: skinless, grams: 1.35),
+      RememberedUnit(mfpFoodId: stew, mfpUnit: bowl, grams: 318.18181818181819),
+      RememberedUnit(mfpFoodId: oatDrink, mfpUnit: millilitres, grams: 1.02),
+      RememberedUnit(mfpFoodId: almondDrink, mfpUnit: millilitres, grams: 0.98),
+    ];
+    const matches = [
+      MatchedFood(
+        mfpFoodId: cod,
+        mfpDescription: 'Dos de cabillaud "nature" à l\'aneth',
+        ekkloFoodId: 'ekklo-cod',
+        ekkloFoodName: 'Cabillaud, filet, cuit à la vapeur',
+      ),
+      MatchedFood(
+        mfpFoodId: stew,
+        mfpDescription: 'Pot-au-feu, with vegetables',
+        ekkloFoodId: 'ekklo-stew',
+        ekkloFoodName: 'Pot-au-feu',
+      ),
+      MatchedFood(
+        mfpFoodId: oatDrink,
+        mfpDescription: 'Boisson avoine',
+        ekkloFoodId: drinkInEkklo,
+        ekkloFoodName: 'Boisson végétale',
+      ),
+      MatchedFood(
+        mfpFoodId: almondDrink,
+        mfpDescription: 'Boisson amande sans sucres',
+        ekkloFoodId: drinkInEkklo,
+        ekkloFoodName: 'Boisson végétale',
+      ),
+    ];
+    const ownCopies = [
+      OwnCopy(
+        mfpFoodId: duck,
+        mfpDescription: 'Canard confit',
+        ekkloFoodId: 'own-duck',
+        ekkloFoodName: 'Canard confit',
+        mfpUnit: leg,
+        mfpFoodVersion: '184467440737095',
+      ),
+      OwnCopy(
+        mfpFoodId: quiche,
+        mfpDescription: 'Quiche lorraine',
+        ekkloFoodId: 'own-quiche',
+        ekkloFoodName: 'Quiche lorraine',
+        mfpUnit: slice,
+        mfpFoodVersion: '42949672961234',
+      ),
+      OwnCopy(
+        mfpFoodId: flan,
+        mfpDescription: 'Flan pâtissier',
+        ekkloFoodId: 'own-flan',
+        ekkloFoodName: 'Flan pâtissier',
+        mfpUnit: cup,
+        mfpFoodVersion: '73741823456789',
+      ),
+    ];
+    late FujinDatabase migrated;
+
+    setUp(() {
+      final (path, legacy) = _legacyDatabase(_versionOfRelease040);
+      for (final food in matches) {
+        legacy.execute(
+          'INSERT INTO memory_food (mfp_food_id, mfp_description, kind, '
+          "ekklo_food_id, ekklo_food_name) VALUES (?, ?, 'ekklo', ?, ?)",
+          [
+            food.mfpFoodId,
+            food.mfpDescription,
+            food.ekkloFoodId,
+            food.ekkloFoodName,
+          ],
+        );
+      }
+      for (final copy in ownCopies) {
+        legacy.execute(
+          'INSERT INTO memory_own_copy (mfp_food_id, mfp_unit, '
+          'mfp_description, kind, ekklo_food_id, ekklo_food_name, '
+          "mfp_food_version) VALUES (?, ?, ?, 'own_copy', ?, ?, ?)",
+          [
+            copy.mfpFoodId,
+            copy.mfpUnit,
+            copy.mfpDescription,
+            copy.ekkloFoodId,
+            copy.ekkloFoodName,
+            copy.mfpFoodVersion,
+          ],
+        );
+      }
+      for (final unit in units) {
+        legacy.execute(
+          'INSERT INTO memory_unit (mfp_food_id, mfp_unit, grams) '
+          'VALUES (?, ?, ?)',
+          [unit.mfpFoodId, unit.mfpUnit, unit.grams],
+        );
+      }
+      legacy
+        ..execute(
+          'INSERT INTO memory_meal (mfp_meal_name, ekklo_meal_name) '
+          'VALUES (?, ?)',
+          [breakfast, petitDejeuner],
+        )
+        ..close();
+      migrated = FujinDatabase.open(path);
+    });
+
+    tearDown(() => migrated.close());
+
+    test('keeps two foods matched to one Ekklo food, unit weights on units '
+        'that only look like grams, and own copies in portion units', () {
+      final loaded = memoryOf(migrated).load();
+
+      check(loaded.matches).unorderedEquals(matches);
+      check(loaded.ownCopies).unorderedEquals(ownCopies);
+      check(loaded.units).unorderedEquals(units);
+    });
+  });
+
   group('sent links', () {
     late FujinDatabase database;
     late SentLinkRepository links;
