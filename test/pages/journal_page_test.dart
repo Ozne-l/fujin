@@ -275,6 +275,21 @@ void main() {
     check(find.text('Rien de nouveau').evaluate()).length.equals(1);
   });
 
+  testWidgets('does not say nothing is new when a pull brings Ekklo back', (
+    tester,
+  ) async {
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [entry('E-1')],
+    )..ekkloReachable = false;
+    await pumpFujin(tester, backends);
+
+    backends.ekkloReachable = true;
+    await _pullToRefresh(tester);
+
+    check(find.text('Rien de nouveau').evaluate()).isEmpty();
+  });
+
   testWidgets('shows the Souffle disc while a pull refreshes', (tester) async {
     final backends = FakeBackends(
       mealNames: [breakfast],

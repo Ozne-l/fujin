@@ -94,7 +94,7 @@ The words below have one meaning in Fūjin's code, docs and conversations. Frenc
 
 **Status counts.** How many entries of a day or meal are in Ekklo, to send, to update and being sent by the background writer (`sending`); `pending` is the last three (not `ComparedEntry.mfpPending`, the MyFitnessPal pending). They feed "N/M dans Ekklo" and the send button label. Code: `StatusCounts` (`lib/domain/journal/status_counts.dart`).
 
-**Refresh outcome.** What a pull to refresh found: `changed`, or `nothingNew` when the MyFitnessPal diary is identical before and after, which triggers the "Rien de nouveau" snackbar. Code: `RefreshOutcome` (`lib/pages/journal/refresh_outcome.dart`).
+**Refresh outcome.** What a pull to refresh found: `changed`, or `nothingNew` when the day showed both apps before the pull and the MyFitnessPal diary is identical before and after, which triggers the "Rien de nouveau" snackbar. Code: `RefreshOutcome` (`lib/pages/journal/refresh_outcome.dart`).
 
 **Send plan.** What a send will do for one day, built before anything is written: one planned entry per entry "À envoyer" or "À mettre à jour" with a Fūjin id, keyed by it, the entries still being searched, and the entries already in Ekklo. Code: `SendPlan` (`lib/domain/sending/send_plan.dart`), built by `SendService.plan` (`lib/domain/sending/send_service.dart`) from the pure rules in `planEntry` (`lib/domain/sending/plan_entry.dart`).
 
