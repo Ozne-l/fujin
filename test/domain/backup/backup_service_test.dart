@@ -417,6 +417,28 @@ void main() {
       check(backups.read(Uint8List.fromList(const [0xff, 0xfe]))).isNull();
     });
 
+    test('a version 1 or 2 file with a unit weight for a food it does not '
+        'match, and keeps Memory as it was', () {
+      final before = memories.load();
+
+      for (final version in [
+        BackupV2.versionWithoutBarcodeLinks,
+        BackupV2.memoryVersion,
+      ]) {
+        check(
+          backups.read(
+            _json({
+              ..._fileOfRelease040(version),
+              'units': [
+                {'mfp_food_id': skyr, 'mfp_unit': pot, 'grams': 150},
+              ],
+            }),
+          ),
+        ).isNull();
+      }
+      check(memories.load()).equals(before);
+    });
+
     test('a whole file with two Ekklo links on one item and keeps what was '
         'there', () async {
       final before = memories.load();
