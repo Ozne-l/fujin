@@ -26,6 +26,9 @@ const _mfpOnlyCopy =
 const _slowDrag = Duration(seconds: 1);
 const _mfpNotWritten = 'Pas écrit dans MyFitnessPal';
 const _deletedInFujin = 'Supprimé dans Fūjin';
+const _withoutId = 'Pomme';
+const _withoutIdFood = 'mfp-apple';
+const _resavedId = 'e-basmati-resaved';
 
 FakeBackends _backends() => LoggedJournal.backends();
 
@@ -266,6 +269,84 @@ void main() {
 
     check(find.text('Modifier l’aliment').evaluate()).isEmpty();
     check(find.text(_action).hitTestable().evaluate()).isEmpty();
+  });
+
+  testWidgets('offers neither Supprimer nor the fiche on a row Fūjin does '
+      'not hold', (tester) async {
+    final backends = _backends();
+    backends.entries = [
+      ...backends.entries,
+      entry(null, food: _withoutIdFood, description: _withoutId),
+    ];
+    await _pump(tester, backends);
+    check(find.text(_withoutId).evaluate()).length.equals(1);
+
+    await tester.tap(find.text(_withoutId));
+    await tester.pumpAndSettle();
+    check(find.text('Modifier l’aliment').evaluate()).isEmpty();
+
+    await _drag(tester, _withoutId, 0.25);
+    check(find.text(_action).hitTestable().evaluate()).isEmpty();
+
+    await _drag(tester, _withoutId, 0.8);
+    check(find.text('Supprimer $_withoutId ?').evaluate()).isEmpty();
+  });
+
+  testWidgets('offers no Supprimer on a row whose deletion is still owed', (
+    tester,
+  ) async {
+    final backends = _backends()..mfpRemoveFails = true;
+    await _pump(tester, backends);
+    await _drag(tester, _row, 0.8);
+    await tester.tap(find.text(_confirm));
+    await tester.pumpAndSettle();
+    check(find.text(_deletedInFujin).evaluate()).length.equals(1);
+
+    await _drag(tester, _row, 0.25);
+    check(find.text(_action).hitTestable().evaluate()).isEmpty();
+
+    await _drag(tester, _row, 0.8);
+    check(find.text(_sheetTitle).evaluate()).isEmpty();
+  });
+
+  testWidgets('says Remplacé dans MyFitnessPal with the food when the '
+      'MyFitnessPal app changed a food deleted in Fūjin', (tester) async {
+    final backends = _backends()..mfpRemoveFails = true;
+    await _pump(tester, backends);
+    await _drag(tester, _row, 0.8);
+    await tester.tap(find.text(_confirm));
+    await tester.pumpAndSettle();
+    backends
+      ..mfpRemoveFails = false
+      ..entries = [
+        for (final logged in backends.entries)
+          switch (logged.id) {
+            LoggedJournal.basmatiId => logged.copyWith(
+              id: _resavedId,
+              servings: 3,
+            ),
+            _ => logged,
+          },
+      ];
+    tester
+        .state<ScaffoldMessengerState>(find.byType(ScaffoldMessenger))
+        .clearSnackBars();
+    tester.view.reset();
+    await tester.pumpAndSettle();
+
+    await tester.fling(
+      find.byType(CustomScrollView),
+      const Offset(0, 400),
+      1000,
+    );
+    await tester.pumpAndSettle();
+
+    check(
+      _snackBarText('Remplacé dans MyFitnessPal').evaluate(),
+    ).length.equals(1);
+    check(
+      _snackBarText('$_row supprimé dans Fūjin').evaluate(),
+    ).length.equals(1);
   });
 
   testWidgets('opens the fiche in edit mode on a tap on a closed row', (

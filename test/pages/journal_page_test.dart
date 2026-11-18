@@ -1860,6 +1860,9 @@ void main() {
       check(
         find.text('Remplacé dans MyFitnessPal').evaluate(),
       ).length.equals(1);
+      check(
+        find.text('Riz basmati : 3 × 100 g → 2 × 100 g').evaluate(),
+      ).length.equals(1);
       await tester.pump(const Duration(seconds: 5));
       await tester.pumpAndSettle();
       check(find.text(_mfpNotWritten).evaluate()).length.equals(1);
