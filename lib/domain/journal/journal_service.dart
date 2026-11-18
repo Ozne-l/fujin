@@ -77,11 +77,15 @@ final class JournalService {
     };
   }
 
-  Future<Fetched<MfpDiaryDay>> fetchDiary(DateTime date) async =>
-      Fetched(await _mfp.diary.forDate(date), readAt: _clock());
+  Future<Fetched<MfpDiaryDay>> fetchDiary(DateTime date) async {
+    final readAt = _clock();
+    return Fetched(await _mfp.diary.forDate(date), readAt: readAt);
+  }
 
-  Future<Fetched<List<EkkloDailyMeal>>> fetchEkkloMeals(DateTime date) async =>
-      Fetched(await _ekklo.meals.forDate(date), readAt: _clock());
+  Future<Fetched<List<EkkloDailyMeal>>> fetchEkkloMeals(DateTime date) async {
+    final readAt = _clock();
+    return Fetched(await _ekklo.meals.forDate(date), readAt: readAt);
+  }
 
   JournalRead journalOf(
     DateTime date, {
