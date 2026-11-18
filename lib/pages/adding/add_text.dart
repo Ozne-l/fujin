@@ -135,10 +135,11 @@ abstract final class AddText {
         food,
         intl.addFoundAutomatically(_gap(planned)),
       ),
-      EkkloSide.willBeCreated => (
+      EkkloSide.willBeCreated when planned.sends => (
         intl.addWillBeCreated,
         intl.addWillBeCreatedDetail(ownAmount),
       ),
+      EkkloSide.willBeCreated => (intl.addToChoose, intl.skippedDetail),
       EkkloSide.toChoose => (
         intl.addToChoose,
         switch (gramUnit) {
