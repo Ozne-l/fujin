@@ -1,12 +1,11 @@
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/domain/comparison/entry_quantity.dart';
-import 'package:fujin/domain/sending/food_words.dart';
 
 const _gramsPerOwnCopyPortion = 100.0;
 const _portionPerUnit = 1.0;
 
-EkkloFoodDraft ownCopyDraft(LoggedEntry entry) {
+EkkloFoodDraft ownCopyDraft(LoggedEntry entry, String name) {
   final quantityType = ownCopyQuantityType(entry.entry.servingUnit);
   final portion = switch (quantityType) {
     EkkloQuantityType.grams => _gramsPerOwnCopyPortion,
@@ -15,7 +14,7 @@ EkkloFoodDraft ownCopyDraft(LoggedEntry entry) {
   final scale = portion / entryUnits(entry.entry);
   final nutrients = entry.entry.nutrients;
   return EkkloFoodDraft(
-    name: productName(entry),
+    name: name,
     category: EkkloFoodCategory.other,
     portion: portion,
     quantityType: quantityType,

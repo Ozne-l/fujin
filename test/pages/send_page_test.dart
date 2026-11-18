@@ -322,6 +322,32 @@ void main() {
     check(find.text('Créer l’aliment perso').evaluate()).isEmpty();
   });
 
+  testWidgets('names a nameless entry associated on sheet 11 on the sent '
+      'screen', (tester) async {
+    final backends = FakeBackends(
+      mealNames: [breakfast],
+      entries: [
+        entry('E-1', food: skyr, description: _nameless, nutrients: _kcal),
+      ],
+      ekkloSearches: {
+        'skyr': [isey, siggis],
+      },
+    );
+    await pumpFujin(tester, backends);
+
+    await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
+    await _tap(tester, 'Changer ›');
+    await tester.enterText(find.byType(TextField).last, 'skyr');
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+    await _tap(tester, 'Skyr');
+    await _tap(tester, 'Associer et mémoriser');
+
+    await _tap(tester, 'Envoyer 1 aliment vers Ekklo');
+    _sees('1 nouveau choix : Aliment sans nom');
+    check(backends.ekkloItems.single.foodId).equals(siggis.id);
+  });
+
   testWidgets('shows a new unit for a food copied in another unit', (
     tester,
   ) async {

@@ -26,7 +26,7 @@ final class SendReport with SendReportMappable {
   final int sent;
   final int reused;
   final int updated;
-  final List<String> newAssociations;
+  final List<String?> newAssociations;
   final List<RetainedWeight> weights;
   final List<String> ownCopies;
   final List<PlannedEntry> unattended;

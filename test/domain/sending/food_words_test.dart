@@ -22,6 +22,10 @@ void main() {
         productName(_food('Danone - Skyr', brand: 'Isey')),
       ).equals('Danone - Skyr');
     });
+
+    test('has no name for a food without a description', () {
+      check(productName(_food('  ', brand: 'Isey'))).isNull();
+    });
   });
 
   group('searchTerms', () {

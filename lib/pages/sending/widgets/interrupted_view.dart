@@ -7,6 +7,7 @@ import 'package:fujin/domain/sending/send_progress.dart';
 import 'package:fujin/domain/sending/send_step.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/sending/send_failure.dart';
 import 'package:fujin/pages/sending/send_notifier.dart';
 import 'package:fujin/pages/sending/widgets/step_list.dart';
@@ -68,7 +69,7 @@ class InterruptedView extends ConsumerWidget {
 
   String _reason(AppLocalizations intl) => switch ((
     failure,
-    _label(progress.failed),
+    _label(intl, progress.failed),
   )) {
     (SendFailure.network, final step?) => intl.interruptedNetwork(step),
     (SendFailure.ekkloSession, final step?) => intl.interruptedSession(step),
@@ -82,9 +83,11 @@ class InterruptedView extends ConsumerWidget {
     (SendFailure.refused || SendFailure.other, null) => intl.sendFailedOther,
   };
 
-  static String? _label(SendStep? step) => switch (step) {
-    MealStep(:final ekkloMealName) => ekkloMealName,
-    OwnCopyStep(:final name) || QuantityUpdateStep(:final name) => name,
-    null => null,
-  };
+  static String? _label(AppLocalizations intl, SendStep? step) =>
+      switch (step) {
+        MealStep(:final ekkloMealName) => ekkloMealName,
+        OwnCopyStep(:final name) => name,
+        QuantityUpdateStep(:final name) => FoodText.name(intl, name),
+        null => null,
+      };
 }

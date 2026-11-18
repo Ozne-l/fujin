@@ -56,8 +56,8 @@ class SendReportMapper extends ClassMapperBase<SendReport> {
     opt: true,
     def: 0,
   );
-  static List<String> _$newAssociations(SendReport v) => v.newAssociations;
-  static const Field<SendReport, List<String>> _f$newAssociations = Field(
+  static List<String?> _$newAssociations(SendReport v) => v.newAssociations;
+  static const Field<SendReport, List<String?>> _f$newAssociations = Field(
     'newAssociations',
     _$newAssociations,
     key: r'new_associations',
@@ -178,7 +178,7 @@ extension SendReportValueCopy<$R, $Out>
 
 abstract class SendReportCopyWith<$R, $In extends SendReport, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
+  ListCopyWith<$R, String?, ObjectCopyWith<$R, String?, String?>?>
   get newAssociations;
   ListCopyWith<
     $R,
@@ -200,7 +200,7 @@ abstract class SendReportCopyWith<$R, $In extends SendReport, $Out>
     int? sent,
     int? reused,
     int? updated,
-    List<String>? newAssociations,
+    List<String?>? newAssociations,
     List<RetainedWeight>? weights,
     List<String>? ownCopies,
     List<PlannedEntry>? unattended,
@@ -217,7 +217,7 @@ class _SendReportCopyWithImpl<$R, $Out>
   late final ClassMapperBase<SendReport> $mapper =
       SendReportMapper.ensureInitialized();
   @override
-  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
+  ListCopyWith<$R, String?, ObjectCopyWith<$R, String?, String?>?>
   get newAssociations => ListCopyWith(
     $value.newAssociations,
     (v, t) => ObjectCopyWith(v, $identity, t),
@@ -260,7 +260,7 @@ class _SendReportCopyWithImpl<$R, $Out>
     int? sent,
     int? reused,
     int? updated,
-    List<String>? newAssociations,
+    List<String?>? newAssociations,
     List<RetainedWeight>? weights,
     List<String>? ownCopies,
     List<PlannedEntry>? unattended,

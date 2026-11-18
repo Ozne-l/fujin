@@ -223,8 +223,11 @@ final class SendService {
   }
 
   Future<void> keep(PlannedEntry planned) async {
-    if (planned.choice case SendAsOwnCopy() when planned.sends) {
-      await _ownCopy(planned.entry);
+    if ((planned.choice, productName(planned.entry)) case (
+      SendAsOwnCopy(),
+      final name?,
+    )) {
+      await _ownCopy(planned.entry, name);
     }
     _remember([planned]);
     if ((
@@ -311,10 +314,13 @@ final class SendService {
     List<String> createdCopies,
   ) {
     final placements = placementsOf(before);
-    final ownCopies = <_OwnCopyKey, LoggedEntry>{
+    final ownCopies = <_OwnCopyKey, (LoggedEntry, String)>{
       for (final planned in active)
-        if (planned.choice case SendAsOwnCopy(reuse: null))
-          _ownCopyKey(planned.entry): planned.entry,
+        if ((planned.choice, productName(planned.entry)) case (
+          SendAsOwnCopy(reuse: null),
+          final name?,
+        ))
+          _ownCopyKey(planned.entry): (planned.entry, name),
     };
     final updates = <String, _Update>{
       for (final planned in active)
@@ -328,17 +334,17 @@ final class SendService {
       }
     }
     return [
-      for (final MapEntry(:key, value: entry) in ownCopies.entries)
+      for (final MapEntry(:key, value: (entry, name)) in ownCopies.entries)
         (
           OwnCopyStep(
             foodId: entry.entry.foodId,
             unit: entry.entry.servingUnit,
-            name: productName(entry),
+            name: name,
           ),
           () async {
-            final (ekkloFoodId, created) = await _ownCopy(entry);
+            final (ekkloFoodId, created) = await _ownCopy(entry, name);
             ownCopyIds[key] = ekkloFoodId;
-            if (created) createdCopies.add(productName(entry));
+            if (created) createdCopies.add(name);
           },
         ),
       for (final update in updates.values)
@@ -401,7 +407,7 @@ final class SendService {
         ),
       };
 
-  Future<(String, bool)> _ownCopy(LoggedEntry entry) async {
+  Future<(String, bool)> _ownCopy(LoggedEntry entry, String name) async {
     final unit = entry.entry.servingUnit;
     switch (switch (entry.mfpFoodId) {
       final mfpFoodId? => _memory.load().food(mfpFoodId, unit),
@@ -410,7 +416,7 @@ final class SendService {
       case final OwnCopy copy when isFresh(copy, entry):
         return (copy.ekkloFoodId, false);
       case OwnCopy() || MatchedFood() || null:
-        final created = await _ekklo.foods.createOwn(ownCopyDraft(entry));
+        final created = await _ekklo.foods.createOwn(ownCopyDraft(entry, name));
         if (entry.mfpFoodId case final mfpFoodId?) {
           _memory.saveFood(
             OwnCopy(
