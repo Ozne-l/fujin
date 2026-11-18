@@ -316,6 +316,7 @@ void main() {
     _sees('→ Choisir l’aliment Ekklo');
     _sees('Reste hors de cet envoi.');
     check(find.text('→ Aliment perso à créer').evaluate()).isEmpty();
+    check(find.text('Confirmer').evaluate()).isEmpty();
 
     await _tap(tester, 'Changer ›');
     _sees('Choisir un candidat');
