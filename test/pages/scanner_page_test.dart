@@ -18,6 +18,8 @@ import 'package:fujin/pages/common/scan_button.dart';
 import 'package:fujin/pages/scanner/widgets/code_keypad.dart';
 import 'package:fujin/pages/tabs/floating_tab_bar.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../support/fake_backends.dart';
@@ -28,6 +30,7 @@ import '../support/pump_fujin.dart';
 const _dinner = 'Dinner';
 const _snacks = 'Snacks';
 const _code = '3275760750398';
+const _mfpUser = '/v2/users/mfp-user';
 const _storeCode = '2112345004501';
 const _oatsName = 'Flocons d’avoine';
 const _brand = 'Quaker';
@@ -705,6 +708,40 @@ void main() {
 
       check(find.textContaining('Il restera').evaluate()).isEmpty();
       check(find.textContaining('Dépassera').evaluate()).isEmpty();
+    });
+
+    testWidgets('opens on a stored meal and offers the stored meals when '
+        'MyFitnessPal does not give its meal names', (tester) async {
+      final camera = FakeScanCamera();
+      final backends = _backends(barcodes: {_code: _oats});
+      await pumpFujin(
+        tester,
+        backends,
+        camera: camera,
+        mfp: await backends.mfp(
+          client: MockClient(
+            (request) => switch (request.url.path) {
+              _mfpUser => Future.value(http.Response('', 503)),
+              _ =>
+                backends.httpClient
+                    .send(
+                      http.Request(request.method, request.url)
+                        ..headers.addAll(request.headers)
+                        ..bodyBytes = request.bodyBytes,
+                    )
+                    .then(http.Response.fromStream),
+            },
+          ),
+        ),
+      );
+      await _openScanner(tester);
+      await _read(tester, camera, _code);
+      await _tapText(tester, 'C’est bien ce produit');
+
+      _sees('Ajouter à $breakfast');
+      await _tapText(tester, breakfast);
+      check(find.text(lunch).evaluate()).isNotEmpty();
+      check(find.text(_dinner).evaluate()).isEmpty();
     });
 
     testWidgets('is greyed and opens nothing when the Ekklo session expired', (

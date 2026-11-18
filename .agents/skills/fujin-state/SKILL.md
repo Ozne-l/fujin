@@ -84,7 +84,7 @@ Riverpod 3 does both injection and state. Providers are written by hand; a notif
 
 9. **Check `ref.mounted` after an `await` before writing `state`; check `context.mounted` in widgets.**
    Why: an auto-disposed notifier can be gone when the future completes (`Ref.mounted` is new in Riverpod 3, riverpod.dev).
-   Example: `if (ref.mounted) state = next;` in `EkkloSignInNotifier` (`lib/pages/ekklo_sign_in/ekklo_sign_in_notifier.dart`); `if (!context.mounted) return;` in the refresh callback of `JournalPage.build`.
+   Example: `if (ref.mounted) state = next;` in `EkkloSignInNotifier` (`lib/pages/ekklo_sign_in/ekklo_sign_in_notifier.dart`); `if (!context.mounted) return;` in the refresh callback of `JournalPage.build`; `AddShortcut.mealOfNow` (`lib/pages/adding/add_shortcut.dart`) checks `context.mounted` after awaiting the meal names, before it reads any other provider.
 
 10. **Wrap reads in `AsyncValue.guard` and render `AsyncValue` with a `switch` on its patterns, data first.**
     Why: errors become state instead of escaping, and matching `AsyncValue(value: ...)` first keeps the previous day on screen while a refresh runs; an error set on a notifier that had a value keeps that value (Riverpod copies the previous state), which is how the offline Journal shows its last figures.
