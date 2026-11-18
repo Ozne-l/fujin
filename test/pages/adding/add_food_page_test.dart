@@ -296,6 +296,30 @@ void main() {
     _sees('Ekklo : sera créé depuis MFP');
   });
 
+  testWidgets('adds a food without a name to MyFitnessPal only, leaving its '
+      'Ekklo food to choose', (tester) async {
+    final nameless = mfpFood(
+      'mfp-nameless',
+      description: ' ',
+      brand: 'Isey',
+      nutrients: nutrients(kcal: 60, protein: 10, carbs: 4, fat: 0.2),
+    );
+    final backends = _backends()
+      ..mfpFoods = [nameless]
+      ..mfpSearches = {
+        'isey': [nameless],
+      };
+    await pumpFujin(tester, backends);
+    await _openAdd(tester);
+    await _search(tester, 'isey');
+    await _tap(tester, 'Isey · 100 g');
+
+    _sees('Ajouter à MFP');
+    _sees('Ekklo : à choisir');
+    _sees('Reste hors de cet envoi.');
+    check(find.text('Ekklo : sera créé depuis MFP').evaluate()).isEmpty();
+  });
+
   testWidgets('looks up a typed barcode', (tester) async {
     final backends = _backends()..mfpBarcodes = {_barcode: _oats};
     await pumpFujin(tester, backends);
