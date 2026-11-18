@@ -54,15 +54,6 @@ final class AddSearchNotifier extends Notifier<AddSearchState> {
     );
   }
 
-  void refreshRecents() {
-    final service = ref.read(addFoodServiceProvider);
-    _memory = service.memory();
-    state = state.copyWith(
-      recents: service.recents(),
-      remembered: rememberedFoods(_memory, state.query),
-    );
-  }
-
   void type(String text) {
     _typing?.cancel();
     final query = text.trim();

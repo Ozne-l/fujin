@@ -22,7 +22,7 @@ Search before typing (02a):
 
 Search while typing (02b):
 
-- "MÉMORISÉS" with "{count} trouvés" comes first, filtered on the phone by `rememberedFoods(memory, query)` (MyFitnessPal and Ekklo names, accent-folded). It shows as soon as the query changes, without waiting for MyFitnessPal, and is hidden when nothing matches. Memory is read once when the search opens and again each time it comes back from the fiche (`AddSearchNotifier.refreshRecents`).
+- "MÉMORISÉS" with "{count} trouvés" comes first, filtered on the phone by `rememberedFoods(memory, query)` (MyFitnessPal and Ekklo names, accent-folded). It shows as soon as the query changes, without waiting for MyFitnessPal, and is hidden when nothing matches. Memory is read once when the search opens; every add closes the search, so a search reached back from the fiche has nothing new to read.
 - "RÉSULTATS MYFITNESSPAL" drops the foods listed under "MÉMORISÉS", by MyFitnessPal id (`AddSearchResults.foodsBesideRemembered`). It is hidden when every result was dropped. "Aucun résultat" and its suggestions show only when neither MyFitnessPal nor "MÉMORISÉS" has a row.
 - "25 premiers" is decided on the count MyFitnessPal returned, before the drop: a full page (`MfpFoods.defaultMaxResults`) reads "25 premiers" even when 23 rows remain. Otherwise the label counts the rows shown.
 - Back from a fiche opened from a row returns to the results as they were, without searching again (`AddSearchNotifier._fetch` keeps the results it replaced). Touching a row while MyFitnessPal is still searching wins over that search, whose answer is dropped.

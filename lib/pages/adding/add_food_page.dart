@@ -109,12 +109,7 @@ class AddFoodPage extends HookConsumerWidget {
                     barcodeToLink: scanned.value?.barcode,
                   ),
                   onBack: switch (mfpFoodId) {
-                    null => () {
-                      ref
-                          .read(addSearchProvider(scanned.value).notifier)
-                          .refreshRecents();
-                      opened.value = null;
-                    },
+                    null => () => opened.value = null,
                     _ => context.pop,
                   },
                 ),
