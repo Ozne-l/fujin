@@ -43,10 +43,15 @@ class MealCard extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final removals = ref.watch(
-      backgroundWriteProvider.select((state) => state.ekkloRemovalIds),
-    );
-    final leaving = MealRows.shown(meal.leaving, removals);
+    final leaving = ref
+        .watch(
+          backgroundWriteProvider.select(
+            (state) => meal.copyWith(
+              leaving: MealRows.shown(meal.leaving, state.ekkloRemovalIds),
+            ),
+          ),
+        )
+        .leaving;
     final counts = ref.watch(
       backgroundWriteProvider.select(
         (state) => meal.counts(sending: state.ekkloSendIds),

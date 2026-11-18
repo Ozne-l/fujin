@@ -51,13 +51,18 @@ class DaySummaryCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sending = ref.watch(
-      backgroundWriteProvider.select((state) => state.ekkloSendIds),
+    final counts = ref.watch(
+      backgroundWriteProvider.select(
+        (state) => switch (read) {
+          BothSides(:final day) => day.counts(sending: state.ekkloSendIds),
+          MfpOnly() || FujinOnly() || EkkloOnly() => null,
+        },
+      ),
     );
-    final fresh = switch ((read, stale)) {
-      (BothSides(:final day), false) => (
+    final fresh = switch ((read, counts, stale)) {
+      (BothSides(:final day), final counts?, false) => (
         ekklo: day.ekkloNutrients,
-        counts: day.counts(sending: sending),
+        counts: counts,
       ),
       _ => null,
     };

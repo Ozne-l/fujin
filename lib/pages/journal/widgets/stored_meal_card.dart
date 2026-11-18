@@ -32,12 +32,15 @@ class StoredMealCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final leaving = MealRows.shown(
-      meal.leaving,
-      ref.watch(
-        backgroundWriteProvider.select((state) => state.ekkloRemovalIds),
-      ),
-    );
+    final leaving = ref
+        .watch(
+          backgroundWriteProvider.select(
+            (state) => meal.copyWith(
+              leaving: MealRows.shown(meal.leaving, state.ekkloRemovalIds),
+            ),
+          ),
+        )
+        .leaving;
     return MealCardFrame(
       header: MealTitle(
         name: meal.name,
