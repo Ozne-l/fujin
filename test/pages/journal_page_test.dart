@@ -12,6 +12,7 @@ import 'package:fujin/data/connectors/connector.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/preferences/fujin_preferences.dart';
 import 'package:fujin/domain/goals/day_goal_state.dart';
+import 'package:fujin/domain/writing/writer_state.dart';
 import 'package:fujin/pages/adding/add_search_notifier.dart';
 import 'package:fujin/pages/adding/widgets/ekklo_summary_card.dart';
 import 'package:fujin/pages/common/appearance_toggle.dart';
@@ -1839,5 +1840,32 @@ void main() {
       ).read(databaseProvider),
     );
     check(entries.findByMfpEntryId('E-1')).isNotNull();
+  });
+
+  testWidgets('runs the background writer once after the first read of a '
+      'day', (tester) async {
+    final diaryGate = Completer<void>();
+    final mealsGate = Completer<void>();
+    final backends = FakeBackends(mealNames: [breakfast])
+      ..diaryGate = diaryGate
+      ..mealsGate = mealsGate;
+    await pumpFujin(tester, backends);
+    final writer = ProviderScope.containerOf(
+      tester.element(find.byType(JournalHeader)),
+    ).read(backgroundWriterProvider);
+    var passes = 0;
+    var previous = writer.state;
+    final states = writer.states.listen((next) {
+      if (previous is WriterIdle && next is WriterRunning) passes++;
+      previous = next;
+    });
+    addTearDown(states.cancel);
+
+    diaryGate.complete();
+    await tester.pumpAndSettle();
+    mealsGate.complete();
+    await tester.pumpAndSettle();
+
+    check(passes).equals(1);
   });
 }

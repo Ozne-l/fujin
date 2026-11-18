@@ -88,6 +88,8 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
 
   final DateTime date;
 
+  Future<JournalRead>? _firstReading;
+
   @override
   FutureOr<JournalRead> build() {
     final service = ref.watch(journalServiceProvider);
@@ -110,7 +112,7 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
         meals: meals,
         mealNames: names,
       ),
-      _ => _firstRead(
+      _ => _sharedFirstRead(
         service,
         _settler(ref.watch, thenWrite: true),
         ref.watch(mfpDiaryProvider(date).future),
@@ -196,6 +198,20 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
       }
     };
   }
+
+  Future<JournalRead> _sharedFirstRead(
+    JournalService service,
+    void Function(Fetch<MfpDiaryDay>, Fetch<List<EkkloDailyMeal>>) settle,
+    Future<Fetched<MfpDiaryDay>> diary,
+    Future<Fetched<List<EkkloDailyMeal>>> meals,
+    Future<List<String>> mealNames,
+  ) => _firstReading ??= _firstRead(
+    service,
+    settle,
+    diary,
+    meals,
+    mealNames,
+  ).whenComplete(() => _firstReading = null);
 
   Future<JournalRead> _firstRead(
     JournalService service,
