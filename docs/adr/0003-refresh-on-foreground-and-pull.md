@@ -14,7 +14,7 @@ Statuses are recomputed from both services ([0001](0001-recompute-statuses-from-
 
 - The Journal re-reads both sides when the app returns to the foreground: `useOnAppLifecycleStateChange` in `lib/pages/journal/journal_page.dart` calls `JournalNotifier.reload()` on `AppLifecycleState.resumed`.
 - Pull to refresh uses the stock Android `RefreshIndicator` (same file) and calls `JournalNotifier.refresh()` (`lib/pages/journal/journal_notifier.dart`).
-- `refresh()` returns a `RefreshOutcome` (`lib/pages/journal/refresh_outcome.dart`): `nothingNew` when the MyFitnessPal diary (`MfpDiaryDay`) is equal before and after the read, `changed` otherwise, including after a failed read.
+- `refresh()` returns a `RefreshOutcome` (`lib/pages/journal/refresh_outcome.dart`): `nothingNew` when the day showed both apps (`BothSides`) before the read and the MyFitnessPal diary (`MfpDiaryDay`) is equal before and after it, `changed` otherwise, including after a failed read.
 - Only `nothingNew` shows the info snackbar of screen K20 for 6 s: "Rien de nouveau" / "Modifié dans MyFitnessPal ? Synchronise l'app" (`nothingNewTitle`, `nothingNewDetail` in `lib/l10n/app_fr.arb`). The first display and foreground returns never show it.
 - No polling and no background refresh.
 - The journal provider does not retry failed reads (`retry: _noRetry` in `lib/pages/journal/journal_notifier.dart`); the problem card asks for a pull instead ("Tire vers le bas pour réessayer.", `lib/pages/journal/widgets/journal_problem_card.dart`).

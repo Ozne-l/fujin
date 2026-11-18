@@ -80,7 +80,7 @@ Riverpod 3 does both injection and state. Providers are written by hand; a notif
 
 8. **Return an outcome from the method for a one-shot UI effect; do not keep events in state.**
    Why: state describes what the screen shows; an event stored there replays on every rebuild and needs clearing.
-   Example: `JournalNotifier.refresh` returns `RefreshOutcome.nothingNew` when the MyFitnessPal diary is equal before and after the read (`lib/pages/journal/journal_notifier.dart`, `lib/pages/journal/refresh_outcome.dart`); only then does `JournalPage` show the 6 s "Rien de nouveau" snackbar (`JournalPage._showNothingNew` in `lib/pages/journal/journal_page.dart`). `reload()` returns nothing, so a foreground return never shows it.
+   Example: `JournalNotifier.refresh` returns `RefreshOutcome.nothingNew` when the day showed both apps before the read and the MyFitnessPal diary is equal before and after it (`lib/pages/journal/journal_notifier.dart`, `lib/pages/journal/refresh_outcome.dart`); only then does `JournalPage` show the 6 s "Rien de nouveau" snackbar (`JournalPage._showNothingNew` in `lib/pages/journal/journal_page.dart`). `reload()` returns nothing, so a foreground return never shows it.
 
 9. **Check `ref.mounted` after an `await` before writing `state`; check `context.mounted` in widgets.**
    Why: an auto-disposed notifier can be gone when the future completes (`Ref.mounted` is new in Riverpod 3, riverpod.dev).

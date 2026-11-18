@@ -125,7 +125,10 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
   }
 
   Future<RefreshOutcome> refresh() async {
-    final before = ref.read(mfpDiaryProvider(date)).value?.value;
+    final before = switch (state.value) {
+      BothSides() => ref.read(mfpDiaryProvider(date)).value?.value,
+      MfpOnly() || FujinOnly() || EkkloOnly() || null => null,
+    };
     final (diary, meals) = await _reread(thenWrite: true);
     return switch ((before, diary, meals)) {
       (final before?, Fetched(value: final after), Fetched())
