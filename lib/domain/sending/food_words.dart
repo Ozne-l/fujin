@@ -48,10 +48,14 @@ const _accents = {
   'ç': 'c',
 };
 
-String productName(LoggedEntry entry) {
-  final description = (entry.foodName ?? '').trim();
+String? productName(LoggedEntry entry) => switch (entry.foodName?.trim()) {
+  null || '' => null,
+  final description => _withoutBrand(description, entry.brand),
+};
+
+String _withoutBrand(String description, String? brand) {
   final separator = description.indexOf(_brandSeparator);
-  return switch ((entry.brand?.trim().toLowerCase(), separator)) {
+  return switch ((brand?.trim().toLowerCase(), separator)) {
     (null, _) || (_, < 0) => description,
     (final brand?, _) => switch ((
       description.substring(0, separator).trim().toLowerCase() == brand,
@@ -77,10 +81,14 @@ NameMatch nameMatchOf(EkkloFood candidate, LoggedEntry entry) {
     ..._words(candidate.name),
     ..._words(candidate.brands ?? ''),
   ].map(_normalize).toList();
-  bool shares(String text) => _words(
-    text,
-  ).map(_normalize).any((word) => candidateWords.any((c) => _similar(word, c)));
-  return switch ((shares(productName(entry)), shares(entry.brand ?? ''))) {
+  bool shares(String? text) => switch (text) {
+    final text? =>
+      _words(text)
+          .map(_normalize)
+          .any((word) => candidateWords.any((c) => _similar(word, c))),
+    null => false,
+  };
+  return switch ((shares(productName(entry)), shares(entry.brand))) {
     (true, _) => NameMatch.product,
     (false, true) => NameMatch.brand,
     (false, false) => NameMatch.none,

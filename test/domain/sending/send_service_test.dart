@@ -234,6 +234,37 @@ void main() {
     check(backends.ekkloItems).isEmpty();
   });
 
+  test('reports a nameless food it associates without a name', () async {
+    backends = FakeBackends(
+      entries: [
+        entry(
+          'E-1',
+          food: skyr,
+          description: _nameless,
+          brand: 'Isey',
+          meal: snacks,
+          servingValue: 250,
+          nutrients: nutrients(kcal: 160, protein: 25, carbs: 10, fat: 0.5),
+        ),
+      ],
+      ekkloSearches: {
+        'skyr': [isey],
+      },
+    );
+    final (_, sending) = await services();
+    final plan = await planDay(sending);
+    final planned = plan.entries.single;
+    final candidate = (await sending.search(planned, 'skyr')).first;
+
+    final report = await send(
+      sending,
+      plan.updating(planned.entryId, (it) => it.choose(candidate)),
+    );
+
+    check(backends.ekkloItems).length.equals(1);
+    check(report.newAssociations).deepEquals([null]);
+  });
+
   test(
     'creates an own copy before sending it in portions of its unit',
     () async {

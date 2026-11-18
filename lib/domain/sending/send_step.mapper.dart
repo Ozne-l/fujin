@@ -250,7 +250,7 @@ class QuantityUpdateStepMapper extends SubClassMapperBase<QuantityUpdateStep> {
     _$entryId,
     key: r'entry_id',
   );
-  static String _$name(QuantityUpdateStep v) => v.name;
+  static String? _$name(QuantityUpdateStep v) => v.name;
   static const Field<QuantityUpdateStep, String> _f$name = Field(
     'name',
     _$name,
@@ -374,10 +374,10 @@ class _QuantityUpdateStepCopyWithImpl<$R, $Out>
   late final ClassMapperBase<QuantityUpdateStep> $mapper =
       QuantityUpdateStepMapper.ensureInitialized();
   @override
-  $R call({String? entryId, String? name, StepState? state}) => $apply(
+  $R call({String? entryId, Object? name = $none, StepState? state}) => $apply(
     FieldCopyWithData({
       if (entryId != null) #entryId: entryId,
-      if (name != null) #name: name,
+      if (name != $none) #name: name,
       if (state != null) #state: state,
     }),
   );

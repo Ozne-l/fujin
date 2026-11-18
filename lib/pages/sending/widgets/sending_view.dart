@@ -55,7 +55,7 @@ class SendingView extends StatelessWidget {
         if (plan.entry(entryId) case final planned?)
           FoodText.name(intl, productName(planned.entry)),
     ],
-    OwnCopyStep(:final name) || QuantityUpdateStep(:final name) => [
+    OwnCopyStep(:final String? name) || QuantityUpdateStep(:final name) => [
       FoodText.name(intl, name),
     ],
     null => const [],

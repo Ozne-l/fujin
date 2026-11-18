@@ -39,7 +39,7 @@ final class QuantityUpdateStep extends SendStep
   });
 
   final String entryId;
-  final String name;
+  final String? name;
 
   @override
   int get entryCount => 1;

@@ -3,6 +3,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/sending/send_report.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/title_text.dart';
 import 'package:fujin/pages/sending/send_text.dart';
 import 'package:fujin/pages/sending/widgets/sent_frame.dart';
@@ -45,7 +46,10 @@ class SentView extends StatelessWidget {
         ),
       if (report.newAssociations case final names when names.isNotEmpty)
         _Row(
-          label: intl.sentAssociations(names.length, names.join(separator)),
+          label: intl.sentAssociations(
+            names.length,
+            names.map((name) => FoodText.name(intl, name)).join(separator),
+          ),
           tile: colors.backgroundHighlight,
           icon: Icons.auto_awesome_outlined,
           iconColor: colors.textGold,

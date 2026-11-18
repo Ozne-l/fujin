@@ -43,7 +43,7 @@ final class PlannedEntry with PlannedEntryMappable {
 
   bool get sends => switch (choice) {
     SkipEntry() => false,
-    SendAsOwnCopy(reuse: null) => productName(entry).isNotEmpty,
+    SendAsOwnCopy(reuse: null) => productName(entry) != null,
     SendToEkkloFood() || SendAsOwnCopy() => true,
   };
 

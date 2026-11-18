@@ -6,6 +6,7 @@ import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/breeze_indicator.dart';
 import 'package:fujin/pages/common/breeze_streaks.dart';
+import 'package:fujin/pages/common/food_text.dart';
 
 class StepList extends StatelessWidget {
   const StepList({required this.steps, super.key});
@@ -121,22 +122,22 @@ class StepList extends StatelessWidget {
       colors.textAlert,
     ),
     (QuantityUpdateStep(:final name), StepState.done) => (
-      name,
+      FoodText.name(intl, name),
       intl.stepQuantityDone,
       colors.textSecondary,
     ),
     (QuantityUpdateStep(:final name), StepState.running) => (
-      name,
+      FoodText.name(intl, name),
       intl.stepOnTheWay(intl.stepQuantity),
       colors.textInfo,
     ),
     (QuantityUpdateStep(:final name), StepState.pending) => (
-      name,
+      FoodText.name(intl, name),
       intl.stepWaiting(intl.stepQuantity),
       colors.textTertiary,
     ),
     (QuantityUpdateStep(:final name), StepState.failed) => (
-      name,
+      FoodText.name(intl, name),
       intl.stepQuantityFailed,
       colors.textAlert,
     ),
