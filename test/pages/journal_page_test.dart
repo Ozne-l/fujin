@@ -1496,6 +1496,71 @@ void main() {
       check(backends.ekkloItems).length.equals(1);
     });
 
+    testWidgets('shows a food added in Fūjin before MyFitnessPal answers '
+        'again', (tester) async {
+      _tallView(tester);
+      _stillClocks(tester);
+      final backends = _basmatiBackends();
+      await pumpFujin(tester, backends);
+      await _openBasmatiInLunch(tester);
+      final gate = backends.diaryGate = Completer<void>();
+
+      await tester.tap(find.text('Ajouter à MFP et Ekklo'));
+      await _frames(tester);
+
+      check(find.text('Riz basmati').evaluate()).length.equals(1);
+      check(_pill(Connector.mfp).evaluate()).length.equals(1);
+      gate.complete();
+      backends.diaryGate = null;
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('greys a food deleted in Fūjin before MyFitnessPal answers '
+        'again', (tester) async {
+      _tallView(tester);
+      _stillClocks(tester);
+      final backends = _basmatiBackends();
+      await pumpFujin(tester, backends);
+      await _addBasmatiToLunch(tester);
+      final removal = backends.mfpRemoveGate = Completer<void>();
+      final diary = backends.diaryGate = Completer<void>();
+
+      await _deleteBasmati(tester);
+
+      check(find.text('Supprimé dans Fūjin').evaluate()).length.equals(1);
+      removal.complete();
+      diary.complete();
+      backends
+        ..mfpRemoveGate = null
+        ..diaryGate = null;
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('does not bring back a food the background writer deleted '
+        'before MyFitnessPal answers again', (tester) async {
+      _tallView(tester);
+      _stillClocks(tester);
+      final backends = _basmatiBackends();
+      await pumpFujin(tester, backends);
+      await _addBasmatiToLunch(tester);
+      final removal = backends.mfpRemoveGate = Completer<void>();
+      await _deleteBasmati(tester);
+      await _frames(tester);
+      final after = backends.diaryGate = Completer<void>();
+
+      removal.complete();
+      backends.mfpRemoveGate = null;
+      await _frames(tester);
+
+      check(backends.entries).isEmpty();
+      check(find.text('Riz basmati').evaluate()).length.equals(1);
+      check(find.text('Supprimé dans Fūjin').evaluate()).length.equals(1);
+      after.complete();
+      backends.diaryGate = null;
+      await tester.pumpAndSettle();
+      check(find.text('Riz basmati').evaluate()).isEmpty();
+    });
+
     testWidgets('says Pas écrit dans MyFitnessPal with Réessayer and stops '
         'the clock', (tester) async {
       _tallView(tester);

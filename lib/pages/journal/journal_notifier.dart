@@ -89,6 +89,7 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
   final DateTime date;
 
   Future<JournalRead>? _firstReading;
+  bool _keepShown = false;
 
   @override
   FutureOr<JournalRead> build() {
@@ -105,13 +106,14 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
     )) {
       (true, AsyncValue(:final error?, :final stackTrace?), _, _, _) =>
         Error.throwWithStackTrace(error, stackTrace),
-      (true, AsyncValue(:final value?), _, _, _) => value,
+      (true, AsyncValue(:final value?), _, _, _) when _keepShown => value,
       (_, _, final diary?, final meals?, final names?) => service.journalOf(
         date,
         diary: diary,
         meals: meals,
         mealNames: names,
       ),
+      (true, AsyncValue(:final value?), _, _, _) => value,
       _ => _sharedFirstRead(
         service,
         _settler(ref.watch, thenWrite: true),
@@ -133,7 +135,14 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
     };
   }
 
-  Future<void> reload({bool thenWrite = true}) => _reread(thenWrite: thenWrite);
+  Future<void> reload({bool thenWrite = true, bool keepShown = false}) async {
+    _keepShown = keepShown;
+    try {
+      await _reread(thenWrite: thenWrite);
+    } finally {
+      _keepShown = false;
+    }
+  }
 
   Future<void> revalidate() async {
     if (!ref.mounted) return;
