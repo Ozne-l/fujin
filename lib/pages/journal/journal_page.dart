@@ -123,18 +123,18 @@ class JournalPage extends HookConsumerWidget {
       await notifier.reload();
     }
 
-    void reloadShown() => unawaited(
+    void reloadShown({bool keepShown = false}) => unawaited(
       ref
           .read(journalProvider(ref.read(selectedDayProvider)).notifier)
-          .reload(thenWrite: false),
+          .reload(thenWrite: false, keepShown: keepShown),
     );
 
-    void rereadDaysOf(Iterable<DateTime> dates) {
+    void rereadDaysOf(Iterable<DateTime> dates, {bool written = false}) {
       final shown = ref.read(selectedDayProvider);
       for (final changedDay in {...dates.map(SelectedDay.calendarDay)}) {
         switch (changedDay) {
           case _ when changedDay == shown:
-            reloadShown();
+            reloadShown(keepShown: written);
           case _:
             ref
               ..invalidate(mfpDiaryProvider(changedDay))
@@ -175,7 +175,7 @@ class JournalPage extends HookConsumerWidget {
           rereadDaysOf([
             written.entry.date,
             if (written.mfpLink case final link?) link.date,
-          ]);
+          ], written: true);
         }
         if ((previous, next) case (WriterRunning(), final WriterIdle idle)) {
           JournalSnackBar.written(
