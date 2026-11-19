@@ -472,10 +472,9 @@ class JournalPage extends HookConsumerWidget {
   ];
 
   static void _showNothingNew(BuildContext context) {
-    JournalSnackBar.show(
-      context,
+    ScaffoldMessenger.of(context).showNotice(
       duration: _nothingNewDuration,
-      content: SnackBarContent(
+      SnackBarContent(
         glyph: SnackBarGlyph.refresh,
         title: context.intl.nothingNewTitle,
         detail: context.intl.nothingNewDetail,

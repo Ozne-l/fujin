@@ -7,6 +7,12 @@ enum FujinRoute {
   journal('/'),
   memory('/memory'),
   memoryFood('/memory/food/:${FujinRoute.foodParameter}'),
+  messages('/messages'),
+  conversation('/messages/:${FujinRoute.conversationParameter}'),
+  chatMedia(
+    '/messages/:${FujinRoute.conversationParameter}'
+    '/media/:${FujinRoute.messageParameter}',
+  ),
   settings('/settings'),
   goals('/settings/${FujinRoute.goalsSegment}'),
   welcome('/welcome'),
@@ -28,6 +34,9 @@ enum FujinRoute {
   static const unitParameter = 'unit';
   static const entryParameter = 'entry';
   static const goalsSegment = 'goals';
+  static const conversationParameter = 'conversation';
+  static const messageParameter = 'message';
+  static const mediaParameter = 'media';
 
   final String path;
 
@@ -73,6 +82,23 @@ enum FujinRoute {
         ),
         null => null,
       };
+
+  String forConversation(String conversationId) =>
+      path.replaceFirst(':$conversationParameter', conversationId);
+
+  String forMedia(
+    String conversationId,
+    String messageId, {
+    required int index,
+  }) => Uri(
+    path: path
+        .replaceFirst(':$conversationParameter', conversationId)
+        .replaceFirst(':$messageParameter', messageId),
+    queryParameters: {mediaParameter: '$index'},
+  ).toString();
+
+  static int mediaIndexOf(Map<String, String> parameters) =>
+      int.tryParse(parameters[mediaParameter] ?? '') ?? 0;
 
   String forFood(RememberedFood food) => Uri(
     path: path.replaceFirst(':$foodParameter', food.mfpFoodId),

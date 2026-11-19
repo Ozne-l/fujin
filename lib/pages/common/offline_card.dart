@@ -3,15 +3,25 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
 
 class OfflineCard extends StatelessWidget {
-  const OfflineCard({required this.detail, required this.onRetry, super.key});
+  const OfflineCard({
+    required this.title,
+    required this.detail,
+    this.onRetry,
+    this.margin = const EdgeInsets.symmetric(
+      horizontal: FujinSize.screenMargin,
+    ),
+    super.key,
+  });
 
+  final String title;
   final String detail;
-  final VoidCallback onRetry;
+  final VoidCallback? onRetry;
+  final EdgeInsetsGeometry margin;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
+      margin: margin,
       padding: const EdgeInsets.all(FujinSpace.s4),
       decoration: BoxDecoration(
         color: context.colors.borderCard,
@@ -36,7 +46,7 @@ class OfflineCard extends StatelessWidget {
               spacing: FujinSpace.s1,
               children: [
                 Text(
-                  context.intl.addOfflineTitle,
+                  title,
                   style: FujinText.inter15Medium.copyWith(
                     color: context.colors.textPrimary,
                   ),
@@ -47,12 +57,14 @@ class OfflineCard extends StatelessWidget {
                     color: context.colors.textSecondary,
                   ),
                 ),
-                const SizedBox(height: FujinSpace.s2),
-                OutlinedButton.icon(
-                  onPressed: onRetry,
-                  icon: const Icon(Icons.refresh),
-                  label: Text(context.intl.tryAgain),
-                ),
+                if (onRetry case final onRetry?) ...[
+                  const SizedBox(height: FujinSpace.s2),
+                  OutlinedButton.icon(
+                    onPressed: onRetry,
+                    icon: const Icon(Icons.refresh),
+                    label: Text(context.intl.tryAgain),
+                  ),
+                ],
               ],
             ),
           ),

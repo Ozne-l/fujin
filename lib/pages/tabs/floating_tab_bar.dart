@@ -4,6 +4,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/pages/common/glass_layer.dart';
 import 'package:fujin/pages/common/scan_button.dart';
 import 'package:fujin/pages/tabs/fujin_tab.dart';
+import 'package:fujin/pages/tabs/messages_item.dart';
 import 'package:fujin/pages/tabs/tab_plate.dart';
 import 'package:motor/motor.dart';
 
@@ -13,6 +14,7 @@ class FloatingTabBar extends StatelessWidget {
     required this.onSelect,
     required this.onScan,
     required this.minimized,
+    this.messages,
     super.key,
   });
 
@@ -20,6 +22,7 @@ class FloatingTabBar extends StatelessWidget {
   final ValueChanged<FujinTab> onSelect;
   final VoidCallback? onScan;
   final bool minimized;
+  final MessagesItem? messages;
 
   static const double _fullScale = 1;
 
@@ -46,7 +49,11 @@ class FloatingTabBar extends StatelessWidget {
               spacing: FujinSpace.s2,
               children: [
                 Expanded(
-                  child: TabPlate(selected: selected, onSelect: onSelect),
+                  child: TabPlate(
+                    selected: selected,
+                    onSelect: onSelect,
+                    messages: messages,
+                  ),
                 ),
                 ScanButton(onTap: onScan),
               ],

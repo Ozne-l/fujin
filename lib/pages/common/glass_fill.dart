@@ -17,6 +17,7 @@ class GlassFill extends HookConsumerWidget {
     required this.child,
     this.floating = false,
     this.pressable = false,
+    this.radius = FujinRadius.pill,
     super.key,
   });
 
@@ -24,10 +25,7 @@ class GlassFill extends HookConsumerWidget {
   final Widget child;
   final bool floating;
   final bool pressable;
-
-  static const LiquidRoundedSuperellipse _shape = LiquidRoundedSuperellipse(
-    borderRadius: FujinRadius.pill,
-  );
+  final double radius;
 
   static ButtonStyle style(
     FujinColors colors,
@@ -87,7 +85,7 @@ class GlassFill extends HookConsumerWidget {
       final fill = blend((it) => it.fill(colors, brightness));
       return GlassBody.ownLayer(
         settings: FujinGlass.control(brightness),
-        shape: _shape,
+        shape: LiquidRoundedSuperellipse(borderRadius: radius),
         reduced: reduced,
         opaque: Color.alphaBlend(fill, colors.backgroundCard),
         fill: fill,

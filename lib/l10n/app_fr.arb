@@ -1282,5 +1282,283 @@
   "@replacedMany": {
     "placeholders": {"count": {"type": "int"}}
   },
+  "chatTab": "Messages",
+  "chatTabUnread": "{count, plural, =1{Messages, 1 non lu} other{Messages, {count} non lus}}",
+  "@chatTabUnread": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "chatBadgeOverflow": "{count}+",
+  "@chatBadgeOverflow": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "chatCoach": "Coach Ekklo",
+  "chatLoadingOlder": "Chargement des messages plus anciens…",
+  "chatToday": "Aujourd’hui",
+  "chatYesterday": "Hier",
+  "chatDay": "{date}",
+  "@chatDay": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "EEEE d MMMM", "isCustomDateFormat": "true"}
+    }
+  },
+  "chatTime": "{time}",
+  "@chatTime": {
+    "placeholders": {
+      "time": {"type": "DateTime", "format": "Hm"}
+    }
+  },
+  "chatPhoto": "Photo",
+  "chatVideo": "Vidéo",
+  "chatVoice": "Message vocal",
+  "chatUnsupportedTitle": "Contenu à ouvrir dans Ekklo",
+  "chatUnsupportedDetail": "Fūjin ne sait pas encore l’afficher.",
+  "chatComposerHint": "Message",
+  "chatMedia": "Médias",
+  "chatSend": "Envoyer",
+  "chatVideoSemantics": "Vidéo, {duration}",
+  "@chatVideoSemantics": {
+    "placeholders": {"duration": {"type": "String"}}
+  },
+  "chatMinutesSeconds": "{minutes} min {seconds} s",
+  "@chatMinutesSeconds": {
+    "placeholders": {
+      "minutes": {"type": "int"},
+      "seconds": {"type": "int"}
+    }
+  },
+  "chatSeconds": "{seconds} s",
+  "@chatSeconds": {
+    "placeholders": {"seconds": {"type": "int"}}
+  },
+  "chatVoiceSemantics": "Message vocal, {elapsed} sur {total}",
+  "@chatVoiceSemantics": {
+    "placeholders": {
+      "elapsed": {"type": "String"},
+      "total": {"type": "String"}
+    }
+  },
+  "chatPlay": "Lire",
+  "chatPause": "Pause",
+  "chatCannotReply": "Tu ne peux pas répondre dans cette conversation.",
+  "chatOfflineTitle": "Pas de connexion",
+  "chatOfflineDetail": "Tu peux relire la conversation. Tu pourras écrire au retour du réseau.",
+  "chatExpiredDetail": "Reconnecte-toi pour recevoir les messages de ton coach et lui répondre. La conversation reste lisible.",
+  "chatViewerYou": "Toi",
+  "chatViewerToday": "Aujourd’hui, {time}",
+  "@chatViewerToday": {
+    "placeholders": {
+      "time": {"type": "DateTime", "format": "Hm"}
+    }
+  },
+  "chatViewerYesterday": "Hier, {time}",
+  "@chatViewerYesterday": {
+    "placeholders": {
+      "time": {"type": "DateTime", "format": "Hm"}
+    }
+  },
+  "chatViewerTodayInline": "aujourd’hui, {time}",
+  "@chatViewerTodayInline": {
+    "placeholders": {
+      "time": {"type": "DateTime", "format": "Hm"}
+    }
+  },
+  "chatViewerYesterdayInline": "hier, {time}",
+  "@chatViewerYesterdayInline": {
+    "placeholders": {
+      "time": {"type": "DateTime", "format": "Hm"}
+    }
+  },
+  "chatViewerEarlier": "{date}, {time}",
+  "@chatViewerEarlier": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "EEEE d MMMM", "isCustomDateFormat": "true"},
+      "time": {"type": "DateTime", "format": "Hm"}
+    }
+  },
+  "chatViewerPosition": "{index} sur {count} · {moment}",
+  "@chatViewerPosition": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "count": {"type": "int"},
+      "moment": {"type": "String"}
+    }
+  },
+  "chatViewerNotLoaded": "Vidéo pas chargée",
+  "chatViewerRetry": "Réessayer",
+  "chatViewerMute": "Couper le son",
+  "chatViewerUnmute": "Remettre le son",
+  "chatViewerLoading": "Chargement de la vidéo",
+  "chatNotificationChannelName": "Messages du coach",
+  "chatNotificationChannelDescription": "Les nouveaux messages de ton coach Ekklo, une notification par conversation.",
+  "chatNotificationCoach": "Coach Ekklo",
+  "chatNotificationPhotos": "{count, plural, =1{Photo} other{{count} photos}}",
+  "@chatNotificationPhotos": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "chatNotificationVideos": "{count, plural, =1{Vidéo} other{{count} vidéos}}",
+  "@chatNotificationVideos": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "chatNotificationVoice": "Message vocal",
+  "chatNotificationMedia": "{count, plural, =1{1 média} other{{count} médias}}",
+  "@chatNotificationMedia": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "chatNotificationPhotosAndVideos": "Photos et vidéos",
+  "chatNotificationCaption": "{media} · {caption}",
+  "@chatNotificationCaption": {
+    "placeholders": {
+      "media": {"type": "String"},
+      "caption": {"type": "String"}
+    }
+  },
+  "chatNotificationUnsupported": "Contenu à ouvrir dans Ekklo",
+  "chatMediaMenuGallery": "Photos et vidéos",
+  "chatMediaMenuPhoto": "Prendre une photo",
+  "chatMediaMenuVideo": "Filmer une vidéo",
+  "chatTrayCount": "{count, plural, =1{1 média} other{{count} médias}}",
+  "@chatTrayCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "chatTrayFor": "Pour {coach}",
+  "@chatTrayFor": {
+    "placeholders": {
+      "coach": {"type": "String"}
+    }
+  },
+  "chatTrayEdit": "Modifier",
+  "chatTrayCaption": "Ajouter une légende",
+  "chatTrayCropped": "Recadrée",
+  "chatTrayTrimmed": "Coupée",
+  "chatTrayLimit": "{count} médias au maximum par message.",
+  "@chatTrayLimit": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "chatTrayRemove": "Retirer",
+  "chatTrayAdd": "Ajouter des médias",
+  "chatTrayCancelReply": "Annuler la réponse",
+  "chatTrayDiscardTitle": "Abandonner ces médias ?",
+  "chatTrayDiscardDetail": "Les médias choisis, leurs modifications et la légende ne seront pas envoyés.",
+  "chatTrayDiscardConfirm": "Abandonner",
+  "chatEditorPhotoTitle": "Modifier la photo",
+  "chatEditorVideoTitle": "Modifier la vidéo",
+  "chatEditorPosition": "{index} sur {count}",
+  "@chatEditorPosition": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "count": {"type": "int"}
+    }
+  },
+  "chatEditorFree": "Libre",
+  "chatEditorOriginal": "Original",
+  "chatEditorRatio": "{width}:{height}",
+  "@chatEditorRatio": {
+    "placeholders": {
+      "width": {"type": "int"},
+      "height": {"type": "int"}
+    }
+  },
+  "chatEditorRotate": "Pivoter",
+  "chatEditorReset": "Réinitialiser",
+  "chatEditorDone": "Terminé",
+  "chatEditorTrim": "Couper",
+  "chatEditorCrop": "Recadrer",
+  "chatEditorRemovePassage": "Retirer ce passage",
+  "chatEditorRestore": "Remettre {duration}",
+  "@chatEditorRestore": {
+    "placeholders": {
+      "duration": {"type": "String"}
+    }
+  },
+  "chatEditorSound": "Son",
+  "chatEditorMuted": "Son coupé",
+  "chatSending": "Envoi…",
+  "chatNotSent": "Non envoyé.",
+  "chatRetry": "Réessayer",
+  "chatReply": "Répondre",
+  "chatDelete": "Supprimer",
+  "chatMoreEmoji": "Autre emoji",
+  "chatReplyTo": "Réponse à {name}",
+  "@chatReplyTo": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "chatReplyToYou": "Réponse à toi",
+  "chatQuoteDeleted": "Message supprimé",
+  "chatDeleteTitle": "Supprimer ce message ?",
+  "chatDeleteDetail": "« {excerpt} » Il sera retiré de la conversation, chez toi et chez {coach}.",
+  "@chatDeleteDetail": {
+    "placeholders": {
+      "excerpt": {"type": "String"},
+      "coach": {"type": "String"}
+    }
+  },
+  "chatDeleting": "Suppression…",
+  "chatDeleteRefusedTitle": "Pas supprimé dans Ekklo",
+  "chatDeleteRefusedDetail": "Ekklo ne supprime pas encore les médias",
+  "chatReactionNotSent": "Réaction pas envoyée",
+  "chatUploadPreparing": "{count, plural, =1{Préparation de la vidéo} other{Préparation des vidéos}} · {percent} %",
+  "@chatUploadPreparing": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "percent": {"type": "int"}
+    }
+  },
+  "chatUploadSending": "{count, plural, =1{Envoi · {percent} %} other{Envoi · {count} médias · {percent} %}}",
+  "@chatUploadSending": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "percent": {"type": "int"}
+    }
+  },
+  "chatUploadRing": "Envoi, {percent} %",
+  "@chatUploadRing": {
+    "placeholders": {
+      "percent": {"type": "int"}
+    }
+  },
+  "chatUploadOriginalSize": "Vidéo HDR non convertie : elle part en taille d’origine, {megabytes} Mo.",
+  "@chatUploadOriginalSize": {
+    "placeholders": {
+      "megabytes": {"type": "int"}
+    }
+  },
+  "chatUploadNotificationTitle": "Envoi à {coach}",
+  "@chatUploadNotificationTitle": {
+    "placeholders": {
+      "coach": {"type": "String"}
+    }
+  },
+  "chatUploadNotificationProgress": "{count, plural, =1{{progress}} other{Média {position} sur {count} · {progress}}}",
+  "@chatUploadNotificationProgress": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "position": {"type": "int"},
+      "progress": {"type": "String"}
+    }
+  },
+  "chatUploadChannelName": "Envoi des médias",
+  "chatUploadChannelDescription": "Préparation des vidéos et envoi des photos, vidéos et messages vocaux.",
+  "chatUploadNotificationWaiting": "En attente du réseau",
+  "chatUploadNotificationFailedTitle": "Médias pas envoyés",
+  "chatUploadNotificationFailedBody": "Touche pour réessayer dans la conversation.",
+  "chatVoiceDelete": "Supprimer l’enregistrement",
+  "chatVoiceTooShortTitle": "Message vocal trop court",
+  "chatVoiceTooShortDetail": "Il faut au moins 1 seconde.",
+  "chatVoiceTenSecondsLeft": "Il reste 10 secondes",
+  "chatVoiceLimitReached": "5 minutes au maximum : enregistrement arrêté",
+  "chatVoiceRefusedTitle": "Pas d’accès au micro",
+  "chatVoiceRefusedDetail": "Autorise le micro pour Fūjin dans les réglages du téléphone.",
+  "chatUploadRingLabel": "{percent} %",
+  "@chatUploadRingLabel": {
+    "placeholders": {
+      "percent": {"type": "int"}
+    }
+  },
   "writeBlockedInDev": "Fūjin DEV n’écrit ni dans MyFitnessPal ni dans Ekklo : rien n’a changé."
 }

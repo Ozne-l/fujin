@@ -1,5 +1,9 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fujin/app/app_environment.dart';
@@ -8,34 +12,63 @@ import 'package:fujin/data/accessibility/reduce_transparency_setting.dart';
 import 'package:fujin/data/backup/backup_files.dart';
 import 'package:fujin/data/backup/backup_repository.dart';
 import 'package:fujin/data/backup/picker_backup_files.dart';
+import 'package:fujin/data/chat/chat_owner_repository.dart';
+import 'package:fujin/data/chat/chat_repository.dart';
+import 'package:fujin/data/chat/foreground_stamp_repository.dart';
+import 'package:fujin/data/chat/message_in_progress_repository.dart';
+import 'package:fujin/data/chat_media/chat_media_cache.dart';
 import 'package:fujin/data/connectors/connector_domain.dart';
+import 'package:fujin/data/database/cache_table.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_table.dart';
+import 'package:fujin/data/dev_chat/fake_chat_server.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/foods/food_repository.dart';
 import 'package:fujin/data/goals/goals_repository.dart';
 import 'package:fujin/data/hints/hint_repository.dart';
+import 'package:fujin/data/http/blocked_web_socket.dart';
 import 'package:fujin/data/http/read_only_http_client.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/meals/meal_repository.dart';
+import 'package:fujin/data/media/channel_media_processor.dart';
+import 'package:fujin/data/media/media_processor.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
+import 'package:fujin/data/notifications/chat_notification_text.dart';
+import 'package:fujin/data/notifications/chat_notifications.dart';
 import 'package:fujin/data/recents/recent_food_repository.dart';
 import 'package:fujin/data/sessions/secure_ekklo_token_store.dart';
 import 'package:fujin/data/sessions/secure_mfp_session_store.dart';
 import 'package:fujin/data/settings/settings_repository.dart';
 import 'package:fujin/data/unattended/unattended_item_repository.dart';
+import 'package:fujin/data/upload/background_media_uploader.dart';
+import 'package:fujin/data/upload/local_upload_notifications.dart';
+import 'package:fujin/data/upload/media_uploader.dart';
+import 'package:fujin/data/upload/relay_scheduler.dart';
+import 'package:fujin/data/upload/upload_folder.dart';
+import 'package:fujin/data/upload/upload_notifications.dart';
+import 'package:fujin/data/upload/workmanager_relay_scheduler.dart';
+import 'package:fujin/data/voice/record_voice_recorder.dart';
+import 'package:fujin/data/voice/voice_recorder.dart';
 import 'package:fujin/domain/accounts/accounts_service.dart';
 import 'package:fujin/domain/adding/add_food_service.dart';
 import 'package:fujin/domain/adding/entry_writer.dart';
 import 'package:fujin/domain/adding/food_completion_service.dart';
 import 'package:fujin/domain/backup/backup_service.dart';
+import 'package:fujin/domain/chat/chat_service.dart';
+import 'package:fujin/domain/chat/chat_state.dart';
+import 'package:fujin/domain/chat/conversation_state.dart';
+import 'package:fujin/domain/chat/upload/chat_upload_service.dart';
+import 'package:fujin/domain/chat/upload/message_upload.dart';
 import 'package:fujin/domain/editing/edit_entry_service.dart';
 import 'package:fujin/domain/editing/remove_entry_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/memory/memory_service.dart';
 import 'package:fujin/domain/sending/send_service.dart';
 import 'package:fujin/domain/writing/background_writer.dart';
+import 'package:fujin/pages/chat_media/image_media_picker.dart';
+import 'package:fujin/pages/chat_media/media_picker.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hooks_riverpod/misc.dart';
 import 'package:http/http.dart' as http;
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -120,6 +153,10 @@ final ekkloClientProvider = Provider<EkkloClient>((ref) {
     httpClient: ref.watch(httpClientProvider),
     baseUri: Config.ekkloBaseUri,
     clock: ref.watch(clockProvider),
+    webSocketConnector: switch (ref.watch(appEnvironmentProvider)) {
+      AppEnvironment.production => null,
+      AppEnvironment.dev => blockedWebSocket,
+    },
   );
   ref.onDispose(client.close);
   return client;
@@ -200,6 +237,7 @@ final accountsServiceProvider = Provider<AccountsService>(
     mfp: ref.watch(mfpClientProvider),
     ekklo: ref.watch(ekkloClientProvider),
     clearWebCookies: ref.watch(clearWebCookiesProvider),
+    forgetChat: ref.watch(forgetChatProvider),
   ),
 );
 
@@ -304,3 +342,189 @@ final editEntryServiceProvider = Provider<EditEntryService>(
     background: ref.watch(backgroundWriterProvider),
   ),
 );
+
+final chatNotificationsProvider = Provider<ChatNotifications>(
+  (ref) =>
+      throw StateError('chatNotificationsProvider is overridden in bootstrap'),
+);
+
+final mediaPickerProvider = Provider<MediaPicker>(
+  (ref) => ImageMediaPicker(),
+);
+
+final appForegroundProvider = StreamProvider<bool>((ref) {
+  bool inForeground(AppLifecycleState? state) => switch (state) {
+    null || AppLifecycleState.resumed || AppLifecycleState.inactive => true,
+    AppLifecycleState.hidden ||
+    AppLifecycleState.paused ||
+    AppLifecycleState.detached => false,
+  };
+  final foreground = StreamController<bool>();
+  final listener = AppLifecycleListener(
+    onStateChange: (state) => foreground.add(inForeground(state)),
+  );
+  ref.onDispose(() {
+    listener.dispose();
+    unawaited(foreground.close());
+  });
+  foreground.add(inForeground(WidgetsBinding.instance.lifecycleState));
+  return foreground.stream;
+});
+
+final appCacheDirectoryProvider = Provider<Directory>(
+  (ref) =>
+      throw StateError('appCacheDirectoryProvider is overridden in bootstrap'),
+);
+
+final chatCachePathProvider = Provider<String?>(
+  (ref) => throw StateError('chatCachePathProvider is overridden in bootstrap'),
+);
+
+final chatCacheProvider = Provider<FujinDatabase<CacheTable>>((ref) {
+  final database = switch (ref.watch(chatCachePathProvider)) {
+    null => FujinDatabase.cacheInMemory(),
+    final path => FujinDatabase.openCacheInApp(path),
+  };
+  ref.onDispose(database.close);
+  return database;
+});
+
+final chatRepositoryProvider = Provider<ChatRepository>(
+  (ref) => ChatRepository(ref.watch(chatCacheProvider)),
+);
+
+final chatOwnerRepositoryProvider = Provider<ChatOwnerRepository>(
+  (ref) => ChatOwnerRepository(ref.watch(chatCacheProvider)),
+);
+
+final foregroundStampRepositoryProvider = Provider<ForegroundStampRepository>(
+  (ref) => ForegroundStampRepository(ref.watch(chatCacheProvider)),
+);
+
+final chatClientProvider = Provider<EkkloClient>((ref) {
+  switch (ref.watch(appEnvironmentProvider)) {
+    case AppEnvironment.production:
+      return ref.watch(ekkloClientProvider);
+    case AppEnvironment.dev:
+      final client = FakeChatServer.client();
+      ref.onDispose(client.close);
+      return client;
+  }
+});
+
+final mediaProcessorProvider = Provider<MediaProcessor>(
+  (ref) => ChannelMediaProcessor(),
+);
+
+final chatMediaCacheProvider = Provider<ChatMediaCache>(
+  (ref) => ChatMediaCache(
+    directory: Directory(
+      '${ref.watch(appCacheDirectoryProvider).path}/'
+      '${ChatMediaCache.folderName}',
+    ),
+    http: ref.watch(httpClientProvider),
+    media: ref.watch(mediaProcessorProvider),
+  ),
+);
+
+final chatServiceProvider = Provider<ChatService>((ref) {
+  final ekklo = ref.watch(ekkloClientProvider);
+  final service = ChatService(
+    messaging: ref.watch(chatClientProvider).messaging,
+    signedIn: () => ekklo.isSignedIn,
+    chats: ref.watch(chatRepositoryProvider),
+    owners: ref.watch(chatOwnerRepositoryProvider),
+    stamps: ref.watch(foregroundStampRepositoryProvider),
+    clock: ref.watch(clockProvider),
+  )..start();
+  ref
+    ..onDispose(service.dispose)
+    ..listen(appForegroundProvider, (_, next) {
+      if (next.value case final foreground?) {
+        service.setForeground(foreground: foreground);
+      }
+    }, fireImmediately: true)
+    ..listen(connectivityProvider, (_, next) {
+      if (next.value case final online?) service.setOnline(online: online);
+    }, fireImmediately: true);
+  return service;
+});
+
+final chatProvider = StreamProvider<ChatState>(
+  (ref) => ref.watch(chatServiceProvider).states,
+);
+
+final StreamProviderFamily<ConversationState, String> conversationProvider =
+    StreamProvider.autoDispose.family<ConversationState, String>(
+      (ref, conversationId) =>
+          ref.watch(chatServiceProvider).watch(conversationId),
+    );
+
+final forgetChatProvider = Provider<Future<void> Function()>(
+  (ref) => () async {
+    await ref.read(chatMediaCacheProvider).deleteAll();
+    ref
+      ..invalidate(chatServiceProvider)
+      ..invalidate(chatCacheProvider);
+    if (ref.read(chatCachePathProvider) case final path?) {
+      FujinDatabase.deleteCache(path);
+    }
+  },
+);
+
+final voiceRecorderProvider = Provider<VoiceRecorder>((ref) {
+  final recorder = RecordVoiceRecorder();
+  ref.onDispose(() => unawaited(recorder.dispose()));
+  return recorder;
+});
+
+final mediaUploaderProvider = Provider<MediaUploader>((ref) {
+  final uploader = BackgroundMediaUploader(
+    cachePath: ref.watch(chatCachePathProvider),
+    intl: ChatNotificationText.ofDevice(),
+  );
+  ref.onDispose(() => unawaited(uploader.close()));
+  return uploader;
+});
+
+final relaySchedulerProvider = Provider<RelayScheduler>(
+  (ref) => const WorkmanagerRelayScheduler(),
+);
+
+final uploadNotificationsProvider = Provider<UploadNotifications>(
+  (ref) => LocalUploadNotifications(ChatNotificationText.ofDevice()),
+);
+
+final chatUploadServiceProvider = Provider<ChatUploadService>((ref) {
+  final service = ChatUploadService(
+    messaging: ref.watch(chatClientProvider).messaging,
+    messages: MessageInProgressRepository(ref.watch(chatCacheProvider)),
+    chats: ref.watch(chatRepositoryProvider),
+    processor: ref.watch(mediaProcessorProvider),
+    uploader: ref.watch(mediaUploaderProvider),
+    relay: ref.watch(relaySchedulerProvider),
+    notifications: ref.watch(uploadNotificationsProvider),
+    folder: UploadFolder(ref.watch(appCacheDirectoryProvider)),
+    cachePath: ref.watch(chatCachePathProvider),
+    accept: (message) => ref.read(chatServiceProvider).accept(message),
+    clock: ref.watch(clockProvider),
+  );
+  unawaited(service.start());
+  ref
+    ..onDispose(service.dispose)
+    ..listen(appForegroundProvider, (_, next) {
+      if (next.value case final foreground?) {
+        service.setForeground(foreground: foreground);
+      }
+    })
+    ..listen(connectivityProvider, (_, next) {
+      if (next.value case final online?) service.setOnline(online: online);
+    }, fireImmediately: true);
+  return service;
+});
+
+final StreamProviderFamily<List<MessageUpload>, String> messageUploadsProvider =
+    StreamProvider.autoDispose.family<List<MessageUpload>, String>(
+      (ref, conversationId) =>
+          ref.watch(chatUploadServiceProvider).watch(conversationId),
+    );

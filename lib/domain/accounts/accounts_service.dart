@@ -8,11 +8,13 @@ final class AccountsService {
     required this._mfp,
     required this._ekklo,
     required this._clearWebCookies,
+    required this._forgetChat,
   });
 
   final MyFitnessPalClient _mfp;
   final EkkloClient _ekklo;
   final Future<void> Function() _clearWebCookies;
+  final Future<void> Function() _forgetChat;
 
   Future<ConnectedAccounts> read() async => ConnectedAccounts(
     mfp: await _mfp.isSignedIn,
@@ -26,6 +28,7 @@ final class AccountsService {
         await _clearWebCookies();
       case Account.ekklo:
         await _ekklo.clearLocalSession();
+        await _forgetChat();
     }
   }
 

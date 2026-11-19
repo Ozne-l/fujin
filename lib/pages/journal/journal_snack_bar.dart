@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/app_environment.dart';
-import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/comparison/replacement.dart';
 import 'package:fujin/domain/editing/edited_food.dart';
@@ -23,12 +22,6 @@ import 'package:fujin/pages/sending/send_failure.dart';
 abstract final class JournalSnackBar {
   static const undoWindow = Duration(seconds: 8);
   static const _settledDuration = Duration(seconds: 4);
-  static const _padding = EdgeInsetsDirectional.fromSTEB(
-    FujinSpace.s3,
-    FujinSpace.s2,
-    FujinSpace.s2,
-    FujinSpace.s2,
-  );
 
   static void added(
     BuildContext context,
@@ -36,10 +29,9 @@ abstract final class JournalSnackBar {
     required VoidCallback onUndo,
   }) {
     final entry = added.entry;
-    show(
-      context,
+    ScaffoldMessenger.of(context).showNotice(
       duration: undoWindow,
-      content: SnackBarContent(
+      SnackBarContent(
         glyph: SnackBarGlyph.done,
         title: context.intl.foodAdded(
           FoodText.name(context.intl, productName(entry)),
@@ -65,10 +57,9 @@ abstract final class JournalSnackBar {
         entry.mealName,
       ),
     };
-    show(
-      context,
+    ScaffoldMessenger.of(context).showNotice(
       duration: _settledDuration,
-      content: SnackBarContent(glyph: glyph, title: title, detail: detail),
+      SnackBarContent(glyph: glyph, title: title, detail: detail),
     );
   }
 
@@ -102,10 +93,9 @@ abstract final class JournalSnackBar {
         (intl.undoAdd, onUndo),
       ),
     };
-    show(
-      context,
+    ScaffoldMessenger.of(context).showNotice(
       duration: undoWindow,
-      content: SnackBarContent(
+      SnackBarContent(
         glyph: SnackBarGlyph.done,
         title: title,
         detail: detail,
@@ -130,10 +120,7 @@ abstract final class JournalSnackBar {
       ),
     ];
     if (notices.isEmpty) return;
-    final messenger = ScaffoldMessenger.of(context)..clearSnackBars();
-    for (final (content, duration) in notices) {
-      messenger.showFujinSnackBar(_snackBar(content, duration));
-    }
+    ScaffoldMessenger.of(context).showNotices(notices);
   }
 
   static (Widget, Duration)? _replaced(
@@ -219,17 +206,4 @@ abstract final class JournalSnackBar {
     }
     return null;
   }
-
-  static void show(
-    BuildContext context, {
-    required Widget content,
-    required Duration duration,
-  }) {
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showFujinSnackBar(_snackBar(content, duration));
-  }
-
-  static SnackBar _snackBar(Widget content, Duration duration) =>
-      SnackBar(duration: duration, padding: _padding, content: content);
 }

@@ -21,7 +21,6 @@ import 'package:fujin/pages/adding/widgets/add_state_panel.dart';
 import 'package:fujin/pages/adding/widgets/barcode_card.dart';
 import 'package:fujin/pages/adding/widgets/food_list.dart';
 import 'package:fujin/pages/adding/widgets/food_list_row.dart';
-import 'package:fujin/pages/adding/widgets/offline_card.dart';
 import 'package:fujin/pages/adding/widgets/open_draft.dart';
 import 'package:fujin/pages/adding/widgets/scanned_banner.dart';
 import 'package:fujin/pages/adding/widgets/suggestion_row.dart';
@@ -30,6 +29,7 @@ import 'package:fujin/pages/common/flow_header.dart';
 import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/glass_layer.dart';
 import 'package:fujin/pages/common/header_layout.dart';
+import 'package:fujin/pages/common/offline_card.dart';
 import 'package:fujin/pages/common/scan_button.dart';
 import 'package:fujin/pages/common/scan_icon.dart';
 import 'package:fujin/pages/common/scroll_edge_blur.dart';
@@ -300,6 +300,7 @@ class SearchView extends HookConsumerWidget {
           ),
           _box(
             OfflineCard(
+              title: context.intl.addOfflineTitle,
               detail: context.intl.addOfflineSearchDetail,
               onRetry: retry,
             ),
@@ -312,6 +313,7 @@ class SearchView extends HookConsumerWidget {
         [
           _box(
             OfflineCard(
+              title: context.intl.addOfflineTitle,
               detail: context.intl.addOfflineDetail,
               onRetry: retry,
             ),

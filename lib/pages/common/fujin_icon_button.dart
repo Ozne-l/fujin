@@ -6,23 +6,38 @@ import 'package:fujin/pages/common/glass_finish.dart';
 
 class FujinIconButton extends StatelessWidget {
   const FujinIconButton({
-    required this.icon,
+    required IconData this.icon,
     required this.tooltip,
     required this.onPressed,
     this.floating = false,
     super.key,
-  });
+  }) : glyph = null,
+       size = FujinSize.touchTarget;
 
-  final IconData icon;
+  const FujinIconButton.glyph({
+    required Widget this.glyph,
+    required this.tooltip,
+    required this.onPressed,
+    this.size = FujinSize.touchTarget,
+    this.floating = false,
+    super.key,
+  }) : icon = null;
+
+  final IconData? icon;
+  final Widget? glyph;
   final String tooltip;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
+  final double size;
   final bool floating;
 
   @override
   Widget build(BuildContext context) => IconButton(
     onPressed: onPressed,
     tooltip: tooltip,
-    icon: Icon(icon),
+    icon: switch (glyph) {
+      final glyph? => glyph,
+      null => Icon(icon),
+    },
     style:
         GlassFill.style(
           context.colors,
@@ -30,7 +45,7 @@ class FujinIconButton extends StatelessWidget {
           floating: floating,
         ).merge(
           IconButton.styleFrom(
-            fixedSize: const Size.square(FujinSize.touchTarget),
+            fixedSize: Size.square(size),
           ).copyWith(overlayColor: FujinTheme.pressedOverlay(context.colors)),
         ),
   );

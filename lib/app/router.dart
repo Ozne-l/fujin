@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/domain/accounts/connected_accounts.dart';
+import 'package:fujin/domain/chat/chat_state.dart';
 import 'package:fujin/pages/adding/add_food_page.dart';
 import 'package:fujin/pages/adding/edit_food_page.dart';
+import 'package:fujin/pages/chat/conversation_page.dart';
+import 'package:fujin/pages/chat_viewer/chat_viewer_page.dart';
 import 'package:fujin/pages/ekklo_sign_in/ekklo_sign_in_page.dart';
 import 'package:fujin/pages/journal/journal_page.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
@@ -24,9 +29,20 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final root = GlobalKey<NavigatorState>();
+  final notifications = ref.watch(chatNotificationsProvider);
   final router = GoRouter(
     navigatorKey: root,
     initialLocation: FujinRoute.splash.path,
+    redirect: (context, state) =>
+        switch (state.matchedLocation == FujinRoute.splash.path) {
+          true => null,
+          false => switch (notifications.takeLaunchConversation()) {
+            final conversation? => FujinRoute.conversation.forConversation(
+              conversation,
+            ),
+            null => null,
+          },
+        },
     routes: [
       GoRoute(
         path: FujinRoute.splash.path,
@@ -106,6 +122,48 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const EkkloSignInPage(),
       ),
       GoRoute(
+        path: FujinRoute.messages.path,
+        redirect: (context, state) => switch (ref.read(chatProvider).value) {
+          ChatPresent(conversations: [final conversation, ...]) =>
+            FujinRoute.conversation.forConversation(conversation.id),
+          ChatPresent() ||
+          ChatAbsent() ||
+          ChatUnknown() ||
+          null => FujinRoute.journal.path,
+        },
+      ),
+      GoRoute(
+        path: FujinRoute.conversation.path,
+        builder: (context, state) =>
+            switch (state.pathParameters[FujinRoute.conversationParameter]) {
+              final conversationId? => ConversationPage(
+                conversationId: conversationId,
+              ),
+              null => throw StateError(
+                '${FujinRoute.conversation.path} needs '
+                '${FujinRoute.conversationParameter}',
+              ),
+            },
+      ),
+      GoRoute(
+        path: FujinRoute.chatMedia.path,
+        builder: (context, state) => switch ((
+          state.pathParameters[FujinRoute.conversationParameter],
+          state.pathParameters[FujinRoute.messageParameter],
+        )) {
+          (final conversationId?, final messageId?) => ChatViewerPage(
+            conversationId: conversationId,
+            messageId: messageId,
+            initialIndex: FujinRoute.mediaIndexOf(state.uri.queryParameters),
+          ),
+          _ => throw StateError(
+            '${FujinRoute.chatMedia.path} needs '
+            '${FujinRoute.conversationParameter} '
+            'and ${FujinRoute.messageParameter}',
+          ),
+        },
+      ),
+      GoRoute(
         path: FujinRoute.send.path,
         builder: (context, state) =>
             switch (state.pathParameters[FujinRoute.dateParameter]) {
@@ -170,6 +228,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
-  ref.onDispose(router.dispose);
+  final taps = notifications.opened.listen((conversation) {
+    final path = FujinRoute.conversation.forConversation(conversation);
+    if (router.state.uri.path != path) unawaited(router.push(path));
+  });
+  ref
+    ..onDispose(taps.cancel)
+    ..onDispose(router.dispose);
   return router;
 });

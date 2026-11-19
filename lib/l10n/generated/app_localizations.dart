@@ -3132,6 +3132,694 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 aliment gardé comme dans Fūjin} other{{count} aliments gardés comme dans Fūjin}}'**
   String replacedMany(int count);
 
+  /// No description provided for @chatTab.
+  ///
+  /// In fr, this message translates to:
+  /// **'Messages'**
+  String get chatTab;
+
+  /// No description provided for @chatTabUnread.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{Messages, 1 non lu} other{Messages, {count} non lus}}'**
+  String chatTabUnread(int count);
+
+  /// No description provided for @chatBadgeOverflow.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count}+'**
+  String chatBadgeOverflow(int count);
+
+  /// No description provided for @chatCoach.
+  ///
+  /// In fr, this message translates to:
+  /// **'Coach Ekklo'**
+  String get chatCoach;
+
+  /// No description provided for @chatLoadingOlder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chargement des messages plus anciens…'**
+  String get chatLoadingOlder;
+
+  /// No description provided for @chatToday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aujourd’hui'**
+  String get chatToday;
+
+  /// No description provided for @chatYesterday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Hier'**
+  String get chatYesterday;
+
+  /// No description provided for @chatDay.
+  ///
+  /// In fr, this message translates to:
+  /// **'{date}'**
+  String chatDay(DateTime date);
+
+  /// No description provided for @chatTime.
+  ///
+  /// In fr, this message translates to:
+  /// **'{time}'**
+  String chatTime(DateTime time);
+
+  /// No description provided for @chatPhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo'**
+  String get chatPhoto;
+
+  /// No description provided for @chatVideo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vidéo'**
+  String get chatVideo;
+
+  /// No description provided for @chatVoice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Message vocal'**
+  String get chatVoice;
+
+  /// No description provided for @chatUnsupportedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contenu à ouvrir dans Ekklo'**
+  String get chatUnsupportedTitle;
+
+  /// No description provided for @chatUnsupportedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fūjin ne sait pas encore l’afficher.'**
+  String get chatUnsupportedDetail;
+
+  /// No description provided for @chatComposerHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Message'**
+  String get chatComposerHint;
+
+  /// No description provided for @chatMedia.
+  ///
+  /// In fr, this message translates to:
+  /// **'Médias'**
+  String get chatMedia;
+
+  /// No description provided for @chatSend.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoyer'**
+  String get chatSend;
+
+  /// No description provided for @chatVideoSemantics.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vidéo, {duration}'**
+  String chatVideoSemantics(String duration);
+
+  /// No description provided for @chatMinutesSeconds.
+  ///
+  /// In fr, this message translates to:
+  /// **'{minutes} min {seconds} s'**
+  String chatMinutesSeconds(int minutes, int seconds);
+
+  /// No description provided for @chatSeconds.
+  ///
+  /// In fr, this message translates to:
+  /// **'{seconds} s'**
+  String chatSeconds(int seconds);
+
+  /// No description provided for @chatVoiceSemantics.
+  ///
+  /// In fr, this message translates to:
+  /// **'Message vocal, {elapsed} sur {total}'**
+  String chatVoiceSemantics(String elapsed, String total);
+
+  /// No description provided for @chatPlay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lire'**
+  String get chatPlay;
+
+  /// No description provided for @chatPause.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pause'**
+  String get chatPause;
+
+  /// No description provided for @chatCannotReply.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tu ne peux pas répondre dans cette conversation.'**
+  String get chatCannotReply;
+
+  /// No description provided for @chatOfflineTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas de connexion'**
+  String get chatOfflineTitle;
+
+  /// No description provided for @chatOfflineDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tu peux relire la conversation. Tu pourras écrire au retour du réseau.'**
+  String get chatOfflineDetail;
+
+  /// No description provided for @chatExpiredDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Reconnecte-toi pour recevoir les messages de ton coach et lui répondre. La conversation reste lisible.'**
+  String get chatExpiredDetail;
+
+  /// No description provided for @chatViewerYou.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toi'**
+  String get chatViewerYou;
+
+  /// No description provided for @chatViewerToday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aujourd’hui, {time}'**
+  String chatViewerToday(DateTime time);
+
+  /// No description provided for @chatViewerYesterday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Hier, {time}'**
+  String chatViewerYesterday(DateTime time);
+
+  /// No description provided for @chatViewerTodayInline.
+  ///
+  /// In fr, this message translates to:
+  /// **'aujourd’hui, {time}'**
+  String chatViewerTodayInline(DateTime time);
+
+  /// No description provided for @chatViewerYesterdayInline.
+  ///
+  /// In fr, this message translates to:
+  /// **'hier, {time}'**
+  String chatViewerYesterdayInline(DateTime time);
+
+  /// No description provided for @chatViewerEarlier.
+  ///
+  /// In fr, this message translates to:
+  /// **'{date}, {time}'**
+  String chatViewerEarlier(DateTime date, DateTime time);
+
+  /// No description provided for @chatViewerPosition.
+  ///
+  /// In fr, this message translates to:
+  /// **'{index} sur {count} · {moment}'**
+  String chatViewerPosition(int index, int count, String moment);
+
+  /// No description provided for @chatViewerNotLoaded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vidéo pas chargée'**
+  String get chatViewerNotLoaded;
+
+  /// No description provided for @chatViewerRetry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get chatViewerRetry;
+
+  /// No description provided for @chatViewerMute.
+  ///
+  /// In fr, this message translates to:
+  /// **'Couper le son'**
+  String get chatViewerMute;
+
+  /// No description provided for @chatViewerUnmute.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remettre le son'**
+  String get chatViewerUnmute;
+
+  /// No description provided for @chatViewerLoading.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chargement de la vidéo'**
+  String get chatViewerLoading;
+
+  /// No description provided for @chatNotificationChannelName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Messages du coach'**
+  String get chatNotificationChannelName;
+
+  /// No description provided for @chatNotificationChannelDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les nouveaux messages de ton coach Ekklo, une notification par conversation.'**
+  String get chatNotificationChannelDescription;
+
+  /// No description provided for @chatNotificationCoach.
+  ///
+  /// In fr, this message translates to:
+  /// **'Coach Ekklo'**
+  String get chatNotificationCoach;
+
+  /// No description provided for @chatNotificationPhotos.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{Photo} other{{count} photos}}'**
+  String chatNotificationPhotos(int count);
+
+  /// No description provided for @chatNotificationVideos.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{Vidéo} other{{count} vidéos}}'**
+  String chatNotificationVideos(int count);
+
+  /// No description provided for @chatNotificationVoice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Message vocal'**
+  String get chatNotificationVoice;
+
+  /// No description provided for @chatNotificationMedia.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{1 média} other{{count} médias}}'**
+  String chatNotificationMedia(int count);
+
+  /// No description provided for @chatNotificationPhotosAndVideos.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photos et vidéos'**
+  String get chatNotificationPhotosAndVideos;
+
+  /// No description provided for @chatNotificationCaption.
+  ///
+  /// In fr, this message translates to:
+  /// **'{media} · {caption}'**
+  String chatNotificationCaption(String media, String caption);
+
+  /// No description provided for @chatNotificationUnsupported.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contenu à ouvrir dans Ekklo'**
+  String get chatNotificationUnsupported;
+
+  /// No description provided for @chatMediaMenuGallery.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photos et vidéos'**
+  String get chatMediaMenuGallery;
+
+  /// No description provided for @chatMediaMenuPhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prendre une photo'**
+  String get chatMediaMenuPhoto;
+
+  /// No description provided for @chatMediaMenuVideo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Filmer une vidéo'**
+  String get chatMediaMenuVideo;
+
+  /// No description provided for @chatTrayCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{1 média} other{{count} médias}}'**
+  String chatTrayCount(int count);
+
+  /// No description provided for @chatTrayFor.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour {coach}'**
+  String chatTrayFor(String coach);
+
+  /// No description provided for @chatTrayEdit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier'**
+  String get chatTrayEdit;
+
+  /// No description provided for @chatTrayCaption.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une légende'**
+  String get chatTrayCaption;
+
+  /// No description provided for @chatTrayCropped.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recadrée'**
+  String get chatTrayCropped;
+
+  /// No description provided for @chatTrayTrimmed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Coupée'**
+  String get chatTrayTrimmed;
+
+  /// No description provided for @chatTrayLimit.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} médias au maximum par message.'**
+  String chatTrayLimit(int count);
+
+  /// No description provided for @chatTrayRemove.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer'**
+  String get chatTrayRemove;
+
+  /// No description provided for @chatTrayAdd.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter des médias'**
+  String get chatTrayAdd;
+
+  /// No description provided for @chatTrayCancelReply.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler la réponse'**
+  String get chatTrayCancelReply;
+
+  /// No description provided for @chatTrayDiscardTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abandonner ces médias ?'**
+  String get chatTrayDiscardTitle;
+
+  /// No description provided for @chatTrayDiscardDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les médias choisis, leurs modifications et la légende ne seront pas envoyés.'**
+  String get chatTrayDiscardDetail;
+
+  /// No description provided for @chatTrayDiscardConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abandonner'**
+  String get chatTrayDiscardConfirm;
+
+  /// No description provided for @chatEditorPhotoTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier la photo'**
+  String get chatEditorPhotoTitle;
+
+  /// No description provided for @chatEditorVideoTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier la vidéo'**
+  String get chatEditorVideoTitle;
+
+  /// No description provided for @chatEditorPosition.
+  ///
+  /// In fr, this message translates to:
+  /// **'{index} sur {count}'**
+  String chatEditorPosition(int index, int count);
+
+  /// No description provided for @chatEditorFree.
+  ///
+  /// In fr, this message translates to:
+  /// **'Libre'**
+  String get chatEditorFree;
+
+  /// No description provided for @chatEditorOriginal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Original'**
+  String get chatEditorOriginal;
+
+  /// No description provided for @chatEditorRatio.
+  ///
+  /// In fr, this message translates to:
+  /// **'{width}:{height}'**
+  String chatEditorRatio(int width, int height);
+
+  /// No description provided for @chatEditorRotate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pivoter'**
+  String get chatEditorRotate;
+
+  /// No description provided for @chatEditorReset.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réinitialiser'**
+  String get chatEditorReset;
+
+  /// No description provided for @chatEditorDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminé'**
+  String get chatEditorDone;
+
+  /// No description provided for @chatEditorTrim.
+  ///
+  /// In fr, this message translates to:
+  /// **'Couper'**
+  String get chatEditorTrim;
+
+  /// No description provided for @chatEditorCrop.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recadrer'**
+  String get chatEditorCrop;
+
+  /// No description provided for @chatEditorRemovePassage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer ce passage'**
+  String get chatEditorRemovePassage;
+
+  /// No description provided for @chatEditorRestore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remettre {duration}'**
+  String chatEditorRestore(String duration);
+
+  /// No description provided for @chatEditorSound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Son'**
+  String get chatEditorSound;
+
+  /// No description provided for @chatEditorMuted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Son coupé'**
+  String get chatEditorMuted;
+
+  /// No description provided for @chatSending.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoi…'**
+  String get chatSending;
+
+  /// No description provided for @chatNotSent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non envoyé.'**
+  String get chatNotSent;
+
+  /// No description provided for @chatRetry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get chatRetry;
+
+  /// No description provided for @chatReply.
+  ///
+  /// In fr, this message translates to:
+  /// **'Répondre'**
+  String get chatReply;
+
+  /// No description provided for @chatDelete.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer'**
+  String get chatDelete;
+
+  /// No description provided for @chatMoreEmoji.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autre emoji'**
+  String get chatMoreEmoji;
+
+  /// No description provided for @chatReplyTo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réponse à {name}'**
+  String chatReplyTo(String name);
+
+  /// No description provided for @chatReplyToYou.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réponse à toi'**
+  String get chatReplyToYou;
+
+  /// No description provided for @chatQuoteDeleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Message supprimé'**
+  String get chatQuoteDeleted;
+
+  /// No description provided for @chatDeleteTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer ce message ?'**
+  String get chatDeleteTitle;
+
+  /// No description provided for @chatDeleteDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'« {excerpt} » Il sera retiré de la conversation, chez toi et chez {coach}.'**
+  String chatDeleteDetail(String excerpt, String coach);
+
+  /// No description provided for @chatDeleting.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suppression…'**
+  String get chatDeleting;
+
+  /// No description provided for @chatDeleteRefusedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas supprimé dans Ekklo'**
+  String get chatDeleteRefusedTitle;
+
+  /// No description provided for @chatDeleteRefusedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ekklo ne supprime pas encore les médias'**
+  String get chatDeleteRefusedDetail;
+
+  /// No description provided for @chatReactionNotSent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réaction pas envoyée'**
+  String get chatReactionNotSent;
+
+  /// No description provided for @chatUploadPreparing.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{Préparation de la vidéo} other{Préparation des vidéos}} · {percent} %'**
+  String chatUploadPreparing(int count, int percent);
+
+  /// No description provided for @chatUploadSending.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{Envoi · {percent} %} other{Envoi · {count} médias · {percent} %}}'**
+  String chatUploadSending(int count, int percent);
+
+  /// No description provided for @chatUploadRing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoi, {percent} %'**
+  String chatUploadRing(int percent);
+
+  /// No description provided for @chatUploadOriginalSize.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vidéo HDR non convertie : elle part en taille d’origine, {megabytes} Mo.'**
+  String chatUploadOriginalSize(int megabytes);
+
+  /// No description provided for @chatUploadNotificationTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoi à {coach}'**
+  String chatUploadNotificationTitle(String coach);
+
+  /// No description provided for @chatUploadNotificationProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{{progress}} other{Média {position} sur {count} · {progress}}}'**
+  String chatUploadNotificationProgress(
+    int count,
+    int position,
+    String progress,
+  );
+
+  /// No description provided for @chatUploadChannelName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoi des médias'**
+  String get chatUploadChannelName;
+
+  /// No description provided for @chatUploadChannelDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Préparation des vidéos et envoi des photos, vidéos et messages vocaux.'**
+  String get chatUploadChannelDescription;
+
+  /// No description provided for @chatUploadNotificationWaiting.
+  ///
+  /// In fr, this message translates to:
+  /// **'En attente du réseau'**
+  String get chatUploadNotificationWaiting;
+
+  /// No description provided for @chatUploadNotificationFailedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Médias pas envoyés'**
+  String get chatUploadNotificationFailedTitle;
+
+  /// No description provided for @chatUploadNotificationFailedBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Touche pour réessayer dans la conversation.'**
+  String get chatUploadNotificationFailedBody;
+
+  /// No description provided for @chatVoiceDelete.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer l’enregistrement'**
+  String get chatVoiceDelete;
+
+  /// No description provided for @chatVoiceTooShortTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Message vocal trop court'**
+  String get chatVoiceTooShortTitle;
+
+  /// No description provided for @chatVoiceTooShortDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Il faut au moins 1 seconde.'**
+  String get chatVoiceTooShortDetail;
+
+  /// No description provided for @chatVoiceTenSecondsLeft.
+  ///
+  /// In fr, this message translates to:
+  /// **'Il reste 10 secondes'**
+  String get chatVoiceTenSecondsLeft;
+
+  /// No description provided for @chatVoiceLimitReached.
+  ///
+  /// In fr, this message translates to:
+  /// **'5 minutes au maximum : enregistrement arrêté'**
+  String get chatVoiceLimitReached;
+
+  /// No description provided for @chatVoiceRefusedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas d’accès au micro'**
+  String get chatVoiceRefusedTitle;
+
+  /// No description provided for @chatVoiceRefusedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autorise le micro pour Fūjin dans les réglages du téléphone.'**
+  String get chatVoiceRefusedDetail;
+
+  /// No description provided for @chatUploadRingLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'{percent} %'**
+  String chatUploadRingLabel(int percent);
+
   /// No description provided for @writeBlockedInDev.
   ///
   /// In fr, this message translates to:

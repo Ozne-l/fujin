@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fujin/app/app_environment.dart';
@@ -7,7 +9,9 @@ import 'package:fujin/app/theme/fujin_scroll_behavior.dart';
 import 'package:fujin/app/theme/fujin_system_bars.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/notifications/chat_notifications.dart';
 import 'package:fujin/data/settings/appearance.dart';
+import 'package:fujin/domain/chat/chat_state.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/appearance_notifier.dart';
@@ -20,6 +24,17 @@ class FujinApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appearance = ref.watch(appearanceProvider);
+    ref
+      ..watch(chatUploadServiceProvider)
+      ..listen(
+        chatProvider,
+        (previous, next) => _switchChecks(
+          ref.read(chatNotificationsProvider),
+          previous?.value,
+          next.value,
+        ),
+        weak: true,
+      );
     return MaterialApp.router(
       onGenerateTitle: (context) => context.intl.appName,
       theme: FujinTheme.light(),
@@ -36,6 +51,24 @@ class FujinApp extends ConsumerWidget {
         appearance: appearance,
       ),
     );
+  }
+
+  static void _switchChecks(
+    ChatNotifications notifications,
+    ChatState? previous,
+    ChatState? next,
+  ) {
+    switch ((previous, next)) {
+      case (ChatPresent(), ChatPresent()) ||
+          (ChatAbsent(), ChatAbsent()) ||
+          (_, ChatUnknown() || null):
+        return;
+      case (_, ChatPresent()):
+        unawaited(notifications.startChecks());
+      case (_, ChatAbsent()):
+        unawaited(notifications.stopChecks());
+        unawaited(notifications.cancelAll());
+    }
   }
 
   static ThemeMode themeModeOf(Appearance appearance) => switch (appearance) {

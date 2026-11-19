@@ -12,6 +12,7 @@ Run `flutter` and `dart` directly. The SDK is Fūjin's own, pinned in `.fvmrc` (
 | After changing a `@MappableClass` / `@MappableEnum` | `dart run build_runner build` |
 | After editing `lib/l10n/app_fr.arb` | `flutter gen-l10n` |
 | After editing a file in `design/tokens/` | `dart run tool/generate_tokens.dart` |
+| When the chat's emoji sheet moves to a newer Unicode emoji version | download `emoji-test.txt` (URL in `tool/generate_emoji.dart`), then `dart run tool/generate_emoji.dart <file>` |
 | Before handing work back | `dart analyze --fatal-infos` |
 | Before handing work back | `dart format lib test tool integration_test test_driver` |
 | Before handing work back | `flutter test` |
@@ -20,7 +21,7 @@ Run `flutter` and `dart` directly. The SDK is Fūjin's own, pinned in `.fvmrc` (
 
 The glass benchmark installs over the owner's Fūjin DEV. Never drop `--keep-app-running`: without it `flutter drive` uninstalls the app when it ends, which wiped his Fūjin DEV data on 2026-10-26. Put his dev build back with `flutter build apk --debug --flavor dev` then `adb install -r build/app/outputs/flutter-apk/app-dev-debug.apk`, never `flutter install`, which uninstalls first and wipes his sessions and settings.
 
-Generated files (`*.mapper.dart`, `lib/l10n/generated/`, `lib/app/theme/fujin_tokens.g.dart`) are committed; regenerate, never hand-edit.
+Generated files (`*.mapper.dart`, `lib/l10n/generated/`, `lib/app/theme/fujin_tokens.g.dart`, `lib/pages/chat/emoji_catalog.g.dart`) are committed; regenerate, never hand-edit.
 
 ## Running without real accounts
 
@@ -34,7 +35,7 @@ flutter run --flavor production \
   --dart-define=EKKLO_BASE_URI=http://10.0.2.2:<port>
 ```
 
-Every build and run names a flavor, `production` or `dev`; a build without one throws at startup. The dev flavor is a second app (`dev.oznel.fujin.dev`, "Fūjin DEV") that the owner runs on his real accounts in read-only mode ([ADR 0017](docs/adr/0017-read-only-dev-environment.md)): reads, sign-in and the barcode lookup go through, every other write is stopped in `ReadOnlyHttpClient` (`lib/data/http/read_only_http_client.dart`). That app is for the owner; agents still use fake servers, and may run `--flavor dev` against them to check the guard.
+Every build and run names a flavor, `production` or `dev`; a build without one throws at startup. The dev flavor is a second app (`dev.oznel.fujin.dev`, "Fūjin DEV") that the owner runs on his real accounts in read-only mode ([ADR 0017](docs/adr/0017-read-only-dev-environment.md)): reads, sign-in and the barcode lookup go through, every other write is stopped in `ReadOnlyHttpClient` (`lib/data/http/read_only_http_client.dart`). The Ekklo chat is stopped whole: every messaging and upload request, reads included, and its socket (`blockedWebSocket`, `lib/data/http/blocked_web_socket.dart`); Fūjin DEV talks to the fake chat on loopback instead (`lib/data/dev_chat/`, [ADR 0045](docs/adr/0045-ekklo-chat.md)). That app is for the owner; agents still use fake servers, and may run `--flavor dev` against them to check the guard.
 
 `10.0.2.2` is the host machine as seen from the Android emulator; on the iOS simulator use `127.0.0.1`. Debug builds allow cleartext HTTP (`android/app/src/debug/AndroidManifest.xml`); release builds do not. Tests never need a server: they use `FakeBackends` (`test/support/fake_backends.dart`).
 

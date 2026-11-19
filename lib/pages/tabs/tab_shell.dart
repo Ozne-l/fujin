@@ -3,12 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/fujin_route.dart';
+import 'package:fujin/app/providers.dart';
 import 'package:fujin/domain/adding/added_food.dart';
+import 'package:fujin/domain/chat/chat_state.dart';
 import 'package:fujin/pages/adding/add_shortcut.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:fujin/pages/scanner/scanner_exit.dart';
 import 'package:fujin/pages/tabs/floating_tab_bar.dart';
 import 'package:fujin/pages/tabs/fujin_tab.dart';
+import 'package:fujin/pages/tabs/messages_item.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -80,6 +83,13 @@ class TabShell extends HookConsumerWidget {
     }
 
     final canAdd = AddShortcut.possible(ref);
+    final messages = switch (ref.watch(chatProvider).value) {
+      final ChatPresent chat when chat.conversations.isNotEmpty => MessagesItem(
+        unread: chat.unreadCount,
+        onOpen: () => unawaited(context.push(FujinRoute.messages.path)),
+      ),
+      ChatPresent() || ChatAbsent() || ChatUnknown() || null => null,
+    };
 
     return Scaffold(
       extendBody: true,
@@ -90,6 +100,7 @@ class TabShell extends HookConsumerWidget {
       bottomNavigationBar: FloatingTabBar(
         selected: FujinTab.values[navigationShell.currentIndex],
         minimized: minimized.value,
+        messages: messages,
         onSelect: (tab) {
           minimized.value = false;
           travel.value = 0;

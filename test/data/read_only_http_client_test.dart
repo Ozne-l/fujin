@@ -1,6 +1,8 @@
 import 'package:checks/checks.dart';
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_test/flutter_test.dart' show test;
+import 'package:fujin/data/dev_chat/fake_chat.dart';
+import 'package:fujin/data/http/blocked_web_socket.dart';
 import 'package:fujin/data/http/read_only_http_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
@@ -80,6 +82,48 @@ void main() {
     check(
       guarded.writesSent,
     ).deepEquals(['POST /api/v1/auth/login/refresh_token']);
+  });
+
+  test('stops every Ekklo chat request, reads included', () async {
+    final guarded = _Guarded(FakeBackends());
+    final ekklo = await guarded.signedInEkklo();
+
+    await check(ekklo.messaging.me()).completes();
+    await check(
+      ekklo.messaging.conversations(),
+    ).throws<EkkloNetworkException>();
+    await check(
+      ekklo.messaging.messages(FakeChat.conversationId),
+    ).throws<EkkloNetworkException>();
+    await check(
+      ekklo.messaging.presignUpload(
+        fileName: 'plate.jpg',
+        fileType: 'image/jpeg',
+        resourceType: EkkloUploadResourceType.values.first,
+        resourceId: FakeChat.conversationId,
+      ),
+    ).throws<EkkloNetworkException>();
+
+    check(
+      guarded.backends.requests.map((request) => request.url.path),
+    ).not((paths) => paths.any((path) => path.startsWith('/api/v1/messaging')));
+    check(
+      guarded.backends.requests.map((request) => request.url.path),
+    ).not((paths) => paths.any((path) => path.startsWith('/api/v1/uploads')));
+  });
+
+  test('never opens the Ekklo chat socket', () async {
+    final store = InMemoryEkkloTokenStore();
+    await store.write(FakeChat.ownerTokens);
+    final ekklo = EkkloClient(
+      baseUri: ekkloUri,
+      tokenStore: store,
+      webSocketConnector: blockedWebSocket,
+    );
+
+    await check(
+      ekklo.messaging.connectSocket(),
+    ).throws<EkkloNetworkException>();
   });
 
   test('lets the MyFitnessPal barcode lookup through', () async {

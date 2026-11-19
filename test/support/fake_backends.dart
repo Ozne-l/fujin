@@ -1,17 +1,24 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/database/calendar_date_hook.dart';
+import 'package:fujin/data/dev_chat/fake_chat.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
+import 'package:web_socket/testing.dart';
+import 'package:web_socket/web_socket.dart';
+
+import 'fixtures.dart';
 
 final Uri mfpWebUri = Uri.parse('https://mfp-web.test');
 final Uri mfpApiUri = Uri.parse('https://mfp-api.test');
 final Uri ekkloUri = Uri.parse('https://ekklo.test');
 final Uri mfpSyncUri = Uri.parse('https://mfp-sync.test');
+final Uri chatMediaUri = Uri.parse('https://chat-media.test');
 
 const _jsonType = {'content-type': 'application/json; charset=utf-8'};
 const _sessionCookies = MfpSessionCookies({
@@ -32,7 +39,13 @@ final class FakeBackends {
     this.mfpFoods = const [],
     this.mfpSearches = const {},
     this.mfpBarcodes = const {},
-  });
+    FakeChat? chat,
+  }) : chat = chat ?? FakeChat(origin: chatMediaUri, clock: () => now);
+
+  final FakeChat chat;
+  final chatMedia = <String, List<int>>{};
+  final _sockets = <WebSocket>[];
+  int socketConnections = 0;
 
   List<MfpFoodEntry> entries;
   List<EkkloDailyMeal> ekkloMeals;
@@ -59,6 +72,9 @@ final class FakeBackends {
   Completer<void>? mfpFoodGate;
   Completer<void>? mfpAddGate;
   Completer<void>? mfpRemoveGate;
+  final chatGates = <String, Completer<void>>{};
+  final refusedChatCalls = <String>{};
+  final lostChatCalls = <String>{};
   final requests = <http.Request>[];
 
   static const ekkloEmail = 'owner@example.com';
@@ -96,6 +112,7 @@ final class FakeBackends {
         when request.method == 'DELETE' && request.url.host == mfpApiUri.host) {
       await gate.future;
     }
+    if (chatGates[chatCall(request)] case final gate?) await gate.future;
     return switch ((request.method, request.url.host, request.url.path)) {
       (_, final host, _) when host == ekkloUri.host && !ekkloReachable =>
         throw http.ClientException('Connection refused', request.url),
@@ -113,6 +130,14 @@ final class FakeBackends {
       (_, final host, _)
           when host == ekkloUri.host && !_carriesEkkloAccess(request) =>
         http.Response('', 401),
+      (_, final host, final path)
+          when host == ekkloUri.host && FakeChat.serves(path) =>
+        _chatCall(request),
+      ('GET', final host, final path) when host == chatMediaUri.host =>
+        switch (chatMedia[path.substring(FakeChat.mediaPath.length)]) {
+          final bytes? => http.Response.bytes(bytes, 200),
+          null => http.Response('', 404),
+        },
       ('GET', final host, '/user/auth_token')
           when host == mfpWebUri.host &&
               request.headers['cookie'] == refusedMfpSession.header =>
@@ -243,7 +268,43 @@ final class FakeBackends {
         httpClient: client ?? httpClient,
         baseUri: ekkloUri,
         tokenStore: store,
+        webSocketConnector: _connectSocket,
       );
+
+  void dropSockets() {
+    for (final socket in [..._sockets]) {
+      unawaited(socket.close());
+    }
+    _sockets.clear();
+  }
+
+  Future<WebSocket> _connectSocket(
+    Uri uri,
+    Map<String, String> headers,
+  ) async {
+    if (!ekkloReachable || uri.host != ekkloUri.host) {
+      throw SocketException('Connection refused: $uri');
+    }
+    if (headers['authorization'] != 'Bearer ${_ekkloTokens.accessToken}') {
+      throw WebSocketException('401');
+    }
+    final (client, server) = fakes();
+    final frames = chat.frames.listen(server.sendText);
+    server.events.listen((event) {
+      switch (event) {
+        case TextDataReceived(:final text):
+          chat.receiveFrame(text);
+        case CloseReceived():
+          unawaited(frames.cancel());
+          _sockets.remove(server);
+        case BinaryDataReceived():
+          return;
+      }
+    }, onDone: () => unawaited(frames.cancel()));
+    _sockets.add(server);
+    socketConnections++;
+    return client;
+  }
 
   static const dailyMealsPath = '/api/v1/nutritions/daily-meals';
   static const _diaryPath = '/v2/diary';
@@ -579,4 +640,32 @@ final class FakeBackends {
 
   static http.Response _json(Object body) =>
       http.Response(jsonEncode(body), 200, headers: _jsonType);
+
+  static String chatCall(http.BaseRequest request) =>
+      '${request.method} ${request.url.path}';
+
+  http.Response _chatCall(http.Request request) {
+    final call = chatCall(request);
+    if (refusedChatCalls.contains(call)) return http.Response('', 500);
+    final reply = _chatReply(
+      chat.handle(
+        request.method,
+        request.url,
+        request.body.isEmpty ? null : jsonDecode(request.body),
+      ),
+    );
+    if (lostChatCalls.contains(call)) {
+      throw http.ClientException('Connection reset', request.url);
+    }
+    return reply;
+  }
+
+  static http.Response _chatReply(FakeChatReply reply) => switch (reply) {
+    (:final status, body: null) => http.Response('', status),
+    (:final status, :final body?) => http.Response(
+      jsonEncode(body),
+      status,
+      headers: _jsonType,
+    ),
+  };
 }

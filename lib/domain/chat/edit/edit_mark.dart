@@ -1,0 +1,1 @@
+enum EditMark { cropped, trimmed }

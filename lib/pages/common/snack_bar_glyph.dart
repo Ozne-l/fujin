@@ -1,13 +1,15 @@
 import 'dart:ui';
 
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/pages/common/alert_icon.dart';
 import 'package:fujin/pages/common/check_icon.dart';
+import 'package:fujin/pages/common/refresh_icon.dart';
 
 enum SnackBarGlyph {
   done(CheckIcon.asset),
   undone('assets/icons/undo.svg'),
-  alert('assets/icons/alert.svg'),
-  refresh('assets/icons/refresh.svg');
+  alert(AlertIcon.asset),
+  refresh(RefreshIcon.asset);
 
   const SnackBarGlyph(this.asset);
 

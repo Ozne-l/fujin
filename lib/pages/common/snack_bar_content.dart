@@ -7,14 +7,14 @@ class SnackBarContent extends StatelessWidget {
   const SnackBarContent({
     required this.glyph,
     required this.title,
-    required this.detail,
+    this.detail,
     this.action,
     super.key,
   });
 
   final SnackBarGlyph glyph;
   final String title;
-  final String detail;
+  final String? detail;
   final (String, VoidCallback)? action;
 
   @override
@@ -42,12 +42,13 @@ class SnackBarContent extends StatelessWidget {
                   color: colors.textOnDark,
                 ),
               ),
-              Text(
-                detail,
-                style: FujinText.inter12Regular.copyWith(
-                  color: colors.textOnDarkSecondary,
+              if (detail case final detail?)
+                Text(
+                  detail,
+                  style: FujinText.inter12Regular.copyWith(
+                    color: colors.textOnDarkSecondary,
+                  ),
                 ),
-              ),
             ],
           ),
         ),

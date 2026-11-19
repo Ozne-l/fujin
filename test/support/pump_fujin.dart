@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart' show WidgetTester, addTearDown;
 import 'package:fujin/app/app_environment.dart';
+import 'package:fujin/app/file_video.dart';
 import 'package:fujin/app/fujin_app.dart';
 import 'package:fujin/app/providers.dart';
+import 'package:fujin/app/url_video.dart';
 import 'package:fujin/data/backup/backup_files.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_id.dart';
@@ -19,7 +23,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'fake_backends.dart';
 import 'fake_backup_files.dart';
+import 'fake_chat_notifications.dart';
+import 'fake_media_picker.dart';
+import 'fake_media_processor.dart';
+import 'fake_media_uploader.dart';
+import 'fake_relay_scheduler.dart';
 import 'fake_scan_camera.dart';
+import 'fake_upload_notifications.dart';
+import 'fake_video_player.dart';
+import 'fake_voice_recorder.dart';
 import 'fixtures.dart';
 import 'in_memory_preferences.dart';
 import 'repositories.dart';
@@ -45,6 +57,13 @@ Future<void> pumpFujin(
   bool reduceTransparency = false,
   AppEnvironment environment = AppEnvironment.production,
   Stream<bool> connectivity = const Stream.empty(),
+  FakeChatNotifications? chatNotifications,
+  FakeMediaProcessor? mediaProcessor,
+  FakeMediaPicker? mediaPicker,
+  FakeVideoPlayer? fileVideo,
+  FakeVideoPlayer? urlVideo,
+  FakeVoiceRecorder? voiceRecorder,
+  FakeMediaUploader? mediaUploader,
 }) async {
   tester.platformDispatcher.localesTestValue = const [Locale('fr')];
   addTearDown(tester.platformDispatcher.clearLocalesTestValue);
@@ -81,6 +100,12 @@ Future<void> pumpFujin(
   };
   final signedInMfp = mfp ?? await backends.mfp(client: httpClient);
   final signedInEkklo = ekklo ?? await backends.ekklo(client: httpClient);
+  final chatClient = switch (environment) {
+    AppEnvironment.production => signedInEkklo,
+    AppEnvironment.dev => await backends.ekklo(),
+  };
+  final cacheDirectory = Directory.systemTemp.createTempSync('fujin-cache');
+  addTearDown(() => cacheDirectory.deleteSync(recursive: true));
   final storedPreferences = preferences ?? await inMemoryPreferences();
   await tester.pumpWidget(
     ProviderScope(
@@ -104,6 +129,36 @@ Future<void> pumpFujin(
         ),
         reduceTransparencyProvider.overrideWith(
           (ref) => Stream.value(reduceTransparency),
+        ),
+        chatNotificationsProvider.overrideWithValue(
+          chatNotifications ?? FakeChatNotifications(),
+        ),
+        chatCachePathProvider.overrideWithValue(null),
+        appCacheDirectoryProvider.overrideWithValue(cacheDirectory),
+        chatClientProvider.overrideWithValue(chatClient),
+        httpClientProvider.overrideWithValue(httpClient),
+        appForegroundProvider.overrideWith((ref) => Stream.value(true)),
+        mediaProcessorProvider.overrideWithValue(
+          mediaProcessor ?? FakeMediaProcessor(),
+        ),
+        mediaPickerProvider.overrideWithValue(mediaPicker ?? FakeMediaPicker()),
+        fileVideoProvider.overrideWithValue(
+          (file) => (fileVideo ?? FakeVideoPlayer()).build(file.uri),
+        ),
+        urlVideoProvider.overrideWithValue(
+          (urlVideo ?? FakeVideoPlayer()).build,
+        ),
+        voiceRecorderProvider.overrideWithValue(
+          voiceRecorder ?? FakeVoiceRecorder(),
+        ),
+        mediaUploaderProvider.overrideWithValue(
+          mediaUploader ?? FakeMediaUploader(),
+        ),
+        relaySchedulerProvider.overrideWithValue(
+          FakeRelayScheduler(),
+        ),
+        uploadNotificationsProvider.overrideWithValue(
+          FakeUploadNotifications(),
         ),
       ],
       child: const FujinApp(),

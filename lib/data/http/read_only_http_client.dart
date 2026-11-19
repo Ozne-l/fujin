@@ -5,19 +5,22 @@ final class ReadOnlyHttpClient extends http.BaseClient {
     this._inner, {
     required Uri ekkloBaseUri,
     required Uri mfpSyncUri,
-  }) : _allowedWrites = {
+  }) : _ekkloOrigin = ekkloBaseUri.origin,
+       _allowedWrites = {
          ekkloBaseUri.resolve(_ekkloLoginPath),
          ekkloBaseUri.resolve(_ekkloRefreshPath),
          mfpSyncUri.resolve(_mfpSyncPath),
        };
 
   static const _readMethods = {'GET', 'HEAD'};
+  static const _ekkloChatPaths = {'/api/v1/messaging', '/api/v1/uploads'};
   static const _ekkloLoginPath = '/api/v1/auth/login';
   static const _ekkloRefreshPath = '/api/v1/auth/login/refresh_token';
   static const _mfpSyncPath = '/iphone_api/synchronize';
   static const _blocked = 'Blocked by the read-only dev environment';
 
   final http.Client _inner;
+  final String _ekkloOrigin;
   final Set<Uri> _allowedWrites;
 
   @override
@@ -38,9 +41,17 @@ final class ReadOnlyHttpClient extends http.BaseClient {
       _readMethods.contains(method.toUpperCase());
 
   bool _allows(http.BaseRequest request) =>
-      reads(request.method) ||
-      _allowedWrites.any(
-        (uri) =>
-            uri.origin == request.url.origin && uri.path == request.url.path,
+      !_isEkkloChat(request.url) &&
+      (reads(request.method) ||
+          _allowedWrites.any(
+            (uri) =>
+                uri.origin == request.url.origin &&
+                uri.path == request.url.path,
+          ));
+
+  bool _isEkkloChat(Uri url) =>
+      url.origin == _ekkloOrigin &&
+      _ekkloChatPaths.any(
+        (path) => url.path == path || url.path.startsWith('$path/'),
       );
 }

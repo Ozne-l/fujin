@@ -2339,6 +2339,505 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get chatTab => 'Messages';
+
+  @override
+  String chatTabUnread(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Messages, $count non lus',
+      one: 'Messages, 1 non lu',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String chatBadgeOverflow(int count) {
+    return '$count+';
+  }
+
+  @override
+  String get chatCoach => 'Coach Ekklo';
+
+  @override
+  String get chatLoadingOlder => 'Chargement des messages plus anciens…';
+
+  @override
+  String get chatToday => 'Aujourd’hui';
+
+  @override
+  String get chatYesterday => 'Hier';
+
+  @override
+  String chatDay(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat(
+      'EEEE d MMMM',
+      localeName,
+    );
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString';
+  }
+
+  @override
+  String chatTime(DateTime time) {
+    final intl.DateFormat timeDateFormat = intl.DateFormat.Hm(localeName);
+    final String timeString = timeDateFormat.format(time);
+
+    return '$timeString';
+  }
+
+  @override
+  String get chatPhoto => 'Photo';
+
+  @override
+  String get chatVideo => 'Vidéo';
+
+  @override
+  String get chatVoice => 'Message vocal';
+
+  @override
+  String get chatUnsupportedTitle => 'Contenu à ouvrir dans Ekklo';
+
+  @override
+  String get chatUnsupportedDetail => 'Fūjin ne sait pas encore l’afficher.';
+
+  @override
+  String get chatComposerHint => 'Message';
+
+  @override
+  String get chatMedia => 'Médias';
+
+  @override
+  String get chatSend => 'Envoyer';
+
+  @override
+  String chatVideoSemantics(String duration) {
+    return 'Vidéo, $duration';
+  }
+
+  @override
+  String chatMinutesSeconds(int minutes, int seconds) {
+    return '$minutes min $seconds s';
+  }
+
+  @override
+  String chatSeconds(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String chatVoiceSemantics(String elapsed, String total) {
+    return 'Message vocal, $elapsed sur $total';
+  }
+
+  @override
+  String get chatPlay => 'Lire';
+
+  @override
+  String get chatPause => 'Pause';
+
+  @override
+  String get chatCannotReply =>
+      'Tu ne peux pas répondre dans cette conversation.';
+
+  @override
+  String get chatOfflineTitle => 'Pas de connexion';
+
+  @override
+  String get chatOfflineDetail =>
+      'Tu peux relire la conversation. Tu pourras écrire au retour du réseau.';
+
+  @override
+  String get chatExpiredDetail =>
+      'Reconnecte-toi pour recevoir les messages de ton coach et lui répondre. La conversation reste lisible.';
+
+  @override
+  String get chatViewerYou => 'Toi';
+
+  @override
+  String chatViewerToday(DateTime time) {
+    final intl.DateFormat timeDateFormat = intl.DateFormat.Hm(localeName);
+    final String timeString = timeDateFormat.format(time);
+
+    return 'Aujourd’hui, $timeString';
+  }
+
+  @override
+  String chatViewerYesterday(DateTime time) {
+    final intl.DateFormat timeDateFormat = intl.DateFormat.Hm(localeName);
+    final String timeString = timeDateFormat.format(time);
+
+    return 'Hier, $timeString';
+  }
+
+  @override
+  String chatViewerTodayInline(DateTime time) {
+    final intl.DateFormat timeDateFormat = intl.DateFormat.Hm(localeName);
+    final String timeString = timeDateFormat.format(time);
+
+    return 'aujourd’hui, $timeString';
+  }
+
+  @override
+  String chatViewerYesterdayInline(DateTime time) {
+    final intl.DateFormat timeDateFormat = intl.DateFormat.Hm(localeName);
+    final String timeString = timeDateFormat.format(time);
+
+    return 'hier, $timeString';
+  }
+
+  @override
+  String chatViewerEarlier(DateTime date, DateTime time) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat(
+      'EEEE d MMMM',
+      localeName,
+    );
+    final String dateString = dateDateFormat.format(date);
+    final intl.DateFormat timeDateFormat = intl.DateFormat.Hm(localeName);
+    final String timeString = timeDateFormat.format(time);
+
+    return '$dateString, $timeString';
+  }
+
+  @override
+  String chatViewerPosition(int index, int count, String moment) {
+    return '$index sur $count · $moment';
+  }
+
+  @override
+  String get chatViewerNotLoaded => 'Vidéo pas chargée';
+
+  @override
+  String get chatViewerRetry => 'Réessayer';
+
+  @override
+  String get chatViewerMute => 'Couper le son';
+
+  @override
+  String get chatViewerUnmute => 'Remettre le son';
+
+  @override
+  String get chatViewerLoading => 'Chargement de la vidéo';
+
+  @override
+  String get chatNotificationChannelName => 'Messages du coach';
+
+  @override
+  String get chatNotificationChannelDescription =>
+      'Les nouveaux messages de ton coach Ekklo, une notification par conversation.';
+
+  @override
+  String get chatNotificationCoach => 'Coach Ekklo';
+
+  @override
+  String chatNotificationPhotos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos',
+      one: 'Photo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String chatNotificationVideos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count vidéos',
+      one: 'Vidéo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatNotificationVoice => 'Message vocal';
+
+  @override
+  String chatNotificationMedia(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count médias',
+      one: '1 média',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatNotificationPhotosAndVideos => 'Photos et vidéos';
+
+  @override
+  String chatNotificationCaption(String media, String caption) {
+    return '$media · $caption';
+  }
+
+  @override
+  String get chatNotificationUnsupported => 'Contenu à ouvrir dans Ekklo';
+
+  @override
+  String get chatMediaMenuGallery => 'Photos et vidéos';
+
+  @override
+  String get chatMediaMenuPhoto => 'Prendre une photo';
+
+  @override
+  String get chatMediaMenuVideo => 'Filmer une vidéo';
+
+  @override
+  String chatTrayCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count médias',
+      one: '1 média',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String chatTrayFor(String coach) {
+    return 'Pour $coach';
+  }
+
+  @override
+  String get chatTrayEdit => 'Modifier';
+
+  @override
+  String get chatTrayCaption => 'Ajouter une légende';
+
+  @override
+  String get chatTrayCropped => 'Recadrée';
+
+  @override
+  String get chatTrayTrimmed => 'Coupée';
+
+  @override
+  String chatTrayLimit(int count) {
+    return '$count médias au maximum par message.';
+  }
+
+  @override
+  String get chatTrayRemove => 'Retirer';
+
+  @override
+  String get chatTrayAdd => 'Ajouter des médias';
+
+  @override
+  String get chatTrayCancelReply => 'Annuler la réponse';
+
+  @override
+  String get chatTrayDiscardTitle => 'Abandonner ces médias ?';
+
+  @override
+  String get chatTrayDiscardDetail =>
+      'Les médias choisis, leurs modifications et la légende ne seront pas envoyés.';
+
+  @override
+  String get chatTrayDiscardConfirm => 'Abandonner';
+
+  @override
+  String get chatEditorPhotoTitle => 'Modifier la photo';
+
+  @override
+  String get chatEditorVideoTitle => 'Modifier la vidéo';
+
+  @override
+  String chatEditorPosition(int index, int count) {
+    return '$index sur $count';
+  }
+
+  @override
+  String get chatEditorFree => 'Libre';
+
+  @override
+  String get chatEditorOriginal => 'Original';
+
+  @override
+  String chatEditorRatio(int width, int height) {
+    return '$width:$height';
+  }
+
+  @override
+  String get chatEditorRotate => 'Pivoter';
+
+  @override
+  String get chatEditorReset => 'Réinitialiser';
+
+  @override
+  String get chatEditorDone => 'Terminé';
+
+  @override
+  String get chatEditorTrim => 'Couper';
+
+  @override
+  String get chatEditorCrop => 'Recadrer';
+
+  @override
+  String get chatEditorRemovePassage => 'Retirer ce passage';
+
+  @override
+  String chatEditorRestore(String duration) {
+    return 'Remettre $duration';
+  }
+
+  @override
+  String get chatEditorSound => 'Son';
+
+  @override
+  String get chatEditorMuted => 'Son coupé';
+
+  @override
+  String get chatSending => 'Envoi…';
+
+  @override
+  String get chatNotSent => 'Non envoyé.';
+
+  @override
+  String get chatRetry => 'Réessayer';
+
+  @override
+  String get chatReply => 'Répondre';
+
+  @override
+  String get chatDelete => 'Supprimer';
+
+  @override
+  String get chatMoreEmoji => 'Autre emoji';
+
+  @override
+  String chatReplyTo(String name) {
+    return 'Réponse à $name';
+  }
+
+  @override
+  String get chatReplyToYou => 'Réponse à toi';
+
+  @override
+  String get chatQuoteDeleted => 'Message supprimé';
+
+  @override
+  String get chatDeleteTitle => 'Supprimer ce message ?';
+
+  @override
+  String chatDeleteDetail(String excerpt, String coach) {
+    return '« $excerpt » Il sera retiré de la conversation, chez toi et chez $coach.';
+  }
+
+  @override
+  String get chatDeleting => 'Suppression…';
+
+  @override
+  String get chatDeleteRefusedTitle => 'Pas supprimé dans Ekklo';
+
+  @override
+  String get chatDeleteRefusedDetail =>
+      'Ekklo ne supprime pas encore les médias';
+
+  @override
+  String get chatReactionNotSent => 'Réaction pas envoyée';
+
+  @override
+  String chatUploadPreparing(int count, int percent) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Préparation des vidéos',
+      one: 'Préparation de la vidéo',
+    );
+    return '$_temp0 · $percent %';
+  }
+
+  @override
+  String chatUploadSending(int count, int percent) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Envoi · $count médias · $percent %',
+      one: 'Envoi · $percent %',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String chatUploadRing(int percent) {
+    return 'Envoi, $percent %';
+  }
+
+  @override
+  String chatUploadOriginalSize(int megabytes) {
+    return 'Vidéo HDR non convertie : elle part en taille d’origine, $megabytes Mo.';
+  }
+
+  @override
+  String chatUploadNotificationTitle(String coach) {
+    return 'Envoi à $coach';
+  }
+
+  @override
+  String chatUploadNotificationProgress(
+    int count,
+    int position,
+    String progress,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Média $position sur $count · $progress',
+      one: '$progress',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatUploadChannelName => 'Envoi des médias';
+
+  @override
+  String get chatUploadChannelDescription =>
+      'Préparation des vidéos et envoi des photos, vidéos et messages vocaux.';
+
+  @override
+  String get chatUploadNotificationWaiting => 'En attente du réseau';
+
+  @override
+  String get chatUploadNotificationFailedTitle => 'Médias pas envoyés';
+
+  @override
+  String get chatUploadNotificationFailedBody =>
+      'Touche pour réessayer dans la conversation.';
+
+  @override
+  String get chatVoiceDelete => 'Supprimer l’enregistrement';
+
+  @override
+  String get chatVoiceTooShortTitle => 'Message vocal trop court';
+
+  @override
+  String get chatVoiceTooShortDetail => 'Il faut au moins 1 seconde.';
+
+  @override
+  String get chatVoiceTenSecondsLeft => 'Il reste 10 secondes';
+
+  @override
+  String get chatVoiceLimitReached =>
+      '5 minutes au maximum : enregistrement arrêté';
+
+  @override
+  String get chatVoiceRefusedTitle => 'Pas d’accès au micro';
+
+  @override
+  String get chatVoiceRefusedDetail =>
+      'Autorise le micro pour Fūjin dans les réglages du téléphone.';
+
+  @override
+  String chatUploadRingLabel(int percent) {
+    return '$percent %';
+  }
+
+  @override
   String get writeBlockedInDev =>
       'Fūjin DEV n’écrit ni dans MyFitnessPal ni dans Ekklo : rien n’a changé.';
 }

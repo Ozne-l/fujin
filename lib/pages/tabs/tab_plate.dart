@@ -4,19 +4,28 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/chat/chat_text.dart';
 import 'package:fujin/pages/common/compact_text_scaling.dart';
 import 'package:fujin/pages/common/glass_lens.dart';
 import 'package:fujin/pages/common/glass_surface.dart';
 import 'package:fujin/pages/common/lens_swell.dart';
 import 'package:fujin/pages/common/slot_row.dart';
 import 'package:fujin/pages/tabs/fujin_tab.dart';
+import 'package:fujin/pages/tabs/messages_item.dart';
+import 'package:fujin/pages/tabs/tab_slot.dart';
 import 'package:motor/motor.dart';
 
 class TabPlate extends HookWidget {
-  const TabPlate({required this.selected, required this.onSelect, super.key});
+  const TabPlate({
+    required this.selected,
+    required this.onSelect,
+    this.messages,
+    super.key,
+  });
 
   final FujinTab selected;
   final ValueChanged<FujinTab> onSelect;
+  final MessagesItem? messages;
 
   static const double _lensOutset = FujinSize.tabPlateInset * 2;
 
@@ -29,31 +38,51 @@ class TabPlate extends HookWidget {
       return null;
     }, [selected]);
     final target = landing.value ?? selected;
+    final items = TabSlot.of(messages: messages);
+    final at = items.indexOf(BranchSlot(target)).toDouble();
     return LayoutBuilder(
       builder: (context, constraints) {
         final slots = SlotRow(
           width: constraints.maxWidth,
-          count: FujinTab.values.length,
+          count: items.length,
           inset: FujinSize.tabPlateInset,
           gap: FujinSize.tabGap,
         );
-        void land(FujinTab tab) {
+        void land(TabSlot slot) {
           held.value = null;
-          if (tab != selected) landing.value = tab;
-          onSelect(tab);
+          switch (slot) {
+            case BranchSlot(:final tab):
+              if (tab != selected) landing.value = tab;
+              onSelect(tab);
+            case MessagesSlot(:final item):
+              item.onOpen();
+          }
         }
 
         final tabs = Row(
           spacing: FujinSize.tabGap,
           children: [
-            for (final tab in FujinTab.values)
+            for (final slot in items)
               Expanded(
-                child: _TabButton(
-                  tab: tab,
-                  label: tab.label(context.intl),
-                  active: tab == target,
-                  onTap: () => land(tab),
-                ),
+                child: switch (slot) {
+                  BranchSlot(:final tab) => _TabButton(
+                    icon: tab.icon,
+                    label: tab.label(context.intl),
+                    active: tab == target,
+                    onTap: () => land(slot),
+                  ),
+                  MessagesSlot(item: MessagesItem(:final unread)) => _TabButton(
+                    icon: MessagesItem.icon,
+                    label: context.intl.chatTab,
+                    semanticsLabel: switch (unread) {
+                      <= 0 => null,
+                      _ => context.intl.chatTabUnread(unread),
+                    },
+                    badge: ChatText.badge(context.intl, unread),
+                    active: false,
+                    onTap: () => land(slot),
+                  ),
+                },
               ),
           ],
         );
@@ -65,8 +94,8 @@ class TabPlate extends HookWidget {
               held.value = slots.at(details.localPosition.dx),
           onHorizontalDragCancel: () => held.value = null,
           onHorizontalDragEnd: (details) => land(
-            FujinTab.values[slots.landing(
-              held.value ?? target.index.toDouble(),
+            items[slots.landing(
+              held.value ?? at,
               details.velocity.pixelsPerSecond.dx,
             )],
           ),
@@ -76,7 +105,7 @@ class TabPlate extends HookWidget {
               null => FujinMotion.tabSlide,
               _ => FujinMotion.lensFollow,
             }),
-            value: held.value ?? target.index.toDouble(),
+            value: held.value ?? at,
             builder: (context, position, velocity, _) {
               final squash =
                   1 +
@@ -89,7 +118,7 @@ class TabPlate extends HookWidget {
               return LensSwell(
                 held: held.value != null,
                 position: position,
-                target: target.index.toDouble(),
+                target: at,
                 builder: (context, swell) => GlassSurface(
                   overlay: switch (LensSwell.showing(swell)) {
                     true => GlassLens(
@@ -177,16 +206,26 @@ class _Pill extends StatelessWidget {
 
 class _TabButton extends StatelessWidget {
   const _TabButton({
-    required this.tab,
+    required this.icon,
     required this.label,
     required this.active,
     required this.onTap,
+    this.semanticsLabel,
+    this.badge,
   });
 
-  final FujinTab tab;
+  final String icon;
   final String label;
+  final String? semanticsLabel;
+  final String? badge;
   final bool active;
   final VoidCallback onTap;
+
+  static const double _badgeRise = 5;
+  static const EdgeInsets _badgePadding = EdgeInsets.symmetric(
+    horizontal: 5,
+    vertical: 1,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -194,9 +233,18 @@ class _TabButton extends StatelessWidget {
       true => context.colors.textLink,
       false => context.colors.textPrimary,
     };
+    final glyph = SvgPicture.asset(
+      icon,
+      width: FujinSize.icon,
+      height: FujinSize.icon,
+      theme: SvgTheme(currentColor: foreground),
+      excludeFromSemantics: true,
+    );
     return Semantics(
       button: true,
       selected: active,
+      label: semanticsLabel,
+      excludeSemantics: semanticsLabel != null,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
@@ -206,13 +254,35 @@ class _TabButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: FujinSize.textGap,
             children: [
-              SvgPicture.asset(
-                tab.icon,
-                width: FujinSize.icon,
-                height: FujinSize.icon,
-                theme: SvgTheme(currentColor: foreground),
-                excludeFromSemantics: true,
-              ),
+              switch (badge) {
+                null => glyph,
+                final badge => Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    glyph,
+                    Positioned(
+                      left: FujinSize.icon / 2,
+                      top: -_badgeRise,
+                      child: DecoratedBox(
+                        decoration: ShapeDecoration(
+                          shape: const StadiumBorder(),
+                          color: context.colors.backgroundAccent,
+                        ),
+                        child: Padding(
+                          padding: _badgePadding,
+                          child: Text(
+                            badge,
+                            maxLines: 1,
+                            style: FujinText.inter11Semibold.copyWith(
+                              color: context.colors.textOnAccent,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              },
               Text(
                 label,
                 maxLines: 1,

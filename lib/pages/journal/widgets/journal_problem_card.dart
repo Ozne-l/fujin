@@ -14,6 +14,10 @@ class JournalProblemCard extends StatelessWidget {
     required this.onSignIn,
     required this.onRetry,
     this.readAt,
+    this.detail,
+    this.margin = const EdgeInsets.symmetric(
+      horizontal: FujinSize.screenMargin,
+    ),
     super.key,
   });
 
@@ -21,11 +25,13 @@ class JournalProblemCard extends StatelessWidget {
   final DateTime? readAt;
   final ValueChanged<FujinRoute> onSignIn;
   final VoidCallback onRetry;
+  final String? detail;
+  final EdgeInsetsGeometry margin;
 
   @override
   Widget build(BuildContext context) {
     final headline = JournalText.problemHeadline(context.intl, problem);
-    final (title, detail) = switch (problem) {
+    final (title, problemDetail) = switch (problem) {
       ReadProblem.mfpSessionExpired => (
         context.intl.disconnected,
         context.intl.mfpSessionExpiredDetail,
@@ -63,7 +69,7 @@ class JournalProblemCard extends StatelessWidget {
       ReadProblem.unknown => (context.intl.tryAgain, onRetry),
     };
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
+      margin: margin,
       padding: const EdgeInsets.all(FujinSpace.s5),
       decoration: BoxDecoration(
         color: context.colors.backgroundAlert,
@@ -101,7 +107,7 @@ class JournalProblemCard extends StatelessWidget {
                 ),
               ),
               Text(
-                detail,
+                detail ?? problemDetail,
                 style: FujinText.inter13Regular.copyWith(
                   color: context.colors.textSecondary,
                 ),

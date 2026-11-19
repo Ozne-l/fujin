@@ -75,6 +75,9 @@ flutter:
     - assets/icons/
     - assets/icons/weather/
     - assets/images/
+    - path: assets/dev_chat/
+      flavors:
+        - dev
   fonts:
     - family: Inter
       fonts:
