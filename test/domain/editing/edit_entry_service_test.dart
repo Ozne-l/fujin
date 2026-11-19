@@ -2,6 +2,7 @@ import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart'
     show group, setUp, tearDown, test;
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
@@ -41,7 +42,7 @@ AddDraft _draft({
 );
 
 void main() {
-  late FujinDatabase database;
+  late FujinDatabase<FujinTable> database;
   late FakeBackends backends;
 
   setUp(() {

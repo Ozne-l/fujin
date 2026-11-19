@@ -26,7 +26,7 @@ final class EntryRepository {
     required this._clock,
   });
 
-  final FujinDatabase _database;
+  final FujinDatabase<FujinTable> _database;
   final FoodRepository _foods;
   final MealRepository _meals;
   final SentLinkRepository _links;

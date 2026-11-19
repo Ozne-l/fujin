@@ -1,30 +1,60 @@
+import 'dart:io';
+
+import 'package:fujin/data/database/cache_opening.dart';
+import 'package:fujin/data/database/cache_schema.dart';
+import 'package:fujin/data/database/cache_table.dart';
+import 'package:fujin/data/database/database_table.dart';
 import 'package:fujin/data/database/fujin_id.dart';
 import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/database/schema.dart';
 import 'package:sqlite3/sqlite3.dart';
 
-final class FujinDatabase {
-  FujinDatabase._(this._db) {
-    _db
-      ..execute('PRAGMA journal_mode = DELETE')
-      ..execute('PRAGMA foreign_keys = ON')
-      ..createFunction(
-        functionName: FujinId.sqlFunction,
-        function: (_) => FujinId.at(DateTime.timestamp()),
-        argumentCount: const AllowedArgumentCount(0),
-      );
-    _migrate();
+final class FujinDatabase<T extends DatabaseTable> {
+  FujinDatabase._(this._db);
+
+  static FujinDatabase<FujinTable> open(String path) =>
+      _journal(sqlite3.open(path));
+
+  static FujinDatabase<FujinTable> inMemory() =>
+      _journal(sqlite3.openInMemory());
+
+  static FujinDatabase<CacheTable> openCacheInApp(String path) {
+    final database = _cache(sqlite3.open(path));
+    if (database.schemaVersion == cacheVersion) return database;
+    database.close();
+    deleteCache(path);
+    return _cache(sqlite3.open(path));
   }
 
-  factory FujinDatabase.open(String path) =>
-      FujinDatabase._(sqlite3.open(path));
+  static CacheOpening openCacheInBackground(String path) {
+    final database = _cache(sqlite3.open(path));
+    if (database.schemaVersion == cacheVersion) return CacheOpened(database);
+    database.close();
+    return const CacheOutdated();
+  }
 
-  factory FujinDatabase.inMemory() => FujinDatabase._(sqlite3.openInMemory());
+  static FujinDatabase<CacheTable> cacheInMemory() =>
+      _cache(sqlite3.openInMemory());
+
+  static void deleteCache(String path) {
+    for (final file in [
+      File(path),
+      File('$path$_walSuffix'),
+      File('$path$_sharedMemorySuffix'),
+    ]) {
+      if (file.existsSync()) file.deleteSync();
+    }
+  }
 
   static const fileName = 'fujin.db';
+  static const cacheFileName = 'fujin-cache.db';
+  static const busyTimeout = Duration(seconds: 5);
+  static const _walSuffix = '-wal';
+  static const _sharedMemorySuffix = '-shm';
+  static const _absent = 0;
 
   final Database _db;
-  final Map<FujinTable, List<String>> _tableColumns = {};
+  final Map<T, List<String>> _tableColumns = {};
 
   int get schemaVersion => _db.userVersion;
 
@@ -34,7 +64,7 @@ final class FujinDatabase {
   void execute(String sql, [List<Object?> parameters = const []]) =>
       _db.execute(sql, parameters);
 
-  void insert(FujinTable table, Map<String, Object?> row) {
+  void insert(T table, Map<String, Object?> row) {
     final columns = _columnsFor(table, row);
     _db.execute(
       'INSERT INTO ${table.sqlName} (${columns.join(', ')}) '
@@ -44,7 +74,7 @@ final class FujinDatabase {
   }
 
   void upsert(
-    FujinTable table,
+    T table,
     Map<String, Object?> row, {
     required List<String> key,
   }) {
@@ -66,7 +96,7 @@ final class FujinDatabase {
   }
 
   void softDelete(
-    FujinTable table,
+    T table,
     String where,
     List<Object?> parameters,
     DateTime now,
@@ -79,7 +109,7 @@ final class FujinDatabase {
     );
   }
 
-  T transaction<T>(T Function() body) {
+  R transaction<R>(R Function() body) {
     if (!_db.autocommit) return body();
     _db.execute('BEGIN IMMEDIATE');
     try {
@@ -94,19 +124,46 @@ final class FujinDatabase {
 
   void close() => _db.close();
 
-  void _migrate() {
+  static FujinDatabase<FujinTable> _journal(Database db) {
+    final database = FujinDatabase<FujinTable>._(
+      _connected(db)
+        ..execute('PRAGMA journal_mode = DELETE')
+        ..createFunction(
+          functionName: FujinId.sqlFunction,
+          function: (_) => FujinId.at(DateTime.timestamp()),
+          argumentCount: const AllowedArgumentCount(0),
+        ),
+    );
     for (final (index, script) in schemaMigrations.indexed.skip(
-      _db.userVersion,
+      db.userVersion,
     )) {
-      transaction(() {
-        _db
+      database.transaction(() {
+        db
           ..execute(script)
           ..userVersion = index + 1;
       });
     }
+    return database;
   }
 
-  List<String> _columnsFor(FujinTable table, Map<String, Object?> row) => {
+  static FujinDatabase<CacheTable> _cache(Database db) {
+    final database =
+        FujinDatabase<CacheTable>._(
+          _connected(db)..execute('PRAGMA journal_mode = WAL'),
+        )..transaction(() {
+          if (db.userVersion != _absent) return;
+          db
+            ..execute(cacheSchema)
+            ..userVersion = cacheVersion;
+        });
+    return database;
+  }
+
+  static Database _connected(Database db) => db
+    ..execute('PRAGMA busy_timeout = ${busyTimeout.inMilliseconds}')
+    ..execute('PRAGMA foreign_keys = ON');
+
+  List<String> _columnsFor(T table, Map<String, Object?> row) => {
     ...row.keys,
     ..._tableColumns.putIfAbsent(
       table,

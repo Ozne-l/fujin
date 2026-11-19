@@ -3,6 +3,7 @@ import 'package:fujin/data/connectors/connector_roles.dart';
 import 'package:fujin/data/connectors/role.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_id.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/entries/entry.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
@@ -20,26 +21,27 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import 'fixtures.dart';
 
-FoodRepository foodsOf(FujinDatabase database) =>
+FoodRepository foodsOf(FujinDatabase<FujinTable> database) =>
     FoodRepository(database, () => now);
 
-MealRepository mealsOf(FujinDatabase database) =>
+MealRepository mealsOf(FujinDatabase<FujinTable> database) =>
     MealRepository(database, () => now);
 
-MemoryRepository memoryOf(FujinDatabase database) => MemoryRepository(
-  database: database,
-  foods: foodsOf(database),
-  meals: mealsOf(database),
-);
+MemoryRepository memoryOf(FujinDatabase<FujinTable> database) =>
+    MemoryRepository(
+      database: database,
+      foods: foodsOf(database),
+      meals: mealsOf(database),
+    );
 
-RecentFoodRepository recentsOf(FujinDatabase database) =>
+RecentFoodRepository recentsOf(FujinDatabase<FujinTable> database) =>
     RecentFoodRepository(database, foodsOf(database));
 
-GoalsRepository goalsOf(FujinDatabase database) =>
+GoalsRepository goalsOf(FujinDatabase<FujinTable> database) =>
     GoalsRepository(database, () => now);
 
 EntryRepository entriesOf(
-  FujinDatabase database, {
+  FujinDatabase<FujinTable> database, {
   DateTime Function()? clock,
 }) {
   final time = clock ?? () => now;
@@ -58,7 +60,11 @@ const foodRoles = ConnectorRoles(mfp: Role.twoWay, ekklo: Role.receiveOnly);
 Entry storedEntry(EntryRepository entries, String entryId) =>
     entries.findAny(entryId)?.entry ?? (throw StateError('No entry $entryId'));
 
-String storeEntry(FujinDatabase database, MfpFoodEntry entry, String id) {
+String storeEntry(
+  FujinDatabase<FujinTable> database,
+  MfpFoodEntry entry,
+  String id,
+) {
   final foodId = foodsOf(database).copiedMfpFood(
     entry.food.id,
     id: FujinId.at(now),
@@ -88,7 +94,7 @@ String storeEntry(FujinDatabase database, MfpFoodEntry entry, String id) {
 }
 
 JournalService journalOver(
-  FujinDatabase database, {
+  FujinDatabase<FujinTable> database, {
   required MyFitnessPalClient mfp,
   required EkkloClient ekklo,
   ConnectorRoles Function()? roles,
@@ -107,7 +113,7 @@ JournalService journalOver(
 );
 
 SendService sendingOver(
-  FujinDatabase database, {
+  FujinDatabase<FujinTable> database, {
   required JournalService journal,
   required EkkloClient ekklo,
 }) => SendService(

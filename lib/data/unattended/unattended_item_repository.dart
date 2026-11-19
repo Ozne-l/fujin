@@ -1,11 +1,12 @@
 import 'package:fujin/data/database/calendar_date_hook.dart';
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/unattended/unattended_item.dart';
 
 final class UnattendedItemRepository {
   const UnattendedItemRepository(this._database);
 
-  final FujinDatabase _database;
+  final FujinDatabase<FujinTable> _database;
 
   List<UnattendedItem> forDate(DateTime date) => [
     for (final row in _database.select(

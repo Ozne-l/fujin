@@ -5,36 +5,30 @@ description: Local persistence in Fūjin: the SQLite file fujin.db, FujinDatabas
 
 # Fūjin storage
 
-Everything of the owner's that Fūjin remembers lives in one SQLite file, `fujin.db`, opened through `FujinDatabase` (`lib/data/database/fujin_database.dart`) with the `sqlite3` package. SQL is hand-written; rows are written from and decoded by the `dart_mappable` mappers. Only that file is backed up. Credentials live elsewhere, in `flutter_secure_storage`; UI flags such as "this hint was shown" and settings of this phone such as the automatic mode and the connector roles in `shared_preferences` (rule 16).
+Everything of the owner's that Fūjin remembers lives in one SQLite file, `fujin.db`, opened through `FujinDatabase` (`lib/data/database/fujin_database.dart`) with the `sqlite3` package. What Ekklo can always give again (the chat) lives in a second file, `fujin-cache.db`, opened through the same class with its own schema ([ADR 0045](../../../docs/adr/0045-ekklo-chat.md)). SQL is hand-written; rows are written from and decoded by the `dart_mappable` mappers. Only `fujin.db` is backed up. Credentials live elsewhere, in `flutter_secure_storage`; UI flags such as "this hint was shown" and settings of this phone such as the automatic mode and the connector roles in `shared_preferences` (rule 16).
 
 | What | Where | Backed up |
 | --- | --- | --- |
 | Foods, references, unit weights, barcode links, meals and meal mappings (Memory), entries with their MyFitnessPal and Ekklo links (unattended expectations included), waiting send links, goals | `fujin.db` (SQLite) | Auto Backup and the backup file |
 | Waiting unattended items (`unattended_item`, from before step 2 of the connector model) | `fujin.db` (SQLite) | Auto Backup only |
 | Recent foods (added through Fūjin) | `fujin.db` (SQLite) | Auto Backup only |
+| Chat conversations and messages (JSON as received), media messages in progress, the last return to the foreground | `fujin-cache.db` (SQLite, WAL) | never: recreated instead of migrated, wiped when Ekklo is disconnected |
 | Ekklo tokens, MyFitnessPal cookies | `flutter_secure_storage` | never |
 | UI flags (hints shown), settings (automatic mode, appearance, connector roles) | `shared_preferences` | never |
 
-The database runs synchronously on the UI isolate: the tables are tiny (a few hundred rows of Memory and links, one row of goals), and `sqlite3` 3.5.2 is pinned because 3.6+ needs a newer `meta` than Flutter 3.44 allows (`pubspec.yaml`).
+`fujin.db` runs synchronously on the UI isolate; `fujin-cache.db` is also opened by the chat's background task and the upload callback, each in its own isolate with its own connection. The tables are tiny (a few hundred rows of Memory and links, one row of goals), and `sqlite3` 3.5.2 is pinned because 3.6+ needs a newer `meta` than Flutter 3.44 allows (`pubspec.yaml`).
 
 ## Rules
 
 1. **Reach SQLite only through `FujinDatabase`; never import `package:sqlite3` elsewhere.**
-   Why: the connection settings (rules 5 and 6) and migrations are applied once, in its private constructor, for every way of opening it.
-   Example: `FujinDatabase.open(path)` in `lib/main.dart`, `FujinDatabase.inMemory()` in the tests; the constructor in `lib/data/database/fujin_database.dart`:
+   Why: the connection settings (rules 5 and 6), the migrations and the cache's creation are applied in its static openers, for every way of opening either file.
+   Example: `FujinDatabase.open(path)` in `lib/main.dart` and `FujinDatabase.inMemory()` in the tests give a `FujinDatabase<FujinTable>`; `openCacheInApp(path)`, `openCacheInBackground(path)` (sealed `CacheOpened` or `CacheOutdated`) and `cacheInMemory()` give a `FujinDatabase<CacheTable>`. Every connection goes through `_connected` in `lib/data/database/fujin_database.dart`:
    ```dart
-   FujinDatabase._(this._db) {
-     _db
-       ..execute('PRAGMA journal_mode = DELETE')
-       ..execute('PRAGMA foreign_keys = ON')
-       ..createFunction(
-         functionName: FujinId.sqlFunction,
-         function: (_) => FujinId.at(DateTime.timestamp()),
-         argumentCount: const AllowedArgumentCount(0),
-       );
-     _migrate();
-   }
+   static Database _connected(Database db) => db
+     ..execute('PRAGMA busy_timeout = ${busyTimeout.inMilliseconds}')
+     ..execute('PRAGMA foreign_keys = ON');
    ```
+   The database is typed by its table enum (`FujinTable` or `CacheTable`, both `DatabaseTable`), so writing a cache table into `fujin.db` does not compile.
 
 2. **Write rows with `insert` or `upsert` from the model's `toMap()`; do not list columns by hand.**
    Why: column names come from the mapper (snake_case set in `build.yaml`), so a field rename cannot leave SQL behind.
@@ -54,11 +48,11 @@ The database runs synchronously on the UI isolate: the tables are tiny (a few hu
 
 5. **Keep foreign keys on and declare the cascade in the schema.**
    Why: SQLite enforces foreign keys only when each connection turns them on (sqlite.org, "SQLite Foreign Key Support").
-   Example: `PRAGMA foreign_keys = ON` in the `FujinDatabase` constructor; `food_unit.food_id REFERENCES food ON DELETE CASCADE` in `lib/data/database/schema.dart`. The cascade only acts on a hard delete, which an import does (`FoodRepository.deleteAll`); forgetting is a soft delete (rule 17).
+   Example: `PRAGMA foreign_keys = ON` in `FujinDatabase._connected`; `food_unit.food_id REFERENCES food ON DELETE CASCADE` in `lib/data/database/schema.dart`. The cascade only acts on a hard delete, which an import does (`FoodRepository.deleteAll`); forgetting is a soft delete (rule 17).
 
-6. **Keep the rollback journal (`journal_mode = DELETE`), not WAL.**
-   Why: in WAL mode committed data can sit in a `-wal` file next to the database, while the backup copies one file only (rule 13); the rollback journal leaves everything in `fujin.db` between transactions (sqlite.org, "PRAGMA journal_mode" and "Write-Ahead Logging").
-   Example: the constructor in `lib/data/database/fujin_database.dart`.
+6. **Keep the rollback journal (`journal_mode = DELETE`) on `fujin.db`; WAL only on `fujin-cache.db`.**
+   Why: in WAL mode committed data can sit in a `-wal` file next to the database, while the backup copies one file only (rule 13); the rollback journal leaves everything in `fujin.db` between transactions (sqlite.org, "PRAGMA journal_mode" and "Write-Ahead Logging"). The cache is never backed up and is written by several isolates at once, where WAL lets a reader and a writer work together; `busy_timeout` (5000 ms on every connection) makes a second writer wait instead of failing with `SQLITE_BUSY`. The cache has one creation script and a version, not migrations: when `cacheVersion` changes, the app deletes the file with its `-wal` and `-shm` and creates it again, and a background opener gets `CacheOutdated` and skips its run.
+   Example: `_journal` and `_cache` in `lib/data/database/fujin_database.dart`; `cacheSchema` and `cacheVersion` in `lib/data/database/cache_schema.dart`.
 
 7. **Group writes that belong together in `FujinDatabase.transaction`; nested calls join the outer transaction.**
    Why: a failure halfway rolls everything back. `transaction` opens `BEGIN IMMEDIATE` only when the connection is in autocommit, so a repository method can be transactional on its own and still be part of a larger one.
@@ -69,8 +63,8 @@ The database runs synchronously on the UI isolate: the tables are tiny (a few hu
    Example: `JournalService.readDay` reads the stored day, runs `compareDay` and calls `_entries.store(comparison.changes)` in one transaction; `JournalService.settleDay` does the same for the Journal's fresh reads, the MyFitnessPal side alone when Ekklo failed (`lib/domain/journal/journal_service.dart`). Pinned by "keeps the item of an interrupted send instead of sending it twice" in `test/domain/journal/journal_service_test.dart`.
 
 9. **Change the schema by appending a script to `schemaMigrations`; never edit a script that has shipped.**
-   Why: `PRAGMA user_version` records how many scripts a device has run; `_migrate` runs only the ones after it, each in its own transaction, then sets `user_version` to its position (sqlite.org, "PRAGMA user_version"). Editing an applied script never reaches existing installs.
-   Example: `lib/data/database/schema.dart` and `FujinDatabase._migrate` (`lib/data/database/fujin_database.dart`); the second script adds `memory_food.mfp_unit`; the third moves own copies to `memory_own_copy`, one row per food and unit, then drops the columns `memory_food` no longer needs (ADR 0018); the fourth creates the one-row `goals` table (ADR 0020); the fifth creates `unattended_item`, owned by `UnattendedItemRepository` (ADR 0025); the sixth creates `recent_food`, owned by `RecentFoodRepository` (ADR 0026); the seventh creates `memory_barcode`, the barcode links of Memory (ADR 0027); the eighth, step 1 of the connector model, creates `food`, `food_serving`, `food_unit`, `food_reference`, `barcode_link`, `meal` and `meal_mapping`, moves the `memory_*` tables and `recent_food` into them, adds `goals.updated_at`, drops the `memory_*` tables and, for step 2, creates `entry`, `mfp_link` and `ekklo_link` empty, `sent_link` and `unattended_item` kept as the waiting tables ([ADR 0044](../../../docs/adr/0044-connector-model.md)); the ninth adds `food.verified` (`ALTER TABLE food ADD COLUMN verified`). A new table also gets a `FujinTable` value. The test "reopening a database file keeps its rows and runs no migration twice" (`test/data/database_test.dart`) checks `schemaVersion` against `schemaMigrations.length`; a script that moves rows gets a test that rebuilds the older schema from the earlier scripts, sets `user_version`, and reopens the file ("moves the own copies of a version 2 database to one row per unit", the group "a 0.4.0 database").
+   Why: `PRAGMA user_version` records how many scripts a device has run; `_journal` runs only the ones after it, each in its own transaction, then sets `user_version` to its position (sqlite.org, "PRAGMA user_version"). Editing an applied script never reaches existing installs.
+   Example: `lib/data/database/schema.dart` and `FujinDatabase._journal` (`lib/data/database/fujin_database.dart`); the second script adds `memory_food.mfp_unit`; the third moves own copies to `memory_own_copy`, one row per food and unit, then drops the columns `memory_food` no longer needs (ADR 0018); the fourth creates the one-row `goals` table (ADR 0020); the fifth creates `unattended_item`, owned by `UnattendedItemRepository` (ADR 0025); the sixth creates `recent_food`, owned by `RecentFoodRepository` (ADR 0026); the seventh creates `memory_barcode`, the barcode links of Memory (ADR 0027); the eighth, step 1 of the connector model, creates `food`, `food_serving`, `food_unit`, `food_reference`, `barcode_link`, `meal` and `meal_mapping`, moves the `memory_*` tables and `recent_food` into them, adds `goals.updated_at`, drops the `memory_*` tables and, for step 2, creates `entry`, `mfp_link` and `ekklo_link` empty, `sent_link` and `unattended_item` kept as the waiting tables ([ADR 0044](../../../docs/adr/0044-connector-model.md)); the ninth adds `food.verified` (`ALTER TABLE food ADD COLUMN verified`). A new table also gets a `FujinTable` value. The test "reopening a database file keeps its rows and runs no migration twice" (`test/data/database_test.dart`) checks `schemaVersion` against `schemaMigrations.length`; a script that moves rows gets a test that rebuilds the older schema from the earlier scripts, sets `user_version`, and reopens the file ("moves the own copies of a version 2 database to one row per unit", the group "a 0.4.0 database").
    Status: the first script is installed on the owner's phone (dev app) and on the emulator, so scripts are append only, the connector model's eighth and ninth scripts included.
 
 10. **Give each aggregate one repository that owns its SQL and returns models.**

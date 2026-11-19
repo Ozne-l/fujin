@@ -8,6 +8,7 @@ import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/data/connectors/connector_roles.dart';
 import 'package:fujin/data/connectors/role.dart';
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/data/foods/food_reference.dart';
 import 'package:fujin/data/http/read_only_http_client.dart';
@@ -75,7 +76,7 @@ AddDraft _draft({
 );
 
 void main() {
-  late FujinDatabase database;
+  late FujinDatabase<FujinTable> database;
   late MemoryRepository memoryRepository;
   late FakeBackends backends;
   late DateTime clock;

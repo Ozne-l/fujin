@@ -1,6 +1,7 @@
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart' show setUp, tearDown, test;
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
@@ -35,7 +36,7 @@ Iterable<EkkloLink> _liveEkkloLinks(WriteServices services) =>
     services.entries.ekkloLinks().where((link) => link.deletedAt == null);
 
 void main() {
-  late FujinDatabase database;
+  late FujinDatabase<FujinTable> database;
   late FakeBackends backends;
 
   setUp(() {

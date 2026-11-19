@@ -1,4 +1,5 @@
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/foods/food_repository.dart';
 import 'package:fujin/data/meals/meal_repository.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
@@ -14,7 +15,7 @@ final class MemoryRepository {
     required this._meals,
   });
 
-  final FujinDatabase _database;
+  final FujinDatabase<FujinTable> _database;
   final FoodRepository _foods;
   final MealRepository _meals;
 

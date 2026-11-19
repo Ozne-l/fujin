@@ -9,7 +9,7 @@ final class RecentFoodRepository {
 
   static const _kept = 20;
 
-  final FujinDatabase _database;
+  final FujinDatabase<FujinTable> _database;
   final FoodRepository _foods;
 
   List<RecentFood> latest() => [

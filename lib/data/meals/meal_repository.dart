@@ -9,7 +9,7 @@ import 'package:fujin/data/memory/meal_mapping.dart';
 final class MealRepository {
   const MealRepository(this._database, this._clock);
 
-  final FujinDatabase _database;
+  final FujinDatabase<FujinTable> _database;
   final DateTime Function() _clock;
 
   List<MealMapping> mappings() => [

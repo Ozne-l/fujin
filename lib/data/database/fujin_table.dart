@@ -1,4 +1,6 @@
-enum FujinTable {
+import 'package:fujin/data/database/database_table.dart';
+
+enum FujinTable implements DatabaseTable {
   food('food'),
   foodServing('food_serving'),
   foodUnit('food_unit'),
@@ -16,5 +18,6 @@ enum FujinTable {
 
   const FujinTable(this.sqlName);
 
+  @override
   final String sqlName;
 }

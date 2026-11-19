@@ -2,6 +2,7 @@ import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart'
     show group, setUp, tearDown, test;
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/foods/food_repository.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -23,7 +24,7 @@ final MfpFood _basmati = mfpFood(
 );
 
 void main() {
-  late FujinDatabase database;
+  late FujinDatabase<FujinTable> database;
   late FoodRepository foods;
 
   setUp(() {

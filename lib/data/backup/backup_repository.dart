@@ -1,5 +1,6 @@
 import 'package:fujin/data/backup/backup.dart';
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/foods/food_repository.dart';
 import 'package:fujin/data/goals/goals_repository.dart';
@@ -20,7 +21,7 @@ final class BackupRepository {
     required this._goals,
   });
 
-  final FujinDatabase _database;
+  final FujinDatabase<FujinTable> _database;
   final FoodRepository _foods;
   final MealRepository _meals;
   final EntryRepository _entries;

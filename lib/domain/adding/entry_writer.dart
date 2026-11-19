@@ -1,5 +1,6 @@
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_id.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/entries/entry.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
@@ -18,7 +19,7 @@ final class EntryWriter {
     required this._clock,
   });
 
-  final FujinDatabase _database;
+  final FujinDatabase<FujinTable> _database;
   final FoodRepository _foods;
   final MealRepository _meals;
   final EntryRepository _entries;

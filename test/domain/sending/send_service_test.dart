@@ -5,6 +5,7 @@ import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_test/flutter_test.dart'
     show group, setUp, tearDown, test;
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
@@ -32,7 +33,7 @@ const _portion = 'portion';
 const _nameless = '';
 
 void main() {
-  late FujinDatabase database;
+  late FujinDatabase<FujinTable> database;
   late EntryRepository entries;
   late MemoryRepository memoryRepository;
   late FakeBackends backends;

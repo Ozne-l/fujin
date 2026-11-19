@@ -2,6 +2,7 @@ import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_test/flutter_test.dart' show addTearDown;
 import 'package:fujin/data/connectors/connector_roles.dart';
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_food_service.dart';
@@ -35,7 +36,7 @@ final class WriteServices {
 
   static Future<WriteServices> over(
     FakeBackends backends,
-    FujinDatabase database, {
+    FujinDatabase<FujinTable> database, {
     http.Client? httpClient,
     EkkloTokenStore? ekkloTokens,
     DateTime Function()? clock,

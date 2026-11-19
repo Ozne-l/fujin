@@ -15,7 +15,7 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 final class FoodRepository {
   const FoodRepository(this._database, this._clock);
 
-  final FujinDatabase _database;
+  final FujinDatabase<FujinTable> _database;
   final DateTime Function() _clock;
 
   String mfpFood(String mfpFoodId, {String? name}) => _database.transaction(

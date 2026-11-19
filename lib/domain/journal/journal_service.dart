@@ -2,6 +2,7 @@ import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/connectors/connector_roles.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_id.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/entries/day_changes.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
@@ -51,7 +52,7 @@ final class JournalService {
   final MemoryRepository _memory;
   final FoodRepository _foods;
   final MealRepository _meals;
-  final FujinDatabase _database;
+  final FujinDatabase<FujinTable> _database;
   final DateTime Function() _clock;
   final ConnectorRoles Function() _roles;
 

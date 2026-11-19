@@ -57,7 +57,7 @@ String _databasePath() {
   return '${directory.path}/${FujinDatabase.fileName}';
 }
 
-(String, FujinDatabase) _legacyDatabase(int version) {
+(String, FujinDatabase<FujinTable>) _legacyDatabase(int version) {
   final path = _databasePath();
   final legacy = FujinDatabase.open(path)..execute('PRAGMA foreign_keys = OFF');
   for (final table in legacy.select(
@@ -91,6 +91,20 @@ void main() {
 
     check(reopened.schemaVersion).equals(schemaMigrations.length);
     check(entriesOf(reopened).forDate(day).entries).deepEquals([?stored]);
+  });
+
+  test('keeps fujin.db in one file, with foreign keys and a busy timeout of '
+      '5 s', () {
+    final database = FujinDatabase.open(_databasePath());
+    addTearDown(database.close);
+
+    Object? pragma(String name) =>
+        database.select('PRAGMA $name').single.columnAt(0);
+    check(pragma('journal_mode')).equals('delete');
+    check(pragma('foreign_keys')).equals(1);
+    check(
+      pragma('busy_timeout'),
+    ).equals(FujinDatabase.busyTimeout.inMilliseconds);
   });
 
   test('moves the own copies of a version 2 database to one row per '
@@ -149,7 +163,7 @@ void main() {
   });
 
   group('a 0.4.0 database', () {
-    late FujinDatabase migrated;
+    late FujinDatabase<FujinTable> migrated;
 
     setUp(() {
       final (path, legacy) = _legacyDatabase(_versionOfRelease040);
@@ -443,7 +457,7 @@ void main() {
       servingValue: 1,
       unit: 'gram(s)',
     ).copyWith(date: DateTime.utc(2026, 10, 8), sentAt: now);
-    late FujinDatabase migrated;
+    late FujinDatabase<FujinTable> migrated;
 
     setUp(() {
       final (path, legacy) = _legacyDatabase(_versionOfRelease040);
@@ -633,7 +647,7 @@ void main() {
         mfpFoodVersion: '73741823456789',
       ),
     ];
-    late FujinDatabase migrated;
+    late FujinDatabase<FujinTable> migrated;
 
     setUp(() {
       final (path, legacy) = _legacyDatabase(_versionOfRelease040);
@@ -694,7 +708,7 @@ void main() {
   });
 
   group('sent links', () {
-    late FujinDatabase database;
+    late FujinDatabase<FujinTable> database;
     late SentLinkRepository links;
 
     setUp(() {
@@ -715,7 +729,7 @@ void main() {
   });
 
   group('Ekklo links', () {
-    late FujinDatabase database;
+    late FujinDatabase<FujinTable> database;
     late EntryRepository entries;
 
     setUp(() {
@@ -783,7 +797,7 @@ void main() {
   });
 
   group('memory', () {
-    late FujinDatabase database;
+    late FujinDatabase<FujinTable> database;
     late MemoryRepository repository;
     const matched = MatchedFood(
       mfpFoodId: rice,
@@ -1012,7 +1026,7 @@ void main() {
 
   group('meals arranged from the diary', () {
     const dinner = 'Dinner';
-    late FujinDatabase database;
+    late FujinDatabase<FujinTable> database;
     late MealRepository meals;
 
     List<String> ordered() => [
@@ -1075,7 +1089,7 @@ void main() {
   });
 
   group('goals', () {
-    late FujinDatabase database;
+    late FujinDatabase<FujinTable> database;
     late GoalsRepository goals;
     const complete = Goals(
       kilocalories: 3000,
@@ -1119,7 +1133,7 @@ void main() {
   });
 
   group('recent foods', () {
-    late FujinDatabase database;
+    late FujinDatabase<FujinTable> database;
 
     setUp(() => database = FujinDatabase.inMemory());
     tearDown(() => database.close());

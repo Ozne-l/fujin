@@ -3,6 +3,7 @@ import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_test/flutter_test.dart'
     show group, setUp, tearDown, test;
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/foods/food.dart';
 import 'package:fujin/data/foods/food_nutrients.dart';
 import 'package:fujin/data/foods/food_reference.dart';
@@ -74,7 +75,7 @@ AddDraft _draft(
 );
 
 void main() {
-  late FujinDatabase database;
+  late FujinDatabase<FujinTable> database;
   late MemoryRepository memoryRepository;
   late FakeBackends backends;
   late DateTime clock;

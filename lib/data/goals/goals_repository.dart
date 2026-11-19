@@ -5,7 +5,7 @@ import 'package:fujin/data/goals/goals.dart';
 final class GoalsRepository {
   const GoalsRepository(this._database, this._clock);
 
-  final FujinDatabase _database;
+  final FujinDatabase<FujinTable> _database;
   final DateTime Function() _clock;
 
   Goals? load() =>

@@ -1,5 +1,6 @@
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_id.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/entries/day_changes.dart';
 import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/data/entries/linked_item.dart';
@@ -21,7 +22,7 @@ final class SentFood {
   final String ekkloMeal;
   final double? servings;
 
-  void store(FujinDatabase database, {required String entryId}) {
+  void store(FujinDatabase<FujinTable> database, {required String entryId}) {
     final entries = entriesOf(database);
     storeEntry(database, entry, entryId);
     final stored = entries.find(entryId)?.entry;

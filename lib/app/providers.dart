@@ -10,6 +10,7 @@ import 'package:fujin/data/backup/backup_repository.dart';
 import 'package:fujin/data/backup/picker_backup_files.dart';
 import 'package:fujin/data/connectors/connector_domain.dart';
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/foods/food_repository.dart';
 import 'package:fujin/data/goals/goals_repository.dart';
@@ -47,7 +48,7 @@ final connectivityProvider = StreamProvider<bool>(
   ),
 );
 
-final databaseProvider = Provider<FujinDatabase>(
+final databaseProvider = Provider<FujinDatabase<FujinTable>>(
   (ref) => throw StateError('databaseProvider is overridden in bootstrap'),
 );
 

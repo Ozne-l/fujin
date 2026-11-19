@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart'
 import 'package:fujin/data/backup/backup.dart';
 import 'package:fujin/data/backup/backup_repository.dart';
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/goals/goals_repository.dart';
@@ -138,19 +139,20 @@ const _memoryOfRelease040 = Memory(
 
 Uint8List _json(Object value) => utf8.encode(jsonEncode(value));
 
-BackupRepository _backupsOf(FujinDatabase database) => BackupRepository(
-  database: database,
-  foods: foodsOf(database),
-  meals: mealsOf(database),
-  entries: entriesOf(database),
-  memory: memoryOf(database),
-  recents: recentsOf(database),
-  links: SentLinkRepository(database),
-  goals: goalsOf(database),
-);
+BackupRepository _backupsOf(FujinDatabase<FujinTable> database) =>
+    BackupRepository(
+      database: database,
+      foods: foodsOf(database),
+      meals: mealsOf(database),
+      entries: entriesOf(database),
+      memory: memoryOf(database),
+      recents: recentsOf(database),
+      links: SentLinkRepository(database),
+      goals: goalsOf(database),
+    );
 
 void main() {
-  late FujinDatabase database;
+  late FujinDatabase<FujinTable> database;
   late MemoryRepository memories;
   late RecentFoodRepository recents;
   late SentLinkRepository links;

@@ -6,7 +6,7 @@ import 'package:fujin/data/links/sent_link.dart';
 final class SentLinkRepository {
   const SentLinkRepository(this._database);
 
-  final FujinDatabase _database;
+  final FujinDatabase<FujinTable> _database;
 
   List<SentLink> forDate(DateTime date) => [
     for (final row in _database.select(

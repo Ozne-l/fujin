@@ -23,7 +23,7 @@ import '../../support/fixtures.dart';
 import '../../support/repositories.dart';
 
 void main() {
-  late FujinDatabase database;
+  late FujinDatabase<FujinTable> database;
   late EntryRepository entries;
   late FakeBackends backends;
 

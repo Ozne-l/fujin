@@ -1,5 +1,6 @@
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/database/fujin_database.dart';
+import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/entries/ekklo_link.dart';
 import 'package:fujin/data/entries/entry.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
@@ -58,7 +59,7 @@ final class SendService {
   final EkkloClient _ekklo;
   final MemoryRepository _memory;
   final EntryRepository _entries;
-  final FujinDatabase _database;
+  final FujinDatabase<FujinTable> _database;
   final DateTime Function() _clock;
   Future<void> _sending = Future.value();
 
