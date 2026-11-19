@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Fūjin</string>
+    <string name="media_channel_name">Sending media</string>
+    <string name="media_channel_description">Preparing videos and sending photos, videos and voice messages.</string>
+    <string name="bg_downloader_notification_channel_name">@string/media_channel_name</string>
+    <string name="bg_downloader_notification_channel_description">@string/media_channel_description</string>
+    <plurals name="media_preparing_videos">
+        <item quantity="one">Preparing video</item>
+        <item quantity="other">Preparing videos</item>
+    </plurals>
+    <string name="media_for_recipient">For %1$s</string>
+    <string name="media_position">%1$d of %2$d</string>
+    <string name="media_percent">%1$d%%</string>
 </resources>
