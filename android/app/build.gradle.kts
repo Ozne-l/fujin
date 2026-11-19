@@ -12,6 +12,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
 
     defaultConfig {
@@ -53,4 +54,15 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+val media3Version = "1.9.2"
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    implementation("androidx.media3:media3-transformer:$media3Version")
+    implementation("androidx.media3:media3-effect:$media3Version")
+    implementation("androidx.media3:media3-common:$media3Version")
+    implementation("androidx.exifinterface:exifinterface:1.4.2")
+    implementation("androidx.core:core-ktx:1.17.0")
 }
