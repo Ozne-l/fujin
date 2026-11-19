@@ -7,7 +7,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0001](0001-recompute-statuses-from-both-sides.md) | Recompute statuses from both sides, with a send-link registry and no queue | Accepted (own-copy expectation settled by 0018; unattended items added by 0025; updates reviewed on screen 10 by 0018; extended to every connector by 0044) |
 | [0002](0002-write-ordering.md) | Write ordering for add, undo, send and own copies | Accepted (sending implemented by 0018, add and undo by 0026, edit and delete by 0043; Fūjin's database written first, and sends run one at a time, by 0044) |
 | [0003](0003-refresh-on-foreground-and-pull.md) | Refresh on foreground return and pull to refresh | Accepted (pull indicator drawn by 0028; selection re-read added by 0029) |
-| [0004](0004-one-sqlite-file.md) | One SQLite file, schema and migrations | Accepted (ids and stamps added by 0044; cache file planned by 0044 and amended by 0045: one class for both files, WAL cache recreated on change, busy timeout; not built) |
+| [0004](0004-one-sqlite-file.md) | One SQLite file, schema and migrations | Accepted (ids and stamps added by 0044; cache file planned by 0044 and amended by 0045: one class for both files, WAL cache recreated on change, busy timeout; built) |
 | [0005](0005-backup.md) | Backup: Auto Backup whitelist, manual JSON file | Accepted (B implemented, C implemented by 0021) |
 | [0006](0006-riverpod-notifiers-as-presenters.md) | Riverpod notifiers as presenters | Accepted (undo and delete notifier built by 0026 and 0043, edit notifier by 0043, replaced by the background writer's notifier in 0044, import and export by 0021) |
 | [0007](0007-dart-mappable-models.md) | dart_mappable models | Accepted |
@@ -20,9 +20,9 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0014](0014-lints-and-code-style.md) | Lints and code style | Accepted |
 | [0015](0015-french-and-english-copy.md) | French and English copy | Accepted |
 | [0016](0016-english-in-code-and-tokens.md) | English in code, design tokens and docs | Accepted |
-| [0017](0017-read-only-dev-environment.md) | Read-only dev environment | Accepted (barcode lookup let through by 0027; Ekklo chat blocked and replaced by a fake chat by 0045, not built) |
+| [0017](0017-read-only-dev-environment.md) | Read-only dev environment | Accepted (barcode lookup let through by 0027; Ekklo chat blocked and replaced by a fake chat by 0045) |
 | [0018](0018-send-flow.md) | Send flow: matching, review and execution | Accepted (automatic sends amended by 0025) |
-| [0019](0019-tab-shell.md) | Tab shell: Journal and Mémoire tabs, Scanner disabled | Accepted (Scanner enabled by 0027; amended by 0033 and 0037) |
+| [0019](0019-tab-shell.md) | Tab shell: Journal and Mémoire tabs, Scanner disabled | Accepted (Scanner enabled by 0027; amended by 0033 and 0037; Messages bar item added by 0047, not a branch) |
 | [0020](0020-goals.md) | Goals: one row in Fūjin's SQLite | Accepted |
 | [0021](0021-backup-file.md) | Backup file: fujin-backup v1 behind the BackupFiles seam | Accepted (version 2 by 0027; version 4 by 0044) |
 | [0022](0022-journal-states-and-goal-rings.md) | Journal states and goal rings | Accepted (band reads held and neighbour weeks prefetched by 0029; MyFitnessPal foods shown with Ekklo missing and offline by 0030) |
@@ -47,6 +47,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0041](0041-liquid-glass-renderer-1.0.md) | Liquid glass on liquid_glass_renderer 1.0 | Proposed |
 | [0042](0042-text-contrast-on-tinted-surfaces.md) | Text contrast on tinted surfaces | Accepted |
 | [0043](0043-edit-and-delete-a-logged-food.md) | Edit and delete a logged food | Accepted (edit and delete saved first and written in the background, and offline edit and delete of known foods built, by 0044) |
-| [0044](0044-connector-model.md) | Connector model: Fūjin's entry at the centre | Accepted (steps 1 to 4 built, offline included, and the role setting, kept in shared preferences; foods without servings completed from MyFitnessPal after an online Journal read; Ekklo "to remove", Ekklo two-way and the cache file not built; chat and cache file designed by 0045 and 0046) |
-| [0045](0045-ekklo-chat.md) | Ekklo chat: contract, sync, cache file, notifications, fake chat in dev | Accepted (not built) |
-| [0046](0046-chat-media.md) | Chat media: processing, edits and background upload | Accepted (not built) |
+| [0044](0044-connector-model.md) | Connector model: Fūjin's entry at the centre | Accepted (steps 1 to 4 built, offline included, and the role setting, kept in shared preferences; foods without servings completed from MyFitnessPal after an online Journal read; Ekklo "to remove" and Ekklo two-way not built; chat and cache file built by 0045 to 0047) |
+| [0045](0045-ekklo-chat.md) | Ekklo chat: contract, sync, cache file, notifications, fake chat in dev | Accepted (built; screens drawn by 0047) |
+| [0046](0046-chat-media.md) | Chat media: processing, edits and background upload | Accepted (built on Android; screens drawn and background work amended by 0047) |
+| [0047](0047-chat-screens.md) | Chat screens: Messages tab, conversation, media tray and editors, voice, full screen, notification copy | Accepted (built) |

@@ -144,13 +144,13 @@ The words below have one meaning in Fūjin's code, docs and conversations. Frenc
 
 **Fake backends.** The test stand-in for both services: an `http` `MockClient` that serves MyFitnessPal and Ekklo routes from in-memory data and records requests, MyFitnessPal food search, food reads, barcode lookups and diary writes included. For runs on a device, separate local fake servers play the same role through `--dart-define`. Code: `FakeBackends` (`test/support/fake_backends.dart`).
 
-**Chat.** The owner's conversation with his coach in Ekklo's messaging, read and written by Fūjin as a client of it: texts, photos, videos, voice messages, replies, reactions and deletion of his own messages. Part of the Ekklo connector, with no Role; there only when Ekklo is connected and its messaging is enabled. Kept in `fujin-cache.db`, which Ekklo can always fill again. Not built. ADR 0045.
+**Chat.** The owner's conversation with his coach in Ekklo's messaging, read and written by Fūjin as a client of it: texts, photos, videos, voice messages, replies, reactions and deletion of his own messages. Part of the Ekklo connector, with no Role; there only when Ekklo is connected and its messaging is enabled, opened from the Messages tab. Kept in `fujin-cache.db`, which Ekklo can always fill again. ADR 0045, screens in ADR 0047.
 
-**Fake chat.** The made-up Ekklo conversation Fūjin DEV talks to instead of the owner's: every kind of message, seeded again at each launch, sends accepted, served inside the dev app. The tests use the same fake. Not built. ADR 0045.
+**Fake chat.** The made-up Ekklo conversation Fūjin DEV talks to instead of the owner's: every kind of message, seeded again at each launch, sends accepted, served inside the dev app. The tests use the same fake. ADR 0045.
 
-**Media edit.** What the owner changes on a photo or a video before sending it in the chat: a crop and quarter turns for a photo; kept passages, a crop and the sound on or off for a video. Applied in the same pass that compresses the file. Not built. ADR 0046.
+**Media edit.** What the owner changes on a photo or a video before sending it in the chat: a crop and quarter turns for a photo; kept passages, a crop and the sound on or off for a video. Applied in the same pass that compresses the file. ADR 0046.
 
-**Upload relay.** The background task that creates a media message in the chat once its files are uploaded, when the app is no longer there to do it. Like every path that creates a media message, it first checks that no message of the conversation already holds the file's URL, so a message is never sent twice. Not built. ADR 0046.
+**Upload relay.** The background task that creates a media message in the chat once its files are uploaded, when the app is no longer there to do it. Like every path that creates a media message, it first checks that no message of the conversation already holds the file's URL, so a message is never sent twice. ADR 0046.
 
 ## Screens
 
@@ -226,3 +226,4 @@ Codes from the Figma file "Fūjin · Maquettes", as used in the docs.
 | O1, O2 | Réglages tab, the third tab: "objectifs définis" (O1) and "aucun objectif" (O2): accounts, goals, sending ("Mode automatique" switch), appearance ("Système", "Clair", "Sombre"), backup, data on this phone, app version. Code: `SettingsPage` (`lib/pages/settings/settings_page.dart`), `SettingsSwitchRow` (`lib/pages/settings/widgets/settings_switch_row.dart`) |
 | O3, O4, O5 | Goal editing: complete goals, empty fields, just saved. Code: `GoalsPage` (`lib/pages/settings/goals_page.dart`), `GoalsNotifier` (`lib/pages/common/goals_notifier.dart`) |
 | O6, O7 | Backup file exported (O6) and imported (O7), reached from Réglages; the import replaces everything after a confirmation. Code: `BackupNotifier` (`lib/pages/settings/backup_notifier.dart`), confirmation sheet (`lib/pages/common/confirm_sheet.dart`) |
+| Ch01 to Ch09 | The chat, frame "Expérience 6 · Chat Ekklo" on the Playground: the Messages tab (Ch01), the conversation (Ch02), my messages' states (Ch03), message actions and the composer (Ch04), the media tray (Ch05), the photo editor (Ch06), the video editor (Ch07), voice recording (Ch08), full screen (Ch09). Node ids in `docs/notes/ekklo-chat.md`. ADR 0047 |

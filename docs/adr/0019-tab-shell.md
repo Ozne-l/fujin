@@ -4,7 +4,7 @@ Date: 2026-10-10
 
 ## Status
 
-Accepted. Supersedes the "Planned" and "No tab bar" bullets of [0010](0010-go-router-navigation.md) and the `lib/pages/` memory and settings items in the planned folders of [0013](0013-layers.md). [0027](0027-barcode-scanner.md) enables the Scanner button. [0033](0033-liquid-glass-and-fade-through.md) replaces the indexed stack and the frosted plate.
+Accepted. Supersedes the "Planned" and "No tab bar" bullets of [0010](0010-go-router-navigation.md) and the `lib/pages/` memory and settings items in the planned folders of [0013](0013-layers.md). [0027](0027-barcode-scanner.md) enables the Scanner button. [0033](0033-liquid-glass-and-fade-through.md) replaces the indexed stack and the frosted plate. [0047](0047-chat-screens.md) adds a fourth item to the bar, Messages, between Mémoire and Réglages, present only while the chat exists; like the Scanner it is not a branch: it opens the conversation as a top-level route above the shell.
 
 ## Context
 

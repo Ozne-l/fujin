@@ -4,7 +4,7 @@ Date: 2026-11-10
 
 ## Status
 
-Accepted; not built. Builds the chat that [0044](0044-connector-model.md) defers, on its connector contract and its cache file `fujin-cache.db`. Amends [0004](0004-one-sqlite-file.md) (one database class for both files, the cache file's rules, a busy timeout on every connection) and [0017](0017-read-only-dev-environment.md) (the dev guard blocks the Ekklo chat, and dev talks to a fake chat). The media of the chat (photo and video processing, edits before sending, background upload, creating a media message when the app is closed) are in [0046](0046-chat-media.md). The screens go through Figma before the build.
+Accepted; built 2026-11-19. [0047](0047-chat-screens.md) draws its screens: the chat opens from a Messages tab, the quick reactions are fixed, the notification channels get their copy, and a full-screen video plays while it streams; it also keeps `users/me` in the cache file. Builds the chat that [0044](0044-connector-model.md) defers, on its connector contract and its cache file `fujin-cache.db`. Amends [0004](0004-one-sqlite-file.md) (one database class for both files, the cache file's rules, a busy timeout on every connection) and [0017](0017-read-only-dev-environment.md) (the dev guard blocks the Ekklo chat, and dev talks to a fake chat). The media of the chat (photo and video processing, edits before sending, background upload, creating a media message when the app is closed) are in [0046](0046-chat-media.md). The screens go through Figma before the build.
 
 ## Context
 

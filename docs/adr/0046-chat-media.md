@@ -4,7 +4,7 @@ Date: 2026-11-10
 
 ## Status
 
-Accepted; not built. The media half of the chat of [0045](0045-ekklo-chat.md). Adds native Android code to Fūjin (a Kotlin method channel and a foreground service) and changes its Android build. Android only: on iOS the chat sends no photo, video or voice message until an AVFoundation equivalent is designed.
+Accepted; built on Android 2026-11-19. [0047](0047-chat-screens.md) draws its screens: the camera is reached from the media menu, a voice message is recorded with a tap and kept when it reaches 5 minutes, and both editors use the Scanner's camera surface; it also records that the upload callback writes through `package:sqlite3`, turns off the upload package's own rescheduling of killed tasks, names the shared media channel and gives each uploaded file its own notification. The media half of the chat of [0045](0045-ekklo-chat.md). Adds native Android code to Fūjin (a Kotlin method channel and a foreground service) and changes its Android build. Android only: on iOS the chat sends no photo, video or voice message until an AVFoundation equivalent is designed.
 
 ## Context
 
