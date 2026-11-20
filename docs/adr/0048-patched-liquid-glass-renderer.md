@@ -33,6 +33,6 @@ On the emulator forced to Vulkan, a log of the matte passes showed one texture f
 
 ## Consequences
 
-- Each matte pass clears its whole low-resolution texture, including passes that draw all of it anyway. The glass benchmark has not been run with the patch.
+- Each matte pass clears its whole low-resolution texture, including passes that draw all of it anyway. On the Pixel 8 (2026-11-20, two profile runs of each build), the glass benchmark shows no difference beyond run-to-run noise between the patched copy and the pub.dev release: average raster time 12.1 to 12.7 ms on both for the tab switch, 8.5 to 11.0 ms with the patch against 9.0 to 9.1 ms without for the chat thread, and the other scenarios overlap the same way.
 - Updating `liquid_glass_renderer` means replacing the directory and checking whether the patch is still needed. Drop the patch when a release stops relying on a second load action for a reused texture, or when Flutter's Vulkan render pass cache takes the load action into account. Then pin the release on pub.dev again.
 - No automated test covers the band. Widget tests run on `FakeGlass`, which has no Flutter GPU matte. The band shows only on a Vulkan device, so the check is manual: send a long message in a conversation.
