@@ -34,7 +34,8 @@ dependencies:
   image_picker_android: ^0.8.13+25
   image_picker_platform_interface: ^2.11.2
   intl: any
-  liquid_glass_renderer: 1.0.0-dev.2
+  liquid_glass_renderer:
+    path: third_party/liquid_glass_renderer
   mobile_scanner: ^7.4.2
   motor: ^1.1.0
   myfitnesspal_client:

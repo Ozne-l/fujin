@@ -31,6 +31,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+/third_party/liquid_glass_renderer/build/
 /coverage/
 
 # Symbolication related
