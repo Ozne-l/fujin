@@ -262,7 +262,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "83ababc94cf2ba9a91767b28d82ec124bde6c3d3"
+      resolved-ref: d2657e7211f31459fa7af0fd693982cea5be7f38
       url: "https://github.com/Ozne-l/ekklo_client.git"
     source: git
     version: "0.1.0"
