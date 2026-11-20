@@ -643,6 +643,62 @@
       },
       "$description": "Gold reading line across the aiming frame.",
       "$type": "dimension"
+    },
+    "upload-ring": {
+      "$value": {
+        "value": 3.5,
+        "unit": "px"
+      },
+      "$description": "Arc of the upload progress ring.",
+      "$type": "dimension"
+    },
+    "strip-focus": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      },
+      "$description": "Border of the selected thumbnail of the media tray strip.",
+      "$type": "dimension"
+    },
+    "add-tile": {
+      "$value": {
+        "value": 1.5,
+        "unit": "px"
+      },
+      "$description": "Dashed border of the add tile of the media strip.",
+      "$type": "dimension"
+    },
+    "crop-mark": {
+      "$value": {
+        "value": 3,
+        "unit": "px"
+      },
+      "$description": "Corners and edge ticks of the crop frame.",
+      "$type": "dimension"
+    },
+    "trim-frame": {
+      "$value": {
+        "value": 3,
+        "unit": "px"
+      },
+      "$description": "Top and bottom edges of the kept part of the video timeline.",
+      "$type": "dimension"
+    },
+    "timeline-selection": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      },
+      "$description": "Outline of the selected passage of the video timeline.",
+      "$type": "dimension"
+    },
+    "playhead": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      },
+      "$description": "Playhead line of the video timeline.",
+      "$type": "dimension"
     }
   },
   "size": {
@@ -1472,6 +1528,790 @@
         "value": 40,
         "unit": "px"
       },
+      "$type": "dimension"
+    },
+    "bubble-padding-horizontal": {
+      "$value": {
+        "value": 14,
+        "unit": "px"
+      },
+      "$description": "Start and end padding of a text chat bubble, and end padding of a voice bubble.",
+      "$type": "dimension"
+    },
+    "bubble-padding-vertical": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$description": "Top and bottom padding of a text chat bubble.",
+      "$type": "dimension"
+    },
+    "bubble-caption-inset": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$description": "Start and end inset of the caption under the photos or videos of a chat bubble.",
+      "$type": "dimension"
+    },
+    "chat-header-photo": {
+      "$value": {
+        "value": 40,
+        "unit": "px"
+      },
+      "$description": "Profile photo of the other person in the chat header.",
+      "$type": "dimension"
+    },
+    "chat-line-gap": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      },
+      "$description": "Gap between the two text lines of the chat header, a reply quote, a reply card or an unsupported message card.",
+      "$type": "dimension"
+    },
+    "chat-media-width": {
+      "$value": {
+        "value": 240,
+        "unit": "px"
+      },
+      "$description": "Width of a single video and of a grid of several photos or videos in the chat.",
+      "$type": "dimension"
+    },
+    "chat-single-photo": {
+      "$value": {
+        "value": 200,
+        "unit": "px"
+      },
+      "$description": "Side of the square frame of a single photo in the chat.",
+      "$type": "dimension"
+    },
+    "chat-video-height": {
+      "$value": {
+        "value": 160,
+        "unit": "px"
+      },
+      "$description": "Height of a single video in the chat.",
+      "$type": "dimension"
+    },
+    "chat-media-tile": {
+      "$value": {
+        "value": 118,
+        "unit": "px"
+      },
+      "$description": "Side of one photo or video in a grid of several in the chat.",
+      "$type": "dimension"
+    },
+    "reaction-bar-height": {
+      "$value": {
+        "value": 58,
+        "unit": "px"
+      },
+      "$description": "Height of the quick reaction bar above a held message, border included.",
+      "$type": "dimension"
+    },
+    "reaction-bar-padding-horizontal": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$description": "Start and end padding of the quick reaction bar.",
+      "$type": "dimension"
+    },
+    "reaction-bar-padding-vertical": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$description": "Top and bottom padding of the quick reaction bar.",
+      "$type": "dimension"
+    },
+    "reaction-cell-width": {
+      "$value": {
+        "value": 40,
+        "unit": "px"
+      },
+      "$description": "Width of one emoji cell in the quick reaction bar.",
+      "$type": "dimension"
+    },
+    "reaction-cell-height": {
+      "$value": {
+        "value": 44,
+        "unit": "px"
+      },
+      "$description": "Height of one emoji cell in the quick reaction bar.",
+      "$type": "dimension"
+    },
+    "reaction-more-icon": {
+      "$value": {
+        "value": 30,
+        "unit": "px"
+      },
+      "$description": "Add icon at the end of the quick reaction bar that opens the emoji sheet.",
+      "$type": "dimension"
+    },
+    "context-menu-width": {
+      "$value": {
+        "value": 220,
+        "unit": "px"
+      },
+      "$description": "Width of the action menu of a held message and of the attachment menu.",
+      "$type": "dimension"
+    },
+    "context-menu-icon": {
+      "$value": {
+        "value": 20,
+        "unit": "px"
+      },
+      "$description": "Icon of a row in the action menu of a held message and in the attachment menu.",
+      "$type": "dimension"
+    },
+    "lift-backdrop-blur": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$description": "Blur sigma of the chat behind a held message.",
+      "$type": "dimension"
+    },
+    "emoji-cell": {
+      "$value": {
+        "value": 44,
+        "unit": "px"
+      },
+      "$description": "Largest side of one emoji cell in the emoji sheet grid.",
+      "$type": "dimension"
+    },
+    "emoji-tab": {
+      "$value": {
+        "value": 40,
+        "unit": "px"
+      },
+      "$description": "Side of a category tab in the emoji sheet.",
+      "$type": "dimension"
+    },
+    "reaction-chip-height": {
+      "$value": {
+        "value": 23,
+        "unit": "px"
+      },
+      "$description": "Height of a reaction chip under a bubble.",
+      "$type": "dimension"
+    },
+    "reaction-chips-inset": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$description": "Distance from the side of a bubble to its first reaction chip.",
+      "$type": "dimension"
+    },
+    "reaction-chip-padding-start": {
+      "$value": {
+        "value": 7,
+        "unit": "px"
+      },
+      "$description": "Padding before the emoji of a reaction chip.",
+      "$type": "dimension"
+    },
+    "reaction-chip-padding-vertical": {
+      "$value": {
+        "value": 3,
+        "unit": "px"
+      },
+      "$description": "Top and bottom padding of a reaction chip.",
+      "$type": "dimension"
+    },
+    "reaction-overlap": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$description": "How far the reaction chips overlap the bottom of their bubble.",
+      "$type": "dimension"
+    },
+    "message-footer-inset": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$description": "Start and end inset of the time and status under a bubble.",
+      "$type": "dimension"
+    },
+    "message-status-icon": {
+      "$value": {
+        "value": 12,
+        "unit": "px"
+      },
+      "$description": "Clock, tick or alert icon of a message status.",
+      "$type": "dimension"
+    },
+    "swipe-reply-disc": {
+      "$value": {
+        "value": 32,
+        "unit": "px"
+      },
+      "$description": "Disc that appears beside a message swiped to reply.",
+      "$type": "dimension"
+    },
+    "swipe-reply-icon": {
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      },
+      "$description": "Reply arrow inside the swipe-to-reply disc.",
+      "$type": "dimension"
+    },
+    "badge-rise": {
+      "$value": {
+        "value": 5,
+        "unit": "px"
+      },
+      "$description": "How far an unread count badge rises above its button or tab.",
+      "$type": "dimension"
+    },
+    "badge-padding-horizontal": {
+      "$value": {
+        "value": 5,
+        "unit": "px"
+      },
+      "$description": "Start and end padding of an unread count badge.",
+      "$type": "dimension"
+    },
+    "badge-padding-vertical": {
+      "$value": {
+        "value": 1,
+        "unit": "px"
+      },
+      "$description": "Top and bottom padding of an unread count badge.",
+      "$type": "dimension"
+    },
+    "reply-bar": {
+      "$value": {
+        "value": 3,
+        "unit": "px"
+      },
+      "$description": "Width of the coloured bar at the start of a reply quote or reply card.",
+      "$type": "dimension"
+    },
+    "reply-bar-gap": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$description": "Gap between the bar of a reply quote or reply card and its text.",
+      "$type": "dimension"
+    },
+    "reply-quote-inset": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$description": "Top, bottom and end padding of a reply quote.",
+      "$type": "dimension"
+    },
+    "reply-thumb": {
+      "$value": {
+        "value": 36,
+        "unit": "px"
+      },
+      "$description": "Thumbnail of the quoted photo or video in a reply quote.",
+      "$type": "dimension"
+    },
+    "reply-card-height": {
+      "$value": {
+        "value": 56,
+        "unit": "px"
+      },
+      "$description": "Height of the reply card above the caption of the media tray.",
+      "$type": "dimension"
+    },
+    "reply-card-bar-height": {
+      "$value": {
+        "value": 36,
+        "unit": "px"
+      },
+      "$description": "Height of the coloured bar of the reply card in the media tray.",
+      "$type": "dimension"
+    },
+    "reply-cancel": {
+      "$value": {
+        "value": 40,
+        "unit": "px"
+      },
+      "$description": "Round button that cancels the reply in the media tray reply card.",
+      "$type": "dimension"
+    },
+    "reply-cancel-icon": {
+      "$value": {
+        "value": 20,
+        "unit": "px"
+      },
+      "$description": "Cross inside the cancel button of the media tray reply card.",
+      "$type": "dimension"
+    },
+    "unsupported-icon-gap": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$description": "Gap between the icon and the text of an unsupported message card.",
+      "$type": "dimension"
+    },
+    "dashed-border-dash": {
+      "$value": {
+        "value": 4,
+        "unit": "px"
+      },
+      "$description": "Dash of the dashed border of an unsupported message card and of the add tile of the media strip.",
+      "$type": "dimension"
+    },
+    "dashed-border-gap": {
+      "$value": {
+        "value": 3,
+        "unit": "px"
+      },
+      "$description": "Gap between the dashes of a dashed border.",
+      "$type": "dimension"
+    },
+    "video-play-icon": {
+      "$value": {
+        "value": 22,
+        "unit": "px"
+      },
+      "$description": "Play icon in the disc over a large video.",
+      "$type": "dimension"
+    },
+    "video-play-icon-small": {
+      "$value": {
+        "value": 17,
+        "unit": "px"
+      },
+      "$description": "Play icon in the disc over a small video in a grid.",
+      "$type": "dimension"
+    },
+    "media-disc": {
+      "$value": {
+        "value": 52,
+        "unit": "px"
+      },
+      "$description": "Disc over a photo or video while it uploads and once it is sent.",
+      "$type": "dimension"
+    },
+    "upload-ring": {
+      "$value": {
+        "value": 44,
+        "unit": "px"
+      },
+      "$description": "Progress ring inside the disc over an uploading photo or video.",
+      "$type": "dimension"
+    },
+    "upload-notice-icon": {
+      "$value": {
+        "value": 14,
+        "unit": "px"
+      },
+      "$description": "Alert icon of the size notice under an uploading video.",
+      "$type": "dimension"
+    },
+    "upload-notice-width": {
+      "$value": {
+        "value": 236,
+        "unit": "px"
+      },
+      "$description": "Largest width of the size notice under an uploading video.",
+      "$type": "dimension"
+    },
+    "upload-voice-icon": {
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      },
+      "$description": "Microphone icon of a voice message that is still uploading.",
+      "$type": "dimension"
+    },
+    "voice-bubble-disc": {
+      "$value": {
+        "value": 36,
+        "unit": "px"
+      },
+      "$description": "Play disc of a voice bubble.",
+      "$type": "dimension"
+    },
+    "voice-bubble-disc-icon": {
+      "$value": {
+        "value": 14,
+        "unit": "px"
+      },
+      "$description": "Play or pause icon in the disc of a voice bubble.",
+      "$type": "dimension"
+    },
+    "voice-gap": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$description": "Gap between the play disc, the clock and the waveform of a voice bubble or of the voice bar.",
+      "$type": "dimension"
+    },
+    "voice-bar-disc": {
+      "$value": {
+        "value": 40,
+        "unit": "px"
+      },
+      "$description": "Play disc of a kept recording in the voice bar.",
+      "$type": "dimension"
+    },
+    "voice-bar-disc-icon": {
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      },
+      "$description": "Play or pause icon in the disc of the voice bar.",
+      "$type": "dimension"
+    },
+    "recording-dot": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$description": "Red dot pulsing while a voice message records.",
+      "$type": "dimension"
+    },
+    "recording-inset": {
+      "$value": {
+        "value": 14,
+        "unit": "px"
+      },
+      "$description": "Padding before the recording dot in the voice bar.",
+      "$type": "dimension"
+    },
+    "voice-hint-padding-vertical": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$description": "Top and bottom padding of the hint bubble above the voice bar.",
+      "$type": "dimension"
+    },
+    "scrubber-thumb": {
+      "$value": {
+        "value": 8,
+        "unit": "px"
+      },
+      "$description": "Thumb of the voice message scrubber.",
+      "$type": "dimension"
+    },
+    "composer-icon": {
+      "$value": {
+        "value": 22,
+        "unit": "px"
+      },
+      "$description": "Icon of the buttons of the chat composer, the voice bar and the media caption bar.",
+      "$type": "dimension"
+    },
+    "waveform-height": {
+      "$value": {
+        "value": 28,
+        "unit": "px"
+      },
+      "$description": "Height of a voice waveform.",
+      "$type": "dimension"
+    },
+    "wave-bar": {
+      "$value": {
+        "value": 3,
+        "unit": "px"
+      },
+      "$description": "Width of one bar of a voice waveform.",
+      "$type": "dimension"
+    },
+    "wave-bar-gap": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      },
+      "$description": "Gap between two bars of a voice waveform.",
+      "$type": "dimension"
+    },
+    "wave-bar-min": {
+      "$value": {
+        "value": 4,
+        "unit": "px"
+      },
+      "$description": "Height of a silent bar of a voice waveform.",
+      "$type": "dimension"
+    },
+    "wave-bar-max": {
+      "$value": {
+        "value": 26,
+        "unit": "px"
+      },
+      "$description": "Height of the loudest bar of a voice waveform.",
+      "$type": "dimension"
+    },
+    "media-pill-icon": {
+      "$value": {
+        "value": 12,
+        "unit": "px"
+      },
+      "$description": "Icon in a small pill over media in the tray or the video editor.",
+      "$type": "dimension"
+    },
+    "media-pill-padding-horizontal": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$description": "Start and end padding of a small pill over media.",
+      "$type": "dimension"
+    },
+    "duration-chip-icon": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$description": "Play icon of the duration chip over a video in the chat.",
+      "$type": "dimension"
+    },
+    "duration-chip-padding-end": {
+      "$value": {
+        "value": 7,
+        "unit": "px"
+      },
+      "$description": "Padding after the time of the duration chip over a video.",
+      "$type": "dimension"
+    },
+    "duration-chip-padding-vertical": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      },
+      "$description": "Top and bottom padding of the duration chip over a video.",
+      "$type": "dimension"
+    },
+    "camera-chip-gap": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$description": "Gap between two aspect chips of the photo editor.",
+      "$type": "dimension"
+    },
+    "camera-chip-icon-gap": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$description": "Gap between the icon and the label of a camera chip.",
+      "$type": "dimension"
+    },
+    "tray-limit-gap": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$description": "Gap between the media strip and the limit note of the media tray.",
+      "$type": "dimension"
+    },
+    "media-strip-tile": {
+      "$value": {
+        "value": 56,
+        "unit": "px"
+      },
+      "$description": "Side of one thumbnail of the media tray strip.",
+      "$type": "dimension"
+    },
+    "media-strip-padding-vertical": {
+      "$value": {
+        "value": 2,
+        "unit": "px"
+      },
+      "$description": "Top and bottom padding of the media tray strip.",
+      "$type": "dimension"
+    },
+    "strip-remove": {
+      "$value": {
+        "value": 20,
+        "unit": "px"
+      },
+      "$description": "Remove badge on a thumbnail of the media tray strip.",
+      "$type": "dimension"
+    },
+    "strip-remove-icon": {
+      "$value": {
+        "value": 12,
+        "unit": "px"
+      },
+      "$description": "Cross in the remove badge of a media strip thumbnail.",
+      "$type": "dimension"
+    },
+    "strip-remove-inset": {
+      "$value": {
+        "value": 3,
+        "unit": "px"
+      },
+      "$description": "Distance from the top and end of a media strip thumbnail to its remove badge.",
+      "$type": "dimension"
+    },
+    "strip-badge": {
+      "$value": {
+        "value": 18,
+        "unit": "px"
+      },
+      "$description": "Video or quality badge at the bottom of a media strip thumbnail.",
+      "$type": "dimension"
+    },
+    "strip-badge-icon": {
+      "$value": {
+        "value": 11,
+        "unit": "px"
+      },
+      "$description": "Quality icon in a media strip thumbnail badge.",
+      "$type": "dimension"
+    },
+    "strip-play-icon": {
+      "$value": {
+        "value": 9,
+        "unit": "px"
+      },
+      "$description": "Play icon in the video badge of a media strip thumbnail.",
+      "$type": "dimension"
+    },
+    "add-tile-icon": {
+      "$value": {
+        "value": 22,
+        "unit": "px"
+      },
+      "$description": "Add icon in the dashed add tile of the media strip.",
+      "$type": "dimension"
+    },
+    "crop-corner": {
+      "$value": {
+        "value": 24,
+        "unit": "px"
+      },
+      "$description": "Length of each arm of a crop frame corner.",
+      "$type": "dimension"
+    },
+    "crop-tick": {
+      "$value": {
+        "value": 24,
+        "unit": "px"
+      },
+      "$description": "Length of the tick in the middle of each crop frame edge.",
+      "$type": "dimension"
+    },
+    "timeline-strip-height": {
+      "$value": {
+        "value": 56,
+        "unit": "px"
+      },
+      "$description": "Height of the thumbnail strip of the video timeline.",
+      "$type": "dimension"
+    },
+    "playhead-knob": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$description": "Round knob on top of the video timeline playhead.",
+      "$type": "dimension"
+    },
+    "playhead-knob-overlap": {
+      "$value": {
+        "value": 1,
+        "unit": "px"
+      },
+      "$description": "How far the playhead knob sinks into the playhead line.",
+      "$type": "dimension"
+    },
+    "timeline-pill-height": {
+      "$value": {
+        "value": 21,
+        "unit": "px"
+      },
+      "$description": "Height of a pill under the video timeline.",
+      "$type": "dimension"
+    },
+    "trim-handle-width": {
+      "$value": {
+        "value": 14,
+        "unit": "px"
+      },
+      "$description": "Width of a trim handle at each end of the video timeline.",
+      "$type": "dimension"
+    },
+    "trim-grip-width": {
+      "$value": {
+        "value": 3,
+        "unit": "px"
+      },
+      "$description": "Width of the grip line in a trim handle.",
+      "$type": "dimension"
+    },
+    "trim-grip-height": {
+      "$value": {
+        "value": 18,
+        "unit": "px"
+      },
+      "$description": "Height of the grip line in a trim handle.",
+      "$type": "dimension"
+    },
+    "selection-handle-width": {
+      "$value": {
+        "value": 10,
+        "unit": "px"
+      },
+      "$description": "Width of a handle at each edge of a selected passage.",
+      "$type": "dimension"
+    },
+    "selection-handle-height": {
+      "$value": {
+        "value": 28,
+        "unit": "px"
+      },
+      "$description": "Height of a handle at each edge of a selected passage.",
+      "$type": "dimension"
+    },
+    "playhead-overhang": {
+      "$value": {
+        "value": 4,
+        "unit": "px"
+      },
+      "$description": "How far the playhead passes the strip above and below.",
+      "$type": "dimension"
+    },
+    "viewer-page-gap": {
+      "$value": {
+        "value": 30,
+        "unit": "px"
+      },
+      "$description": "Gap between two photos or videos while swiping in the media viewer.",
+      "$type": "dimension"
+    },
+    "page-dot-gap": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$description": "Gap between two page dots of the media viewer.",
+      "$type": "dimension"
+    },
+    "video-time-gap": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$description": "Gap between the seek bar and the times of the video controls.",
+      "$type": "dimension"
+    },
+    "scroll-edge-blur": {
+      "$value": {
+        "value": 6,
+        "unit": "px"
+      },
+      "$description": "Blur sigma of the progressive blur where a list scrolls under a fixed header.",
       "$type": "dimension"
     }
   },
