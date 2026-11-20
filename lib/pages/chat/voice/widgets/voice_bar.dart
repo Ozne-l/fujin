@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/chat/voice/voice_limits.dart';
@@ -10,11 +9,13 @@ import 'package:fujin/pages/chat/voice/voice_state.dart';
 import 'package:fujin/pages/chat/voice/widgets/level_waveform.dart';
 import 'package:fujin/pages/chat/voice/widgets/voice_hint.dart';
 import 'package:fujin/pages/chat/voice/widgets/voice_player_control.dart';
+import 'package:fujin/pages/chat/voice/widgets/voice_scrubber.dart';
 import 'package:fujin/pages/chat_media/chat_media_icon.dart';
 import 'package:fujin/pages/chat_media/widgets/media_glyph.dart';
 import 'package:fujin/pages/common/glass_fill.dart';
 import 'package:fujin/pages/common/glass_finish.dart';
 import 'package:fujin/pages/common/trash_icon.dart';
+import 'package:motor/motor.dart';
 
 class VoiceBar extends StatelessWidget {
   const VoiceBar({
@@ -28,23 +29,24 @@ class VoiceBar extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onSend;
 
-  static const double _icon = 22;
-  static const double _dot = 10;
-  static const double _disc = 40;
-  static const double _discIcon = 16;
-  static const double _gap = 10;
-  static const double _recordingInset = 14;
-  static const double _discInset = (FujinSize.field - _disc) / 2;
+  static const double _discInset =
+      (FujinSize.field - FujinSize.voiceBarDisc) / 2;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final dot = Container(
-      width: _dot,
-      height: _dot,
-      decoration: BoxDecoration(
-        color: colors.textAlert,
-        shape: BoxShape.circle,
+    final dot = SequenceMotionBuilder<int, double>(
+      sequence: FujinMotion.recordingPulse,
+      converter: MotionConverter.single,
+      builder: (context, opacity, _, child) =>
+          Opacity(opacity: opacity, child: child),
+      child: Container(
+        width: FujinSize.recordingDot,
+        height: FujinSize.recordingDot,
+        decoration: BoxDecoration(
+          color: colors.textAlert,
+          shape: BoxShape.circle,
+        ),
       ),
     );
     Widget clock(Duration shown, Color colour) => Text(
@@ -69,7 +71,7 @@ class VoiceBar extends StatelessWidget {
 
     final (inset, field, hint, active) = switch (state) {
       VoiceIdle() || VoiceStarting() => (
-        _recordingInset,
+        FujinSize.recordingInset,
         [
           dot,
           clock(Duration.zero, colors.textPrimary),
@@ -79,7 +81,7 @@ class VoiceBar extends StatelessWidget {
         false,
       ),
       VoiceRecording(:final elapsed, :final levels) => (
-        _recordingInset,
+        FujinSize.recordingInset,
         [
           dot,
           clock(elapsed, switch (VoiceLimits.nearEnd(elapsed)) {
@@ -100,31 +102,30 @@ class VoiceBar extends StatelessWidget {
           [
             Expanded(
               child: VoicePlayerControl(
-                file: File(path),
-                disc: _disc,
-                icon: _discIcon,
+                path: path,
+                disc: FujinSize.voiceBarDisc,
+                icon: FujinSize.voiceBarDiscIcon,
                 fill: colors.backgroundCard,
                 builder: (context, playback, button) => Row(
-                  spacing: _gap,
+                  spacing: FujinSize.voiceGap,
                   children: [
                     button,
                     clock(switch (playback.started) {
                       true => playback.position,
                       false => duration,
                     }, colors.textPrimary),
-                    waveform(
-                      levels,
-                      whole: true,
-                      played: switch ((
-                        playback.started,
-                        playback.total.inMilliseconds,
-                      )) {
-                        (false, _) || (_, 0) => 0,
-                        (true, final length) =>
-                          playback.position.inMilliseconds / length,
-                      },
-                      playedColour: colors.textLink,
-                      restColour: colors.textTertiary,
+                    Expanded(
+                      child: VoiceScrubber(
+                        playback: playback,
+                        thumbColour: colors.textLink,
+                        builder: (context, played) => LevelWaveform(
+                          levels: levels,
+                          whole: true,
+                          played: played,
+                          playedColour: colors.textLink,
+                          restColour: colors.textTertiary,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -138,7 +139,7 @@ class VoiceBar extends StatelessWidget {
           true,
         ),
       VoiceSending(:final shown, :final levels) => (
-        _recordingInset,
+        FujinSize.recordingInset,
         [
           dot,
           clock(shown, colors.textPrimary),
@@ -166,7 +167,7 @@ class VoiceBar extends StatelessWidget {
               tooltip: context.intl.chatVoiceDelete,
               icon: MediaGlyph(
                 TrashIcon.asset,
-                size: _icon,
+                size: FujinSize.composerIcon,
                 color: colors.textPrimary,
               ),
               style: GlassFill.style(colors, GlassFinish.clear, floating: true)
@@ -184,7 +185,7 @@ class VoiceBar extends StatelessWidget {
                       left: inset,
                       right: FujinSpace.s4,
                     ),
-                    child: Row(spacing: _gap, children: field),
+                    child: Row(spacing: FujinSize.voiceGap, children: field),
                   ),
                 ),
               ),
@@ -197,7 +198,7 @@ class VoiceBar extends StatelessWidget {
               tooltip: context.intl.chatSend,
               icon: MediaGlyph(
                 ChatMediaIcon.send,
-                size: _icon,
+                size: FujinSize.composerIcon,
                 color: switch (active) {
                   true => GlassFinish.ink.foreground(colors),
                   false => colors.buttonDisabledText,

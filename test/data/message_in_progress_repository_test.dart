@@ -81,4 +81,44 @@ void main() {
     check(messages.inConversation(_conversation)).isEmpty();
     check(messages.files(_messageId)).isEmpty();
   });
+
+  test('a start time given in local time comes back as the same instant', () {
+    final local = _startedAt.toLocal();
+
+    messages.start(_message.copyWith(startedAt: local), const []);
+
+    check(messages.message(_messageId))
+        .isNotNull()
+        .has((message) => message.startedAt, 'startedAt')
+        .which(
+          (startedAt) => startedAt
+            ..has((at) => at.isUtc, 'isUtc').isTrue()
+            ..has((at) => at.isAtSameMomentAs(local), 'same moment').isTrue(),
+        );
+  });
+
+  test('messages started in local and UTC time are listed in the order they '
+      'started', () {
+    final first = _message.copyWith(id: 'first', startedAt: _startedAt);
+    final second = _message.copyWith(
+      id: 'second',
+      startedAt: _startedAt.add(const Duration(minutes: 30)).toLocal(),
+    );
+    final third = _message.copyWith(
+      id: 'third',
+      startedAt: _startedAt.add(const Duration(hours: 1)),
+    );
+
+    messages
+      ..start(third, const [])
+      ..start(second, const [])
+      ..start(first, const []);
+
+    check([
+      for (final message in messages.all()) message.id,
+    ]).deepEquals(['first', 'second', 'third']);
+    check([
+      for (final message in messages.inConversation(_conversation)) message.id,
+    ]).deepEquals(['first', 'second', 'third']);
+  });
 }

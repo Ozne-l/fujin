@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:fujin/app/theme/fujin_tokens.g.dart';
 
 class WaveBars extends StatelessWidget {
   const WaveBars({
@@ -16,35 +17,38 @@ class WaveBars extends StatelessWidget {
   final Color playedColour;
   final Color restColour;
 
-  static const double height = 28;
-  static const double _bar = 3;
-  static const double _gap = 2;
-  static const double _lowest = 4;
-  static const double _highest = 26;
+  static const double height = FujinSize.waveformHeight;
+  static const double pitch = FujinSize.waveBar + FujinSize.waveBarGap;
 
   static int fitting(double width) =>
-      math.max(0, ((width + _gap) / (_bar + _gap)).floor());
+      math.max(0, ((width + FujinSize.waveBarGap) / pitch).floor());
+
+  static double width(int count) =>
+      math.max(0, count * pitch - FujinSize.waveBarGap);
 
   @override
   Widget build(BuildContext context) {
-    final playedBars = (played * levels.length).round();
+    final reached = played * levels.length;
     return ExcludeSemantics(
       child: SizedBox(
         height: height,
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          spacing: _gap,
+          spacing: FujinSize.waveBarGap,
           children: [
             for (final (index, level) in levels.indexed)
               Container(
-                width: _bar,
-                height: _lowest + level * (_highest - _lowest),
+                width: FujinSize.waveBar,
+                height:
+                    FujinSize.waveBarMin +
+                    level * (FujinSize.waveBarMax - FujinSize.waveBarMin),
                 decoration: ShapeDecoration(
                   shape: const StadiumBorder(),
-                  color: switch (index < playedBars) {
-                    true => playedColour,
-                    false => restColour,
-                  },
+                  color: Color.lerp(
+                    restColour,
+                    playedColour,
+                    (reached - index).clamp(0, 1),
+                  ),
                 ),
               ),
           ],

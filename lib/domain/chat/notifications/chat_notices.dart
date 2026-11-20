@@ -1,9 +1,9 @@
 import 'package:ekklo_client/ekklo_client.dart';
-import 'package:fujin/domain/chat/notifications/chat_notification.dart';
+import 'package:fujin/data/notifications/chat_notification.dart';
+import 'package:fujin/data/notifications/media_label.dart';
+import 'package:fujin/data/notifications/notified_content.dart';
+import 'package:fujin/data/notifications/notified_message.dart';
 import 'package:fujin/domain/chat/notifications/conversation_notice.dart';
-import 'package:fujin/domain/chat/notifications/media_label.dart';
-import 'package:fujin/domain/chat/notifications/notified_content.dart';
-import 'package:fujin/domain/chat/notifications/notified_message.dart';
 import 'package:fujin/domain/chat/person_name.dart';
 
 List<ConversationNotice> chatNotices(
@@ -88,7 +88,7 @@ NotifiedContent _contentOf(EkkloMessage message) => switch ((
     message,
   ),
   (null, _, _, []) => const NotifiedUnsupported(),
-  (null, _, _, final media) => _media(_labelOf(media), message),
+  (null, _, _, final media) => _media(MediaLabel.of(media), message),
 };
 
 NotifiedMedia _media(MediaLabel label, EkkloMessage message) => NotifiedMedia(
@@ -98,11 +98,3 @@ NotifiedMedia _media(MediaLabel label, EkkloMessage message) => NotifiedMedia(
     _ => message.content,
   },
 );
-
-MediaLabel _labelOf(List<EkkloMedia> media) =>
-    switch ({for (final item in media) item.kind}) {
-      Set(length: 1, first: EkkloMediaKind.image) => PhotosLabel(media.length),
-      Set(length: 1, first: EkkloMediaKind.video) => VideosLabel(media.length),
-      Set(length: 1, first: EkkloMediaKind.voice) => const VoiceLabel(),
-      _ => MixedLabel(media.length),
-    };

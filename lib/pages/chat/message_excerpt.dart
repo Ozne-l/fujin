@@ -1,5 +1,7 @@
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fujin/app/notifications/media_label_text.dart';
+import 'package:fujin/data/notifications/media_label.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/pages/chat/widgets/reply_quote.dart';
 import 'package:fujin/pages/chat_media/media_reply.dart';
@@ -33,16 +35,10 @@ abstract final class MessageExcerpt {
         (EkkloMessageKind.voice, _) => intl.chatVoice,
         (EkkloMessageKind.unsupported, _) ||
         (EkkloMessageKind.media, []) => intl.chatUnsupportedTitle,
-        (EkkloMessageKind.media, final media) => switch ({
-          for (final item in media) item.kind,
-        }) {
-          Set(length: 1, first: EkkloMediaKind.image) =>
-            intl.chatNotificationPhotos(media.length),
-          Set(length: 1, first: EkkloMediaKind.video) =>
-            intl.chatNotificationVideos(media.length),
-          Set(length: 1, first: EkkloMediaKind.voice) => intl.chatVoice,
-          _ => intl.chatNotificationMedia(media.length),
-        },
+        (EkkloMessageKind.media, final media) => MediaLabelText.of(
+          intl,
+          MediaLabel.of(media),
+        ),
       };
 
   static String _shortened(String text) => switch (text.trim().characters) {

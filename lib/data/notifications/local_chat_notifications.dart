@@ -5,19 +5,18 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:fujin/data/notifications/chat_notification_text.dart';
+import 'package:fujin/data/notifications/chat_notification.dart';
+import 'package:fujin/data/notifications/chat_notification_copy.dart';
 import 'package:fujin/data/notifications/chat_notifications.dart';
-import 'package:fujin/domain/chat/notifications/chat_notification.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:workmanager/workmanager.dart';
 
 final class LocalChatNotifications implements ChatNotifications {
-  LocalChatNotifications._(this._plugin, this._intl);
+  LocalChatNotifications._(this._plugin, this._copy);
 
   static const channelId = 'chat';
   static const checkName = 'chat-check';
   static const checkPeriod = Duration(minutes: 15);
-  static const _icon = '@mipmap/ic_launcher_monochrome';
+  static const icon = '@mipmap/ic_launcher_monochrome';
   static const _coachKey = 'coach';
   static const _ownerKey = 'owner';
   static const _idBytes = 4;
@@ -25,16 +24,16 @@ final class LocalChatNotifications implements ChatNotifications {
   static const _requestInProgress = 'permissionRequestInProgress';
 
   final FlutterLocalNotificationsPlugin _plugin;
-  final AppLocalizations _intl;
+  final ChatNotificationCopy _copy;
   final StreamController<String> _opened = StreamController.broadcast();
   String? _launchConversation;
 
   static Future<LocalChatNotifications> forApp({
-    required AppLocalizations intl,
+    required ChatNotificationCopy copy,
     required Function backgroundDispatcher,
   }) async {
     final plugin = FlutterLocalNotificationsPlugin();
-    final notifications = LocalChatNotifications._(plugin, intl);
+    final notifications = LocalChatNotifications._(plugin, copy);
     await plugin.initialize(
       settings: _settings,
       onDidReceiveNotificationResponse: (response) {
@@ -56,21 +55,24 @@ final class LocalChatNotifications implements ChatNotifications {
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >()
-        ?.createNotificationChannel(_channelOf(intl));
+        ?.createNotificationChannel(_channelOf(copy));
     if (_checksRun) await Workmanager().initialize(backgroundDispatcher);
     return notifications;
   }
 
   static Future<LocalChatNotifications> forBackground({
-    required AppLocalizations intl,
+    required ChatNotificationCopy copy,
   }) async {
-    final plugin = FlutterLocalNotificationsPlugin();
-    await plugin.initialize(settings: _settings);
-    return LocalChatNotifications._(plugin, intl);
+    await initializeBackground();
+    return LocalChatNotifications._(FlutterLocalNotificationsPlugin(), copy);
+  }
+
+  static Future<void> initializeBackground() async {
+    await FlutterLocalNotificationsPlugin().initialize(settings: _settings);
   }
 
   static const InitializationSettings _settings = InitializationSettings(
-    android: AndroidInitializationSettings(_icon),
+    android: AndroidInitializationSettings(icon),
     iOS: DarwinInitializationSettings(
       requestAlertPermission: false,
       requestSoundPermission: false,
@@ -80,11 +82,11 @@ final class LocalChatNotifications implements ChatNotifications {
 
   static bool get _checksRun => defaultTargetPlatform == TargetPlatform.android;
 
-  static AndroidNotificationChannel _channelOf(AppLocalizations intl) =>
+  static AndroidNotificationChannel _channelOf(ChatNotificationCopy copy) =>
       AndroidNotificationChannel(
         channelId,
-        intl.chatNotificationChannelName,
-        description: intl.chatNotificationChannelDescription,
+        copy.channelName,
+        description: copy.channelDescription,
         importance: Importance.high,
       );
 
@@ -108,17 +110,17 @@ final class LocalChatNotifications implements ChatNotifications {
   Future<void> show(ChatNotification notification) async {
     final coach = Person(
       key: _coachKey,
-      name: notification.coachName ?? _intl.chatNotificationCoach,
+      name: notification.coachName ?? _copy.coach,
     );
     final messages = [
       for (final message in notification.messages)
         Message(
-          ChatNotificationText.of(_intl, message.content),
+          _copy.textOf(message.content),
           message.sentAt,
           coach,
         ),
     ];
-    final channel = _channelOf(_intl);
+    final channel = _channelOf(_copy);
     await _plugin.show(
       id: idOf(notification.conversationId),
       title: coach.name,
@@ -138,7 +140,7 @@ final class LocalChatNotifications implements ChatNotifications {
           styleInformation: MessagingStyleInformation(
             Person(
               key: _ownerKey,
-              name: notification.ownerName ?? _intl.appName,
+              name: notification.ownerName ?? _copy.owner,
             ),
             groupConversation: false,
             messages: messages,

@@ -276,6 +276,42 @@ void main() {
       check(served.bodyBytes).deepEquals(bytes);
     });
 
+    test('answers a range it cannot satisfy with 416', () async {
+      final chat = FakeChat(origin: FakeChatServer.baseUri);
+      final server = await FakeChatServer.start(
+        chat,
+        loadAsset: (key) async => ByteData.sublistView(_assetBytes),
+      );
+      addTearDown(() => server?.close());
+      final client = FakeChatServer.client();
+      addTearDown(client.close);
+      final upload = await client.messaging.presignUpload(
+        fileName: 'empty.mp4',
+        fileType: 'video/mp4',
+        resourceType: EkkloUploadResourceType.messageVideo,
+        resourceId: FakeChat.conversationId,
+      );
+      await http.put(upload.uploadUrl, body: const <int>[]);
+      final asset = FakeChatServer.baseUri.resolve(
+        '${FakeChat.mediaPath}${DevChatAsset.squat.fileName}',
+      );
+
+      final empty = await http.get(
+        upload.publicUrl,
+        headers: {'range': 'bytes=0-'},
+      );
+      final pastEnd = await http.get(
+        asset,
+        headers: {'range': 'bytes=${_assetBytes.length}-'},
+      );
+
+      check(empty.statusCode).equals(HttpStatus.requestedRangeNotSatisfiable);
+      check(pastEnd.statusCode).equals(HttpStatus.requestedRangeNotSatisfiable);
+      check(
+        pastEnd.headers['content-range'],
+      ).equals('bytes */${_assetBytes.length}');
+    });
+
     test('refuses requests without the dev token', () async {
       final server = await FakeChatServer.start(
         FakeChat(origin: FakeChatServer.baseUri),

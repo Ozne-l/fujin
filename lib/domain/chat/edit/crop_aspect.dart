@@ -21,7 +21,12 @@ enum CropAspect {
   double? ratioIn(Size picture) => switch (this) {
     CropAspect.free => null,
     CropAspect.original => picture.width / picture.height,
-    CropAspect(:final width?, :final height?) => width / height,
-    CropAspect() => null,
+    CropAspect.square ||
+    CropAspect.fourFive ||
+    CropAspect.sixteenNine ||
+    CropAspect.nineSixteen => switch ((width, height)) {
+      (final width?, final height?) => width / height,
+      (_, _) => null,
+    },
   };
 }

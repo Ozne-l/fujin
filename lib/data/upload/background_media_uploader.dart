@@ -5,14 +5,14 @@ import 'package:background_downloader/background_downloader.dart';
 import 'package:fujin/data/upload/media_uploader.dart';
 import 'package:fujin/data/upload/upload_completion.dart';
 import 'package:fujin/data/upload/upload_metadata.dart';
+import 'package:fujin/data/upload/upload_notification_copy.dart';
 import 'package:fujin/data/upload/upload_order.dart';
 import 'package:fujin/data/upload/upload_update.dart';
-import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
 @pragma('vm:entry-point')
 final class BackgroundMediaUploader implements MediaUploader {
-  BackgroundMediaUploader({required this._cachePath, required this._intl});
+  BackgroundMediaUploader({required this._cachePath, required this._copy});
 
   static const group = 'chat-upload';
   static const retries = 3;
@@ -24,7 +24,7 @@ final class BackgroundMediaUploader implements MediaUploader {
   static const Map<String, String> _headers = {'Content-Disposition': ''};
 
   final String? _cachePath;
-  final AppLocalizations _intl;
+  final UploadNotificationCopy _copy;
   final _updates = StreamController<UploadUpdate>.broadcast();
   StreamSubscription<TaskUpdate>? _subscription;
 
@@ -99,10 +99,8 @@ final class BackgroundMediaUploader implements MediaUploader {
         options: TaskOptions(onTaskFinished: finished),
         notificationConfig: TaskNotificationConfig(
           running: TaskNotification(
-            _intl.chatUploadNotificationTitle(
-              order.notice.coach ?? _intl.chatNotificationCoach,
-            ),
-            _intl.chatUploadNotificationProgress(
+            _copy.title(order.notice.coach),
+            _copy.progress(
               order.notice.count,
               order.position,
               _progressToken,

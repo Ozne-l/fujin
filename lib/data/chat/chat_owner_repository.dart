@@ -1,6 +1,5 @@
-import 'dart:convert';
-
 import 'package:ekklo_client/ekklo_client.dart';
+import 'package:fujin/data/chat/cached_owner.dart';
 import 'package:fujin/data/database/cache_table.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 
@@ -10,20 +9,18 @@ final class ChatOwnerRepository {
   final FujinDatabase<CacheTable> _database;
 
   EkkloUser? read() => switch (_database.select(
-    'SELECT json FROM chat_owner WHERE id = ?',
-    const [_onlyRow],
+    'SELECT * FROM chat_owner WHERE id = ?',
+    const [CachedOwner.onlyRow],
   )) {
-    [{_json: final String json}] => EkkloUserMapper.fromJson(json),
+    [final row] => EkkloUserMapper.fromMap(CachedOwnerMapper.fromMap(row).json),
     _ => null,
   };
 
   void save(EkkloUser owner) => _database.upsert(
     CacheTable.owner,
-    {_id: _onlyRow, _json: jsonEncode(owner.toMap())},
+    CachedOwner(json: owner.toMap()).toMap(),
     key: const [_id],
   );
 
   static const _id = 'id';
-  static const _json = 'json';
-  static const _onlyRow = 1;
 }

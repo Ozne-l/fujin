@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart' show addTearDown, testWidgets;
-import 'package:fujin/pages/chat_media/picked_files.dart';
-import 'package:fujin/pages/chat_media/picked_media.dart';
+import 'package:fujin/data/media/picked_files.dart';
+import 'package:fujin/data/media/picked_media.dart';
 import 'package:image_picker/image_picker.dart' show XFile;
 
 const _onePixelPng =

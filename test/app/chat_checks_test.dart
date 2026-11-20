@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart'
     show WidgetTester, find, testWidgets;
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/data/dev_chat/fake_chat.dart';
-import 'package:fujin/domain/chat/notifications/chat_notification.dart';
+import 'package:fujin/data/notifications/chat_notification.dart';
 import 'package:fujin/pages/tabs/tab_plate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

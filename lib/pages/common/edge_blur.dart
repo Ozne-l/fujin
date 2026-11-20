@@ -8,7 +8,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:progressive_blur/progressive_blur.dart';
 
 class EdgeBlur extends ConsumerWidget {
-  const EdgeBlur({super.key});
+  const EdgeBlur({super.key}) : _edge = Alignment.topCenter;
+
+  const EdgeBlur.bottom({super.key}) : _edge = Alignment.bottomCenter;
+
+  final Alignment _edge;
 
   static const double _sigma = 6;
   static const double _wash = 0;
@@ -35,8 +39,8 @@ class EdgeBlur extends ConsumerWidget {
           Widget wash(double alpha) => DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+                begin: _edge,
+                end: -_edge,
                 colors: [
                   page.withValues(alpha: alpha),
                   page.withValues(alpha: alpha),
@@ -56,8 +60,8 @@ class EdgeBlur extends ConsumerWidget {
                   linearGradientBlur: LinearGradientBlur(
                     values: const [_full, _full, _none],
                     stops: stops,
-                    start: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+                    start: _edge,
+                    end: -_edge,
                   ),
                   bands: [Offset.zero & size],
                 ),

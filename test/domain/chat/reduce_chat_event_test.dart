@@ -50,7 +50,9 @@ ChatChange _reduce(EkkloMessagingEvent event, {EkkloMessage? current}) =>
 
 EkkloMessage _saved(ChatChange change) => switch (change) {
   MessageSaved(:final message) => message,
-  MessageRemoved() || NothingChanged() => throw StateError('$change'),
+  MessagesRead() ||
+  MessageRemoved() ||
+  NothingChanged() => throw StateError('$change'),
 };
 
 void main() {
@@ -86,13 +88,78 @@ void main() {
     );
   });
 
-  test('ignores a read mark', () {
-    check(
-      _reduce(
-        const EkkloMessageRead(conversationId: FakeChat.conversationId),
-        current: _message(),
+  group('a read mark', () {
+    EkkloMessage sent(String id, {String senderId = FakeChat.ownerId}) =>
+        EkkloMessageMapper.fromMap(
+          FakeChat.message(id: id, createdAt: _at, senderId: senderId),
+        );
+    final seenBefore = EkkloMessageMapper.fromMap({
+      ...FakeChat.message(
+        id: 'm-0',
+        createdAt: _at,
+        senderId: FakeChat.ownerId,
       ),
-    ).isA<NothingChanged>();
+      'read_by_other': true,
+    });
+    final thread = [
+      seenBefore,
+      sent('m-1'),
+      sent('m-2', senderId: FakeChat.coachId),
+      sent('m-3'),
+      sent('m-4'),
+    ];
+    ChatChange read({String? messageId, String? userId = FakeChat.coachId}) =>
+        reduceChatEvent(
+          EkkloMessageRead(
+            conversationId: FakeChat.conversationId,
+            messageId: messageId,
+            userId: userId,
+          ),
+          current: null,
+          ownerId: FakeChat.ownerId,
+          thread: thread,
+        );
+    List<EkkloMessage> marked(ChatChange change) => switch (change) {
+      MessagesRead(:final messages) => messages,
+      MessageSaved() ||
+      MessageRemoved() ||
+      NothingChanged() => throw StateError('$change'),
+    };
+
+    test('from the coach marks my unread messages up to that one', () {
+      final messages = marked(read(messageId: 'm-3'));
+
+      check(messages.map((message) => message.id)).deepEquals(['m-1', 'm-3']);
+      check(messages.every((message) => message.readByOther)).isTrue();
+    });
+
+    test('without a message marks all my unread messages', () {
+      check(
+        marked(read()).map((message) => message.id),
+      ).deepEquals(['m-1', 'm-3', 'm-4']);
+    });
+
+    test('is kept in the JSON the cache stores', () {
+      final [first, ...] = marked(read(messageId: 'm-1'));
+
+      check(
+        EkkloMessageMapper.fromMap(first.receivedJson).readByOther,
+      ).isTrue();
+    });
+
+    test('from me changes nothing', () {
+      check(
+        read(messageId: 'm-4', userId: FakeChat.ownerId),
+      ).isA<NothingChanged>();
+    });
+
+    test('on a message that is not cached changes nothing', () {
+      check(read(messageId: 'm-9')).isA<NothingChanged>();
+    });
+
+    test('on messages already read changes nothing', () {
+      check(read(messageId: 'm-0')).isA<NothingChanged>();
+    });
   });
 
   group('a reaction', () {

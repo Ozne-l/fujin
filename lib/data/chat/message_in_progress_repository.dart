@@ -10,7 +10,7 @@ final class MessageInProgressRepository {
 
   void start(MessageInProgress message, Iterable<FileInProgress> files) =>
       _database.transaction(() {
-        _database.insert(CacheTable.messageInProgress, message.toMap());
+        _database.insert(CacheTable.messageInProgress, _rowOf(message));
         for (final file in files) {
           _database.insert(CacheTable.fileInProgress, file.toMap());
         }
@@ -18,7 +18,7 @@ final class MessageInProgressRepository {
 
   void save(MessageInProgress message) => _database.upsert(
     CacheTable.messageInProgress,
-    message.toMap(),
+    _rowOf(message),
     key: const [_id],
   );
 
@@ -75,6 +75,9 @@ final class MessageInProgressRepository {
     'DELETE FROM chat_message_in_progress WHERE id = ?',
     [id],
   );
+
+  static Map<String, Object?> _rowOf(MessageInProgress message) =>
+      message.copyWith(startedAt: message.startedAt.toUtc()).toMap();
 
   static const _id = 'id';
 }

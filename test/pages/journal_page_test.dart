@@ -748,23 +748,27 @@ void main() {
       check(_ring(tester, '30').selected).isTrue();
     });
 
-    testWidgets('turns back to this week at once when the phone asks for '
-        'less motion', (tester) async {
-      tester.platformDispatcher.accessibilityFeaturesTestValue =
-          const FakeAccessibilityFeatures(disableAnimations: true);
-      addTearDown(
-        tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
-      );
-      await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
-      await _swipeWeekBack(tester);
+    for (final (phone, features) in [
+      ('Android', const FakeAccessibilityFeatures(disableAnimations: true)),
+      ('iOS', const FakeAccessibilityFeatures(reduceMotion: true)),
+    ]) {
+      testWidgets('turns back to this week at once when the $phone phone asks '
+          'for less motion', (tester) async {
+        tester.platformDispatcher.accessibilityFeaturesTestValue = features;
+        addTearDown(
+          tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+        );
+        await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+        await _swipeWeekBack(tester);
 
-      await tester.tap(find.text('Aujourd’hui ›'));
-      await tester.pump();
+        await tester.tap(find.text('Aujourd’hui ›'));
+        await tester.pump();
 
-      check(
-        tester.widget<PageView>(find.byType(PageView)).controller?.page,
-      ).equals(0);
-    });
+        check(
+          tester.widget<PageView>(find.byType(PageView)).controller?.page,
+        ).equals(0);
+      });
+    }
 
     testWidgets('hints that the band slides on the first visit only', (
       tester,

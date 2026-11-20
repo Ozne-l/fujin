@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/providers.dart';
+import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/domain/accounts/connected_accounts.dart';
 import 'package:fujin/domain/chat/chat_state.dart';
 import 'package:fujin/pages/adding/add_food_page.dart';
@@ -147,20 +148,39 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: FujinRoute.chatMedia.path,
-        builder: (context, state) => switch ((
-          state.pathParameters[FujinRoute.conversationParameter],
-          state.pathParameters[FujinRoute.messageParameter],
-        )) {
-          (final conversationId?, final messageId?) => ChatViewerPage(
-            conversationId: conversationId,
-            messageId: messageId,
-            initialIndex: FujinRoute.mediaIndexOf(state.uri.queryParameters),
-          ),
-          _ => throw StateError(
-            '${FujinRoute.chatMedia.path} needs '
-            '${FujinRoute.conversationParameter} '
-            'and ${FujinRoute.messageParameter}',
-          ),
+        pageBuilder: (context, state) {
+          final flight = switch (FujinMotion.reduced(context)) {
+            true => FujinMotion.dissolve,
+            false => FujinMotion.mediaFlight,
+          };
+          return CustomTransitionPage<void>(
+            key: state.pageKey,
+            opaque: false,
+            transitionDuration: flight.duration,
+            reverseTransitionDuration: flight.duration,
+            transitionsBuilder: (context, animation, secondary, child) =>
+                FadeTransition(
+                  opacity: animation.drive(CurveTween(curve: flight.curve)),
+                  child: child,
+                ),
+            child: switch ((
+              state.pathParameters[FujinRoute.conversationParameter],
+              state.pathParameters[FujinRoute.messageParameter],
+            )) {
+              (final conversationId?, final messageId?) => ChatViewerPage(
+                conversationId: conversationId,
+                messageId: messageId,
+                initialIndex: FujinRoute.mediaIndexOf(
+                  state.uri.queryParameters,
+                ),
+              ),
+              _ => throw StateError(
+                '${FujinRoute.chatMedia.path} needs '
+                '${FujinRoute.conversationParameter} '
+                'and ${FujinRoute.messageParameter}',
+              ),
+            },
+          );
         },
       ),
       GoRoute(
@@ -229,8 +249,12 @@ final routerProvider = Provider<GoRouter>((ref) {
     ],
   );
   final taps = notifications.opened.listen((conversation) {
-    final path = FujinRoute.conversation.forConversation(conversation);
-    if (router.state.uri.path != path) unawaited(router.push(path));
+    if (router.state.pathParameters[FujinRoute.conversationParameter] !=
+        conversation) {
+      unawaited(
+        router.push(FujinRoute.conversation.forConversation(conversation)),
+      );
+    }
   });
   ref
     ..onDispose(taps.cancel)

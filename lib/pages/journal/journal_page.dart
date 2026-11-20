@@ -20,6 +20,7 @@ import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
 import 'package:fujin/pages/common/gold_separator.dart';
 import 'package:fujin/pages/common/header_layout.dart';
+import 'package:fujin/pages/common/journal_problem_card.dart';
 import 'package:fujin/pages/common/scroll_extent_listener.dart';
 import 'package:fujin/pages/common/snack_bar_content.dart';
 import 'package:fujin/pages/common/snack_bar_glyph.dart';
@@ -38,7 +39,6 @@ import 'package:fujin/pages/journal/widgets/day_summary_card.dart';
 import 'package:fujin/pages/journal/widgets/diary_meal_card.dart';
 import 'package:fujin/pages/journal/widgets/journal_brand.dart';
 import 'package:fujin/pages/journal/widgets/journal_header.dart';
-import 'package:fujin/pages/journal/widgets/journal_problem_card.dart';
 import 'package:fujin/pages/journal/widgets/loading_meal_card.dart';
 import 'package:fujin/pages/journal/widgets/loading_summary_card.dart';
 import 'package:fujin/pages/journal/widgets/meal_card.dart';
@@ -321,7 +321,7 @@ class JournalPage extends HookConsumerWidget {
                 onSelect: select,
               ),
             ),
-            body: (context, extent) => SwipeRow.group(
+            body: (context, extent, _) => SwipeRow.group(
               child: SouffleRefresh(
                 onRefresh: refresh,
                 slivers: [

@@ -14,21 +14,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../support/fake_backends.dart';
 import '../../support/fake_media_processor.dart';
-
-const _patience = 2000;
-const _settle = Duration(milliseconds: 1);
-
-Future<void> _until(bool Function() reached) async {
-  for (var turn = 0; turn < _patience && !reached(); turn++) {
-    await Future<void>.delayed(_settle);
-  }
-}
+import '../../support/until.dart';
 
 void main() {
   test('signing out of Ekklo forgets the chat and its media', () async {
     final root = Directory.systemTemp.createTempSync('forget-chat');
     addTearDown(() => root.deleteSync(recursive: true));
-    final cachePath = '${root.path}/${FujinDatabase.cacheFileName}';
+    final cachePath = FujinDatabase.cachePathIn(root);
     final media = Directory('${root.path}/${ChatMediaCache.folderName}');
     final backends = FakeBackends();
     backends.chatMedia['plate.jpg'] = [1, 2, 3];
@@ -54,14 +46,14 @@ void main() {
       (_, next) => states.addAll([?next.value]),
       fireImmediately: true,
     );
-    await _until(() => states.lastOrNull is ChatPresent);
+    await until(() => states.lastOrNull, (state) => state is ChatPresent);
     await container
         .read(chatMediaCacheProvider)
         .file(chatMediaUri.resolve('${FakeChat.mediaPath}plate.jpg'));
     check(File(cachePath).existsSync()).isTrue();
 
     await container.read(accountsServiceProvider).signOut(Account.ekklo);
-    await _until(() => states.lastOrNull is ChatAbsent);
+    await until(() => states.lastOrNull, (state) => state is ChatAbsent);
 
     check(states.last).isA<ChatAbsent>();
     check(media.existsSync()).isFalse();

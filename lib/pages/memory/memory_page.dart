@@ -166,7 +166,7 @@ class MemoryPage extends HookConsumerWidget {
               ),
             ),
           ),
-          body: (context, extent) => PageView(
+          body: (context, extent, _) => PageView(
             controller: pages,
             children: [
               for (final segment in MemorySegment.values)

@@ -1,5 +1,6 @@
 import 'package:checks/checks.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart'
+    show Finder, WidgetTester, find, testWidgets;
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/data/dev_chat/fake_chat.dart';
 import 'package:fujin/pages/tabs/tab_plate.dart';

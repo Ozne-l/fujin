@@ -72,5 +72,38 @@ void main() {
         sentText(_pending('ok', after: 'm-0'), page, ownerId: _owner)?.id,
       ).equals('m-3');
     });
+
+    test('was not sent when its same text is another one of mine', () {
+      final page = [
+        _message('m-1', content: 'Et toi ?', at: _attempt, sender: _coach),
+        _message('m-2', content: 'ok', at: _attempt),
+      ];
+
+      check(
+        sentText(
+          _pending('ok', after: 'm-1'),
+          page,
+          ownerId: _owner,
+          taken: {'m-2'},
+        ),
+      ).isNull();
+    });
+
+    test('was sent as the next same text when the first is taken', () {
+      final page = [
+        _message('m-1', content: 'Et toi ?', at: _attempt, sender: _coach),
+        _message('m-2', content: 'ok', at: _attempt),
+        _message('m-3', content: 'ok', at: _attempt),
+      ];
+
+      check(
+        sentText(
+          _pending('ok', after: 'm-1'),
+          page,
+          ownerId: _owner,
+          taken: {'m-2'},
+        )?.id,
+      ).equals('m-3');
+    });
   });
 }

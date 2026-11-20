@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/providers.dart';
+import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/media/forget_file.dart';
+import 'package:fujin/data/media/picked_media.dart';
 import 'package:fujin/domain/chat/edit/edited_media.dart';
 import 'package:fujin/domain/chat/edit/media_send.dart';
 import 'package:fujin/l10n/intl_context.dart';
@@ -12,7 +15,6 @@ import 'package:fujin/pages/chat_media/chat_media_icon.dart';
 import 'package:fujin/pages/chat_media/media_reply.dart';
 import 'package:fujin/pages/chat_media/media_tray_notifier.dart';
 import 'package:fujin/pages/chat_media/photo_editor_page.dart';
-import 'package:fujin/pages/chat_media/picked_media.dart';
 import 'package:fujin/pages/chat_media/video_editor_page.dart';
 import 'package:fujin/pages/chat_media/widgets/caption_bar.dart';
 import 'package:fujin/pages/chat_media/widgets/discard_sheet.dart';
@@ -20,6 +22,7 @@ import 'package:fujin/pages/chat_media/widgets/media_glyph.dart';
 import 'package:fujin/pages/chat_media/widgets/media_strip.dart';
 import 'package:fujin/pages/chat_media/widgets/tray_preview.dart';
 import 'package:fujin/pages/chat_media/widgets/tray_reply_card.dart';
+import 'package:fujin/pages/common/fade_through.dart';
 import 'package:fujin/pages/common/fujin_icon_button.dart';
 import 'package:fujin/pages/common/glass_fill.dart';
 import 'package:fujin/pages/common/glass_finish.dart';
@@ -33,8 +36,6 @@ class MediaTrayPage extends HookConsumerWidget {
     required this.onSend,
     super.key,
   });
-
-  static const double _limitGap = 6;
 
   final String coach;
   final MediaReply? reply;
@@ -68,26 +69,31 @@ class MediaTrayPage extends HookConsumerWidget {
     void close() {
       switch (tray.isDirty(caption.text)) {
         case true:
-          unawaited(
-            showDiscardSheet(
-              context,
-              onDiscard: () {
-                notifier.discard();
-                navigator.pop();
-              },
-            ),
-          );
+          unawaited(showDiscardSheet(context, onDiscard: navigator.pop));
         case false:
-          notifier.discard();
           navigator.pop();
       }
     }
 
     Future<void> open(int index) async {
       final media = tray.media[index];
+      final flight = switch (FujinMotion.reduced(context)) {
+        true => FujinMotion.dissolve,
+        false => FujinMotion.mediaFlight,
+      };
       final edited = await navigator.push<EditedMedia>(
-        MaterialPageRoute(
-          builder: (context) => switch (media) {
+        PageRouteBuilder(
+          transitionDuration: flight.duration,
+          reverseTransitionDuration: flight.duration,
+          transitionsBuilder: (context, animation, secondary, child) =>
+              FadeTransition(
+                opacity: CurvedAnimation(
+                  parent: animation,
+                  curve: flight.curve,
+                ),
+                child: child,
+              ),
+          pageBuilder: (context, animation, secondary) => switch (media) {
             final EditedPhoto photo => PhotoEditorPage(
               photo: photo,
               position: index + 1,
@@ -109,7 +115,14 @@ class MediaTrayPage extends HookConsumerWidget {
         final more = await ref
             .read(mediaPickerProvider)
             .gallery(limit: tray.room);
-        if (context.mounted) await notifier.add(more);
+        switch (context.mounted) {
+          case true:
+            await notifier.add(more);
+          case false:
+            for (final media in more) {
+              unawaited(forgetFile(media.path));
+            }
+        }
       } on PlatformException {
         return;
       }
@@ -128,7 +141,6 @@ class MediaTrayPage extends HookConsumerWidget {
 
     void remove(int index) {
       if (tray.media.length == 1) {
-        notifier.discard();
         navigator.pop();
         return;
       }
@@ -173,10 +185,14 @@ class MediaTrayPage extends HookConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: FujinSize.textGap,
                         children: [
-                          Text(
-                            intl.chatTrayCount(tray.media.length),
-                            style: FujinText.inter16Medium.copyWith(
-                              color: colors.textPrimary,
+                          FadeThrough(
+                            scale: 1,
+                            child: Text(
+                              intl.chatTrayCount(tray.media.length),
+                              key: ValueKey(tray.media.length),
+                              style: FujinText.inter16Medium.copyWith(
+                                color: colors.textPrimary,
+                              ),
                             ),
                           ),
                           Text(
@@ -225,13 +241,16 @@ class MediaTrayPage extends HookConsumerWidget {
                   padding: const EdgeInsets.symmetric(
                     horizontal: FujinSize.screenMargin,
                   ),
-                  child: switch (shown) {
-                    final shown? => TrayPreview(
-                      media: shown,
-                      onOpen: () => unawaited(open(tray.selected)),
-                    ),
-                    null => const SizedBox.shrink(),
-                  },
+                  child: FadeThrough(
+                    child: switch (shown) {
+                      final shown? => TrayPreview(
+                        key: ValueKey(shown.path),
+                        media: shown,
+                        onOpen: () => unawaited(open(tray.selected)),
+                      ),
+                      null => const SizedBox.shrink(),
+                    },
+                  ),
                 ),
               ),
               const SizedBox(height: FujinSpace.s4),
@@ -249,7 +268,7 @@ class MediaTrayPage extends HookConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(
                     FujinSize.screenMargin,
-                    _limitGap,
+                    FujinSize.trayLimitGap,
                     FujinSize.screenMargin,
                     0,
                   ),

@@ -1,3 +1,4 @@
+import 'package:fujin/data/chat/foreground_stamp.dart';
 import 'package:fujin/data/database/cache_table.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 
@@ -7,20 +8,18 @@ final class ForegroundStampRepository {
   final FujinDatabase<CacheTable> _database;
 
   DateTime? last() => switch (_database.select(
-    'SELECT at FROM chat_foreground WHERE id = ?',
-    const [_onlyRow],
+    'SELECT * FROM chat_foreground WHERE id = ?',
+    const [ForegroundStamp.onlyRow],
   )) {
-    [{_at: final String at}] => DateTime.parse(at),
+    [final row] => ForegroundStampMapper.fromMap(row).at,
     _ => null,
   };
 
   void record(DateTime at) => _database.upsert(
     CacheTable.foreground,
-    {_id: _onlyRow, _at: at.toUtc().toIso8601String()},
+    ForegroundStamp(at: at.toUtc()).toMap(),
     key: const [_id],
   );
 
   static const _id = 'id';
-  static const _at = 'at';
-  static const _onlyRow = 1;
 }

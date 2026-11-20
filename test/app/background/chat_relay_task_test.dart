@@ -20,7 +20,7 @@ void main() {
       'or changing the file', () async {
     final directory = Directory.systemTemp.createTempSync('fujin_relay_task_');
     addTearDown(() => directory.deleteSync(recursive: true));
-    final path = '${directory.path}/${FujinDatabase.cacheFileName}';
+    final path = FujinDatabase.cachePathIn(directory);
     FujinDatabase.openCacheInApp(path)
       ..execute('PRAGMA user_version = $_otherVersion')
       ..close();

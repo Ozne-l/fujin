@@ -13,8 +13,6 @@ class AspectChips extends StatelessWidget {
     super.key,
   });
 
-  static const double _gap = 6;
-
   final CropAspect selected;
   final ValueChanged<CropAspect> onSelected;
 
@@ -25,7 +23,8 @@ class AspectChips extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: FujinSpace.s3),
       itemCount: CropAspect.values.length,
-      separatorBuilder: (context, index) => const SizedBox(width: _gap),
+      separatorBuilder: (context, index) =>
+          const SizedBox(width: FujinSize.cameraChipGap),
       itemBuilder: (context, index) {
         final aspect = CropAspect.values[index];
         return CameraChip(

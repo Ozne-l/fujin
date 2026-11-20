@@ -1,0 +1,30 @@
+# 49. Chat motion, shared-element flights and haptics
+
+Date: 2026-11-20
+
+## Status
+
+Accepted. Amends [0008](0008-theme-from-design-tokens.md) (Hero flights, a custom full-screen viewer route and framework implicit animations are allowed in the chat) and [0031](0031-reduced-motion.md) (iOS "Réduire les animations" is read; transitions that carry meaning dissolve instead of jumping), and the "no seen mark" bullet of [0045](0045-ekklo-chat.md).
+
+## Context
+
+The Ekklo chat ([0045](0045-ekklo-chat.md) to [0047](0047-chat-screens.md)) worked but most of it snapped: new messages, the reply card, reactions, deletes, the composer's icons, the upload-to-sent swap, the editors' rotate, aspect and reset. The full-screen viewer had no zoom and no drag-to-dismiss, and nothing flew from the thread to it. The owner asked for an App Store-level polish on 2026-11-20, after a study of Telegram's and Signal's sources, Apple's *Designing Fluid Interfaces* (WWDC18) and *Animate with springs* (WWDC23), and the Human Interface Guidelines on motion and haptics. He kept tap-to-record for voice and set aside a container transform from a row, particle effects and a typing indicator (Ekklo sends no typing event).
+
+`MediaQuery.disableAnimations` only carries Android's "Supprimer les animations": on iOS, Flutter exposes reduced motion as `AccessibilityFeatures.reduceMotion` and leaves the flag false, so 0031 never applied there.
+
+## Decision
+
+- **Presets.** Chat timings join `FujinMotion`: `dissolve` (150 ms), `grow` (200 ms, M3 standard curve), `messageIn` (250 ms), `sendFlight` (250 ms, ease-out-quint), `highlight` (600 ms), `mediaFlight` (300 ms), the springs `release` (keeps the finger's velocity), `lift` and `pop`, and `swapScale`. Gestures release into a spring seeded with the finger's velocity, never a fixed curve.
+- **Framework animations.** In the chat, `Hero`, `AnimatedSwitcher`, `AnimatedSize` and route animations may be used when their duration and curve come from a `FujinMotion` preset, as `FadeThrough` already does. A `Tween` may shape the animation such a widget hands its builder (the scale of `FadeThrough` and of the composer's icon swap, the rise of the reply card), since the preset still times it. Hand-written `AnimationController` stays out; motor drives everything else.
+- **Shared elements.** A photo or video tile flies to the full-screen viewer and back with a `Hero` whose corners go from the bubble's radius to square. The viewer is a transparent route so its black backdrop can fade with a downward drag: past one sixth of the height, or on a fling, it closes and the media flies home; otherwise it springs back.
+- **Sending.** A sent text flies from the field into its bubble; its width, inset and type size follow the same ease-out-quint curve, so it stays on its lines in flight. A message or upload of the owner's that arrives while the thread is scrolled up brings the thread back down to it, as the "latest messages" button does.
+- **Double tap.** Two taps on a sent message within `kDoubleTapTimeout` and `kDoubleTapSlop` toggle the owner's ❤️ on it, with `FujinHaptics.select`: added if it is not his, taken back if it is. The taps are not held to wait for a second one, so a tap on a photo, a video, a voice note's button or a quote acts at once and never counts towards a double tap; the heart comes from the text, the caption or the bubble around them.
+- **Thread under the composer.** The composer is `HeaderLayout`'s footer: the thread fills the screen behind it, rests just above it, and blurs under it with `EdgeBlur.bottom`, the header's blur turned upside down ([0037](0037-progressive-blur-under-fixed-headers.md)). The blur stays inside the composer's area, so nothing is blurred at rest.
+- **Haptics.** `FujinHaptics` (`lib/app/theme/fujin_haptics.dart`) is the only caller of `HapticFeedback`: `select` when a value changes (an emoji under the finger, a crop or trim limit), `threshold` when a gesture crosses its commit point (swipe to reply), `press` for a long press or a destructive sheet, `error` when a send fails. Nothing fires during a voice recording.
+- **Seen and not sent.** `EkkloMessage.readByOther` (`read_by_other`, a missing or null value read as false) is cached in the message's JSON. A `message_read` event from anyone but the owner marks the owner's messages read up to and including its `message_id`, all of them when it has none; an id not in the cache changes nothing. A message Ekklo sends again (a page, an edit, a send's answer) without `read_by_other` keeps the `true` already cached for its id: the pure rule `keepingRead` (`lib/domain/chat/keeping_read.dart`), since Ekklo's lists may omit the field. Only the owner's newest read message reads « Vu » next to its time, which dissolves in. The official app marks just the one message; marking the earlier ones too is our reading of a read receipt, not observed. A status that changes on screen to « Non envoyé. » shakes once (`FujinMotion.shake`: 3 cycles, 4 px, 300 ms, none under reduced motion). `FujinHaptics.error` fires once when a text send or retry ends unsent: `ChatService.sendText` and `retryText` return whether the text went out, so a refusal that comes before « Envoi… » was ever drawn still buzzes. A media upload has no such call to wait on, so its bubble buzzes when its status changes to failed while on screen; a row rebuilt, scrolled back or reopened already failed neither shakes nor buzzes.
+- **Reduced motion.** `FujinMotion.reduced` reads both `MediaQuery.disableAnimationsOf` and the platform's `reduceMotion`. `FujinMotion.dissolveOf(context, motion)` returns `dissolve` when it is set: entrances that tell the reader something happened (a new message, a reaction, the reply card, the "Vu" mark) fade instead of sliding or springing. Hero flights are skipped. Flights, lifts and pops land at once through `FujinMotion.of`.
+
+## Consequences
+
+- The glass benchmark gets a chat scenario so moving glass in the thread is measured before and after.
+- New chat motion takes its preset through `FujinMotion.of` or `FujinMotion.dissolveOf`; the `fujin-dialect` skill says so.

@@ -14,14 +14,14 @@ class MessageContent extends StatelessWidget {
     required this.item,
     required this.coachName,
     required this.onOpenMedia,
+    this.onQuote,
     super.key,
   });
 
   final ThreadMessage item;
   final String coachName;
   final ValueChanged<int> onOpenMedia;
-
-  static const double _captionInset = 10;
+  final ValueChanged<String>? onQuote;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +34,10 @@ class MessageContent extends StatelessWidget {
         mine: item.quotesMine,
         coachName: coachName,
         quoted: item.quoted,
+        onTap: switch ((onQuote, reply.deleted)) {
+          (final onQuote?, false) => () => onQuote(reply.id),
+          _ => null,
+        },
       ),
     };
     final caption = switch (message.content) {
@@ -79,11 +83,15 @@ class MessageContent extends StatelessWidget {
             spacing: FujinSpace.s2,
             children: [
               ?quote,
-              MediaGallery(media: visual, onOpen: onOpenMedia),
+              MediaGallery(
+                messageId: message.id,
+                media: visual,
+                onOpen: onOpenMedia,
+              ),
               if (caption case final caption?)
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: _captionInset,
+                    horizontal: FujinSize.bubbleCaptionInset,
                   ),
                   child: caption,
                 ),
@@ -96,7 +104,11 @@ class MessageContent extends StatelessWidget {
         spacing: FujinSpace.s1,
         children: [
           if (quote != null || caption != null) textBubble(caption),
-          MediaGallery(media: visual, onOpen: onOpenMedia),
+          MediaGallery(
+            messageId: message.id,
+            media: visual,
+            onOpen: onOpenMedia,
+          ),
         ],
       ),
     };

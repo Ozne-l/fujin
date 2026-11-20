@@ -17,7 +17,7 @@ const _publicUrl = 'https://chat-media.test/media/upload-1-f-1.jpg';
 String _cachePath() {
   final directory = Directory.systemTemp.createTempSync('fujin_completion_');
   addTearDown(() => directory.deleteSync(recursive: true));
-  return '${directory.path}/${FujinDatabase.cacheFileName}';
+  return FujinDatabase.cachePathIn(directory);
 }
 
 MessageInProgressRepository _seeded(String cachePath) {

@@ -14,8 +14,6 @@ class CameraChip extends StatelessWidget {
     super.key,
   });
 
-  static const double _gap = 6;
-
   final String label;
   final String? icon;
   final bool selected;
@@ -55,7 +53,7 @@ class CameraChip extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: size.padding),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    spacing: _gap,
+                    spacing: FujinSize.cameraChipIconGap,
                     children: [
                       if (glyph case final glyph?)
                         MediaGlyph(glyph, size: size.icon, color: foreground),

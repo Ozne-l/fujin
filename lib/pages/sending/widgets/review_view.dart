@@ -43,7 +43,7 @@ class ReviewView extends StatelessWidget {
               child: SendHeader(plan: plan),
             ),
           ),
-          body: (context, extent) => FadeThrough(
+          body: (context, extent, _) => FadeThrough(
             scale: _unscaled,
             child: switch (searching) {
               true => _Searching(
@@ -143,7 +143,7 @@ class _Review extends HookWidget {
           ),
         },
       ),
-      body: (context, extent) => ScrollEdgeBlur(
+      body: (context, extent, _) => ScrollEdgeBlur(
         top: extent + FujinSpace.s3,
         child: ListView(
           padding: EdgeInsets.only(

@@ -23,6 +23,14 @@ final class MessageRemoved extends ChatChange with MessageRemovedMappable {
   final String messageId;
 }
 
+@MappableClass(discriminatorValue: 'read')
+final class MessagesRead extends ChatChange with MessagesReadMappable {
+  const MessagesRead({required this.conversationId, required this.messages});
+
+  final String conversationId;
+  final List<EkkloMessage> messages;
+}
+
 @MappableClass(discriminatorValue: 'none')
 final class NothingChanged extends ChatChange with NothingChangedMappable {
   const NothingChanged();

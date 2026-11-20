@@ -6,10 +6,9 @@ class VoiceHint extends StatelessWidget {
 
   final String text;
 
-  static const double _vertical = 6;
   static const EdgeInsets _padding = EdgeInsets.symmetric(
     horizontal: FujinSpace.s3,
-    vertical: _vertical,
+    vertical: FujinSize.voiceHintPaddingVertical,
   );
 
   @override

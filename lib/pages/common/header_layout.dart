@@ -2,10 +2,16 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 class HeaderLayout extends StatelessWidget {
-  const HeaderLayout({required this.header, required this.body, super.key});
+  const HeaderLayout({
+    required this.header,
+    required this.body,
+    this.footer,
+    super.key,
+  });
 
   final Widget header;
-  final Widget Function(BuildContext context, double extent) body;
+  final Widget? footer;
+  final Widget Function(BuildContext context, double top, double bottom) body;
 
   static Widget shield(Widget child) => GestureDetector(
     behavior: HitTestBehavior.opaque,
@@ -23,24 +29,30 @@ class HeaderLayout extends StatelessWidget {
       LayoutId(
         id: _Slot.body,
         child: LayoutBuilder(
-          builder: (context, constraints) => body(
-            context,
-            switch (constraints) {
-              _BodyConstraints(:final extent) => extent,
-              BoxConstraints() => _HeaderDelegate.none,
-            },
-          ),
+          builder: (context, constraints) => switch (constraints) {
+            _BodyConstraints(:final top, :final bottom) => body(
+              context,
+              top,
+              bottom,
+            ),
+            BoxConstraints() => body(
+              context,
+              _HeaderDelegate.none,
+              _HeaderDelegate.none,
+            ),
+          },
         ),
       ),
       LayoutId(
         id: _Slot.header,
         child: _PassThrough(child: header),
       ),
+      if (footer case final footer?) LayoutId(id: _Slot.footer, child: footer),
     ],
   );
 }
 
-enum _Slot { header, body }
+enum _Slot { header, body, footer }
 
 class _HeaderDelegate extends MultiChildLayoutDelegate {
   _HeaderDelegate();
@@ -53,9 +65,22 @@ class _HeaderDelegate extends MultiChildLayoutDelegate {
       _Slot.header,
       BoxConstraints.tightFor(width: size.width),
     );
-    layoutChild(_Slot.body, _BodyConstraints(size, extent: header.height));
+    final footer = switch (hasChild(_Slot.footer)) {
+      true => layoutChild(
+        _Slot.footer,
+        BoxConstraints.tightFor(width: size.width),
+      ),
+      false => Size.zero,
+    };
+    layoutChild(
+      _Slot.body,
+      _BodyConstraints(size, top: header.height, bottom: footer.height),
+    );
     positionChild(_Slot.header, Offset.zero);
     positionChild(_Slot.body, Offset.zero);
+    if (hasChild(_Slot.footer)) {
+      positionChild(_Slot.footer, Offset(none, size.height - footer.height));
+    }
   }
 
   @override
@@ -63,16 +88,21 @@ class _HeaderDelegate extends MultiChildLayoutDelegate {
 }
 
 class _BodyConstraints extends BoxConstraints {
-  _BodyConstraints(super.size, {required this.extent}) : super.tight();
+  _BodyConstraints(super.size, {required this.top, required this.bottom})
+    : super.tight();
 
-  final double extent;
+  final double top;
+  final double bottom;
 
   @override
   bool operator ==(Object other) =>
-      other is _BodyConstraints && other.extent == extent && super == other;
+      other is _BodyConstraints &&
+      other.top == top &&
+      other.bottom == bottom &&
+      super == other;
 
   @override
-  int get hashCode => Object.hash(super.hashCode, extent);
+  int get hashCode => Object.hash(super.hashCode, top, bottom);
 }
 
 class _PassThrough extends SingleChildRenderObjectWidget {

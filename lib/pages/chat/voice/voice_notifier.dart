@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:fujin/app/file_video.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/data/voice/voice_recorder.dart';
+import 'package:fujin/domain/chat/upload/chat_upload_service.dart';
 import 'package:fujin/domain/chat/voice/voice_limits.dart';
 import 'package:fujin/pages/chat/reply_notifier.dart';
 import 'package:fujin/pages/chat/voice/voice_send_outcome.dart';
@@ -24,8 +25,8 @@ final class VoiceNotifier extends Notifier<VoiceState> {
 
   final String _conversationId;
 
-  static const sample = Duration(milliseconds: 100);
-  static const folderName = 'chat_voice';
+  static const _samplePeriod = Duration(milliseconds: 100);
+  static const _folderName = 'chat_voice';
   static const _extension = '.m4a';
   static const double _quietest = -50;
 
@@ -67,7 +68,10 @@ final class VoiceNotifier extends Notifier<VoiceState> {
     _path = path;
     _recording = true;
     state = const VoiceRecording(elapsed: Duration.zero, levels: []);
-    _timer = Timer.periodic(sample, (timer) => unawaited(_sample(timer)));
+    _timer = Timer.periodic(
+      _samplePeriod,
+      (timer) => unawaited(_sample(timer)),
+    );
     return VoiceStartOutcome.recording;
   }
 
@@ -80,13 +84,22 @@ final class VoiceNotifier extends Notifier<VoiceState> {
       case VoiceRecording(:final elapsed, :final levels):
         final path = _path;
         if (path == null) return VoiceSendOutcome.notSent;
+        final uploads = ref.read(chatUploadServiceProvider);
+        final video = ref.read(fileVideoProvider);
+        _path = null;
         state = VoiceSending(shown: elapsed, levels: levels);
         await _stopRecorder();
-        final duration = await _readBack(path, recorded: elapsed);
-        return _hand(path, duration, levels, replyToId: replyToId);
+        final duration = await _readBack(video, path, recorded: elapsed);
+        return _hand(uploads, path, duration, levels, replyToId: replyToId);
       case VoiceKept(:final path, :final duration, :final levels):
         state = VoiceSending(shown: duration, levels: levels);
-        return _hand(path, duration, levels, replyToId: replyToId);
+        return _hand(
+          ref.read(chatUploadServiceProvider),
+          path,
+          duration,
+          levels,
+          replyToId: replyToId,
+        );
       case VoiceIdle() || VoiceStarting() || VoiceSending():
         return VoiceSendOutcome.notSent;
     }
@@ -114,7 +127,7 @@ final class VoiceNotifier extends Notifier<VoiceState> {
   }
 
   Future<void> _sample(Timer timer) async {
-    final elapsed = sample * timer.tick;
+    final elapsed = _samplePeriod * timer.tick;
     if (state case VoiceRecording(
       :final levels,
     ) when VoiceLimits.reached(elapsed)) {
@@ -146,8 +159,9 @@ final class VoiceNotifier extends Notifier<VoiceState> {
   }) async {
     final path = _path;
     if (path == null) return;
+    final video = ref.read(fileVideoProvider);
     await _stopRecorder();
-    final duration = await _readBack(path, recorded: elapsed);
+    final duration = await _readBack(video, path, recorded: elapsed);
     if (!ref.mounted || _path != path) return;
     state = VoiceKept(
       path: path,
@@ -158,6 +172,7 @@ final class VoiceNotifier extends Notifier<VoiceState> {
   }
 
   Future<VoiceSendOutcome> _hand(
+    ChatUploadService uploads,
     String path,
     Duration duration,
     List<double> levels, {
@@ -165,14 +180,12 @@ final class VoiceNotifier extends Notifier<VoiceState> {
   }) async {
     _path = null;
     try {
-      await ref
-          .read(chatUploadServiceProvider)
-          .sendVoice(
-            conversationId: _conversationId,
-            path: path,
-            durationSeconds: VoiceLimits.seconds(duration),
-            replyToId: replyToId,
-          );
+      await uploads.sendVoice(
+        conversationId: _conversationId,
+        path: path,
+        durationSeconds: VoiceLimits.seconds(duration),
+        replyToId: replyToId,
+      );
     } on Exception {
       if (!ref.mounted) {
         _delete(path);
@@ -202,8 +215,12 @@ final class VoiceNotifier extends Notifier<VoiceState> {
     await _recorder.stop();
   }
 
-  Future<Duration> _readBack(String path, {required Duration recorded}) async {
-    final player = ref.read(fileVideoProvider)(File(path));
+  static Future<Duration> _readBack(
+    FileVideo video,
+    String path, {
+    required Duration recorded,
+  }) async {
+    final player = video(File(path));
     try {
       await player.initialize();
       return switch (player.value.duration) {
@@ -220,7 +237,7 @@ final class VoiceNotifier extends Notifier<VoiceState> {
   String _newPath() {
     final folder = Directory(
       '${ref.read(appCacheDirectoryProvider).path}'
-      '${Platform.pathSeparator}$folderName',
+      '${Platform.pathSeparator}$_folderName',
     )..createSync(recursive: true);
     final name = ref.read(clockProvider)().microsecondsSinceEpoch;
     return '${folder.path}${Platform.pathSeparator}$name$_extension';

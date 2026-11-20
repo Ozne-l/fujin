@@ -3,16 +3,16 @@ import 'dart:ui';
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart'
     show addTearDown, group, setUp, test;
+import 'package:fujin/app/notifications/chat_notification_text.dart';
 import 'package:fujin/data/chat/chat_owner_repository.dart';
 import 'package:fujin/data/chat/chat_repository.dart';
 import 'package:fujin/data/chat/foreground_stamp_repository.dart';
 import 'package:fujin/data/database/cache_table.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/dev_chat/fake_chat.dart';
-import 'package:fujin/data/notifications/chat_notification_text.dart';
+import 'package:fujin/data/notifications/notified_message.dart';
 import 'package:fujin/domain/chat/notifications/chat_check.dart';
 import 'package:fujin/domain/chat/notifications/chat_notification_service.dart';
-import 'package:fujin/domain/chat/notifications/notified_message.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 
 import '../../../support/fake_backends.dart';
@@ -58,7 +58,7 @@ void main() {
     for (final message
         in notifications.shown[_conversation]?.messages ??
             const <NotifiedMessage>[])
-      ChatNotificationText.of(_french, message.content),
+      ChatNotificationText(_french).textOf(message.content),
   ];
 
   List<String> messagingCalls() => [

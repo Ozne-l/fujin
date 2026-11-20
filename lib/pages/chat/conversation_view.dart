@@ -14,6 +14,7 @@ part 'conversation_view.mapper.dart';
 final class ConversationView with ConversationViewMappable {
   const ConversationView({
     required this.conversationId,
+    required this.ownerId,
     required this.coach,
     required this.newestFirst,
     required this.link,
@@ -29,6 +30,10 @@ final class ConversationView with ConversationViewMappable {
     List<MessageUpload> uploads = const [],
   }) {
     final byId = {for (final message in state.messages) message.id: message};
+    final seenId = state.messages
+        .where((message) => state.isMine(message) && message.readByOther)
+        .lastOrNull
+        ?.id;
     final items = <ThreadItem>[];
     DateTime? shown;
     final shownMessages = [
@@ -69,6 +74,7 @@ final class ConversationView with ConversationViewMappable {
           },
           quotesMine: message.replyTo?.senderId == state.ownerId,
           delivery: delivery,
+          seen: message.id == seenId,
         ),
       );
     }
@@ -88,6 +94,7 @@ final class ConversationView with ConversationViewMappable {
     }
     return ConversationView(
       conversationId: state.conversationId,
+      ownerId: state.ownerId,
       coach: state.conversation?.coach,
       newestFirst: items.reversed.toList(),
       link: state.link,
@@ -100,6 +107,7 @@ final class ConversationView with ConversationViewMappable {
   }
 
   final String conversationId;
+  final String? ownerId;
   final EkkloPerson? coach;
   final List<ThreadItem> newestFirst;
   final ChatLink link;
@@ -108,4 +116,12 @@ final class ConversationView with ConversationViewMappable {
   final bool hasOlder;
   final bool canSend;
   final bool protectsCapture;
+
+  bool get writable => switch ((link, canSend)) {
+    (ChatLink.online || ChatLink.connecting, true) => true,
+    (ChatLink.online || ChatLink.connecting, false) => false,
+    (ChatLink.offline || ChatLink.expired, _) => false,
+  };
+
+  bool isMine(EkkloMessage message) => message.senderId == ownerId;
 }

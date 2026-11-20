@@ -3,6 +3,9 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/chat/chat_files.dart';
 import 'package:fujin/pages/chat/chat_text.dart';
+import 'package:fujin/pages/chat/widgets/image_arrival.dart';
+import 'package:fujin/pages/chat/widgets/media_placeholder.dart';
+import 'package:fujin/pages/chat/widgets/photo_tile.dart';
 import 'package:fujin/pages/chat/widgets/video_duration_chip.dart';
 import 'package:fujin/pages/chat_media/chat_media_icon.dart';
 import 'package:fujin/pages/chat_media/widgets/media_glyph.dart';
@@ -22,8 +25,6 @@ class VideoTile extends ConsumerWidget {
 
   static const double _largeDisc = FujinSize.pictogram;
   static const double _smallDisc = FujinSize.controlHeight;
-  static const double _largeIcon = 22;
-  static const double _smallIcon = 17;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,8 +33,8 @@ class VideoTile extends ConsumerWidget {
     final poster = ref.watch(videoPosterProvider(url)).value;
     final duration = poster?.duration;
     final (disc, icon) = switch (large) {
-      true => (_largeDisc, _largeIcon),
-      false => (_smallDisc, _smallIcon),
+      true => (_largeDisc, FujinSize.videoPlayIcon),
+      false => (_smallDisc, FujinSize.videoPlayIconSmall),
     };
     return Semantics(
       label: switch (duration) {
@@ -49,15 +50,19 @@ class VideoTile extends ConsumerWidget {
           fit: StackFit.expand,
           children: [
             switch (poster) {
-              final poster? => Image.file(
-                poster.file,
+              final poster? => Image(
+                image: PhotoTile.thumbOf(
+                  poster.file,
+                  width: size.width,
+                  ratio: ratio,
+                ),
                 fit: BoxFit.cover,
-                cacheWidth: (size.width * ratio).round(),
                 excludeFromSemantics: true,
+                frameBuilder: ImageArrival.frameBuilder,
                 errorBuilder: (context, error, stackTrace) =>
-                    ColoredBox(color: colors.backgroundNeutral),
+                    const MediaPlaceholder(),
               ),
-              null => ColoredBox(color: colors.backgroundNeutral),
+              null => const MediaPlaceholder(),
             },
             Center(
               child: Container(

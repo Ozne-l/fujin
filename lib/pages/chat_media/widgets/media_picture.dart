@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/chat/edit/crop_geometry.dart';
 import 'package:fujin/domain/chat/edit/edited_media.dart';
+import 'package:fujin/pages/chat/widgets/image_arrival.dart';
 import 'package:fujin/pages/chat_media/media_frames.dart';
 import 'package:fujin/pages/chat_media/widgets/cropped_picture.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -61,6 +62,7 @@ class MediaPicture extends ConsumerWidget {
             false => null,
           },
           gaplessPlayback: true,
+          frameBuilder: ImageArrival.frameBuilder,
           errorBuilder: (context, error, stackTrace) =>
               ColoredBox(color: colors.backgroundNeutral),
         ),

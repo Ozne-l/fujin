@@ -22,7 +22,7 @@ CachedConversation _conversation(String id) =>
 String _cachePath() {
   final directory = Directory.systemTemp.createTempSync('fujin_cache_');
   addTearDown(() => directory.deleteSync(recursive: true));
-  return '${directory.path}/${FujinDatabase.cacheFileName}';
+  return FujinDatabase.cachePathIn(directory);
 }
 
 FujinDatabase<CacheTable> _outdatedCache(String path) {

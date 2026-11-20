@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart'
     show WidgetTester, find, testWidgets;
@@ -17,6 +19,7 @@ const _settings = 'Réglages';
 const _accounts = 'COMPTES';
 const _coach = 'Nora Lindqvist';
 const _back = 'Retour';
+const _message = 'message-1';
 
 String _location(WidgetTester tester) => ProviderScope.containerOf(
   tester.element(find.byType(FujinApp)),
@@ -71,6 +74,39 @@ void main() {
     await tester.pumpAndSettle();
 
     notifications.open(_conversation);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip(_back));
+    await tester.pumpAndSettle();
+
+    check(find.text(_coach).evaluate()).isEmpty();
+    check(find.text(_accounts).evaluate()).length.equals(1);
+  });
+
+  testWidgets('a notification for the conversation under its media viewer '
+      'stacks no second conversation', (tester) async {
+    final notifications = FakeChatNotifications();
+    await pumpFujin(
+      tester,
+      FakeBackends(mealNames: [breakfast]),
+      chatNotifications: notifications,
+    );
+    final router = ProviderScope.containerOf(
+      tester.element(find.byType(FujinApp)),
+    ).read(routerProvider);
+    await tester.tap(find.text(_settings));
+    await tester.pumpAndSettle();
+    notifications.open(_conversation);
+    await tester.pumpAndSettle();
+    unawaited(
+      router.push(
+        FujinRoute.chatMedia.forMedia(_conversation, _message, index: 0),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    notifications.open(_conversation);
+    await tester.pumpAndSettle();
+    router.pop();
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip(_back));
     await tester.pumpAndSettle();

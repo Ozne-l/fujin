@@ -3,8 +3,10 @@ import 'dart:io';
 
 import 'package:checks/checks.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart'
     show
+        FakeAccessibilityFeatures,
         FakeViewPadding,
         Finder,
         WidgetTester,
@@ -14,6 +16,7 @@ import 'package:flutter_test/flutter_test.dart'
         testWidgets;
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/media/picked_media.dart';
 import 'package:fujin/data/media/video_probe.dart';
 import 'package:fujin/domain/chat/edit/edited_media.dart';
 import 'package:fujin/domain/chat/edit/media_send.dart';
@@ -22,11 +25,14 @@ import 'package:fujin/pages/chat_media/media_menu_anchor.dart';
 import 'package:fujin/pages/chat_media/media_reply.dart';
 import 'package:fujin/pages/chat_media/media_scratch.dart';
 import 'package:fujin/pages/chat_media/photo_editor_page.dart';
-import 'package:fujin/pages/chat_media/picked_media.dart';
 import 'package:fujin/pages/chat_media/video_editor_page.dart';
 import 'package:fujin/pages/chat_media/widgets/crop_overlay.dart';
 import 'package:fujin/pages/chat_media/widgets/crop_stage.dart';
 import 'package:fujin/pages/chat_media/widgets/cropped_picture.dart';
+import 'package:fujin/pages/chat_media/widgets/media_flight.dart';
+import 'package:fujin/pages/chat_media/widgets/media_picture.dart';
+import 'package:fujin/pages/chat_media/widgets/media_strip.dart';
+import 'package:fujin/pages/chat_media/widgets/tray_preview.dart';
 import 'package:fujin/pages/chat_media/widgets/video_timeline.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -34,6 +40,7 @@ import '../../support/fake_backends.dart';
 import '../../support/fake_media_picker.dart';
 import '../../support/fake_media_processor.dart';
 import '../../support/pump_fujin.dart';
+import '../../support/until.dart';
 
 const _coach = 'Thomas Leroy';
 const _open = 'Ouvrir les médias';
@@ -118,6 +125,33 @@ Future<void> _tap(WidgetTester tester, Finder finder) async {
   await tester.tap(finder);
   await tester.pumpAndSettle();
 }
+
+List<String> _haptics(WidgetTester tester) {
+  final calls = <String>[];
+  tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+    SystemChannels.platform,
+    (call) async {
+      if (call.method == 'HapticFeedback.vibrate') {
+        calls.add('${call.arguments}');
+      }
+      return null;
+    },
+  );
+  addTearDown(
+    () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      null,
+    ),
+  );
+  return calls;
+}
+
+Rect _editedPhoto(WidgetTester tester) => tester.getRect(
+  find.descendant(
+    of: find.byType(CropStage),
+    matching: find.byType(RotatedBox),
+  ),
+);
 
 void main() {
   group('the media menu', () {
@@ -228,6 +262,47 @@ void main() {
       check(find.bySemanticsLabel('Ajouter des médias').evaluate()).isEmpty();
     });
 
+    testWidgets('keeps ten media and their copies only when a second pick '
+        'lands while a video is read', (tester) async {
+      final copies = _copies(2 * MediaSend.maximumMedia);
+      final first = copies.take(MediaSend.maximumMedia).toList();
+      final video = first.last.path;
+      final host = _Host();
+      host.processor
+        ..probeGate = Completer<void>()
+        ..probes[video] = const VideoProbe(
+          uprightWidth: 1920,
+          uprightHeight: 1080,
+          rotation: 0,
+          duration: Duration(seconds: 42),
+          hdr: false,
+        );
+      await host.pump(tester);
+      await host.pickFromGallery(tester, [
+        for (final copy in first.take(first.length - 1)) _photoAt(copy.path),
+        PickedVideo(video),
+      ]);
+
+      host.picker.chosen = [
+        for (final copy in copies.skip(MediaSend.maximumMedia))
+          _photoAt(copy.path),
+      ];
+      await _tap(tester, find.bySemanticsLabel('Ajouter des médias'));
+      host.processor.probeGate?.complete();
+      await tester.pumpAndSettle();
+      await tester.runAsync(
+        () => until(
+          () => copies.where((copy) => copy.existsSync()).length,
+          (left) => left <= MediaSend.maximumMedia,
+        ),
+      );
+
+      check(find.text('10 médias').evaluate()).length.equals(1);
+      check(
+        copies.where((copy) => copy.existsSync()),
+      ).length.equals(MediaSend.maximumMedia);
+    });
+
     testWidgets('leaves out a video it cannot read', (tester) async {
       final host = _Host();
       await host.pump(tester);
@@ -249,6 +324,27 @@ void main() {
 
       check(find.text(_open).hitTestable().evaluate()).length.equals(1);
       check(host.sent).isEmpty();
+    });
+
+    testWidgets('folds a removed medium away before it leaves the strip', (
+      tester,
+    ) async {
+      final host = _Host();
+      await host.pump(tester);
+      await host.pickFromGallery(tester, [_photo(1), _photo(2)]);
+      final thumbnails = find.descendant(
+        of: find.byType(MediaStrip),
+        matching: find.byType(MediaPicture),
+      );
+
+      await tester.tap(find.bySemanticsLabel('Retirer').first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+      check(thumbnails.evaluate()).length.equals(2);
+
+      await tester.pumpAndSettle();
+      check(thumbnails.evaluate()).length.equals(1);
+      check(find.text('1 média').evaluate()).length.equals(1);
     });
 
     testWidgets('deletes the copy of a removed medium, keeps the others', (
@@ -362,6 +458,88 @@ void main() {
           .equals(3);
     });
 
+    testWidgets('turns the photo through a quarter turn', (tester) async {
+      final host = _Host();
+      await host.pump(tester);
+      await host.pickFromGallery(tester, [_photo(1)]);
+      await _tap(tester, find.text('Modifier'));
+
+      await tester.tap(find.text('Pivoter'));
+      await tester.pump();
+      final turning = _editedPhoto(tester);
+      check(turning.width).isGreaterThan(turning.height);
+
+      await tester.pumpAndSettle();
+      final turned = _editedPhoto(tester);
+      check(turned.height).isGreaterThan(turned.width);
+    });
+
+    testWidgets('turns the photo at once when motion is reduced', (
+      tester,
+    ) async {
+      tester.platformDispatcher.accessibilityFeaturesTestValue =
+          const FakeAccessibilityFeatures(disableAnimations: true);
+      addTearDown(
+        tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+      );
+      final host = _Host();
+      await host.pump(tester);
+      await host.pickFromGallery(tester, [_photo(1)]);
+      await _tap(tester, find.text('Modifier'));
+
+      await tester.tap(find.text('Pivoter'));
+      await tester.pump();
+
+      final turned = _editedPhoto(tester);
+      check(turned.height).isGreaterThan(turned.width);
+    });
+
+    testWidgets('frames the photo square on 1:1', (tester) async {
+      final host = _Host();
+      await host.pump(tester);
+      await host.pickFromGallery(tester, [_photo(1)]);
+      await _tap(tester, find.text('Modifier'));
+
+      await _tap(tester, find.text('1:1'));
+      await _tap(tester, find.byTooltip('Terminé'));
+
+      final shown = tester.getSize(
+        find.descendant(
+          of: find.byType(TrayPreview),
+          matching: find.byType(MediaFlight),
+        ),
+      );
+      check(shown.width).isCloseTo(shown.height, 0.5);
+    });
+
+    testWidgets('ticks once each time a crop edge meets the photo edge', (
+      tester,
+    ) async {
+      final host = _Host();
+      await host.pump(tester);
+      await host.pickFromGallery(tester, [_photo(1)]);
+      await _tap(tester, find.text('Modifier'));
+      final haptics = _haptics(tester);
+      final crop = tester.getRect(
+        find.descendant(
+          of: find.byType(CropStage),
+          matching: find.byType(Positioned),
+        ),
+      );
+
+      final drag = await tester.startGesture(
+        Offset(crop.left - 2, crop.center.dy),
+      );
+      for (final step in <double>[40, 40, -60, -60, -40]) {
+        await drag.moveBy(Offset(step, 0));
+        await tester.pump();
+      }
+      await drag.up();
+      await tester.pumpAndSettle();
+
+      check(haptics).deepEquals(['HapticFeedbackType.selectionClick']);
+    });
+
     testWidgets('drops its changes on Annuler', (tester) async {
       final host = _Host();
       await host.pump(tester);
@@ -471,7 +649,7 @@ void main() {
       check(timeline.right).isLessOrEqual(screen.width - _gestureZone);
       await tester.dragFrom(
         Offset(
-          timeline.right - VideoTimeline.handleWidth / 2,
+          timeline.right - FujinSize.trimHandleWidth / 2,
           timeline.center.dy,
         ),
         Offset(-timeline.width / 6, 0),

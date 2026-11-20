@@ -2,8 +2,7 @@ import 'dart:async';
 
 import 'package:checks/checks.dart';
 import 'package:ekklo_client/ekklo_client.dart';
-import 'package:flutter_test/flutter_test.dart'
-    show TestFailure, addTearDown, group, test;
+import 'package:flutter_test/flutter_test.dart' show addTearDown, group, test;
 import 'package:fujin/data/chat/chat_owner_repository.dart';
 import 'package:fujin/data/chat/chat_repository.dart';
 import 'package:fujin/data/chat/foreground_stamp_repository.dart';
@@ -17,10 +16,9 @@ import 'package:fujin/domain/chat/conversation_state.dart';
 import 'package:fujin/domain/chat/pending_text_state.dart';
 
 import '../../support/fake_backends.dart';
+import '../../support/until.dart';
 
 final _start = DateTime.utc(2026, 11, 18, 8);
-const _settle = Duration(milliseconds: 1);
-const _patience = 2000;
 
 final class _FakeTimer implements Timer {
   _FakeTimer(this.duration, this._fire);
@@ -97,10 +95,10 @@ final class _Chat {
   }
 
   Future<ChatState> chatWhere(bool Function(ChatState state) test) =>
-      _until(() => _chatStates.lastOrNull, test);
+      until(() => _chatStates.lastOrNull, test);
 
   Future<void> connected() =>
-      _until<int>(() => backends.socketConnections, (count) => count > 0);
+      until<int>(() => backends.socketConnections, (count) => count > 0);
 }
 
 final class _Watched {
@@ -112,15 +110,7 @@ final class _Watched {
   final states = <ConversationState>[];
 
   Future<ConversationState> where(bool Function(ConversationState) test) =>
-      _until(() => states.lastOrNull, test);
-}
-
-Future<T> _until<T>(T? Function() read, bool Function(T value) test) async {
-  for (var turn = 0; turn < _patience; turn++) {
-    if (read() case final value? when test(value)) return value;
-    await Future<void>.delayed(_settle);
-  }
-  throw TestFailure('never reached, last: ${read()}');
+      until(() => states.lastOrNull, test);
 }
 
 FakeChatJson _text(String id, int minute, {String? senderId}) =>
@@ -145,6 +135,7 @@ const _conversationsPath = '/api/v1/messaging/conversations';
 const _conversations = 'GET $_conversationsPath';
 const _conversationPath = '$_conversationsPath/${FakeChat.conversationId}';
 const _postText = 'POST $_conversationPath/messages';
+const _pageRead = 'GET $_conversationPath/messages';
 const _markRead = 'POST $_conversationPath/read';
 
 String _reactions(String messageId) =>
@@ -311,10 +302,10 @@ void main() {
         ..dropSockets();
 
       for (var round = 0; round < 6; round++) {
-        await _until(() => chat.timers.length, (count) => count > round);
+        await until(() => chat.timers.length, (count) => count > round);
         chat.timers[round].fire();
       }
-      await _until(() => chat.timers.length, (count) => count > 6);
+      await until(() => chat.timers.length, (count) => count > 6);
 
       check(
         chat.timers.map((timer) => timer.duration.inSeconds),
@@ -331,9 +322,9 @@ void main() {
         ..refusedChatCalls.add(_conversations)
         ..dropSockets();
 
-      await _until(() => chat.timers.length, (count) => count > 0);
+      await until(() => chat.timers.length, (count) => count > 0);
       chat.timers.single.fire();
-      await _until(() => chat.timers.length, (count) => count > 1);
+      await until(() => chat.timers.length, (count) => count > 1);
 
       check(
         chat.timers.map((timer) => timer.duration.inSeconds),
@@ -435,6 +426,56 @@ void main() {
       check(_ids(state)).deepEquals(['m-0', 'm-2']);
     });
 
+    test('reads again the messages a broken walk left out', () async {
+      final cache = FujinDatabase.cacheInMemory();
+      final backends = FakeBackends(
+        chat: FakeChat(origin: chatMediaUri, messages: _history(50)),
+      );
+      final first = await _Chat(backends, cache: cache).started();
+      await _Watched(
+        first.service,
+        FakeChat.conversationId,
+      ).where((state) => _ready(state) && state.messages.length == 50);
+      first.service.dispose();
+      backends.chat.messages.addAll([
+        for (var index = 50; index < 170; index++) _text('m-$index', index),
+      ]);
+      final newest = backends.chatGates[_pageRead] = Completer();
+      final readBefore = first.messagePageReads;
+
+      final again = await _Chat(backends, cache: cache).started();
+      final watched = _Watched(again.service, FakeChat.conversationId);
+      await until(
+        () => again.messagePageReads,
+        (reads) => reads == readBefore + 1,
+      );
+      final older = backends.chatGates[_pageRead] = Completer();
+      newest.complete();
+      await until(
+        () => again.messagePageReads,
+        (reads) => reads == readBefore + 2,
+      );
+      backends.refusedChatCalls.add(_pageRead);
+      older.complete();
+      await until(() => again.timers, (timers) => timers.isNotEmpty);
+      backends
+        ..refusedChatCalls.clear()
+        ..chatGates.remove(_pageRead);
+      again.timers.last.fire();
+      await until(() => backends.socketConnections, (count) => count == 2);
+      var state = await watched.where(
+        (state) => _ready(state) && state.messages.first.id == 'm-120',
+      );
+      while (state.hasOlder) {
+        await again.service.loadOlder(FakeChat.conversationId);
+        state = await watched.where((state) => !state.loadingOlder);
+      }
+
+      check(_ids(state)).deepEquals([
+        for (var index = 0; index < 170; index++) 'm-$index',
+      ]);
+    });
+
     test('focuses the socket on it', () async {
       final backends = FakeBackends();
       final chat = await _Chat(backends).started();
@@ -442,7 +483,7 @@ void main() {
 
       _Watched(chat.service, FakeChat.conversationId);
 
-      await _until(
+      await until(
         () => backends.chat.focused,
         (focused) => focused.contains(FakeChat.conversationId),
       );
@@ -501,6 +542,42 @@ void main() {
         (state) => state.messages.length == 1,
       );
       check(_ids(state)).deepEquals(['m-1']);
+    });
+
+    test('keep my messages seen when they come back unmarked', () async {
+      final backends = FakeBackends(
+        chat: FakeChat(
+          origin: chatMediaUri,
+          messages: [
+            _text('m-0', 0, senderId: FakeChat.ownerId),
+            _text('m-1', 1, senderId: FakeChat.ownerId),
+          ],
+        ),
+      );
+      final (chat, watched) = await _opened(backends);
+      backends.chat.announce('message_read', {
+        'conversation_id': FakeChat.conversationId,
+        'message_id': 'm-1',
+        'user_id': FakeChat.coachId,
+      });
+      await watched.where(
+        (state) => state.messages.every((message) => message.readByOther),
+      );
+
+      backends.chat.edit('m-0', 'Edited');
+      await watched.where(
+        (state) => state.messages.first.content == 'Edited',
+      );
+      backends.chat.messages.add(_text('m-2', 2));
+      backends.dropSockets();
+
+      final state = await watched.where(
+        (state) => _ready(state) && state.messages.length == 3,
+      );
+      check(
+        state.messages.map((message) => message.readByOther),
+      ).deepEquals([true, true, false]);
+      check(backends.socketConnections).equals(2);
     });
 
     test('a coach message updates the unread count', () async {
@@ -642,6 +719,39 @@ void main() {
         ).equals(PendingTextState.failed);
       },
     );
+
+    test('stays failed when the same text sent just before went', () async {
+      final backends = FakeBackends(
+        chat: FakeChat(origin: chatMediaUri, messages: _history(2)),
+      );
+      final (chat, watched) = await _opened(backends);
+      final firstGate = backends.chatGates[_postText] = Completer();
+      final first = chat.service.sendText(FakeChat.conversationId, 'ok');
+      await until(() => _count(chat, _postText), (count) => count == 1);
+      final secondGate = backends.chatGates[_postText] = Completer();
+      final second = chat.service.sendText(FakeChat.conversationId, 'ok');
+      await until(() => _count(chat, _postText), (count) => count == 2);
+
+      firstGate.complete();
+      await first;
+      backends.refusedChatCalls.add(_postText);
+      secondGate.complete();
+      await second;
+
+      final state = await watched.where(
+        (state) =>
+            state.messages.last.content == 'ok' &&
+            state.pendingTexts.every(
+              (text) => text.state != PendingTextState.sending,
+            ),
+      );
+      check(state.pendingTexts.map((text) => text.state)).deepEquals([
+        PendingTextState.failed,
+      ]);
+      check(
+        state.messages.where((message) => message.content == 'ok'),
+      ).length.equals(1);
+    });
 
     test('is not sent twice when a retry finds it already arrived', () async {
       final backends = FakeBackends(
@@ -855,14 +965,14 @@ void main() {
     test('marks read again when the coach writes while it is open', () async {
       final backends = unread(1);
       final (chat, _) = await _opened(backends);
-      await _until(() => _count(chat, _markRead), (count) => count == 1);
+      await until(() => _count(chat, _markRead), (count) => count == 1);
       await chat.chatWhere(
         (state) => state is ChatPresent && state.unreadCount == 0,
       );
 
       backends.chat.deliver(_text('m-9', 9));
 
-      await _until(() => _count(chat, _markRead), (count) => count == 2);
+      await until(() => _count(chat, _markRead), (count) => count == 2);
     });
   });
 }

@@ -4,7 +4,7 @@ Date: 2026-10-14
 
 ## Status
 
-Accepted. Extends the motion part of [0008](0008-theme-from-design-tokens.md).
+Accepted. Extends the motion part of [0008](0008-theme-from-design-tokens.md). Amended by [0049](0049-chat-motion.md): iOS "Réduire les animations" is read too, and entrances that carry meaning dissolve.
 
 ## Context
 

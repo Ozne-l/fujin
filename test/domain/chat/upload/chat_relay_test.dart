@@ -34,7 +34,7 @@ final class _Relay {
   _Relay() {
     final directory = Directory.systemTemp.createTempSync('fujin_relay_');
     addTearDown(() => directory.deleteSync(recursive: true));
-    cachePath = '${directory.path}/${FujinDatabase.cacheFileName}';
+    cachePath = FujinDatabase.cachePathIn(directory);
     folder = UploadFolder(directory);
     final database = FujinDatabase.openCacheInApp(cachePath);
     addTearDown(database.close);

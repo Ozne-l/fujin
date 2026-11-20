@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:checks/checks.dart';
+import 'package:flutter/gestures.dart'
+    show kDoubleTapTimeout, kLongPressTimeout;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -22,6 +24,7 @@ const _conversationPath =
 const _postText = 'POST $_conversationPath/messages';
 const _question = 'Tu as bien dormi ?';
 const _answer = 'Plutôt bien.';
+const _quickTap = Duration(milliseconds: 100);
 
 FakeChatJson _text(
   String id,
@@ -91,6 +94,18 @@ Finder _bubble(String text) => find.ancestor(
   of: find.text(text),
   matching: find.byType(MessageGestures),
 );
+
+bool _draftFocused(WidgetTester tester) =>
+    tester.widget<EditableText>(find.byType(EditableText)).focusNode.hasFocus;
+
+double _opacity(WidgetTester tester, String text) => tester
+    .widget<FadeTransition>(
+      find
+          .ancestor(of: find.text(text), matching: find.byType(FadeTransition))
+          .first,
+    )
+    .opacity
+    .value;
 
 List<String> _haptics(WidgetTester tester) {
   final calls = <String>[];
@@ -193,6 +208,25 @@ void main() {
       check(find.text('Réponse à $_coach').evaluate()).isEmpty();
     });
 
+    testWidgets('starts from « Répondre » under a message taller than the '
+        'screen', (tester) async {
+      final long = [
+        for (var line = 1; line <= 40; line++) 'Ligne $line du programme.',
+      ].join('\n');
+      await pumpFujin(tester, _backends(messages: [_text('m1', long)]));
+      await _open(tester);
+
+      await tester.longPressAt(
+        tester.getBottomLeft(find.text(long)) + const Offset(20, -20),
+      );
+      await tester.pumpAndSettle();
+      check(find.text('Répondre').hitTestable().evaluate()).length.equals(1);
+      await tester.tap(find.text('Répondre'));
+      await tester.pumpAndSettle();
+
+      check(find.text('Réponse à $_coach').evaluate()).length.equals(1);
+    });
+
     testWidgets('to my own message reads « Réponse à toi » and cancels', (
       tester,
     ) async {
@@ -210,14 +244,13 @@ void main() {
       check(find.text('Réponse à toi').evaluate()).isEmpty();
     });
 
-    testWidgets('starts past 30 px of swipe, with a haptic tick', (
-      tester,
-    ) async {
+    testWidgets('starts when a swipe passes 64 px and lets go, with one '
+        'haptic tick', (tester) async {
       await pumpFujin(tester, _backends());
       await _open(tester);
       final haptics = _haptics(tester);
-      const below = MessageGestures.threshold / MessageGestures.dragFactor - 10;
-      const past = MessageGestures.threshold / MessageGestures.dragFactor + 10;
+      const below = MessageGestures.trigger - 14;
+      const past = MessageGestures.trigger + 16;
 
       await tester.drag(_bubble(_question), const Offset(below, 0));
       await tester.pumpAndSettle();
@@ -231,11 +264,68 @@ void main() {
       await tester.drag(_bubble(_question), const Offset(past, 0));
       await tester.pumpAndSettle();
       check(find.text('Réponse à $_coach').evaluate()).length.equals(1);
-      check(haptics).length.equals(1);
+      check(haptics).deepEquals(['HapticFeedbackType.lightImpact']);
+      check(_draftFocused(tester)).isTrue();
 
       await tester.drag(_bubble(_answer), const Offset(-past, 0));
       await tester.pumpAndSettle();
       check(find.text('Réponse à toi').evaluate()).length.equals(1);
+    });
+
+    testWidgets('does not start from a drag that goes mostly down', (
+      tester,
+    ) async {
+      await pumpFujin(tester, _backends());
+      await _open(tester);
+      final haptics = _haptics(tester);
+
+      await tester.drag(
+        _bubble(_question),
+        const Offset(MessageGestures.trigger + 16, 120),
+      );
+      await tester.pumpAndSettle();
+
+      check(find.text('Réponse à $_coach').evaluate()).isEmpty();
+      check(haptics).isEmpty();
+    });
+
+    testWidgets('card fades in under the composer', (tester) async {
+      await pumpFujin(tester, _backends());
+      await _open(tester);
+
+      await tester.drag(
+        _bubble(_question),
+        const Offset(MessageGestures.trigger + 16, 0),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+      final arriving = _opacity(tester, 'Réponse à $_coach');
+      await tester.pumpAndSettle();
+
+      check(arriving).isLessThan(1);
+      check(_opacity(tester, 'Réponse à $_coach')).equals(1);
+    });
+
+    testWidgets('with reduced motion, the swiped bubble is back at once', (
+      tester,
+    ) async {
+      tester.platformDispatcher.accessibilityFeaturesTestValue =
+          const FakeAccessibilityFeatures(disableAnimations: true);
+      addTearDown(
+        tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+      );
+      await pumpFujin(tester, _backends());
+      await _open(tester);
+      final resting = tester.getTopLeft(find.text(_question).first).dx;
+
+      await tester.drag(
+        _bubble(_question),
+        const Offset(MessageGestures.trigger + 16, 0),
+      );
+      await tester.pump();
+
+      check(tester.getTopLeft(find.text(_question).first).dx).equals(resting);
+      check(find.text('Réponse à $_coach').evaluate()).length.equals(1);
     });
   });
 
@@ -289,6 +379,62 @@ void main() {
       ).equals(1);
     });
 
+    testWidgets('of a heart comes from a double tap on the message', (
+      tester,
+    ) async {
+      final backends = _backends();
+      await pumpFujin(tester, backends);
+      await _open(tester);
+
+      await tester.tap(find.text(_question));
+      await tester.pump(_quickTap);
+      await tester.tap(find.text(_question));
+      await tester.pumpAndSettle();
+
+      check(find.text('❤️').evaluate()).length.equals(1);
+      check(
+        _lastBody(backends, 'POST $_conversationPath/messages/m1/reactions'),
+      ).deepEquals({'emoji': '❤️'});
+    });
+
+    testWidgets('of my heart goes away with a double tap on the message', (
+      tester,
+    ) async {
+      final backends = _backends(
+        messages: [
+          _text(
+            'm1',
+            _question,
+            reactions: [FakeChat.reaction('❤️', mine: true)],
+          ),
+        ],
+      );
+      await pumpFujin(tester, backends);
+      await _open(tester);
+
+      await tester.tap(find.text(_question));
+      await tester.pump(_quickTap);
+      await tester.tap(find.text(_question));
+      await tester.pumpAndSettle();
+
+      check(find.text('❤️').evaluate()).isEmpty();
+      check(
+        _count(backends, 'DELETE $_conversationPath/messages/m1/reactions'),
+      ).equals(1);
+    });
+
+    testWidgets('does not come from two slow taps', (tester) async {
+      await pumpFujin(tester, _backends());
+      await _open(tester);
+
+      await tester.tap(find.text(_question));
+      await tester.pump(kDoubleTapTimeout * 2);
+      await tester.tap(find.text(_question));
+      await tester.pumpAndSettle();
+
+      check(find.text('❤️').evaluate()).isEmpty();
+    });
+
     testWidgets('can be any emoji from « Autre emoji »', (tester) async {
       await pumpFujin(tester, _backends());
       await _open(tester);
@@ -323,6 +469,99 @@ void main() {
 
       await _longPress(tester, _answer);
       check(find.text('Supprimer').evaluate()).length.equals(1);
+    });
+
+    testWidgets('reacts with the emoji the finger slides to and lets go on', (
+      tester,
+    ) async {
+      await pumpFujin(tester, _backends());
+      await _open(tester);
+      final haptics = _haptics(tester);
+
+      final finger = await tester.startGesture(
+        tester.getCenter(find.text(_question)),
+      );
+      await tester.pump(kLongPressTimeout + const Duration(milliseconds: 50));
+      await tester.pumpAndSettle();
+      await finger.moveTo(tester.getCenter(find.text('😮')));
+      await tester.pump();
+      await finger.up();
+      await tester.pumpAndSettle();
+
+      check(find.text('Répondre').evaluate()).isEmpty();
+      check(find.text('😮').evaluate()).length.equals(1);
+      check(find.text('1').evaluate()).length.equals(1);
+      check(haptics).contains('HapticFeedbackType.selectionClick');
+    });
+
+    testWidgets('stays open when the finger lets go off the emojis', (
+      tester,
+    ) async {
+      await pumpFujin(tester, _backends());
+      await _open(tester);
+
+      final finger = await tester.startGesture(
+        tester.getCenter(find.text(_question)),
+      );
+      await tester.pump(kLongPressTimeout + const Duration(milliseconds: 50));
+      await tester.pumpAndSettle();
+      await finger.moveBy(const Offset(0, 20));
+      await finger.up();
+      await tester.pumpAndSettle();
+
+      check(find.text('Répondre').evaluate()).length.equals(1);
+      check(find.text('😮').evaluate()).length.equals(1);
+    });
+
+    testWidgets('folds back before it is gone', (tester) async {
+      await pumpFujin(tester, _backends());
+      await _open(tester);
+
+      await _longPress(tester, _question);
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      check(find.text('Répondre').evaluate()).length.equals(1);
+
+      await tester.pumpAndSettle();
+      check(find.text('Répondre').evaluate()).isEmpty();
+    });
+
+    testWidgets('with reduced motion, is gone at once', (tester) async {
+      tester.platformDispatcher.accessibilityFeaturesTestValue =
+          const FakeAccessibilityFeatures(disableAnimations: true);
+      addTearDown(
+        tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+      );
+      await pumpFujin(tester, _backends());
+      await _open(tester);
+
+      await _longPress(tester, _question);
+      check(find.text('Répondre').evaluate()).length.equals(1);
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pump();
+      await tester.pump();
+
+      check(find.text('Répondre').evaluate()).isEmpty();
+    });
+
+    testWidgets('with reduced motion, a reaction shows without a flight', (
+      tester,
+    ) async {
+      tester.platformDispatcher.accessibilityFeaturesTestValue =
+          const FakeAccessibilityFeatures(disableAnimations: true);
+      addTearDown(
+        tester.platformDispatcher.clearAccessibilityFeaturesTestValue,
+      );
+      await pumpFujin(tester, _backends());
+      await _open(tester);
+
+      await _longPress(tester, _question);
+      await tester.tap(find.text('👍'));
+      await tester.pump();
+      await tester.pump();
+
+      check(find.text('👍').evaluate()).length.equals(1);
     });
   });
 

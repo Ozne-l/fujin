@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:ekklo_client/ekklo_client.dart';
@@ -19,6 +20,7 @@ final class FakeChatServer {
   static const _socketPath = '/api/v1/messaging/ws';
   static const _apiPrefix = '/api/';
   static const _bytesUnit = 'bytes=';
+  static final _sending = Expando<bool>();
   static const _contentTypes = {
     'jpg': 'image/jpeg',
     'jpeg': 'image/jpeg',
@@ -77,9 +79,15 @@ final class FakeChatServer {
           await _reply(request, HttpStatus.notFound, null);
       }
     } on Object {
-      request.response.statusCode = HttpStatus.internalServerError;
-      await request.response.close();
+      await _abort(request.response);
     }
+  }
+
+  static Future<void> _abort(HttpResponse response) async {
+    if (_sending[response] == null) {
+      response.statusCode = HttpStatus.internalServerError;
+    }
+    await response.close().catchError((Object _) {});
   }
 
   bool _authorized(HttpRequest request) =>
@@ -104,6 +112,7 @@ final class FakeChatServer {
 
   static Future<void> _reply(HttpRequest request, int status, Object? body) {
     request.response.statusCode = status;
+    _sending[request.response] = true;
     if (body != null) {
       request.response
         ..headers.contentType = ContentType.json
@@ -123,10 +132,18 @@ final class FakeChatServer {
     final bytes = await _bytesOf(key);
     final response = request.response;
     if (bytes == null) return _reply(request, HttpStatus.notFound, null);
-    final (start, end) = _rangeOf(
+    final range = _rangeOf(
       request.headers.value(HttpHeaders.rangeHeader),
       bytes.length,
     );
+    if (range == null) {
+      response.headers.set(
+        HttpHeaders.contentRangeHeader,
+        'bytes */${bytes.length}',
+      );
+      return _reply(request, HttpStatus.requestedRangeNotSatisfiable, null);
+    }
+    final (start, end) = range;
     response
       ..statusCode = switch ((start, end + 1 == bytes.length)) {
         (0, true) => HttpStatus.ok,
@@ -145,6 +162,7 @@ final class FakeChatServer {
         'bytes $start-$end/${bytes.length}',
       );
     }
+    _sending[response] = true;
     if (request.method != 'HEAD') {
       response.add(Uint8List.sublistView(bytes, start, end + 1));
     }
@@ -162,23 +180,30 @@ final class FakeChatServer {
     );
   }
 
-  static (int, int) _rangeOf(String? header, int length) {
+  static (int, int)? _rangeOf(String? header, int length) {
     final last = length - 1;
     if (header == null || !header.startsWith(_bytesUnit)) return (0, last);
-    return switch (header.substring(_bytesUnit.length).split('-')) {
+    final (start, end) = switch (header
+        .substring(_bytesUnit.length)
+        .split('-')) {
       [final from, final to] => switch ((
         int.tryParse(from),
         int.tryParse(to),
       )) {
-        (final start?, final end?) when start <= end => (
-          start.clamp(0, last),
-          end.clamp(0, last),
+        (final start?, final end?) when start <= end => (start, min(end, last)),
+        (final start?, null) => (start, last),
+        (null, final suffix?) when suffix > 0 => (
+          max(length - suffix, 0),
+          last,
         ),
-        (final start?, null) => (start.clamp(0, last), last),
-        (null, final suffix?) => ((length - suffix).clamp(0, last), last),
+        (null, _?) => (length, last),
         _ => (0, last),
       },
       _ => (0, last),
+    };
+    return switch (start > last) {
+      true => null,
+      false => (start, end),
     };
   }
 }

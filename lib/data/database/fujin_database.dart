@@ -47,11 +47,14 @@ final class FujinDatabase<T extends DatabaseTable> {
   }
 
   static const fileName = 'fujin.db';
-  static const cacheFileName = 'fujin-cache.db';
   static const busyTimeout = Duration(seconds: 5);
+  static const _cacheFileName = 'fujin-cache.db';
   static const _walSuffix = '-wal';
   static const _sharedMemorySuffix = '-shm';
   static const _absent = 0;
+
+  static String cachePathIn(Directory directory) =>
+      '${directory.path}/$_cacheFileName';
 
   final Database _db;
   final Map<T, List<String>> _tableColumns = {};

@@ -1,11 +1,10 @@
-import 'dart:io';
-
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/app/background/chat_background_task.dart';
+import 'package:fujin/app/notifications/device_localizations.dart';
+import 'package:fujin/app/notifications/upload_notification_text.dart';
 import 'package:fujin/data/chat/message_in_progress_repository.dart';
 import 'package:fujin/data/database/cache_opening.dart';
 import 'package:fujin/data/database/fujin_database.dart';
-import 'package:fujin/data/notifications/chat_notification_text.dart';
 import 'package:fujin/data/notifications/local_chat_notifications.dart';
 import 'package:fujin/data/upload/local_upload_notifications.dart';
 import 'package:fujin/data/upload/upload_folder.dart';
@@ -43,25 +42,24 @@ abstract final class ChatRelayTask {
     }
   }
 
-  static Future<bool> run(Map<String, dynamic>? input) async {
-    final messageId = switch (input?[WorkmanagerRelayScheduler.messageKey]) {
-      final String id => id,
-      _ => null,
-    };
-    if (messageId == null) return true;
+  static Future<bool> run(Map<String, dynamic>? input) async =>
+      switch (input?[WorkmanagerRelayScheduler.messageKey]) {
+        final String messageId => await _relayInBackground(messageId),
+        _ => true,
+      };
+
+  static Future<bool> _relayInBackground(String messageId) async {
     final support = await getApplicationSupportDirectory();
     final cache = await getApplicationCacheDirectory();
-    final intl = ChatNotificationText.ofDevice();
-    await LocalChatNotifications.forBackground(intl: intl);
+    final intl = deviceLocalizations();
+    await LocalChatNotifications.initializeBackground();
     final ekklo = ChatBackgroundTask.client();
     try {
       final outcome = await relay(
-        cachePath:
-            '${support.path}${Platform.pathSeparator}'
-            '${FujinDatabase.cacheFileName}',
+        cachePath: FujinDatabase.cachePathIn(support),
         messageId: messageId,
         ekklo: ekklo,
-        notifications: LocalUploadNotifications(intl),
+        notifications: LocalUploadNotifications(UploadNotificationText(intl)),
         folder: UploadFolder(cache),
         clock: DateTime.now,
       );

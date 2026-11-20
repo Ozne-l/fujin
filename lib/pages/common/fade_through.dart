@@ -31,7 +31,12 @@ class FadeThrough extends StatelessWidget {
     ),
     layoutBuilder: (current, previous) => Stack(
       fit: StackFit.passthrough,
-      children: [...previous, ?current],
+      children: [
+        for (final child in previous)
+          IgnorePointer(key: child.key, child: child),
+        if (current case final current?)
+          IgnorePointer(key: current.key, ignoring: false, child: current),
+      ],
     ),
     child: child,
   );

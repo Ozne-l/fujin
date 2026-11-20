@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:checks/checks.dart';
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_test/flutter_test.dart' show group, test;
-import 'package:fujin/data/notifications/chat_notification_text.dart';
+import 'package:fujin/app/notifications/chat_notification_text.dart';
 import 'package:fujin/domain/chat/notifications/chat_notices.dart';
 import 'package:fujin/domain/chat/notifications/conversation_notice.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
@@ -65,7 +65,7 @@ List<String> _texts(List<ConversationNotice> notices) => [
   for (final notice in notices)
     if (notice case ShowNotice(:final notification))
       for (final message in notification.messages)
-        ChatNotificationText.of(_french, message.content),
+        ChatNotificationText(_french).textOf(message.content),
 ];
 
 List<String> _textOfEach(List<EkkloMessage> messages) => [

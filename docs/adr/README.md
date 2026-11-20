@@ -11,7 +11,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0005](0005-backup.md) | Backup: Auto Backup whitelist, manual JSON file | Accepted (B implemented, C implemented by 0021) |
 | [0006](0006-riverpod-notifiers-as-presenters.md) | Riverpod notifiers as presenters | Accepted (undo and delete notifier built by 0026 and 0043, edit notifier by 0043, replaced by the background writer's notifier in 0044, import and export by 0021) |
 | [0007](0007-dart-mappable-models.md) | dart_mappable models | Accepted |
-| [0008](0008-theme-from-design-tokens.md) | Theme from design tokens, motion with motor | Accepted, amended by 0035 and 0043 (goal rings built by 0022, send progress by 0018; pill, sheet and snackbar motion built; reduced motion added by 0031; `hai-light` darkened by 0032) |
+| [0008](0008-theme-from-design-tokens.md) | Theme from design tokens, motion with motor | Accepted, amended by 0035, 0043 and 0049 (goal rings built by 0022, send progress by 0018; pill, sheet and snackbar motion built; reduced motion added by 0031; `hai-light` darkened by 0032) |
 | [0009](0009-french-only-copy.md) | French-only copy | Superseded by 0015 |
 | [0010](0010-go-router-navigation.md) | go_router navigation | Accepted (tab plans superseded by 0019) |
 | [0011](0011-sessions-in-secure-storage.md) | Sessions in secure storage | Accepted |
@@ -34,7 +34,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0028](0028-fujin-drawn-controls.md) | Fūjin-drawn controls instead of stock Material | Accepted (Android stretch under the pull replaced by the bounce in 0038) |
 | [0029](0029-journal-reads-held-for-display.md) | Journal reads held in memory for display, writes read live | Accepted (entries shown from Fūjin's database by 0044) |
 | [0030](0030-mfp-foods-shown-when-a-side-is-missing.md) | MyFitnessPal foods shown when Ekklo or the network is missing | Accepted |
-| [0031](0031-reduced-motion.md) | Reduced motion follows the phone setting | Accepted |
+| [0031](0031-reduced-motion.md) | Reduced motion follows the phone setting | Accepted, amended by 0049 (iOS setting read, meaningful entrances dissolve) |
 | [0032](0032-text-contrast.md) | Text roles meet 4.5:1 on page and card | Accepted |
 | [0033](0033-liquid-glass-and-fade-through.md) | Liquid glass tab bar and fade-through navigation | Proposed (extended by 0036; top fade replaced by 0037; glass settings and rim superseded by 0041) |
 | [0034](0034-remembered-foods-in-the-add-search.md) | Remembered foods in the add search, and "Ajouter" on screen 19 | Accepted |
@@ -48,7 +48,8 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0042](0042-text-contrast-on-tinted-surfaces.md) | Text contrast on tinted surfaces | Accepted |
 | [0043](0043-edit-and-delete-a-logged-food.md) | Edit and delete a logged food | Accepted (edit and delete saved first and written in the background, and offline edit and delete of known foods built, by 0044) |
 | [0044](0044-connector-model.md) | Connector model: Fūjin's entry at the centre | Accepted (steps 1 to 4 built, offline included, and the role setting, kept in shared preferences; foods without servings completed from MyFitnessPal after an online Journal read; Ekklo "to remove" and Ekklo two-way not built; chat and cache file built by 0045 to 0047) |
-| [0045](0045-ekklo-chat.md) | Ekklo chat: contract, sync, cache file, notifications, fake chat in dev | Accepted (built; screens drawn by 0047) |
+| [0045](0045-ekklo-chat.md) | Ekklo chat: contract, sync, cache file, notifications, fake chat in dev | Accepted, amended by 0049 (built; screens drawn by 0047; seen mark added by 0049) |
 | [0046](0046-chat-media.md) | Chat media: processing, edits and background upload | Accepted (built on Android; screens drawn and background work amended by 0047) |
 | [0047](0047-chat-screens.md) | Chat screens: Messages tab, conversation, media tray and editors, voice, full screen, notification copy | Accepted (built) |
 | [0048](0048-patched-liquid-glass-renderer.md) | Patched liquid_glass_renderer in third_party | Accepted |
+| [0049](0049-chat-motion.md) | Chat motion, shared-element flights and haptics | Accepted |

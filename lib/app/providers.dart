@@ -8,6 +8,10 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/config.dart';
+import 'package:fujin/app/file_video.dart';
+import 'package:fujin/app/notifications/device_localizations.dart';
+import 'package:fujin/app/notifications/upload_notification_text.dart';
+import 'package:fujin/app/url_video.dart';
 import 'package:fujin/data/accessibility/reduce_transparency_setting.dart';
 import 'package:fujin/data/backup/backup_files.dart';
 import 'package:fujin/data/backup/backup_repository.dart';
@@ -31,9 +35,10 @@ import 'package:fujin/data/http/read_only_http_client.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/meals/meal_repository.dart';
 import 'package:fujin/data/media/channel_media_processor.dart';
+import 'package:fujin/data/media/image_media_picker.dart';
+import 'package:fujin/data/media/media_picker.dart';
 import 'package:fujin/data/media/media_processor.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
-import 'package:fujin/data/notifications/chat_notification_text.dart';
 import 'package:fujin/data/notifications/chat_notifications.dart';
 import 'package:fujin/data/recents/recent_food_repository.dart';
 import 'package:fujin/data/sessions/secure_ekklo_token_store.dart';
@@ -58,20 +63,18 @@ import 'package:fujin/domain/chat/chat_service.dart';
 import 'package:fujin/domain/chat/chat_state.dart';
 import 'package:fujin/domain/chat/conversation_state.dart';
 import 'package:fujin/domain/chat/upload/chat_upload_service.dart';
-import 'package:fujin/domain/chat/upload/message_upload.dart';
 import 'package:fujin/domain/editing/edit_entry_service.dart';
 import 'package:fujin/domain/editing/remove_entry_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/memory/memory_service.dart';
 import 'package:fujin/domain/sending/send_service.dart';
 import 'package:fujin/domain/writing/background_writer.dart';
-import 'package:fujin/pages/chat_media/image_media_picker.dart';
-import 'package:fujin/pages/chat_media/media_picker.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
 import 'package:http/http.dart' as http;
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:video_player/video_player.dart';
 
 final clockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
 
@@ -401,6 +404,11 @@ final foregroundStampRepositoryProvider = Provider<ForegroundStampRepository>(
   (ref) => ForegroundStampRepository(ref.watch(chatCacheProvider)),
 );
 
+final messageInProgressRepositoryProvider =
+    Provider<MessageInProgressRepository>(
+      (ref) => MessageInProgressRepository(ref.watch(chatCacheProvider)),
+    );
+
 final chatClientProvider = Provider<EkkloClient>((ref) {
   switch (ref.watch(appEnvironmentProvider)) {
     case AppEnvironment.production:
@@ -481,7 +489,7 @@ final voiceRecorderProvider = Provider<VoiceRecorder>((ref) {
 final mediaUploaderProvider = Provider<MediaUploader>((ref) {
   final uploader = BackgroundMediaUploader(
     cachePath: ref.watch(chatCachePathProvider),
-    intl: ChatNotificationText.ofDevice(),
+    copy: UploadNotificationText(deviceLocalizations()),
   );
   ref.onDispose(() => unawaited(uploader.close()));
   return uploader;
@@ -492,13 +500,14 @@ final relaySchedulerProvider = Provider<RelayScheduler>(
 );
 
 final uploadNotificationsProvider = Provider<UploadNotifications>(
-  (ref) => LocalUploadNotifications(ChatNotificationText.ofDevice()),
+  (ref) =>
+      LocalUploadNotifications(UploadNotificationText(deviceLocalizations())),
 );
 
 final chatUploadServiceProvider = Provider<ChatUploadService>((ref) {
   final service = ChatUploadService(
     messaging: ref.watch(chatClientProvider).messaging,
-    messages: MessageInProgressRepository(ref.watch(chatCacheProvider)),
+    messages: ref.watch(messageInProgressRepositoryProvider),
     chats: ref.watch(chatRepositoryProvider),
     processor: ref.watch(mediaProcessorProvider),
     uploader: ref.watch(mediaUploaderProvider),
@@ -523,8 +532,10 @@ final chatUploadServiceProvider = Provider<ChatUploadService>((ref) {
   return service;
 });
 
-final StreamProviderFamily<List<MessageUpload>, String> messageUploadsProvider =
-    StreamProvider.autoDispose.family<List<MessageUpload>, String>(
-      (ref, conversationId) =>
-          ref.watch(chatUploadServiceProvider).watch(conversationId),
-    );
+final fileVideoProvider = Provider<FileVideo>(
+  (ref) => VideoPlayerController.file,
+);
+
+final urlVideoProvider = Provider<UrlVideo>(
+  (ref) => VideoPlayerController.networkUrl,
+);

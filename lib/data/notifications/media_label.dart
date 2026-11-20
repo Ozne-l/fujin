@@ -1,10 +1,20 @@
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:ekklo_client/ekklo_client.dart';
 
 part 'media_label.mapper.dart';
 
 @MappableClass(discriminatorKey: 'kind')
 sealed class MediaLabel with MediaLabelMappable {
   const MediaLabel();
+
+  static MediaLabel of(List<EkkloMedia> media) => switch ({
+    for (final item in media) item.kind,
+  }) {
+    Set(length: 1, first: EkkloMediaKind.image) => PhotosLabel(media.length),
+    Set(length: 1, first: EkkloMediaKind.video) => VideosLabel(media.length),
+    Set(length: 1, first: EkkloMediaKind.voice) => const VoiceLabel(),
+    _ => MixedLabel(media.length),
+  };
 }
 
 @MappableClass(discriminatorValue: 'photos')

@@ -68,12 +68,24 @@ final class ChatMediaCache {
         await response.stream.drain<void>();
         throw ChatMediaUnavailable(url, '${response.statusCode}');
       }
-      await response.stream.pipe(part.openWrite());
+      await _write(response.stream, part);
       return await part.rename(target.path);
     } on http.ClientException catch (error) {
       throw ChatMediaUnavailable(url, error.message);
     } on FileSystemException catch (error) {
       throw ChatMediaUnavailable(url, error.message);
+    }
+  }
+
+  static Future<void> _write(Stream<List<int>> body, File part) async {
+    final sink = part.openWrite();
+    try {
+      await sink.addStream(body);
+      await sink.close();
+    } on Object {
+      await sink.close().catchError((Object _) {});
+      if (part.existsSync()) await part.delete();
+      rethrow;
     }
   }
 

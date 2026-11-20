@@ -1,6 +1,6 @@
-import 'package:fujin/pages/chat_media/media_picker.dart';
-import 'package:fujin/pages/chat_media/picked_files.dart';
-import 'package:fujin/pages/chat_media/picked_media.dart';
+import 'package:fujin/data/media/media_picker.dart';
+import 'package:fujin/data/media/picked_files.dart';
+import 'package:fujin/data/media/picked_media.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_picker_android/image_picker_android.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';

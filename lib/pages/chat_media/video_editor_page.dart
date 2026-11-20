@@ -3,7 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:fujin/app/file_video.dart';
+import 'package:fujin/app/providers.dart';
+import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/chat/edit/crop_geometry.dart';
 import 'package:fujin/domain/chat/edit/duration_clamp.dart';
@@ -21,8 +22,10 @@ import 'package:fujin/pages/chat_media/widgets/crop_stage.dart';
 import 'package:fujin/pages/chat_media/widgets/cropped_picture.dart';
 import 'package:fujin/pages/chat_media/widgets/editor_frame.dart';
 import 'package:fujin/pages/chat_media/widgets/gesture_safe_padding.dart';
+import 'package:fujin/pages/chat_media/widgets/media_flight.dart';
 import 'package:fujin/pages/chat_media/widgets/media_glyph.dart';
 import 'package:fujin/pages/chat_media/widgets/video_timeline.dart';
+import 'package:fujin/pages/common/fade_through.dart';
 import 'package:fujin/pages/common/fujin_icon_button.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:video_player/video_player.dart';
@@ -107,7 +110,7 @@ class VideoEditorPage extends HookConsumerWidget {
                 source: video.path,
                 duration: video.edit.duration,
                 count: _thumbnails,
-                maxSize: (VideoTimeline.stripHeight * dpr).ceil(),
+                maxSize: (FujinSize.timelineStripHeight * dpr).ceil(),
               )),
             )
             .value ??
@@ -126,15 +129,21 @@ class VideoEditorPage extends HookConsumerWidget {
     };
     final colors = context.colors;
     final upright = video.upright;
-    final picture = switch ((ready.value, poster)) {
-      (true, _) => VideoPlayer(controller),
-      (false, final poster?) => Image.file(
-        File(poster),
-        fit: BoxFit.fill,
-        gaplessPlayback: true,
+    final picture = FadeThrough(
+      scale: 1,
+      child: KeyedSubtree(
+        key: ValueKey((ready.value, poster)),
+        child: switch ((ready.value, poster)) {
+          (true, _) => VideoPlayer(controller),
+          (false, final poster?) => Image.file(
+            File(poster),
+            fit: BoxFit.fill,
+            gaplessPlayback: true,
+          ),
+          (false, null) => ColoredBox(color: colors.cameraButton),
+        },
       ),
-      (false, null) => ColoredBox(color: colors.cameraButton),
-    };
+    );
     Future<void> togglePlay() async {
       if (value.isPlaying) return controller.pause();
       final at = value.position;
@@ -165,113 +174,131 @@ class VideoEditorPage extends HookConsumerWidget {
       onDone: () => Navigator.of(context).pop(video.copyWith(edit: edit.value)),
       children: [
         Expanded(
-          child: switch (mode.value) {
-            _Mode.trim => Padding(
-              padding: const EdgeInsets.all(FujinSize.screenMargin),
-              child: Stack(
-                fit: StackFit.expand,
-                alignment: Alignment.center,
-                children: [
-                  CroppedPicture(upright: upright, crop: crop, child: picture),
-                  Center(
-                    child: FujinIconButton.glyph(
-                      glyph: MediaGlyph(
-                        switch (value.isPlaying) {
-                          true => ChatMediaIcon.pause,
-                          false => ChatMediaIcon.play,
-                        },
-                        size: FujinSize.icon,
-                        color: colors.textPrimary,
-                      ),
-                      tooltip: switch (value.isPlaying) {
-                        true => context.intl.chatPause,
-                        false => context.intl.chatPlay,
-                      },
-                      onPressed: switch (ready.value) {
-                        true => () => unawaited(togglePlay()),
-                        false => null,
-                      },
-                      size: FujinSize.glyphCard,
-                      floating: true,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            _Mode.crop => CropStage(
-              aspectRatio: upright.aspectRatio,
-              picture: picture,
-              crop: crop,
-              onDragged: (handle, delta) =>
-                  edit.value = edit.value.dragged(handle, delta, upright),
-            ),
-          },
-        ),
-        switch (mode.value) {
-          _Mode.trim => GestureSafePadding(
-            child: Column(
-              spacing: FujinSpace.s2,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      ChatText.clock(edit.value.finalPosition(playhead)),
-                      style: FujinText.inter13Regular.copyWith(
-                        color: colors.cameraText,
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      ChatText.clock(edit.value.keptDuration),
-                      style: FujinText.inter13Regular.copyWith(
-                        color: colors.cameraText,
-                      ),
-                    ),
-                  ],
-                ),
-                VideoTimeline(
-                  edit: edit.value,
-                  frames: frames,
-                  playhead: playhead.clampedTo(
-                    Duration.zero,
-                    edit.value.duration,
-                  ),
-                  selection: selection.value,
-                  onEdited: changed,
-                  onSelected: (passage) => selection.value = passage,
-                  onSeek: seek,
-                ),
-                if (selection.value case final passage?)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: FujinSpace.s3,
+          child: FadeThrough(
+            child: KeyedSubtree(
+              key: ValueKey(mode.value),
+              child: switch (mode.value) {
+                _Mode.trim => Padding(
+                  padding: const EdgeInsets.all(FujinSize.screenMargin),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    alignment: Alignment.center,
                     children: [
-                      CameraChip(
-                        label: context.intl.cancel,
-                        onPressed: () => selection.value = null,
+                      CroppedPicture(
+                        upright: upright,
+                        crop: crop,
+                        child: MediaFlight(path: video.path, child: picture),
                       ),
-                      CameraChip(
-                        label: context.intl.chatEditorRemovePassage,
-                        icon: ChatMediaIcon.scissors,
-                        onPressed: switch (edit.value.canRemove(passage)) {
-                          true => () {
-                            selection.value = null;
-                            changed(edit.value.removing(passage));
+                      Center(
+                        child: FujinIconButton.glyph(
+                          glyph: FadeThrough(
+                            scale: 1 - FujinMotion.swapScale,
+                            child: MediaGlyph(
+                              switch (value.isPlaying) {
+                                true => ChatMediaIcon.pause,
+                                false => ChatMediaIcon.play,
+                              },
+                              key: ValueKey(value.isPlaying),
+                              size: FujinSize.icon,
+                              color: colors.textPrimary,
+                            ),
+                          ),
+                          tooltip: switch (value.isPlaying) {
+                            true => context.intl.chatPause,
+                            false => context.intl.chatPlay,
                           },
-                          false => null,
-                        },
+                          onPressed: switch (ready.value) {
+                            true => () => unawaited(togglePlay()),
+                            false => null,
+                          },
+                          size: FujinSize.glyphCard,
+                          floating: true,
+                        ),
                       ),
                     ],
                   ),
-              ],
+                ),
+                _Mode.crop => CropStage(
+                  aspectRatio: upright.aspectRatio,
+                  picture: picture,
+                  crop: crop,
+                  onDragged: (handle, delta) =>
+                      edit.value = edit.value.dragged(handle, delta, upright),
+                ),
+              },
             ),
           ),
-          _Mode.crop => AspectChips(
-            selected: edit.value.aspect,
-            onSelected: (aspect) =>
-                edit.value = edit.value.withAspect(aspect, upright),
+        ),
+        FadeThrough(
+          child: KeyedSubtree(
+            key: ValueKey(mode.value),
+            child: switch (mode.value) {
+              _Mode.trim => GestureSafePadding(
+                child: Column(
+                  spacing: FujinSpace.s2,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          ChatText.clock(edit.value.finalPosition(playhead)),
+                          style: FujinText.inter13Regular.copyWith(
+                            color: colors.cameraText,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          ChatText.clock(edit.value.keptDuration),
+                          style: FujinText.inter13Regular.copyWith(
+                            color: colors.cameraText,
+                          ),
+                        ),
+                      ],
+                    ),
+                    VideoTimeline(
+                      edit: edit.value,
+                      frames: frames,
+                      playhead: playhead.clampedTo(
+                        Duration.zero,
+                        edit.value.duration,
+                      ),
+                      selection: selection.value,
+                      onEdited: changed,
+                      onSelected: (passage) => selection.value = passage,
+                      onSeek: seek,
+                    ),
+                    if (selection.value case final passage?)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        spacing: FujinSpace.s3,
+                        children: [
+                          CameraChip(
+                            label: context.intl.cancel,
+                            onPressed: () => selection.value = null,
+                          ),
+                          CameraChip(
+                            label: context.intl.chatEditorRemovePassage,
+                            icon: ChatMediaIcon.scissors,
+                            onPressed: switch (edit.value.canRemove(passage)) {
+                              true => () {
+                                selection.value = null;
+                                changed(edit.value.removing(passage));
+                              },
+                              false => null,
+                            },
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+              _Mode.crop => AspectChips(
+                selected: edit.value.aspect,
+                onSelected: (aspect) =>
+                    edit.value = edit.value.withAspect(aspect, upright),
+              ),
+            },
           ),
-        },
+        ),
         const SizedBox(height: FujinSpace.s4),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,

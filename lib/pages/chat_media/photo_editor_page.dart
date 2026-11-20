@@ -11,6 +11,7 @@ import 'package:fujin/pages/chat_media/widgets/aspect_chips.dart';
 import 'package:fujin/pages/chat_media/widgets/camera_chip.dart';
 import 'package:fujin/pages/chat_media/widgets/crop_stage.dart';
 import 'package:fujin/pages/chat_media/widgets/editor_frame.dart';
+import 'package:fujin/pages/chat_media/widgets/media_flight.dart';
 
 class PhotoEditorPage extends HookWidget {
   const PhotoEditorPage({
@@ -41,20 +42,24 @@ class PhotoEditorPage extends HookWidget {
         Expanded(
           child: CropStage(
             aspectRatio: shown.aspectRatio,
-            picture: RotatedBox(
-              quarterTurns: edit.value.quarterTurns,
-              child: Image.file(
-                File(photo.path),
-                fit: BoxFit.fill,
-                cacheWidth: switch (upright.width >= upright.height) {
-                  true => decodedSide,
-                  false => null,
-                },
-                cacheHeight: switch (upright.width >= upright.height) {
-                  true => null,
-                  false => decodedSide,
-                },
-                gaplessPlayback: true,
+            quarterTurns: edit.value.quarterTurns,
+            picture: MediaFlight(
+              path: photo.path,
+              child: RotatedBox(
+                quarterTurns: edit.value.quarterTurns,
+                child: Image.file(
+                  File(photo.path),
+                  fit: BoxFit.fill,
+                  cacheWidth: switch (upright.width >= upright.height) {
+                    true => decodedSide,
+                    false => null,
+                  },
+                  cacheHeight: switch (upright.width >= upright.height) {
+                    true => null,
+                    false => decodedSide,
+                  },
+                  gaplessPlayback: true,
+                ),
               ),
             ),
             crop: edit.value.shownCrop,

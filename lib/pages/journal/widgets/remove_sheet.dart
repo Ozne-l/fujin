@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:fujin/app/theme/fujin_haptics.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/sending/food_words.dart';
 import 'package:fujin/l10n/intl_context.dart';
@@ -20,7 +20,7 @@ Future<void> showRemoveSheet(
   required EntryRemoval removal,
   required bool inEkklo,
 }) {
-  unawaited(HapticFeedback.mediumImpact());
+  FujinHaptics.press();
   return SheetFrame.show(
     context,
     builder: (context) => _RemoveSheet(removal: removal, inEkklo: inEkklo),

@@ -5,6 +5,7 @@ import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/chat/widgets/failure_shake.dart';
 import 'package:fujin/pages/chat_media/chat_media_icon.dart';
 import 'package:fujin/pages/chat_media/widgets/media_glyph.dart';
 import 'package:fujin/pages/common/clock_icon.dart';
@@ -25,7 +26,6 @@ class MessageStatus extends StatelessWidget {
   final _StatusKind _kind;
   final VoidCallback? onRetry;
 
-  static const double _smallIcon = 12;
   static const EdgeInsets _retryPadding = EdgeInsets.symmetric(
     horizontal: FujinSpace.s1,
     vertical: FujinSpace.s2,
@@ -54,14 +54,14 @@ class MessageStatus extends StatelessWidget {
           children: [
             MediaGlyph(
               ClockIcon.face,
-              size: _smallIcon,
+              size: FujinSize.messageStatusIcon,
               color: colors.textTertiary,
             ),
             turning(
               FujinMotion.clockTurns,
               MediaGlyph(
                 ClockIcon.hand,
-                size: _smallIcon,
+                size: FujinSize.messageStatusIcon,
                 color: colors.textTertiary,
               ),
             ),
@@ -74,7 +74,7 @@ class MessageStatus extends StatelessWidget {
           FujinMotion.spinTurns,
           MediaGlyph(
             ChatMediaIcon.loader,
-            size: _smallIcon,
+            size: FujinSize.messageStatusIcon,
             color: colors.textTertiary,
           ),
         ),
@@ -101,15 +101,18 @@ class MessageStatus extends StatelessWidget {
               tapTargetSize: MaterialTapTargetSize.padded,
               visualDensity: VisualDensity.compact,
             ).copyWith(overlayColor: FujinTheme.pressedOverlay(colors)),
-            child: Text(intl.chatRetry),
+            child: Text(intl.tryAgain),
           ),
         ],
       ),
     };
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      spacing: FujinSpace.s1,
-      children: [icon, ...children],
+    return FailureShake(
+      failed: _kind == _StatusKind.failed,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: FujinSpace.s1,
+        children: [icon, ...children],
+      ),
     );
   }
 }

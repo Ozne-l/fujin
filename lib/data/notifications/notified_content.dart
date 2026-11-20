@@ -1,5 +1,5 @@
 import 'package:dart_mappable/dart_mappable.dart';
-import 'package:fujin/domain/chat/notifications/media_label.dart';
+import 'package:fujin/data/notifications/media_label.dart';
 
 part 'notified_content.mapper.dart';
 

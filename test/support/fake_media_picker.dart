@@ -1,5 +1,5 @@
-import 'package:fujin/pages/chat_media/media_picker.dart';
-import 'package:fujin/pages/chat_media/picked_media.dart';
+import 'package:fujin/data/media/media_picker.dart';
+import 'package:fujin/data/media/picked_media.dart';
 
 final class FakeMediaPicker implements MediaPicker {
   List<PickedMedia> chosen = const [];

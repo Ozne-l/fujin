@@ -13,7 +13,6 @@ class CaptionBar extends StatelessWidget {
     super.key,
   });
 
-  static const double _icon = 22;
   static const double _actionInset =
       (FujinSize.field - FujinSize.touchTarget) / 2;
 
@@ -41,7 +40,7 @@ class CaptionBar extends StatelessWidget {
             tooltip: context.intl.chatSend,
             icon: MediaGlyph(
               ChatMediaIcon.send,
-              size: _icon,
+              size: FujinSize.composerIcon,
               color: colors.buttonPrimaryText,
             ),
             style: IconButton.styleFrom(

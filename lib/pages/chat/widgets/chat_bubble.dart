@@ -16,8 +16,8 @@ class ChatBubble extends StatelessWidget {
   final Widget child;
 
   static const EdgeInsets textPadding = EdgeInsets.symmetric(
-    horizontal: _horizontal,
-    vertical: _vertical,
+    horizontal: FujinSize.bubblePaddingHorizontal,
+    vertical: FujinSize.bubblePaddingVertical,
   );
   static const EdgeInsets mediaPadding = EdgeInsets.fromLTRB(
     FujinSpace.s1,
@@ -25,8 +25,6 @@ class ChatBubble extends StatelessWidget {
     FujinSpace.s1,
     FujinSpace.s2,
   );
-  static const double _horizontal = 14;
-  static const double _vertical = 10;
 
   @override
   Widget build(BuildContext context) => DecoratedBox(

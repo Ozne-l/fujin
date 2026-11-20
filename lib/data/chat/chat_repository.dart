@@ -72,6 +72,15 @@ final class ChatRepository {
         saveMessages(page);
       });
 
+  void replaceMessages(String conversationId, List<CachedMessage> messages) =>
+      _database.transaction(() {
+        _database.execute(
+          'DELETE FROM chat_message WHERE conversation_id = ?',
+          [conversationId],
+        );
+        saveMessages(messages);
+      });
+
   void removeMessage(String id) =>
       _database.execute('DELETE FROM chat_message WHERE id = ?', [id]);
 
@@ -93,17 +102,20 @@ final class ChatRepository {
         _ => null,
       };
 
-  bool holdsAny(Iterable<String> ids) => switch (ids.toList()) {
-    [] => false,
-    final ids =>
-      _database
-          .select(
-            'SELECT 1 FROM chat_message '
-            'WHERE id IN (${List.filled(ids.length, '?').join(', ')}) LIMIT 1',
-            ids,
-          )
-          .isNotEmpty,
-  };
+  bool holdsAny(Iterable<String> ids) => _database.select(
+    'SELECT 1 FROM chat_message '
+    'WHERE id IN (SELECT value FROM json_each(?)) LIMIT 1',
+    [jsonEncode(ids.toList())],
+  ).isNotEmpty;
+
+  List<CachedMessage> allMessages(String conversationId) => [
+    for (final row in _database.select(
+      'SELECT * FROM chat_message WHERE conversation_id = ? '
+      'ORDER BY created_at, id',
+      [conversationId],
+    ))
+      CachedMessageMapper.fromMap(row),
+  ];
 
   List<CachedMessage> messages(
     String conversationId, {

@@ -20,9 +20,11 @@ final class FakeMediaProcessor implements MediaProcessor {
   final _exports = <StreamController<VideoExportEvent>>[];
   MediaFailure? failure;
   bool secure = false;
+  Completer<void>? probeGate;
 
   @override
   Future<VideoProbe> probeVideo(String source) async {
+    if (probeGate case final gate?) await gate.future;
     _throwFailure();
     return switch (probes[source]) {
       final probe? => probe,

@@ -2352,6 +2352,18 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String chatJumpToLatest(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Go to the latest messages, $count new',
+      one: 'Go to the latest messages, 1 new',
+      zero: 'Go to the latest messages',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get chatCoach => 'Ekklo coach';
 
   @override
@@ -2433,6 +2445,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatPause => 'Pause';
 
   @override
+  String get chatVoiceNotLoaded => 'Voice message not loaded';
+
+  @override
   String get chatCannotReply => 'You can\'t reply in this conversation.';
 
   @override
@@ -2503,9 +2518,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatViewerNotLoaded => 'Video not loaded';
 
   @override
-  String get chatViewerRetry => 'Retry';
-
-  @override
   String get chatViewerMute => 'Mute';
 
   @override
@@ -2513,6 +2525,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chatViewerLoading => 'Loading video';
+
+  @override
+  String chatViewerSkipBack(int seconds) {
+    return '−$seconds s';
+  }
+
+  @override
+  String chatViewerSkipForward(int seconds) {
+    return '+$seconds s';
+  }
 
   @override
   String get chatNotificationChannelName => 'Coach messages';
@@ -2690,7 +2712,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatNotSent => 'Not sent.';
 
   @override
-  String get chatRetry => 'Try again';
+  String get chatSeen => 'Seen';
 
   @override
   String get chatReply => 'Reply';

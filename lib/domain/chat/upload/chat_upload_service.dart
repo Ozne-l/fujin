@@ -280,24 +280,26 @@ final class ChatUploadService {
     ];
     try {
       for (final file in waiting) {
-        _messages.saveFile(
-          await _process(
-            message,
-            file,
-            position: videos.indexOf(file.id) + 1,
-            videos: videos.length,
-          ),
+        final processed = await _process(
+          message,
+          file,
+          position: videos.indexOf(file.id) + 1,
+          videos: videos.length,
         );
+        if (_disposed) return null;
+        _messages.saveFile(processed);
         _exported.remove(file.id);
         _emit(message.conversationId);
       }
     } on Object catch (error) {
+      if (_disposed) return null;
       if (error is! MediaProcessingException && error is! FormatException) {
         rethrow;
       }
       await _fail(processing);
       return null;
     }
+    if (_disposed) return null;
     final uploading = processing.copyWith(
       state: MessageInProgressState.uploading,
     );
@@ -359,8 +361,9 @@ final class ChatUploadService {
   }
 
   Future<bool> _uploadAll(MessageInProgress message) async {
-    final files = _messages.files(message.id);
     final active = await _uploader.activeUploads();
+    if (_disposed) return false;
+    final files = _messages.files(message.id);
     final pending = [
       for (final file in files)
         if (!file.isComplete && !_uploading(file, active)) file,
@@ -386,6 +389,7 @@ final class ChatUploadService {
           resourceType: kind.resourceType,
           resourceId: message.conversationId,
         );
+        if (_disposed) return false;
         final publicUrl = '${presigned.publicUrl}';
         _messages.saveFile(file.copyWith(publicUrl: publicUrl));
         _sizes[file.id] = max(File(path).statSync().size, 1);
@@ -409,9 +413,11 @@ final class ChatUploadService {
         }
       }
     } on EkkloNetworkException {
+      if (_disposed) return false;
       await _wait(message);
       return false;
     } on Object catch (error) {
+      if (_disposed) return false;
       if (error is! EkkloException &&
           error is! FileSystemException &&
           error is! FormatException) {
@@ -420,6 +426,7 @@ final class ChatUploadService {
       await _fail(message);
       return false;
     }
+    if (_disposed) return false;
     await _relay.schedule(message.id);
     if (_waiting.remove(message.id)) await _notifications.cancel(message.id);
     _emit(message.conversationId);

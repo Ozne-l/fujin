@@ -1,8 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fujin/app/theme/fujin_haptics.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/pages/common/lens_swell.dart';
@@ -43,7 +41,7 @@ class FujinSwitch extends HookWidget {
 
     void toggle({required bool to}) {
       if (to == value) return;
-      unawaited(HapticFeedback.lightImpact());
+      FujinHaptics.threshold();
       onChanged(to);
     }
 

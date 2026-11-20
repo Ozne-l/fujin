@@ -1,36 +1,33 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:fujin/app/providers.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/chat/chat_files.dart';
 import 'package:fujin/pages/chat_viewer/widgets/viewer_veil.dart';
+import 'package:fujin/pages/chat_viewer/widgets/viewer_zoom.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class PhotoStage extends HookConsumerWidget {
-  const PhotoStage({required this.url, super.key});
+class PhotoStage extends ConsumerWidget {
+  const PhotoStage({required this.url, required this.onZoomed, super.key});
 
   final Uri url;
+  final ValueChanged<bool> onZoomed;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final attempt = useState(0);
-    final file = useFuture(
-      useMemoized(
-        () => ref.read(chatMediaCacheProvider).file(url),
-        [url, attempt.value],
-      ),
-    );
-    return switch (file) {
-      AsyncSnapshot(data: final file?) => Center(
-        child: Image.file(
-          file,
-          fit: BoxFit.contain,
-          semanticLabel: context.intl.chatPhoto,
+  Widget build(BuildContext context, WidgetRef ref) =>
+      switch (ref.watch(chatFileProvider(url))) {
+        AsyncValue(value: final file?) => ViewerZoom(
+          onZoomed: onZoomed,
+          child: Center(
+            child: Image.file(
+              file,
+              fit: BoxFit.contain,
+              semanticLabel: context.intl.chatPhoto,
+            ),
+          ),
         ),
-      ),
-      AsyncSnapshot(hasError: true) => ViewerVeil.failed(
-        onRetry: () => attempt.value++,
-      ),
-      AsyncSnapshot() => const ViewerVeil.loading(),
-    };
-  }
+        AsyncValue(isLoading: true) => const ViewerVeil.loading(),
+        AsyncValue(hasError: true) => ViewerVeil.failed(
+          onRetry: () => ref.invalidate(chatFileProvider(url)),
+        ),
+        AsyncValue() => const ViewerVeil.loading(),
+      };
 }

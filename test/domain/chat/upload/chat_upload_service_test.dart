@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:checks/checks.dart';
@@ -32,10 +33,10 @@ import '../../../support/fake_media_processor.dart';
 import '../../../support/fake_media_uploader.dart';
 import '../../../support/fake_relay_scheduler.dart';
 import '../../../support/fake_upload_notifications.dart';
+import '../../../support/until.dart';
 
 final _start = DateTime.utc(2026, 11, 19, 9);
 const _settle = Duration(milliseconds: 1);
-const _patience = 2000;
 const String _conversation = FakeChat.conversationId;
 const _presignCall = 'POST /api/v1/uploads/presigned-url';
 const _voiceCall =
@@ -112,34 +113,26 @@ final class _Upload {
   };
 
   Future<void> ordered(int count) =>
-      _until<int>(() => uploader.orders.length, (length) => length >= count);
+      until<int>(() => uploader.orders.length, (length) => length >= count);
 
-  Future<void> posted() => _until<List<MessageInProgress>>(
+  Future<void> posted() => until<List<MessageInProgress>>(
     messages.all,
     (all) => all.isEmpty,
   );
 
   Future<void> inState(MessageInProgressState state) =>
-      _until<MessageInProgressState>(
+      until<MessageInProgressState>(
         () => messages.all().firstOrNull?.state,
         (now) => now == state,
       );
 
-  Future<Set<String>> failureNotice() => _until<Set<String>>(
+  Future<Set<String>> failureNotice() => until<Set<String>>(
     () => notifications.failed,
     (ids) => ids.isNotEmpty,
   );
 
   Future<UploadPhase> phase(bool Function(UploadPhase phase) test) =>
-      _until(() => shown.lastOrNull?.firstOrNull?.phase, test);
-}
-
-Future<T> _until<T>(T? Function() read, bool Function(T value) test) async {
-  for (var turn = 0; turn < _patience; turn++) {
-    if (read() case final value? when test(value)) return value;
-    await Future<void>.delayed(_settle);
-  }
-  throw TestFailure('never reached, last: ${read()}');
+      until(() => shown.lastOrNull?.firstOrNull?.phase, test);
 }
 
 ExportedVideo _exported(String path, VideoOutcome outcome) => ExportedVideo(
@@ -209,7 +202,7 @@ void main() {
           _conversation,
           const MediaSend(media: [_video]),
         );
-        await _until(
+        await until(
           () => upload.processor.exportRequests.length,
           (n) => n == 1,
         );
@@ -246,6 +239,51 @@ void main() {
           ..has((order) => order.notice.count, 'count').equals(1);
       },
     );
+
+    test('an export that ends after sign-out writes nothing and asks for no '
+        'upload', () async {
+      final upload = await _Upload().started();
+      await upload.service.sendMedia(
+        _conversation,
+        const MediaSend(media: [_video]),
+      );
+      await until(() => upload.processor.exportRequests.length, (n) => n == 1);
+
+      upload.service.dispose();
+      upload.database.close();
+      upload.processor.finish(
+        _exported(
+          upload.processor.exportRequests.single.output,
+          VideoOutcome.original,
+        ),
+      );
+      await Future<void>.delayed(_settle * 20);
+
+      check(upload.calls).not((calls) => calls.contains(_presignCall));
+      check(upload.uploader.orders).isEmpty();
+    });
+
+    test('a presign that answers after sign-out writes nothing and asks for '
+        'no upload', () async {
+      final upload = await _Upload().started();
+      final gate = upload.backends.chatGates[_presignCall] = Completer();
+      await upload.service.sendMedia(
+        _conversation,
+        const MediaSend(media: [_photo]),
+      );
+      await until(
+        () => upload.calls.where((call) => call == _presignCall).length,
+        (n) => n == 1,
+      );
+
+      upload.service.dispose();
+      upload.database.close();
+      gate.complete();
+      await Future<void>.delayed(_settle * 20);
+
+      check(upload.uploader.orders).isEmpty();
+      check(upload.relay.scheduled).isEmpty();
+    });
 
     test('a processing failure leaves the message not sent with a notice; '
         'retrying processes it again and sends it', () async {
@@ -316,7 +354,14 @@ void main() {
       upload.uploader
         ..settle(second)
         ..finish(first);
-      await Future<void>.delayed(_settle * 20);
+      await until(
+        () => upload.messages
+            .files(upload.only.id)
+            .where(
+              (file) => file.isComplete,
+            ),
+        (complete) => complete.length == 1,
+      );
 
       check(upload.uploader.orders).length.equals(2);
       check(
@@ -326,6 +371,7 @@ void main() {
       upload.uploader.finish(second);
       await upload.posted();
 
+      check(upload.uploader.orders).length.equals(2);
       check(
         upload.backends.chat.messages.last['media_urls'],
       ).isA<List<Object?>>().deepEquals([first.publicUrl, second.publicUrl]);
@@ -343,8 +389,12 @@ void main() {
       final earlier = upload.uploader.orders.single;
       upload.uploader.fail(earlier.fileId, expired: true);
       await upload.ordered(2);
-      upload.uploader.finish(earlier);
-      await Future<void>.delayed(_settle * 20);
+      upload.uploader
+        ..finish(earlier)
+        ..progress(earlier.fileId, 0.5);
+      await upload.phase(
+        (phase) => phase is UploadSending && phase.percent > 0,
+      );
 
       check(upload.messages.all()).length.equals(1);
       check(upload.calls).not((calls) => calls.contains(_mediaCall));
@@ -367,7 +417,7 @@ void main() {
         _conversation,
         const MediaSend(media: [_photo]),
       );
-      await _until(() => upload.notifications.waiting, (ids) => ids.isNotEmpty);
+      await until(() => upload.notifications.waiting, (ids) => ids.isNotEmpty);
 
       check(upload.only.state).equals(MessageInProgressState.uploading);
       check(upload.uploader.orders).isEmpty();
@@ -393,7 +443,7 @@ void main() {
       );
       await upload.ordered(1);
       upload.uploader.completeAll();
-      await _until(() => upload.notifications.waiting, (ids) => ids.isNotEmpty);
+      await until(() => upload.notifications.waiting, (ids) => ids.isNotEmpty);
 
       upload.backends.lostChatCalls.clear();
       upload.service.setForeground(foreground: true);
@@ -416,7 +466,7 @@ void main() {
       );
       await upload.ordered(1);
       upload.uploader.completeAll();
-      await _until(() => upload.notifications.waiting, (ids) => ids.isNotEmpty);
+      await until(() => upload.notifications.waiting, (ids) => ids.isNotEmpty);
       final id = upload.only.id;
 
       check(upload.relay.scheduled).deepEquals({id});
@@ -427,7 +477,7 @@ void main() {
         messages: upload.messages,
         notifications: upload.notifications,
         folder: upload.folder,
-        cachePath: '${upload.cache.path}/${FujinDatabase.cacheFileName}',
+        cachePath: FujinDatabase.cachePathIn(upload.cache),
         clock: () => upload.now,
       ).relay(id);
 

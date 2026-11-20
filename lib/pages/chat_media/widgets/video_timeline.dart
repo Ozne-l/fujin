@@ -3,6 +3,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fujin/app/theme/fujin_haptics.dart';
+import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/chat/edit/duration_clamp.dart';
 import 'package:fujin/domain/chat/edit/video_edit.dart';
@@ -10,7 +12,9 @@ import 'package:fujin/domain/chat/edit/video_passage.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/chat/chat_text.dart';
 import 'package:fujin/pages/chat_media/chat_media_icon.dart';
+import 'package:fujin/pages/chat_media/use_lingering.dart';
 import 'package:fujin/pages/chat_media/widgets/media_glyph.dart';
+import 'package:motor/motor.dart';
 
 class VideoTimeline extends HookWidget {
   const VideoTimeline({
@@ -24,12 +28,7 @@ class VideoTimeline extends HookWidget {
     super.key,
   });
 
-  static const double stripHeight = 56;
-  static const double _knob = 10;
-  static const double _pillGap = 8;
-  static const double _pillHeight = 21;
   static const double _reach = 24;
-  static const double handleWidth = 14;
 
   final VideoEdit edit;
   final List<String?> frames;
@@ -42,6 +41,27 @@ class VideoTimeline extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final grab = useRef<({_Grip grip, Duration offset})?>(null);
+    final touching = useRef(false);
+    final limited = switch (grab.value) {
+      (:final grip, offset: _) => _atLimit(grip),
+      null => false,
+    };
+    useEffect(() {
+      if (limited && !touching.value) FujinHaptics.select();
+      touching.value = limited;
+      return null;
+    }, [limited]);
+    final (
+      value: restorable,
+      settle: settleRestorable,
+    ) = useLingering<List<VideoPassage>>(
+      (held) => [
+        ...?held?.where((passage) => !edit.removed.contains(passage)),
+        ...edit.removed,
+      ],
+    );
+    final (value: measured, settle: settleMeasured) =
+        useLingering<VideoPassage?>((held) => selection ?? held);
     final colors = context.colors;
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -51,32 +71,57 @@ class VideoTimeline extends HookWidget {
             width * at.inMicroseconds / math.max(1, duration.inMicroseconds);
         Duration at(double dx) => duration * (dx / width).clamp(0, 1);
         return SizedBox(
-          height: _knob + stripHeight + _pillGap + _pillHeight,
+          height:
+              FujinSize.playheadKnob +
+              FujinSize.timelineStripHeight +
+              FujinSpace.s2 +
+              FujinSize.timelinePillHeight,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
               Positioned(
-                top: _knob,
+                top: FujinSize.playheadKnob,
                 left: 0,
                 right: 0,
-                height: stripHeight,
+                height: FujinSize.timelineStripHeight,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(FujinRadius.key),
-                  child: Row(
-                    children: [
-                      for (final frame in frames)
-                        Expanded(
-                          child: switch (frame) {
-                            final frame? => Image.file(
-                              File(frame),
-                              fit: BoxFit.cover,
-                              height: stripHeight,
-                              gaplessPlayback: true,
-                            ),
-                            null => ColoredBox(color: colors.cameraButton),
-                          },
-                        ),
-                    ],
+                  child: ColoredBox(
+                    color: colors.cameraButton,
+                    child: Row(
+                      children: [
+                        for (final frame in frames)
+                          Expanded(
+                            child: switch (frame) {
+                              final frame? => Image.file(
+                                File(frame),
+                                fit: BoxFit.cover,
+                                height: FujinSize.timelineStripHeight,
+                                gaplessPlayback: true,
+                                frameBuilder:
+                                    (context, child, painted, synchronous) =>
+                                        SingleMotionBuilder(
+                                          value: switch ((
+                                            synchronous,
+                                            painted,
+                                          )) {
+                                            (true, _) || (_, _?) => 1,
+                                            (false, null) => 0,
+                                          },
+                                          motion: FujinMotion.dissolve,
+                                          builder: (context, opacity, child) =>
+                                              Opacity(
+                                                opacity: opacity.clamp(0, 1),
+                                                child: child,
+                                              ),
+                                          child: child,
+                                        ),
+                              ),
+                              null => const SizedBox.shrink(),
+                            },
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -97,6 +142,7 @@ class VideoTimeline extends HookWidget {
                   onHorizontalDragStart: (details) {
                     final dx = details.localPosition.dx;
                     final grip = _gripAt(dx, x);
+                    touching.value = _atLimit(grip);
                     grab.value = (
                       grip: grip,
                       offset: at(dx) - _gripTime(grip),
@@ -116,15 +162,26 @@ class VideoTimeline extends HookWidget {
                       playhead: playhead,
                       x: x,
                       colors: colors,
-                      top: _knob,
+                      top: FujinSize.playheadKnob,
                     ),
                   ),
                 ),
               ),
-              for (final passage in edit.removed)
+              for (final passage in restorable)
                 _PillAt(
+                  key: ValueKey(passage),
                   center: x(passage.start + passage.length ~/ 2),
-                  top: _knob + stripHeight + _pillGap,
+                  top:
+                      FujinSize.playheadKnob +
+                      FujinSize.timelineStripHeight +
+                      FujinSpace.s2,
+                  shown: edit.removed.contains(passage),
+                  onGone: () => settleRestorable(
+                    (held) => [
+                      for (final kept in held)
+                        if (kept != passage) kept,
+                    ],
+                  ),
                   child: _Pill(
                     label: context.intl.chatEditorRestore(
                       ChatText.clock(passage.length),
@@ -135,12 +192,18 @@ class VideoTimeline extends HookWidget {
                     },
                   ),
                 ),
-              if (selection case final selection?)
+              if (measured case final shownSelection?)
                 _PillAt(
-                  center: x(selection.start + selection.length ~/ 2),
-                  top: _knob + stripHeight + _pillGap,
+                  key: const ValueKey(#selection),
+                  center: x(shownSelection.start + shownSelection.length ~/ 2),
+                  top:
+                      FujinSize.playheadKnob +
+                      FujinSize.timelineStripHeight +
+                      FujinSpace.s2,
+                  shown: selection != null,
+                  onGone: () => settleMeasured((_) => null),
                   child: _Pill(
-                    label: ChatText.clock(selection.length),
+                    label: ChatText.clock(shownSelection.length),
                   ),
                 ),
             ],
@@ -156,8 +219,8 @@ class VideoTimeline extends HookWidget {
         (grip: _Grip.selectionStart, at: x(selection.start)),
         (grip: _Grip.selectionEnd, at: x(selection.end)),
       ],
-      (grip: _Grip.start, at: x(edit.start) + handleWidth / 2),
-      (grip: _Grip.end, at: x(edit.end) - handleWidth / 2),
+      (grip: _Grip.start, at: x(edit.start) + FujinSize.trimHandleWidth / 2),
+      (grip: _Grip.end, at: x(edit.end) - FujinSize.trimHandleWidth / 2),
     ];
     for (final candidate in candidates) {
       if ((candidate.at - dx).abs() <= _reach) return candidate.grip;
@@ -172,6 +235,22 @@ class VideoTimeline extends HookWidget {
     (_Grip.selectionEnd, final selection?) => selection.end,
     (_Grip.selectionStart || _Grip.selectionEnd, null) => playhead,
     (_Grip.playhead, _) => playhead,
+  };
+
+  bool _atLimit(_Grip grip) => switch ((grip, selection)) {
+    (_Grip.start, _) =>
+      edit.start == Duration.zero ||
+          edit.end - edit.start <= VideoEdit.minimumKept,
+    (_Grip.end, _) =>
+      edit.end == edit.duration ||
+          edit.end - edit.start <= VideoEdit.minimumKept,
+    (_Grip.selectionStart, final selection?) =>
+      selection.start == edit.start ||
+          selection.length <= VideoEdit.minimumPassage,
+    (_Grip.selectionEnd, final selection?) =>
+      selection.end == edit.end || selection.length <= VideoEdit.minimumPassage,
+    (_Grip.selectionStart || _Grip.selectionEnd, null) => false,
+    (_Grip.playhead, _) => false,
   };
 
   void _drag(_Grip grip, Duration to) {
@@ -212,10 +291,19 @@ class VideoTimeline extends HookWidget {
 enum _Grip { start, end, selectionStart, selectionEnd, playhead }
 
 class _PillAt extends StatelessWidget {
-  const _PillAt({required this.center, required this.top, required this.child});
+  const _PillAt({
+    required this.center,
+    required this.top,
+    required this.shown,
+    required this.onGone,
+    required this.child,
+    super.key,
+  });
 
   final double center;
   final double top;
+  final bool shown;
+  final VoidCallback onGone;
   final Widget child;
 
   @override
@@ -225,7 +313,23 @@ class _PillAt extends StatelessWidget {
     right: 0,
     child: CustomSingleChildLayout(
       delegate: _CenterAt(center),
-      child: child,
+      child: IgnorePointer(
+        ignoring: !shown,
+        child: SingleMotionBuilder(
+          value: switch (shown) {
+            true => 1,
+            false => 0,
+          },
+          from: 0,
+          motion: FujinMotion.dissolve,
+          onAnimationStatusChanged: (status) {
+            if (!shown && !status.isAnimating) onGone();
+          },
+          builder: (context, opacity, child) =>
+              Opacity(opacity: opacity.clamp(0, 1), child: child),
+          child: child,
+        ),
+      ),
     ),
   );
 }
@@ -237,7 +341,7 @@ class _CenterAt extends SingleChildLayoutDelegate {
 
   @override
   Size getSize(BoxConstraints constraints) =>
-      Size(constraints.maxWidth, VideoTimeline._pillHeight);
+      Size(constraints.maxWidth, FujinSize.timelinePillHeight);
 
   @override
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
@@ -259,9 +363,6 @@ class _CenterAt extends SingleChildLayoutDelegate {
 class _Pill extends StatelessWidget {
   const _Pill({required this.label, this.icon, this.onPressed});
 
-  static const double _iconSize = 12;
-  static const double _horizontal = 6;
-
   final String label;
   final String? icon;
   final VoidCallback? onPressed;
@@ -275,9 +376,11 @@ class _Pill extends StatelessWidget {
         shape: const StadiumBorder(),
       ),
       child: SizedBox(
-        height: VideoTimeline._pillHeight,
+        height: FujinSize.timelinePillHeight,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: _horizontal),
+          padding: const EdgeInsets.symmetric(
+            horizontal: FujinSize.mediaPillPaddingHorizontal,
+          ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             spacing: FujinSpace.s1,
@@ -285,7 +388,7 @@ class _Pill extends StatelessWidget {
               if (icon case final icon?)
                 MediaGlyph(
                   icon,
-                  size: _iconSize,
+                  size: FujinSize.mediaPillIcon,
                   color: colors.cameraBackground,
                 ),
               Text(
@@ -325,15 +428,6 @@ class _TimelinePainter extends CustomPainter {
 
   static const double _trimmedAlpha = 0.6;
   static const double _removedAlpha = 0.85;
-  static const double _bar = 3;
-  static const double _grip = 3;
-  static const double _gripHeight = 18;
-  static const double _outline = 2;
-  static const double _selectionHandleWidth = 10;
-  static const double _selectionHandleHeight = 28;
-  static const double _playheadWidth = 2;
-  static const double _playheadOverhang = 4;
-  static const double _knob = 10;
 
   final VideoEdit edit;
   final VideoPassage? selection;
@@ -344,7 +438,7 @@ class _TimelinePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final bottom = top + VideoTimeline.stripHeight;
+    final bottom = top + FujinSize.timelineStripHeight;
     final start = x(edit.start);
     final end = x(edit.end);
     final trimmed = Paint()
@@ -365,20 +459,26 @@ class _TimelinePainter extends CustomPainter {
       );
     }
     canvas
-      ..drawRect(Rect.fromLTRB(start, top, end, top + _bar), accent)
-      ..drawRect(Rect.fromLTRB(start, bottom - _bar, end, bottom), accent);
+      ..drawRect(
+        Rect.fromLTRB(start, top, end, top + FujinStroke.trimFrame),
+        accent,
+      )
+      ..drawRect(
+        Rect.fromLTRB(start, bottom - FujinStroke.trimFrame, end, bottom),
+        accent,
+      );
     for (final handle in [
       Rect.fromLTWH(
         start,
         top,
-        VideoTimeline.handleWidth,
-        VideoTimeline.stripHeight,
+        FujinSize.trimHandleWidth,
+        FujinSize.timelineStripHeight,
       ),
       Rect.fromLTWH(
-        end - VideoTimeline.handleWidth,
+        end - FujinSize.trimHandleWidth,
         top,
-        VideoTimeline.handleWidth,
-        VideoTimeline.stripHeight,
+        FujinSize.trimHandleWidth,
+        FujinSize.timelineStripHeight,
       ),
     ]) {
       canvas
@@ -387,8 +487,8 @@ class _TimelinePainter extends CustomPainter {
           RRect.fromRectAndRadius(
             Rect.fromCenter(
               center: handle.center,
-              width: _grip,
-              height: _gripHeight,
+              width: FujinSize.trimGripWidth,
+              height: FujinSize.trimGripHeight,
             ),
             const Radius.circular(FujinRadius.bar),
           ),
@@ -403,11 +503,14 @@ class _TimelinePainter extends CustomPainter {
         bottom,
       );
       canvas.drawRRect(
-        RRect.fromRectAndRadius(area.deflate(_outline / 2), key),
+        RRect.fromRectAndRadius(
+          area.deflate(FujinStroke.timelineSelection / 2),
+          key,
+        ),
         Paint()
           ..color = colors.cameraText
           ..style = PaintingStyle.stroke
-          ..strokeWidth = _outline,
+          ..strokeWidth = FujinStroke.timelineSelection,
       );
       for (final edge in [area.left, area.right]) {
         canvas
@@ -415,8 +518,8 @@ class _TimelinePainter extends CustomPainter {
             RRect.fromRectAndRadius(
               Rect.fromCenter(
                 center: Offset(edge, area.center.dy),
-                width: _selectionHandleWidth,
-                height: _selectionHandleHeight,
+                width: FujinSize.selectionHandleWidth,
+                height: FujinSize.selectionHandleHeight,
               ),
               const Radius.circular(FujinRadius.pill),
             ),
@@ -426,8 +529,8 @@ class _TimelinePainter extends CustomPainter {
             RRect.fromRectAndRadius(
               Rect.fromCenter(
                 center: Offset(edge, area.center.dy),
-                width: _grip / 2,
-                height: _gripHeight / 2,
+                width: FujinSize.trimGripWidth / 2,
+                height: FujinSize.trimGripHeight / 2,
               ),
               const Radius.circular(FujinRadius.bar),
             ),
@@ -440,18 +543,24 @@ class _TimelinePainter extends CustomPainter {
       ..drawRRect(
         RRect.fromRectAndRadius(
           Rect.fromLTRB(
-            head - _playheadWidth / 2,
-            top - _playheadOverhang,
-            head + _playheadWidth / 2,
-            bottom + _playheadOverhang,
+            head - FujinStroke.playhead / 2,
+            top - FujinSize.playheadOverhang,
+            head + FujinStroke.playhead / 2,
+            bottom + FujinSize.playheadOverhang,
           ),
           const Radius.circular(FujinRadius.bar),
         ),
         light,
       )
       ..drawCircle(
-        Offset(head, top - _playheadOverhang - _knob / 2 + 1),
-        _knob / 2,
+        Offset(
+          head,
+          top -
+              FujinSize.playheadOverhang -
+              FujinSize.playheadKnob / 2 +
+              FujinSize.playheadKnobOverlap,
+        ),
+        FujinSize.playheadKnob / 2,
         light,
       );
   }

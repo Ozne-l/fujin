@@ -1,7 +1,7 @@
 import 'dart:ui' as ui;
 
-import 'package:fujin/pages/chat_media/forget_file.dart';
-import 'package:fujin/pages/chat_media/picked_media.dart';
+import 'package:fujin/data/media/forget_file.dart';
+import 'package:fujin/data/media/picked_media.dart';
 import 'package:image_picker/image_picker.dart';
 
 const _videoPrefix = 'video/';

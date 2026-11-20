@@ -12,13 +12,6 @@ import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 class TrayReplyCard extends ConsumerWidget {
   const TrayReplyCard({required this.reply, required this.onCancel, super.key});
 
-  static const double _height = 56;
-  static const double _bar = 3;
-  static const double _barHeight = 36;
-  static const double _gap = 10;
-  static const double _lineGap = 2;
-  static const double _cancel = 40;
-  static const double _cancelIcon = 20;
   static const LiquidRoundedSuperellipse _shape = LiquidRoundedSuperellipse(
     borderRadius: FujinRadius.field,
   );
@@ -38,24 +31,27 @@ class TrayReplyCard extends ConsumerWidget {
       opaque: Color.alphaBlend(colors.backgroundGlass, colors.backgroundCard),
       fill: colors.backgroundGlass,
       child: SizedBox(
-        height: _height,
+        height: FujinSize.replyCardHeight,
         child: Padding(
           padding: const EdgeInsets.only(left: FujinSpace.s3),
           child: Row(
-            spacing: _gap,
+            spacing: FujinSize.replyBarGap,
             children: [
               DecoratedBox(
                 decoration: BoxDecoration(
                   color: bar,
                   borderRadius: BorderRadius.circular(FujinRadius.pill),
                 ),
-                child: const SizedBox(width: _bar, height: _barHeight),
+                child: const SizedBox(
+                  width: FujinSize.replyBar,
+                  height: FujinSize.replyCardBarHeight,
+                ),
               ),
               Expanded(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: _lineGap,
+                  spacing: FujinSize.chatLineGap,
                   children: [
                     Text(
                       reply.title,
@@ -81,12 +77,12 @@ class TrayReplyCard extends ConsumerWidget {
                 tooltip: context.intl.chatTrayCancelReply,
                 icon: Icon(
                   Icons.close,
-                  size: _cancelIcon,
+                  size: FujinSize.replyCancelIcon,
                   color: colors.textPrimary,
                 ),
                 style: IconButton.styleFrom(
-                  fixedSize: const Size.square(_cancel),
-                  minimumSize: const Size.square(_cancel),
+                  fixedSize: const Size.square(FujinSize.replyCancel),
+                  minimumSize: const Size.square(FujinSize.replyCancel),
                 ).copyWith(overlayColor: FujinTheme.pressedOverlay(colors)),
               ),
             ],

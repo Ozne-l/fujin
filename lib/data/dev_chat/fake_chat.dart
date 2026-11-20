@@ -270,7 +270,7 @@ final class FakeChat {
     final reactions = [
       for (final reaction
           in message['reactions'] as List<Object?>? ?? const <Object?>[])
-        {...reaction! as FakeChatJson},
+        if (reaction case final FakeChatJson reaction) {...reaction},
     ];
     final existing = reactions
         .where((reaction) => reaction['emoji'] == emoji)

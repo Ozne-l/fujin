@@ -19,7 +19,7 @@ const int _otherVersion = cacheVersion + 1;
 String _cachePath() {
   final directory = Directory.systemTemp.createTempSync('fujin_cache_');
   addTearDown(() => directory.deleteSync(recursive: true));
-  return '${directory.path}/${FujinDatabase.cacheFileName}';
+  return FujinDatabase.cachePathIn(directory);
 }
 
 void main() {

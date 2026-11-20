@@ -4,9 +4,9 @@ import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/data/dev_chat/fake_chat.dart';
+import 'package:fujin/data/media/picked_media.dart';
 import 'package:fujin/pages/chat/conversation_page.dart';
 import 'package:fujin/pages/chat/reply_notifier.dart';
-import 'package:fujin/pages/chat_media/picked_media.dart';
 import 'package:fujin/pages/tabs/tab_plate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -23,6 +23,17 @@ const _sending = 'Envoi ·';
 Future<void> _tap(WidgetTester tester, Finder finder) async {
   await tester.tap(finder);
   await tester.pumpAndSettle();
+}
+
+Future<void> _sendWhileSpinning(WidgetTester tester) async {
+  await tester.tap(find.byTooltip('Envoyer'));
+  await _spin(tester);
+}
+
+Future<void> _spin(WidgetTester tester) async {
+  for (var frame = 0; frame < 20; frame++) {
+    await tester.pump(const Duration(milliseconds: 100));
+  }
 }
 
 void main() {
@@ -59,16 +70,16 @@ void main() {
 
     await _tap(tester, find.bySemanticsLabel('Médias'));
     await _tap(tester, find.text('Photos et vidéos'));
-    await _tap(tester, find.byTooltip('Envoyer'));
+    await _sendWhileSpinning(tester);
 
     check(find.text(_waiting).evaluate()).length.equals(1);
     check(find.textContaining(_sending).evaluate()).isEmpty();
 
     backends.lostChatCalls.clear();
     network.add(false);
-    await tester.pumpAndSettle();
+    await _spin(tester);
     network.add(true);
-    await tester.pumpAndSettle();
+    await _spin(tester);
 
     check(uploader.orders).length.equals(1);
     check(find.text(_waiting).evaluate()).isEmpty();
@@ -119,7 +130,7 @@ void main() {
 
     await _tap(tester, find.bySemanticsLabel('Médias'));
     await _tap(tester, find.text('Photos et vidéos'));
-    await _tap(tester, find.byTooltip('Envoyer'));
+    await _sendWhileSpinning(tester);
 
     check(find.text(_waiting).evaluate()).length.equals(1);
     check(find.text('Toi').evaluate()).length.equals(1);

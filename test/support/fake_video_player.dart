@@ -14,6 +14,7 @@ final class FakeVideoPlayer {
   final Duration duration;
   int failures;
   Completer<void>? gate;
+  Completer<void>? seekBuffer;
   final List<FakeVideoController> controllers = [];
 
   FakeVideoController get last => controllers.last;
@@ -29,6 +30,7 @@ final class FakeVideoController extends VideoPlayerController {
   FakeVideoController._(super.url, this._player) : super.networkUrl();
 
   final FakeVideoPlayer _player;
+  final List<Duration> seeks = [];
   bool disposed = false;
 
   @override
@@ -46,8 +48,17 @@ final class FakeVideoController extends VideoPlayerController {
     );
   }
 
+  Future<void> complete() async {
+    value = value.copyWith(isCompleted: true);
+    await pause();
+    await seekTo(value.duration);
+  }
+
   @override
-  Future<void> play() async => value = value.copyWith(isPlaying: true);
+  Future<void> play() async {
+    if (value.position == value.duration) await seekTo(Duration.zero);
+    value = value.copyWith(isPlaying: true, isCompleted: false);
+  }
 
   @override
   Future<void> pause() async => value = value.copyWith(isPlaying: false);
@@ -57,8 +68,22 @@ final class FakeVideoController extends VideoPlayerController {
       value = value.copyWith(volume: volume);
 
   @override
-  Future<void> seekTo(Duration position) async =>
-      value = value.copyWith(position: position);
+  Future<void> seekTo(Duration position) async {
+    seeks.add(position);
+    value = value.copyWith(
+      position: position,
+      isCompleted: position == value.duration,
+    );
+    if (_player.seekBuffer case final buffer?) {
+      value = value.copyWith(isBuffering: true);
+      unawaited(_bufferUntil(buffer.future));
+    }
+  }
+
+  Future<void> _bufferUntil(Future<void> buffered) async {
+    await buffered;
+    if (!disposed) value = value.copyWith(isBuffering: false);
+  }
 
   @override
   Future<void> dispose() async {

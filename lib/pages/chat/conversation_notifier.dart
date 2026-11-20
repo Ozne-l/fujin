@@ -18,6 +18,12 @@ conversationViewProvider = NotifierProvider.autoDispose
       ConversationNotifier.new,
     );
 
+final StreamProviderFamily<List<MessageUpload>, String> messageUploadsProvider =
+    StreamProvider.autoDispose.family<List<MessageUpload>, String>(
+      (ref, conversationId) =>
+          ref.watch(chatUploadServiceProvider).watch(conversationId),
+    );
+
 final class ConversationNotifier
     extends Notifier<AsyncValue<ConversationView>> {
   ConversationNotifier(this._conversationId);
@@ -50,11 +56,11 @@ final class ConversationNotifier
 
   Future<void> signedInAgain() => ref.read(chatServiceProvider).refresh();
 
-  Future<void> send(String content, {EkkloMessage? replyTo}) => ref
+  Future<bool> send(String content, {EkkloMessage? replyTo}) => ref
       .read(chatServiceProvider)
       .sendText(_conversationId, content, replyTo: replyTo);
 
-  Future<void> retry(String pendingId) =>
+  Future<bool> retry(String pendingId) =>
       ref.read(chatServiceProvider).retryText(_conversationId, pendingId);
 
   Future<bool> react(String messageId, String emoji) async {

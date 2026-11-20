@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/chat/widgets/media_placeholder.dart';
 import 'package:fujin/pages/chat/widgets/photo_tile.dart';
 import 'package:fujin/pages/common/fujin_icon_button.dart';
 import 'package:fujin/pages/common/source_dot.dart';
@@ -16,10 +17,6 @@ class ChatHeader extends StatelessWidget {
   final String name;
   final Uri? photo;
   final VoidCallback onBack;
-
-  static const double _photo = 40;
-  static const double _photoGap = 12;
-  static const double _lineGap = 2;
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -42,21 +39,20 @@ class ChatHeader extends StatelessWidget {
           child: switch (photo) {
             final photo? => PhotoTile(
               url: photo,
-              size: const Size.square(_photo),
+              size: const Size.square(FujinSize.chatHeaderPhoto),
             ),
-            null => SizedBox.square(
-              dimension: _photo,
-              child: ColoredBox(color: context.colors.backgroundNeutral),
+            null => const MediaPlaceholder(
+              size: Size.square(FujinSize.chatHeaderPhoto),
             ),
           },
         ),
-        const SizedBox(width: _photoGap),
+        const SizedBox(width: FujinSpace.s3),
         Expanded(
           child: Semantics(
             header: true,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: _lineGap,
+              spacing: FujinSize.chatLineGap,
               children: [
                 Text(
                   name,

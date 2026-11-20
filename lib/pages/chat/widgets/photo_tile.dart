@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/pages/chat/chat_files.dart';
+import 'package:fujin/pages/chat/widgets/image_arrival.dart';
+import 'package:fujin/pages/chat/widgets/media_placeholder.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class PhotoTile extends ConsumerWidget {
@@ -9,32 +12,31 @@ class PhotoTile extends ConsumerWidget {
   final Uri url;
   final Size size;
 
+  static ImageProvider thumbOf(
+    File file, {
+    required double width,
+    required double ratio,
+  }) => ResizeImage.resizeIfNeeded(
+    (width * ratio).round(),
+    null,
+    FileImage(file),
+  );
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ratio = MediaQuery.devicePixelRatioOf(context);
     return switch (ref.watch(chatFileProvider(url))) {
-      AsyncValue(value: final file?) => Image.file(
-        file,
+      AsyncValue(value: final file?) => Image(
+        image: thumbOf(file, width: size.width, ratio: ratio),
         width: size.width,
         height: size.height,
         fit: BoxFit.cover,
-        cacheWidth: (size.width * ratio).round(),
         excludeFromSemantics: true,
-        errorBuilder: (context, error, stackTrace) => _Blank(size: size),
+        frameBuilder: ImageArrival.frameBuilder,
+        errorBuilder: (context, error, stackTrace) =>
+            MediaPlaceholder(size: size),
       ),
-      AsyncValue() => _Blank(size: size),
+      AsyncValue() => MediaPlaceholder(size: size),
     };
   }
-}
-
-class _Blank extends StatelessWidget {
-  const _Blank({required this.size});
-
-  final Size size;
-
-  @override
-  Widget build(BuildContext context) => SizedBox.fromSize(
-    size: size,
-    child: ColoredBox(color: context.colors.backgroundNeutral),
-  );
 }

@@ -17,6 +17,7 @@ class ChatChangeMapper extends ClassMapperBase<ChatChange> {
       MapperContainer.globals.use(_instance = ChatChangeMapper._());
       MessageSavedMapper.ensureInitialized();
       MessageRemovedMapper.ensureInitialized();
+      MessagesReadMapper.ensureInitialized();
       NothingChangedMapper.ensureInitialized();
     }
     return _instance!;
@@ -336,6 +337,167 @@ class _MessageRemovedCopyWithImpl<$R, $Out>
   MessageRemovedCopyWith<$R2, MessageRemoved, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
   ) => _MessageRemovedCopyWithImpl<$R2, $Out2>($value, $cast, t);
+}
+
+class MessagesReadMapper extends SubClassMapperBase<MessagesRead> {
+  MessagesReadMapper._();
+
+  static MessagesReadMapper? _instance;
+  static MessagesReadMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = MessagesReadMapper._());
+      ChatChangeMapper.ensureInitialized().addSubMapper(_instance!);
+      EkkloMessageMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'MessagesRead';
+
+  static String _$conversationId(MessagesRead v) => v.conversationId;
+  static const Field<MessagesRead, String> _f$conversationId = Field(
+    'conversationId',
+    _$conversationId,
+    key: r'conversation_id',
+  );
+  static List<EkkloMessage> _$messages(MessagesRead v) => v.messages;
+  static const Field<MessagesRead, List<EkkloMessage>> _f$messages = Field(
+    'messages',
+    _$messages,
+  );
+
+  @override
+  final MappableFields<MessagesRead> fields = const {
+    #conversationId: _f$conversationId,
+    #messages: _f$messages,
+  };
+  @override
+  final bool ignoreNull = true;
+
+  @override
+  final String discriminatorKey = 'change';
+  @override
+  final dynamic discriminatorValue = 'read';
+  @override
+  late final ClassMapperBase superMapper = ChatChangeMapper.ensureInitialized();
+
+  static MessagesRead _instantiate(DecodingData data) {
+    return MessagesRead(
+      conversationId: data.dec(_f$conversationId),
+      messages: data.dec(_f$messages),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static MessagesRead fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<MessagesRead>(map);
+  }
+
+  static MessagesRead fromJson(String json) {
+    return ensureInitialized().decodeJson<MessagesRead>(json);
+  }
+}
+
+mixin MessagesReadMappable {
+  String toJson() {
+    return MessagesReadMapper.ensureInitialized().encodeJson<MessagesRead>(
+      this as MessagesRead,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return MessagesReadMapper.ensureInitialized().encodeMap<MessagesRead>(
+      this as MessagesRead,
+    );
+  }
+
+  MessagesReadCopyWith<MessagesRead, MessagesRead, MessagesRead> get copyWith =>
+      _MessagesReadCopyWithImpl<MessagesRead, MessagesRead>(
+        this as MessagesRead,
+        $identity,
+        $identity,
+      );
+  @override
+  String toString() {
+    return MessagesReadMapper.ensureInitialized().stringifyValue(
+      this as MessagesRead,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return MessagesReadMapper.ensureInitialized().equalsValue(
+      this as MessagesRead,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return MessagesReadMapper.ensureInitialized().hashValue(
+      this as MessagesRead,
+    );
+  }
+}
+
+extension MessagesReadValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, MessagesRead, $Out> {
+  MessagesReadCopyWith<$R, MessagesRead, $Out> get $asMessagesRead =>
+      $base.as((v, t, t2) => _MessagesReadCopyWithImpl<$R, $Out>(v, t, t2));
+}
+
+abstract class MessagesReadCopyWith<$R, $In extends MessagesRead, $Out>
+    implements ChatChangeCopyWith<$R, $In, $Out> {
+  ListCopyWith<
+    $R,
+    EkkloMessage,
+    EkkloMessageCopyWith<$R, EkkloMessage, EkkloMessage>
+  >
+  get messages;
+  @override
+  $R call({String? conversationId, List<EkkloMessage>? messages});
+  MessagesReadCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _MessagesReadCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, MessagesRead, $Out>
+    implements MessagesReadCopyWith<$R, MessagesRead, $Out> {
+  _MessagesReadCopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<MessagesRead> $mapper =
+      MessagesReadMapper.ensureInitialized();
+  @override
+  ListCopyWith<
+    $R,
+    EkkloMessage,
+    EkkloMessageCopyWith<$R, EkkloMessage, EkkloMessage>
+  >
+  get messages => ListCopyWith(
+    $value.messages,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(messages: v),
+  );
+  @override
+  $R call({String? conversationId, List<EkkloMessage>? messages}) => $apply(
+    FieldCopyWithData({
+      if (conversationId != null) #conversationId: conversationId,
+      if (messages != null) #messages: messages,
+    }),
+  );
+  @override
+  MessagesRead $make(CopyWithData data) => MessagesRead(
+    conversationId: data.get(#conversationId, or: $value.conversationId),
+    messages: data.get(#messages, or: $value.messages),
+  );
+
+  @override
+  MessagesReadCopyWith<$R2, MessagesRead, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _MessagesReadCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class NothingChangedMapper extends SubClassMapperBase<NothingChanged> {

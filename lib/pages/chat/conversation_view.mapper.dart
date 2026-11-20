@@ -31,6 +31,12 @@ class ConversationViewMapper extends ClassMapperBase<ConversationView> {
     _$conversationId,
     key: r'conversation_id',
   );
+  static String? _$ownerId(ConversationView v) => v.ownerId;
+  static const Field<ConversationView, String> _f$ownerId = Field(
+    'ownerId',
+    _$ownerId,
+    key: r'owner_id',
+  );
   static EkkloPerson? _$coach(ConversationView v) => v.coach;
   static const Field<ConversationView, EkkloPerson> _f$coach = Field(
     'coach',
@@ -81,6 +87,7 @@ class ConversationViewMapper extends ClassMapperBase<ConversationView> {
   @override
   final MappableFields<ConversationView> fields = const {
     #conversationId: _f$conversationId,
+    #ownerId: _f$ownerId,
     #coach: _f$coach,
     #newestFirst: _f$newestFirst,
     #link: _f$link,
@@ -96,6 +103,7 @@ class ConversationViewMapper extends ClassMapperBase<ConversationView> {
   static ConversationView _instantiate(DecodingData data) {
     return ConversationView(
       conversationId: data.dec(_f$conversationId),
+      ownerId: data.dec(_f$ownerId),
       coach: data.dec(_f$coach),
       newestFirst: data.dec(_f$newestFirst),
       link: data.dec(_f$link),
@@ -174,6 +182,7 @@ abstract class ConversationViewCopyWith<$R, $In extends ConversationView, $Out>
   get newestFirst;
   $R call({
     String? conversationId,
+    String? ownerId,
     EkkloPerson? coach,
     List<ThreadItem>? newestFirst,
     ChatLink? link,
@@ -209,6 +218,7 @@ class _ConversationViewCopyWithImpl<$R, $Out>
   @override
   $R call({
     String? conversationId,
+    Object? ownerId = $none,
     Object? coach = $none,
     List<ThreadItem>? newestFirst,
     ChatLink? link,
@@ -220,6 +230,7 @@ class _ConversationViewCopyWithImpl<$R, $Out>
   }) => $apply(
     FieldCopyWithData({
       if (conversationId != null) #conversationId: conversationId,
+      if (ownerId != $none) #ownerId: ownerId,
       if (coach != $none) #coach: coach,
       if (newestFirst != null) #newestFirst: newestFirst,
       if (link != null) #link: link,
@@ -233,6 +244,7 @@ class _ConversationViewCopyWithImpl<$R, $Out>
   @override
   ConversationView $make(CopyWithData data) => ConversationView(
     conversationId: data.get(#conversationId, or: $value.conversationId),
+    ownerId: data.get(#ownerId, or: $value.ownerId),
     coach: data.get(#coach, or: $value.coach),
     newestFirst: data.get(#newestFirst, or: $value.newestFirst),
     link: data.get(#link, or: $value.link),

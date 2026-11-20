@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:fujin/app/theme/fujin_haptics.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/alert_pictogram.dart';
@@ -13,7 +13,7 @@ Future<void> showDiscardSheet(
   BuildContext context, {
   required VoidCallback onDiscard,
 }) {
-  unawaited(HapticFeedback.mediumImpact());
+  FujinHaptics.press();
   return SheetFrame.show(
     context,
     builder: (context) => _DiscardSheet(onDiscard: onDiscard),

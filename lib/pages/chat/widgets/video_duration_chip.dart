@@ -9,13 +9,17 @@ class VideoDurationChip extends StatelessWidget {
 
   final Duration duration;
 
-  static const double _icon = 10;
-  static const EdgeInsets _padding = EdgeInsets.fromLTRB(6, 2, 7, 2);
+  static const EdgeInsets _padding = EdgeInsets.fromLTRB(
+    FujinSize.mediaPillPaddingHorizontal,
+    FujinSize.durationChipPaddingVertical,
+    FujinSize.durationChipPaddingEnd,
+    FujinSize.durationChipPaddingVertical,
+  );
 
   @override
   Widget build(BuildContext context) => DarkPill(
     icon: ChatMediaIcon.play,
-    iconSize: _icon,
+    iconSize: FujinSize.durationChipIcon,
     label: ChatText.clock(duration),
     labelStyle: FujinText.inter11Semibold,
     padding: _padding,

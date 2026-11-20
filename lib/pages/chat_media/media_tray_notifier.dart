@@ -2,14 +2,14 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:fujin/app/providers.dart';
+import 'package:fujin/data/media/forget_file.dart';
 import 'package:fujin/data/media/media_processing_exception.dart';
+import 'package:fujin/data/media/picked_media.dart';
 import 'package:fujin/domain/chat/edit/edited_media.dart';
 import 'package:fujin/domain/chat/edit/media_send.dart';
 import 'package:fujin/domain/chat/edit/video_edit.dart';
-import 'package:fujin/pages/chat_media/forget_file.dart';
 import 'package:fujin/pages/chat_media/media_scratch.dart';
 import 'package:fujin/pages/chat_media/media_tray.dart';
-import 'package:fujin/pages/chat_media/picked_media.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final NotifierProvider<MediaTrayNotifier, MediaTray> mediaTrayProvider =
@@ -52,12 +52,19 @@ final class MediaTrayNotifier extends Notifier<MediaTray> {
           }
       }
     }
-    if (!ref.mounted || added.isEmpty) return;
+    if (!ref.mounted) {
+      for (final media in added) {
+        unawaited(forgetFile(media.path));
+      }
+      return;
+    }
+    final merged = [...state.media, ...added];
+    for (final extra in merged.skip(MediaSend.maximumMedia)) {
+      unawaited(forgetFile(extra.path));
+    }
+    if (added.isEmpty || state.isFull) return;
     state = MediaTray(
-      media: [
-        ...state.media,
-        ...added,
-      ].take(MediaSend.maximumMedia).toList(),
+      media: merged.take(MediaSend.maximumMedia).toList(),
       selected: state.media.length,
     );
   }

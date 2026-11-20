@@ -3150,6 +3150,12 @@ abstract class AppLocalizations {
   /// **'{count}+'**
   String chatBadgeOverflow(int count);
 
+  /// No description provided for @chatJumpToLatest.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =0{Aller aux derniers messages} =1{Aller aux derniers messages, 1 nouveau} other{Aller aux derniers messages, {count} nouveaux}}'**
+  String chatJumpToLatest(int count);
+
   /// No description provided for @chatCoach.
   ///
   /// In fr, this message translates to:
@@ -3270,6 +3276,12 @@ abstract class AppLocalizations {
   /// **'Pause'**
   String get chatPause;
 
+  /// No description provided for @chatVoiceNotLoaded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Message vocal pas chargé'**
+  String get chatVoiceNotLoaded;
+
   /// No description provided for @chatCannotReply.
   ///
   /// In fr, this message translates to:
@@ -3342,12 +3354,6 @@ abstract class AppLocalizations {
   /// **'Vidéo pas chargée'**
   String get chatViewerNotLoaded;
 
-  /// No description provided for @chatViewerRetry.
-  ///
-  /// In fr, this message translates to:
-  /// **'Réessayer'**
-  String get chatViewerRetry;
-
   /// No description provided for @chatViewerMute.
   ///
   /// In fr, this message translates to:
@@ -3365,6 +3371,18 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Chargement de la vidéo'**
   String get chatViewerLoading;
+
+  /// No description provided for @chatViewerSkipBack.
+  ///
+  /// In fr, this message translates to:
+  /// **'−{seconds} s'**
+  String chatViewerSkipBack(int seconds);
+
+  /// No description provided for @chatViewerSkipForward.
+  ///
+  /// In fr, this message translates to:
+  /// **'+{seconds} s'**
+  String chatViewerSkipForward(int seconds);
 
   /// No description provided for @chatNotificationChannelName.
   ///
@@ -3624,11 +3642,11 @@ abstract class AppLocalizations {
   /// **'Non envoyé.'**
   String get chatNotSent;
 
-  /// No description provided for @chatRetry.
+  /// No description provided for @chatSeen.
   ///
   /// In fr, this message translates to:
-  /// **'Réessayer'**
-  String get chatRetry;
+  /// **'Vu'**
+  String get chatSeen;
 
   /// No description provided for @chatReply.
   ///

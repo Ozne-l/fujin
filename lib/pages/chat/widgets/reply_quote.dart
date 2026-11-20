@@ -4,6 +4,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/chat/chat_files.dart';
+import 'package:fujin/pages/chat/widgets/media_placeholder.dart';
 import 'package:fujin/pages/chat/widgets/photo_tile.dart';
 import 'package:fujin/pages/chat_media/chat_media_icon.dart';
 import 'package:fujin/pages/chat_media/widgets/media_glyph.dart';
@@ -15,6 +16,7 @@ class ReplyQuote extends StatelessWidget {
     required this.mine,
     required this.coachName,
     this.quoted,
+    this.onTap,
     super.key,
   });
 
@@ -22,12 +24,9 @@ class ReplyQuote extends StatelessWidget {
   final bool mine;
   final String coachName;
   final EkkloMessage? quoted;
+  final VoidCallback? onTap;
 
-  static const double _bar = 3;
-  static const double _gap = 10;
-  static const double _lineGap = 2;
-  static const double _inset = 6;
-  static const Size _thumb = Size.square(36);
+  static const Size _thumb = Size.square(FujinSize.replyThumb);
 
   static EkkloReplyTo of(EkkloMessage message) => EkkloReplyTo(
     id: message.id,
@@ -40,7 +39,7 @@ class ReplyQuote extends StatelessWidget {
     AppLocalizations intl,
     EkkloReplyTo reply,
     EkkloMessage? quoted,
-  ) => switch ((reply.deleted, reply.type, firstVisual(quoted)?.kind)) {
+  ) => switch ((reply.deleted, reply.type, _firstVisual(quoted)?.kind)) {
     (true, _, _) => (null, intl.chatQuoteDeleted),
     (false, EkkloMessageType.image, _) ||
     (false, EkkloMessageType.mixed, EkkloMediaKind.image) => (
@@ -57,14 +56,13 @@ class ReplyQuote extends StatelessWidget {
       ChatMediaIcon.mic,
       intl.chatVoice,
     ),
-    (false, EkkloMessageType.text, _) => (null, reply.content ?? ''),
-    (false, EkkloMessageType.unknown, _) => (
+    (false, EkkloMessageType.text || EkkloMessageType.unknown, _) => (
       null,
       reply.content ?? intl.chatUnsupportedTitle,
     ),
   };
 
-  static EkkloMedia? firstVisual(EkkloMessage? message) => message?.media
+  static EkkloMedia? _firstVisual(EkkloMessage? message) => message?.media
       .where((media) => media.kind != EkkloMediaKind.voice)
       .firstOrNull;
 
@@ -86,26 +84,31 @@ class ReplyQuote extends StatelessWidget {
       true => intl.chatViewerYou,
       false => reply.senderName ?? coachName,
     };
-    return ClipRRect(
+    final card = ClipRRect(
       borderRadius: BorderRadius.circular(FujinRadius.tile),
       child: ColoredBox(
         color: colors.backgroundCard,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(0, _inset, _inset, _inset),
+          padding: const EdgeInsets.fromLTRB(
+            0,
+            FujinSize.replyQuoteInset,
+            FujinSize.replyQuoteInset,
+            FujinSize.replyQuoteInset,
+          ),
           child: IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: _gap,
+              spacing: FujinSize.replyBarGap,
               children: [
                 SizedBox(
-                  width: _bar,
+                  width: FujinSize.replyBar,
                   child: ColoredBox(color: bar),
                 ),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
-                    spacing: _lineGap,
+                    spacing: FujinSize.chatLineGap,
                     children: [
                       Text(
                         author,
@@ -139,7 +142,7 @@ class ReplyQuote extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (firstVisual(quoted) case final media?)
+                if (_firstVisual(quoted) case final media?)
                   Center(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(FujinRadius.key),
@@ -152,6 +155,17 @@ class ReplyQuote extends StatelessWidget {
         ),
       ),
     );
+    return switch (onTap) {
+      null => card,
+      final onTap => Semantics(
+        button: true,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: card,
+        ),
+      ),
+    };
   }
 }
 
@@ -167,17 +181,20 @@ class _Thumbnail extends ConsumerWidget {
       EkkloMediaKind.video => switch (ref.watch(
         videoPosterProvider(media.url),
       )) {
-        AsyncValue(value: final poster?) => Image.file(
-          poster.file,
+        AsyncValue(value: final poster?) => Image(
+          image: PhotoTile.thumbOf(
+            poster.file,
+            width: size.width,
+            ratio: MediaQuery.devicePixelRatioOf(context),
+          ),
           width: size.width,
           height: size.height,
           fit: BoxFit.cover,
           excludeFromSemantics: true,
+          errorBuilder: (context, error, stackTrace) =>
+              const MediaPlaceholder(size: size),
         ),
-        AsyncValue() => SizedBox.fromSize(
-          size: size,
-          child: ColoredBox(color: context.colors.backgroundNeutral),
-        ),
+        AsyncValue() => const MediaPlaceholder(size: size),
       },
       EkkloMediaKind.image ||
       EkkloMediaKind.voice => PhotoTile(url: media.url, size: size),

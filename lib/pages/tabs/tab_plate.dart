@@ -221,10 +221,9 @@ class _TabButton extends StatelessWidget {
   final bool active;
   final VoidCallback onTap;
 
-  static const double _badgeRise = 5;
   static const EdgeInsets _badgePadding = EdgeInsets.symmetric(
-    horizontal: 5,
-    vertical: 1,
+    horizontal: FujinSize.badgePaddingHorizontal,
+    vertical: FujinSize.badgePaddingVertical,
   );
 
   @override
@@ -262,7 +261,7 @@ class _TabButton extends StatelessWidget {
                     glyph,
                     Positioned(
                       left: FujinSize.icon / 2,
-                      top: -_badgeRise,
+                      top: -FujinSize.badgeRise,
                       child: DecoratedBox(
                         decoration: ShapeDecoration(
                           shape: const StadiumBorder(),

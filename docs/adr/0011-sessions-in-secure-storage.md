@@ -22,5 +22,5 @@ Both client packages take a pluggable credential store (`EkkloTokenStore` in `~/
 ## Consequences
 
 - After a reinstall or restore the owner signs in again.
-- Session expiry surfaces as `MfpAuthException` or `EkkloAuthException`, shown as "Déconnecté" in `lib/pages/journal/widgets/journal_problem_card.dart`.
+- Session expiry surfaces as `MfpAuthException` or `EkkloAuthException`, shown as "Déconnecté" in `lib/pages/common/journal_problem_card.dart`.
 - Credentials never appear in the database, the backup file, or test fixtures (tests use fake values in `test/support/fake_backends.dart`).

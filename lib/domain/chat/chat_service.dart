@@ -11,6 +11,7 @@ import 'package:fujin/domain/chat/chat_change.dart';
 import 'package:fujin/domain/chat/chat_link.dart';
 import 'package:fujin/domain/chat/chat_state.dart';
 import 'package:fujin/domain/chat/conversation_state.dart';
+import 'package:fujin/domain/chat/keeping_read.dart';
 import 'package:fujin/domain/chat/pending_text.dart';
 import 'package:fujin/domain/chat/pending_text_state.dart';
 import 'package:fujin/domain/chat/reduce_chat_event.dart';
@@ -45,6 +46,7 @@ final class ChatService {
   final _watchers = <StreamController<ChatState>>{};
   final _opened = <String, _Opened>{};
   final _pending = <String, List<PendingText>>{};
+  final _claimed = <String>{};
   final _deleting = <String>{};
   final _reading = <String>{};
   int _pendingCount = 0;
@@ -195,13 +197,13 @@ final class ChatService {
     }
   }
 
-  Future<void> sendText(
+  Future<bool> sendText(
     String conversationId,
     String content, {
     EkkloMessage? replyTo,
   }) async {
     final ownerId = _owner?.id;
-    if (ownerId == null || _disposed) return;
+    if (ownerId == null || _disposed) return true;
     final pending = PendingText(
       message: EkkloMessage(
         id: '$pendingPrefix${++_pendingCount}',
@@ -224,10 +226,10 @@ final class ChatService {
       after: _chats.messages(conversationId, limit: 1).firstOrNull?.id,
     );
     _putPending(pending);
-    await _post(pending);
+    return _post(pending);
   }
 
-  Future<void> retryText(String conversationId, String pendingId) async {
+  Future<bool> retryText(String conversationId, String pendingId) async {
     final ownerId = _owner?.id;
     final pending = _pending[conversationId]
         ?.where((pending) => pending.id == pendingId)
@@ -235,25 +237,35 @@ final class ChatService {
     if (ownerId == null ||
         pending == null ||
         pending.state != PendingTextState.failed) {
-      return;
+      return true;
     }
     final sending = pending.copyWith(state: PendingTextState.sending);
     _putPending(sending);
     try {
       final page = await _messaging.messages(conversationId);
-      if (_disposed) return;
-      _chats.replaceNewestPage(conversationId, _cachedPage(page));
-      if (sentText(sending, page.messages, ownerId: ownerId) != null) {
+      if (_disposed) return true;
+      _saveNewest(conversationId, page);
+      if (sentText(
+            sending,
+            page.messages,
+            ownerId: ownerId,
+            taken: _claimed,
+          )
+          case final arrived?) {
+        _claimed.add(arrived.id);
         _dropPending(sending);
-        return _emitConversation(conversationId);
+        _emitConversation(conversationId);
+        return true;
       }
     } on EkkloAuthException {
       _expire();
-      return _putPending(pending);
+      _putPending(pending);
+      return false;
     } on EkkloException {
-      return _putPending(pending);
+      _putPending(pending);
+      return false;
     }
-    await _post(sending);
+    return _post(sending);
   }
 
   Future<void> react(String messageId, String emoji) async {
@@ -291,7 +303,7 @@ final class ChatService {
 
   void accept(EkkloMessage message) {
     if (_disposed) return;
-    _chats.saveMessages([_cached(message)]);
+    _chats.saveMessages([_keptRead(message)]);
     _emitConversation(message.conversationId);
   }
 
@@ -433,8 +445,11 @@ final class ChatService {
   Future<void> _walk(String conversationId, _Opened opened) async {
     var page = await _messaging.messages(conversationId);
     if (_disposed) return;
-    var overlaps = _chats.holdsAny(page.messages.map((m) => m.id));
-    _chats.replaceNewestPage(conversationId, _cachedPage(page));
+    final kept = _saveNewest(conversationId, page);
+    var overlaps = kept == null;
+    final known = {
+      for (final row in kept ?? const <CachedMessage>[]) row.id: row,
+    };
     opened.loadingNewest = false;
     _emitConversation(conversationId);
     while (!overlaps && page.hasMore) {
@@ -442,11 +457,34 @@ final class ChatService {
       if (oldest == null || !_opened.containsKey(conversationId)) return;
       page = await _messaging.messages(conversationId, beforeId: oldest.id);
       if (_disposed) return;
-      overlaps = _chats.holdsAny(page.messages.map((m) => m.id));
-      _chats.saveMessages(_cachedPage(page));
+      final walked = _cachedPage(page, known: known);
+      overlaps = walked.any((row) => known.containsKey(row.id));
+      _chats.saveMessages([
+        if ((overlaps, walked) case (true, [final edge, ...]))
+          for (final row in known.values)
+            if (row.createdAt.isBefore(edge.createdAt)) row,
+        ...walked,
+      ]);
       _emitConversation(conversationId);
     }
     if (!page.hasMore) opened.historyComplete = true;
+  }
+
+  List<CachedMessage>? _saveNewest(
+    String conversationId,
+    EkkloMessagePage page,
+  ) {
+    final newest = _cachedPage(page);
+    switch (page.hasMore && !_chats.holdsAny(newest.map((m) => m.id))) {
+      case false:
+        _chats.replaceNewestPage(conversationId, newest);
+        return null;
+      case true:
+        final kept = _chats.allMessages(conversationId);
+        _chats.replaceMessages(conversationId, newest);
+        _opened[conversationId]?.historyComplete = false;
+        return kept;
+    }
   }
 
   Future<void> _fetchOlder(String conversationId, _Opened opened) async {
@@ -471,10 +509,27 @@ final class ChatService {
       EkkloReactionEvent(:final messageId) => message(messageId),
       _ => null,
     };
-    switch (reduceChatEvent(event, current: current, ownerId: owner.id)) {
+    final thread = switch (event) {
+      EkkloMessageRead(:final conversationId, :final userId)
+          when userId != owner.id =>
+        [
+          for (final cached in _chats.allMessages(conversationId))
+            EkkloMessageMapper.fromMap(cached.json),
+        ],
+      _ => const <EkkloMessage>[],
+    };
+    switch (reduceChatEvent(
+      event,
+      current: current,
+      ownerId: owner.id,
+      thread: thread,
+    )) {
       case MessageSaved(:final message):
-        _chats.saveMessages([_cached(message)]);
+        _chats.saveMessages([_keptRead(message)]);
         _emitConversation(message.conversationId);
+      case MessagesRead(:final conversationId, :final messages):
+        _chats.saveMessages(messages.map(_cached));
+        _emitConversation(conversationId);
       case MessageRemoved(:final conversationId, :final messageId):
         _chats.removeMessage(messageId);
         _emitConversation(conversationId);
@@ -530,7 +585,7 @@ final class ChatService {
     if (opened.watchers.isEmpty) _opened.remove(conversationId);
   }
 
-  Future<void> _post(PendingText pending) async {
+  Future<bool> _post(PendingText pending) async {
     final text = pending.message;
     try {
       final sent = await _messaging.sendText(
@@ -538,16 +593,20 @@ final class ChatService {
         text.content,
         replyToId: text.replyTo?.id,
       );
-      if (_disposed) return;
+      if (_disposed) return true;
+      _claimed.add(sent.id);
       _dropPending(pending);
       accept(sent);
+      return true;
     } on EkkloAuthException {
-      if (_disposed) return;
+      if (_disposed) return true;
       _expire();
       _putPending(pending.copyWith(state: PendingTextState.failed));
+      return false;
     } on EkkloException {
-      if (_disposed) return;
+      if (_disposed) return true;
       _putPending(pending.copyWith(state: PendingTextState.failed));
+      return false;
     }
   }
 
@@ -664,12 +723,24 @@ final class ChatService {
     final built = _conversationState(conversationId, opened);
     final ownerId = _owner?.id;
     if (ownerId == null) return built;
-    final arrived = [
-      for (final text in built.pendingTexts)
-        if (text.state == PendingTextState.failed &&
-            sentText(text, built.messages, ownerId: ownerId) != null)
-          text,
-    ]..forEach(_dropPending);
+    final taken = {..._claimed};
+    final arrived = <PendingText>[];
+    for (final text in built.pendingTexts) {
+      switch ((
+        text.state,
+        sentText(text, built.messages, ownerId: ownerId, taken: taken),
+      )) {
+        case (_, null):
+          break;
+        case (PendingTextState.sending, final message?):
+          taken.add(message.id);
+        case (PendingTextState.failed, final message?):
+          taken.add(message.id);
+          _claimed.add(message.id);
+          arrived.add(text);
+      }
+    }
+    arrived.forEach(_dropPending);
     return switch (arrived) {
       [] => built,
       _ => built.copyWith(pendingTexts: [...?_pending[conversationId]]),
@@ -708,9 +779,21 @@ final class ChatService {
     final cached => EkkloMessageMapper.fromMap(cached.json),
   };
 
-  static List<CachedMessage> _cachedPage(EkkloMessagePage page) => [
-    for (final message in page.messages) _cached(message),
+  List<CachedMessage> _cachedPage(
+    EkkloMessagePage page, {
+    Map<String, CachedMessage> known = const {},
+  }) => [
+    for (final message in page.messages)
+      _cached(
+        keepingRead(
+          message,
+          cached: _decoded(known[message.id] ?? _chats.message(message.id)),
+        ),
+      ),
   ];
+
+  CachedMessage _keptRead(EkkloMessage message) =>
+      _cached(keepingRead(message, cached: this.message(message.id)));
 
   static CachedMessage _cached(EkkloMessage message) => CachedMessage(
     id: message.id,

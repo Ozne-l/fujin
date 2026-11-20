@@ -1,7 +1,7 @@
 import 'dart:async';
 
+import 'package:fujin/data/notifications/chat_notification.dart';
 import 'package:fujin/data/notifications/chat_notifications.dart';
-import 'package:fujin/domain/chat/notifications/chat_notification.dart';
 
 final class FakeChatNotifications implements ChatNotifications {
   FakeChatNotifications({this.launchConversation});

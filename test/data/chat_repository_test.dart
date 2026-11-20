@@ -73,6 +73,17 @@ void main() {
       check(chat.messages(_conversation, limit: 10)).isEmpty();
       check(chat.messages(_otherConversation, limit: 10)).length.equals(1);
     });
+
+    test('far from the cache replaces every message of its conversation', () {
+      chat.replaceMessages(_conversation, [_message('m-9', 8)]);
+
+      check(
+        idsOf(chat.messages(_conversation, limit: 10)),
+      ).deepEquals(['m-9']);
+      check(
+        idsOf(chat.messages(_otherConversation, limit: 10)),
+      ).deepEquals(['other']);
+    });
   });
 
   group('messages', () {

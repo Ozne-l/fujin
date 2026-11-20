@@ -1,4 +1,4 @@
-import 'package:fujin/domain/chat/notifications/chat_notification.dart';
+import 'package:fujin/data/notifications/chat_notification.dart';
 
 abstract interface class ChatNotifications {
   Stream<String> get opened;

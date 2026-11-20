@@ -3,13 +3,14 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/background/chat_relay_task.dart';
 import 'package:fujin/app/config.dart';
+import 'package:fujin/app/notifications/chat_notification_text.dart';
+import 'package:fujin/app/notifications/device_localizations.dart';
 import 'package:fujin/data/chat/chat_owner_repository.dart';
 import 'package:fujin/data/chat/chat_repository.dart';
 import 'package:fujin/data/chat/foreground_stamp_repository.dart';
 import 'package:fujin/data/database/cache_opening.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/dev_chat/fake_chat_server.dart';
-import 'package:fujin/data/notifications/chat_notification_text.dart';
 import 'package:fujin/data/notifications/chat_notifications.dart';
 import 'package:fujin/data/notifications/local_chat_notifications.dart';
 import 'package:fujin/data/sessions/secure_ekklo_token_store.dart';
@@ -56,12 +57,12 @@ abstract final class ChatBackgroundTask {
   static Future<bool> _run() async {
     final directory = await getApplicationSupportDirectory();
     final notifications = await LocalChatNotifications.forBackground(
-      intl: ChatNotificationText.ofDevice(),
+      copy: ChatNotificationText(deviceLocalizations()),
     );
     final ekklo = client();
     try {
       await check(
-        cachePath: '${directory.path}/${FujinDatabase.cacheFileName}',
+        cachePath: FujinDatabase.cachePathIn(directory),
         ekklo: ekklo,
         notifications: notifications,
         clock: DateTime.now,

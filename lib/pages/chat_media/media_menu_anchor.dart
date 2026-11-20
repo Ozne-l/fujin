@@ -9,13 +9,13 @@ import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/media/picked_media.dart';
 import 'package:fujin/domain/chat/edit/media_send.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/chat_media/chat_media_icon.dart';
 import 'package:fujin/pages/chat_media/media_reply.dart';
 import 'package:fujin/pages/chat_media/media_tray_page.dart';
-import 'package:fujin/pages/chat_media/picked_media.dart';
 import 'package:fujin/pages/chat_media/widgets/media_glyph.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:motor/motor.dart';
@@ -29,7 +29,6 @@ class MediaMenuAnchor extends HookConsumerWidget {
     super.key,
   });
 
-  static const double _width = 220;
   static const double _overhang = FujinSpace.s2;
   static const double _gap = FujinSpace.s3;
   static const double _foldedScale = 0.96;
@@ -147,9 +146,12 @@ class MediaMenuAnchor extends HookConsumerWidget {
           child: Stack(
             children: [
               Positioned(
-                left: math.max(FujinSize.screenMargin, right - _width),
+                left: math.max(
+                  FujinSize.screenMargin,
+                  right - FujinSize.contextMenuWidth,
+                ),
                 bottom: overlay.height - anchor.top + _gap,
-                width: _width,
+                width: FujinSize.contextMenuWidth,
                 child: TapRegion(
                   groupId: info.tapRegionGroupId,
                   onTapOutside: (event) => controller.close(),
@@ -201,8 +203,6 @@ enum _Source {
 class _Panel extends StatelessWidget {
   const _Panel({required this.onChosen});
 
-  static const double _icon = 20;
-
   final ValueChanged<_Source> onChosen;
 
   @override
@@ -226,7 +226,8 @@ class _Panel extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             for (final (index, source) in _Source.values.indexed) ...[
-              if (index > 0) Divider(height: 1, color: colors.borderDivider),
+              if (index > 0)
+                Divider(height: FujinStroke.card, color: colors.borderDivider),
               Semantics(
                 button: true,
                 child: InkWell(
@@ -242,7 +243,7 @@ class _Panel extends StatelessWidget {
                         children: [
                           MediaGlyph(
                             source.icon,
-                            size: _icon,
+                            size: FujinSize.contextMenuIcon,
                             color: colors.textPrimary,
                           ),
                           Expanded(

@@ -1,8 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fujin/app/theme/fujin_haptics.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/pages/common/glass_fill.dart';
@@ -56,7 +54,7 @@ class FujinSegments extends HookWidget {
     void select(int index) {
       settle(index);
       if (position == index) return;
-      unawaited(HapticFeedback.selectionClick());
+      FujinHaptics.select();
       if (keys[index].currentContext case final segment?) {
         onSelect(index, segment);
       }

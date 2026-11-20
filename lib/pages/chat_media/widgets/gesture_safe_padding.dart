@@ -4,13 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 
 class GestureSafePadding extends StatelessWidget {
-  const GestureSafePadding({
-    required this.child,
-    this.vertical = 0,
-    super.key,
-  });
+  const GestureSafePadding({required this.child, super.key});
 
-  final double vertical;
   final Widget child;
 
   static EdgeInsets insetsOf(
@@ -29,7 +24,7 @@ class GestureSafePadding extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: insetsOf(context, vertical: vertical),
+    padding: insetsOf(context),
     child: child,
   );
 }

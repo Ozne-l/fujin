@@ -81,6 +81,52 @@ void main() {
       ..has((item) => item.quoted, 'quoted').isNull()
       ..has((item) => item.quotesMine, 'quotesMine').isFalse();
   });
+
+  test('only my newest message the coach read is marked seen', () {
+    EkkloMessage read(String id, DateTime at, String senderId) =>
+        EkkloMessageMapper.fromMap({
+          ...FakeChat.message(id: id, createdAt: at, senderId: senderId),
+          'read_by_other': true,
+        });
+
+    final view = ConversationView.of(
+      _state([
+        read('older', DateTime(2026, 10, 7, 8), FakeChat.ownerId),
+        read('newer', DateTime(2026, 10, 7, 9), FakeChat.ownerId),
+        read('coach', DateTime(2026, 10, 7, 10), FakeChat.coachId),
+        _message(
+          'unread',
+          DateTime(2026, 10, 7, 11),
+          senderId: FakeChat.ownerId,
+        ),
+      ]),
+    );
+
+    check({
+      for (final item in view.newestFirst)
+        if (item case ThreadMessage(:final message, :final seen))
+          message.id: seen,
+    }).deepEquals({
+      'unread': false,
+      'coach': false,
+      'newer': true,
+      'older': false,
+    });
+  });
+
+  test('knows my messages from the owner of the conversation', () {
+    final mine = _message(
+      'mine',
+      DateTime(2026, 10, 7, 8),
+      senderId: FakeChat.ownerId,
+    );
+    final coach = _message('coach', DateTime(2026, 10, 7, 9));
+
+    final view = ConversationView.of(_state([mine, coach]));
+
+    check(view.isMine(mine)).isTrue();
+    check(view.isMine(coach)).isFalse();
+  });
 }
 
 extension on ConversationView {

@@ -21,8 +21,6 @@ class EmojiSheet extends HookWidget {
   const EmojiSheet({super.key});
 
   static const double _share = 0.6;
-  static const double _cell = 44;
-  static const double _tab = 40;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +42,7 @@ class EmojiSheet extends HookWidget {
           ),
           const SizedBox(height: FujinSpace.s3),
           SizedBox(
-            height: _tab,
+            height: FujinSize.emojiTab,
             child: ListView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(
@@ -57,10 +55,10 @@ class EmojiSheet extends HookWidget {
                     selected: index == group.value,
                     child: InkResponse(
                       onTap: () => group.value = index,
-                      radius: _tab / 2,
+                      radius: FujinSize.emojiTab / 2,
                       child: Container(
-                        width: _tab,
-                        height: _tab,
+                        width: FujinSize.emojiTab,
+                        height: FujinSize.emojiTab,
                         alignment: Alignment.center,
                         decoration: ShapeDecoration(
                           shape: const CircleBorder(),
@@ -90,7 +88,7 @@ class EmojiSheet extends HookWidget {
                 MediaQuery.paddingOf(context).bottom + FujinSpace.s3,
               ),
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: _cell,
+                maxCrossAxisExtent: FujinSize.emojiCell,
               ),
               itemCount: emojis.length,
               itemBuilder: (context, index) => Semantics(
@@ -99,7 +97,7 @@ class EmojiSheet extends HookWidget {
                 excludeSemantics: true,
                 child: InkResponse(
                   onTap: () => navigator.pop(emojis[index]),
-                  radius: _cell / 2,
+                  radius: FujinSize.emojiCell / 2,
                   child: Center(
                     child: Text(
                       emojis[index],

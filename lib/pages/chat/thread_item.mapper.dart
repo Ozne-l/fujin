@@ -226,6 +226,13 @@ class ThreadMessageMapper extends SubClassMapperBase<ThreadMessage> {
     opt: true,
     def: MessageDelivery.sent,
   );
+  static bool _$seen(ThreadMessage v) => v.seen;
+  static const Field<ThreadMessage, bool> _f$seen = Field(
+    'seen',
+    _$seen,
+    opt: true,
+    def: false,
+  );
 
   @override
   final MappableFields<ThreadMessage> fields = const {
@@ -234,6 +241,7 @@ class ThreadMessageMapper extends SubClassMapperBase<ThreadMessage> {
     #quoted: _f$quoted,
     #quotesMine: _f$quotesMine,
     #delivery: _f$delivery,
+    #seen: _f$seen,
   };
   @override
   final bool ignoreNull = true;
@@ -252,6 +260,7 @@ class ThreadMessageMapper extends SubClassMapperBase<ThreadMessage> {
       quoted: data.dec(_f$quoted),
       quotesMine: data.dec(_f$quotesMine),
       delivery: data.dec(_f$delivery),
+      seen: data.dec(_f$seen),
     );
   }
 
@@ -326,6 +335,7 @@ abstract class ThreadMessageCopyWith<$R, $In extends ThreadMessage, $Out>
     EkkloMessage? quoted,
     bool? quotesMine,
     MessageDelivery? delivery,
+    bool? seen,
   });
   ThreadMessageCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -351,6 +361,7 @@ class _ThreadMessageCopyWithImpl<$R, $Out>
     Object? quoted = $none,
     bool? quotesMine,
     MessageDelivery? delivery,
+    bool? seen,
   }) => $apply(
     FieldCopyWithData({
       if (message != null) #message: message,
@@ -358,6 +369,7 @@ class _ThreadMessageCopyWithImpl<$R, $Out>
       if (quoted != $none) #quoted: quoted,
       if (quotesMine != null) #quotesMine: quotesMine,
       if (delivery != null) #delivery: delivery,
+      if (seen != null) #seen: seen,
     }),
   );
   @override
@@ -367,6 +379,7 @@ class _ThreadMessageCopyWithImpl<$R, $Out>
     quoted: data.get(#quoted, or: $value.quoted),
     quotesMine: data.get(#quotesMine, or: $value.quotesMine),
     delivery: data.get(#delivery, or: $value.delivery),
+    seen: data.get(#seen, or: $value.seen),
   );
 
   @override

@@ -432,7 +432,7 @@ class SearchView extends HookConsumerWidget {
               child: header,
             ),
           ),
-          body: (context, extent) => ScrollEdgeBlur(
+          body: (context, extent, _) => ScrollEdgeBlur(
             top: extent,
             child: CustomScrollView(
               slivers: [

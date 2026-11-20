@@ -72,7 +72,7 @@ class _Failure extends StatelessWidget {
           ),
         ),
       CameraChip(
-        label: context.intl.chatViewerRetry,
+        label: context.intl.tryAgain,
         icon: ChatMediaIcon.refresh,
         onPressed: onRetry,
       ),

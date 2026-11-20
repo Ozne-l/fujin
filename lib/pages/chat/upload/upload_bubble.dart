@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/chat/chat_media_kind.dart';
+import 'package:fujin/domain/chat/upload/message_upload.dart';
 import 'package:fujin/domain/chat/upload/upload_phase.dart';
 import 'package:fujin/domain/chat/upload/uploading_media.dart';
 import 'package:fujin/l10n/intl_context.dart';
@@ -8,6 +9,7 @@ import 'package:fujin/pages/chat/chat_text.dart';
 import 'package:fujin/pages/chat/thread_item.dart';
 import 'package:fujin/pages/chat/upload/upload_tile.dart';
 import 'package:fujin/pages/chat/widgets/chat_bubble.dart';
+import 'package:fujin/pages/chat/widgets/failure_shake.dart';
 import 'package:fujin/pages/chat/widgets/media_gallery.dart';
 import 'package:fujin/pages/chat/widgets/message_row.dart';
 import 'package:fujin/pages/chat/widgets/message_status.dart';
@@ -27,10 +29,6 @@ class UploadBubble extends StatelessWidget {
   final String coachName;
   final VoidCallback onRetry;
 
-  static const double _captionInset = 10;
-  static const double _alertIcon = 14;
-  static const double _noticeWidth = 236;
-  static const double _voiceIcon = 16;
   static const int _bytesPerMegabyte = 1000000;
 
   @override
@@ -51,38 +49,40 @@ class UploadBubble extends StatelessWidget {
         quoted: quoted,
       ),
     };
-    final content = switch (upload.media) {
-      [UploadingMedia(kind: ChatMediaKind.voice)] => ChatBubble(
-        mine: true,
-        failed: failed,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          spacing: FujinSpace.s2,
-          children: [
-            ?quote,
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              spacing: FujinSpace.s2,
-              children: [
-                MediaGlyph(
-                  ChatMediaIcon.mic,
-                  size: _voiceIcon,
-                  color: colors.textPrimary,
-                ),
-                Text(
-                  ChatText.clock(
-                    Duration(seconds: upload.durationSeconds ?? 0),
+    final content = switch (upload) {
+      MessageUpload(
+        media: [UploadingMedia(kind: ChatMediaKind.voice)],
+        durationSeconds: final seconds?,
+      ) =>
+        ChatBubble(
+          mine: true,
+          failed: failed,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            spacing: FujinSpace.s2,
+            children: [
+              ?quote,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: FujinSpace.s2,
+                children: [
+                  MediaGlyph(
+                    ChatMediaIcon.mic,
+                    size: FujinSize.uploadVoiceIcon,
+                    color: colors.textPrimary,
                   ),
-                  semanticsLabel: intl.chatVoice,
-                  style: body,
-                ),
-              ],
-            ),
-          ],
+                  Text(
+                    ChatText.clock(Duration(seconds: seconds)),
+                    semanticsLabel: intl.chatVoice,
+                    style: body,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
-      final media => ChatBubble(
+      MessageUpload(:final media) => ChatBubble(
         mine: true,
         failed: failed,
         padding: ChatBubble.mediaPadding,
@@ -107,7 +107,7 @@ class UploadBubble extends StatelessWidget {
               if (upload.caption case final caption when caption.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: _captionInset,
+                    horizontal: FujinSize.bubbleCaptionInset,
                   ),
                   child: Text(caption, style: body),
                 ),
@@ -136,7 +136,9 @@ class UploadBubble extends StatelessWidget {
     };
     final notice = switch ((failed, upload.originalBytes)) {
       (false, final bytes?) => ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: _noticeWidth),
+        constraints: const BoxConstraints(
+          maxWidth: FujinSize.uploadNoticeWidth,
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,7 +146,7 @@ class UploadBubble extends StatelessWidget {
           children: [
             MediaGlyph(
               ChatMediaIcon.alert,
-              size: _alertIcon,
+              size: FujinSize.uploadNoticeIcon,
               color: colors.textGold,
             ),
             Flexible(
@@ -169,7 +171,10 @@ class UploadBubble extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         spacing: FujinSpace.s1,
-        children: [status, ?notice],
+        children: [
+          FailureShake(failed: failed, buzz: true, child: status),
+          ?notice,
+        ],
       ),
     );
   }

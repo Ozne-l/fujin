@@ -108,12 +108,118 @@ abstract final class FujinMotion {
     reverseDuration: Duration(milliseconds: 250),
   );
 
+  static const Curve _standard = Cubic(0.2, 0, 0, 1);
+  static const Curve easeOutQuint = Cubic(0.23, 1, 0.32, 1);
+  static const CurvedMotion dissolve = CurvedMotion(
+    Duration(milliseconds: 150),
+    Curves.easeOut,
+  );
+  static const double swapScale = 0.1;
+  static const CurvedMotion grow = CurvedMotion(
+    Duration(milliseconds: 200),
+    _standard,
+  );
+  static const CurvedMotion messageIn = CurvedMotion(
+    Duration(milliseconds: 250),
+    _standard,
+  );
+  static const CurvedMotion sendFlight = CurvedMotion(
+    Duration(milliseconds: 250),
+    easeOutQuint,
+  );
+  static const CurvedMotion highlight = CurvedMotion(
+    Duration(milliseconds: 600),
+    Curves.easeOut,
+  );
+  static const CurvedMotion mediaFlight = CurvedMotion(
+    Duration(milliseconds: 300),
+    Curves.fastOutSlowIn,
+  );
+  static const Motion release = CupertinoMotion.interactive(snapToEnd: true);
+  static const Motion lift = CupertinoMotion.snappy(
+    duration: Duration(milliseconds: 250),
+    snapToEnd: true,
+  );
+  static const Motion pop = CupertinoMotion.bouncy(
+    duration: Duration(milliseconds: 350),
+    snapToEnd: true,
+  );
+  static const double messageRise = 16;
+  static const Motion sendFlightClock = LinearMotion(
+    Duration(milliseconds: 250),
+  );
+  static const CurvedMotion scrollGlide = CurvedMotion(
+    Duration(milliseconds: 400),
+    _standard,
+  );
+  static const CurvedMotion scrollSettle = CurvedMotion(
+    Duration(milliseconds: 250),
+    _standard,
+  );
+  static const double popSwell = 1.2;
+  static const double liftScale = 1.03;
+  static const Duration liftSettle = Duration(milliseconds: 300);
+  static const Duration reactionStagger = Duration(milliseconds: 20);
+  static const double reactionHover = 1.5;
+  static const Motion reactionFlight = LinearMotion(
+    Duration(milliseconds: 350),
+  );
+  static const Curve flightDrop = Curves.easeInOut;
+  static const double pressShrink = 0.85;
+  static const Motion _uploadSpin = LinearMotion(Duration(milliseconds: 2500));
+  static const uploadSpinTurns = StepSequence<double>(
+    [0, 1],
+    motion: _uploadSpin,
+    loop: LoopMode.seamless,
+  );
+  static const Duration uploadTick = Duration(milliseconds: 400);
+  static const Duration viewerIdle = Duration(seconds: 3);
+  static const Duration seekBadge = Duration(milliseconds: 700);
+  static const Motion shake = LinearMotion(Duration(milliseconds: 300));
+  static const int _shakeCycles = 3;
+  static const double _shakeDistance = 4;
+
+  static double shakeOffset(double shakes) {
+    final progress = shakes % 1;
+    return math.sin(progress * _shakeCycles * 2 * math.pi) *
+        _shakeDistance *
+        (1 - progress);
+  }
+
+  static const CurvedMotion rotate = CurvedMotion(
+    Duration(milliseconds: 250),
+    _standard,
+  );
+  static const CurvedMotion gridFade = CurvedMotion(
+    Duration(milliseconds: 400),
+    Interval(0.5, 1, curve: Curves.easeOut),
+  );
+  static const recordingPulse = StepSequence<double>(
+    [1, 0.35],
+    motion: CurvedMotion(Duration(milliseconds: 1200), Curves.easeInOut),
+    loop: LoopMode.pingPong,
+  );
+  static const Motion levelScroll = LinearMotion(Duration(milliseconds: 100));
+  static const Motion playedFill = LinearMotion(Duration(milliseconds: 500));
+  static const double scrubSwell = 1.6;
+
   static bool reduced(BuildContext context) =>
-      MediaQuery.disableAnimationsOf(context);
+      MediaQuery.disableAnimationsOf(context) ||
+      WidgetsBinding
+          .instance
+          .platformDispatcher
+          .accessibilityFeatures
+          .reduceMotion;
 
   static Motion of(BuildContext context, Motion motion) =>
       switch (reduced(context)) {
         true => const InstantMotion(),
+        false => motion,
+      };
+
+  static Motion dissolveOf(BuildContext context, Motion motion) =>
+      switch (reduced(context)) {
+        true => dissolve,
         false => motion,
       };
 

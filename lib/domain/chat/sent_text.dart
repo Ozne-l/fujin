@@ -5,6 +5,7 @@ EkkloMessage? sentText(
   PendingText pending,
   List<EkkloMessage> newestPage, {
   required String ownerId,
+  Set<String> taken = const {},
 }) {
   final text = pending.message;
   final start = switch (pending.after) {
@@ -20,6 +21,7 @@ EkkloMessage? sentText(
   return candidates
       .where(
         (message) =>
+            !taken.contains(message.id) &&
             message.senderId == ownerId &&
             message.type == EkkloMessageType.text &&
             message.content == text.content,

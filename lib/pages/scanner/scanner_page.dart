@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fujin/app/fujin_route.dart';
+import 'package:fujin/app/theme/fujin_haptics.dart';
 import 'package:fujin/app/theme/fujin_system_bars.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
@@ -47,7 +48,7 @@ class ScannerPage extends HookConsumerWidget {
         ScannerAiming(),
         ScannerLooking() || ScannerTyping(code: String(isNotEmpty: true)),
       )) {
-        unawaited(HapticFeedback.mediumImpact());
+        FujinHaptics.press();
       }
     });
 

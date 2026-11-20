@@ -1,4 +1,4 @@
-import 'package:fujin/pages/chat_media/picked_media.dart';
+import 'package:fujin/data/media/picked_media.dart';
 
 abstract interface class MediaPicker {
   Future<List<PickedMedia>> gallery({required int limit});

@@ -8,9 +8,6 @@ import 'package:fujin/pages/chat_media/widgets/media_glyph.dart';
 class UnsupportedCard extends StatelessWidget {
   const UnsupportedCard({super.key});
 
-  static const double _iconGap = 10;
-  static const double _lineGap = 2;
-
   @override
   Widget build(BuildContext context) => CustomPaint(
     painter: _DashedOutline(
@@ -21,7 +18,7 @@ class UnsupportedCard extends StatelessWidget {
       padding: ChatBubble.textPadding,
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        spacing: _iconGap,
+        spacing: FujinSize.unsupportedIconGap,
         children: [
           MediaGlyph(
             ChatMediaIcon.externalLink,
@@ -31,7 +28,7 @@ class UnsupportedCard extends StatelessWidget {
           Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: _lineGap,
+              spacing: FujinSize.chatLineGap,
               children: [
                 Text(
                   context.intl.chatUnsupportedTitle,
@@ -60,9 +57,6 @@ class _DashedOutline extends CustomPainter {
   final Color fill;
   final Color stroke;
 
-  static const double _dash = 4;
-  static const double _gap = 3;
-
   @override
   void paint(Canvas canvas, Size size) {
     final shape = RRect.fromRectAndRadius(
@@ -75,8 +69,15 @@ class _DashedOutline extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = FujinStroke.card;
     for (final metric in (Path()..addRRect(shape)).computeMetrics()) {
-      for (var start = 0.0; start < metric.length; start += _dash + _gap) {
-        canvas.drawPath(metric.extractPath(start, start + _dash), line);
+      for (
+        var start = 0.0;
+        start < metric.length;
+        start += FujinSize.dashedBorderDash + FujinSize.dashedBorderGap
+      ) {
+        canvas.drawPath(
+          metric.extractPath(start, start + FujinSize.dashedBorderDash),
+          line,
+        );
       }
     }
   }

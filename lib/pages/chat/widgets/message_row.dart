@@ -1,5 +1,6 @@
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter/material.dart';
+import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/pages/chat/widgets/reaction_chips.dart';
 
@@ -20,8 +21,14 @@ class MessageRow extends StatelessWidget {
   final ValueChanged<EkkloReaction>? onReaction;
 
   static const double _share = 0.8;
-  static const double _overlap = 6;
-  static const double _footerInset = 6;
+
+  static Offset reactionLanding(Rect bubble, {required bool mine}) => Offset(
+    switch (mine) {
+      true => bubble.right - ReactionChips.inset - ReactionChips.height,
+      false => bubble.left + ReactionChips.inset + ReactionChips.height / 2,
+    },
+    bubble.bottom + ReactionChips.height / 2 - FujinSize.reactionOverlap,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -39,37 +46,41 @@ class MessageRow extends StatelessWidget {
       crossAxisAlignment: alignment,
       spacing: FujinSpace.s1,
       children: [
-        switch (reactions) {
-          [] => bounded,
-          _ => Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  bottom: ReactionChips.height - _overlap,
-                ),
-                child: bounded,
-              ),
-              PositionedDirectional(
-                bottom: 0,
-                start: switch (mine) {
-                  true => null,
-                  false => 0,
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            AnimatedPadding(
+              duration: switch (FujinMotion.reduced(context)) {
+                true => Duration.zero,
+                false => FujinMotion.grow.duration,
+              },
+              curve: FujinMotion.grow.curve,
+              padding: EdgeInsets.only(
+                bottom: switch (reactions) {
+                  [] => 0,
+                  _ => ReactionChips.height - FujinSize.reactionOverlap,
                 },
-                end: switch (mine) {
-                  true => 0,
-                  false => null,
-                },
-                child: ReactionChips(
-                  reactions: reactions,
-                  onToggle: onReaction,
-                ),
               ),
-            ],
-          ),
-        },
+              child: bounded,
+            ),
+            PositionedDirectional(
+              bottom: 0,
+              start: switch (mine) {
+                true => null,
+                false => 0,
+              },
+              end: switch (mine) {
+                true => 0,
+                false => null,
+              },
+              child: ReactionChips(reactions: reactions, onToggle: onReaction),
+            ),
+          ],
+        ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: _footerInset),
+          padding: const EdgeInsets.symmetric(
+            horizontal: FujinSize.messageFooterInset,
+          ),
           child: footer,
         ),
       ],

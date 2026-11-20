@@ -18,10 +18,12 @@ abstract final class MediaText {
       switch (aspect) {
         CropAspect.free => intl.chatEditorFree,
         CropAspect.original => intl.chatEditorOriginal,
-        CropAspect(:final width?, :final height?) => intl.chatEditorRatio(
-          width,
-          height,
-        ),
-        CropAspect() => intl.chatEditorFree,
+        CropAspect.square ||
+        CropAspect.fourFive ||
+        CropAspect.sixteenNine ||
+        CropAspect.nineSixteen => switch ((aspect.width, aspect.height)) {
+          (final width?, final height?) => intl.chatEditorRatio(width, height),
+          (_, _) => intl.chatEditorFree,
+        },
       };
 }

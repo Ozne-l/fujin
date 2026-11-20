@@ -25,6 +25,7 @@ final class ThreadMessage extends ThreadItem with ThreadMessageMappable {
     this.quoted,
     this.quotesMine = false,
     this.delivery = MessageDelivery.sent,
+    this.seen = false,
   });
 
   final EkkloMessage message;
@@ -32,6 +33,7 @@ final class ThreadMessage extends ThreadItem with ThreadMessageMappable {
   final EkkloMessage? quoted;
   final bool quotesMine;
   final MessageDelivery delivery;
+  final bool seen;
 }
 
 @MappableClass(discriminatorValue: 'upload')

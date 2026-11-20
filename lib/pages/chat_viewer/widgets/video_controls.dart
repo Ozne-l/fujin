@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
@@ -7,7 +10,7 @@ import 'package:fujin/pages/chat_media/chat_media_icon.dart';
 import 'package:fujin/pages/chat_media/widgets/media_glyph.dart';
 import 'package:video_player/video_player.dart';
 
-class VideoControls extends StatelessWidget {
+class VideoControls extends HookWidget {
   const VideoControls({
     required this.value,
     required this.muted,
@@ -18,22 +21,32 @@ class VideoControls extends StatelessWidget {
     super.key,
   });
 
-  static const double _timeGap = 6;
-
   final VideoPlayerValue value;
   final bool muted;
   final VoidCallback onPlay;
   final VoidCallback onPause;
-  final ValueChanged<Duration> onSeek;
+  final Future<void> Function(Duration position) onSeek;
   final ValueChanged<bool> onMute;
+
+  static Duration _at(double milliseconds) =>
+      Duration(milliseconds: milliseconds.round());
 
   @override
   Widget build(BuildContext context) {
+    final dragged = useState<Duration?>(null);
+    final resume = useRef(false);
     final duration = value.duration;
-    final position = switch (value.position) {
+    final position = switch (dragged.value ?? value.position) {
       final position when position > duration => duration,
       final position => position,
     };
+    Future<void> seek(Duration target) async {
+      await onSeek(target);
+      if (!context.mounted) return;
+      dragged.value = null;
+      if (resume.value && target < duration) onPlay();
+    }
+
     final timeStyle = FujinText.inter12Medium.copyWith(
       color: context.colors.cameraText,
     );
@@ -55,7 +68,7 @@ class VideoControls extends StatelessWidget {
         Expanded(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            spacing: _timeGap,
+            spacing: FujinSize.videoTimeGap,
             children: [
               SliderTheme(
                 data: SliderThemeData(
@@ -76,15 +89,18 @@ class VideoControls extends StatelessWidget {
                     padding: EdgeInsets.zero,
                     max: duration.inMilliseconds.toDouble(),
                     value: position.inMilliseconds.toDouble(),
-                    semanticFormatterCallback: (milliseconds) => ChatText.clock(
-                      Duration(milliseconds: milliseconds.round()),
-                    ),
+                    semanticFormatterCallback: (milliseconds) =>
+                        ChatText.clock(_at(milliseconds)),
+                    onChangeStart: (_) {
+                      resume.value = value.isPlaying;
+                      if (value.isPlaying) onPause();
+                    },
                     onChanged: switch (duration) {
                       Duration.zero => null,
-                      _ => (milliseconds) => onSeek(
-                        Duration(milliseconds: milliseconds.round()),
-                      ),
+                      _ => (milliseconds) => dragged.value = _at(milliseconds),
                     },
+                    onChangeEnd: (milliseconds) =>
+                        unawaited(seek(_at(milliseconds))),
                   ),
                 ),
               ),

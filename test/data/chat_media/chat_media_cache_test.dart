@@ -7,6 +7,8 @@ import 'package:fujin/data/chat_media/chat_media_unavailable.dart';
 import 'package:fujin/data/dev_chat/fake_chat.dart';
 import 'package:fujin/data/media/media_failure.dart';
 import 'package:fujin/data/media/video_probe.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 
 import '../../support/fake_backends.dart';
 import '../../support/fake_media_processor.dart';
@@ -85,6 +87,31 @@ void main() {
 
     check(cache.directory.listSync()).isEmpty();
   });
+
+  test(
+    'keeps no partial file when the connection drops mid-download',
+    () async {
+      final cache = _cache();
+      final dropping = MockClient.streaming(
+        (request, _) async => http.StreamedResponse(
+          Stream.fromFutures([
+            Future.value(_plateBytes),
+            Future.error(http.ClientException('connection reset')),
+          ]),
+          HttpStatus.ok,
+        ),
+      );
+      final media = ChatMediaCache(
+        directory: cache.directory,
+        http: dropping,
+        media: cache.media,
+      );
+
+      await check(media.file(_plate)).throws<ChatMediaUnavailable>();
+
+      check(cache.directory.listSync()).isEmpty();
+    },
+  );
 
   test(
     'extracts a video poster once and remembers its size and length',
