@@ -341,7 +341,7 @@ final class FakeChat {
     return (
       status: 200,
       body: {
-        'messages': page,
+        'messages': [for (final message in page) _asEkkloSends(message)],
         'has_more': candidates.length > limit,
         'total': page.length,
       },
@@ -419,7 +419,7 @@ final class FakeChat {
       },
     );
     deliver(created);
-    return (status: status, body: created);
+    return (status: status, body: _asEkkloSends(created));
   }
 
   FakeChatReply _read(String id) {
@@ -485,10 +485,15 @@ final class FakeChat {
       if (newest.isNotEmpty) 'updated_at': newest.first['created_at'],
       'last_messages': [
         for (final message in newest.take(_lastMessages))
-          {...message}..remove('media_urls'),
+          _asEkkloSends(message)..remove('media_urls'),
       ],
     };
   }
+
+  FakeChatJson _asEkkloSends(FakeChatJson message) => {
+    ...message,
+    'conversation_id': '',
+  };
 
   FakeChatJson? _message(String id) =>
       messages.where((message) => message['id'] == id).firstOrNull;
