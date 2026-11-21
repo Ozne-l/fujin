@@ -4,7 +4,7 @@ Date: 2026-11-21
 
 ## Status
 
-Accepted (worktree script, CI and release workflows built; ruleset on `main`, release key and first release not done yet).
+Accepted; built 2026-11-21. The ruleset on `main` is active, the release key is in the repository secrets, and `v0.6.1` is the first release. The Pixel moved to it through the backup file: the export taken after the import matched the one taken before, apart from its date.
 
 ## Context
 
