@@ -4,6 +4,6 @@ Fūjin uses no issue tracker. A feature's spec is an ADR in `docs/adr/`, listed 
 
 Do not open GitHub issues on `Ozne-l/fujin`.
 
-**PRs as a request surface: no.** Only the owner opens pull requests.
+**PRs as a request surface: no.** A pull request carries the code of one task to `main` ([ADR 0051](../adr/0051-worktrees-pull-requests-and-releases.md)), never a spec. Agents open one only when the owner asks.
 
 "Publish to the issue tracker" means write or amend the ADR. "Fetch the ticket" means read the ADR the owner names.

@@ -16,12 +16,23 @@ Run `flutter` and `dart` directly. The SDK is Fūjin's own, pinned in `.fvmrc` (
 | Before handing work back | `dart analyze --fatal-infos` |
 | Before handing work back | `dart format lib test tool integration_test test_driver` |
 | Before handing work back | `flutter test` |
-| Before a build for the owner's phone | raise `version` in `pubspec.yaml` ([ADR 0039](docs/adr/0039-app-version.md)), commit `chore(release): <version>` |
+| To ship a build to the owner's phone | raise `version` in `pubspec.yaml` ([ADR 0039](docs/adr/0039-app-version.md)), commit `chore(release): <version>` in its own pull request; merging it publishes the release that Obtainium installs ([ADR 0051](docs/adr/0051-worktrees-pull-requests-and-releases.md)) |
+| To start a task beside others | `tool/worktree.sh new <task>`, then start the agent in `~/Dev/fujin.worktrees/<task>` |
+| Once the task's pull request is merged | `tool/worktree.sh rm <task>` |
 | Before and after a change to the glass | `flutter drive --profile --no-dds --keep-app-running --flavor dev -d <phone> --driver=test_driver/glass_performance_driver.dart --target=integration_test/glass_performance_test.dart` |
 
 The glass benchmark installs over the owner's Fūjin DEV. Never drop `--keep-app-running`: without it `flutter drive` uninstalls the app when it ends, which wiped his Fūjin DEV data on 2026-10-26. Put his dev build back with `flutter build apk --debug --flavor dev` then `adb install -r build/app/outputs/flutter-apk/app-dev-debug.apk`, never `flutter install`, which uninstalls first and wipes his sessions and settings.
 
 Generated files (`*.mapper.dart`, `lib/l10n/generated/`, `lib/app/theme/fujin_tokens.g.dart`, `lib/pages/chat/emoji_catalog.g.dart`) are committed; regenerate, never hand-edit.
+
+## Worktrees, pull requests and releases
+
+Each task runs in its own worktree and branch, and reaches `main` through a pull request ([ADR 0051](docs/adr/0051-worktrees-pull-requests-and-releases.md)):
+
+- `main` takes only rebase merges of pull requests that are up to date with it and pass the CI (`.github/workflows/ci.yml`: generated files unchanged, analyze, format, `flutter test`, a debug APK of each flavor). Nobody pushes to `main` directly.
+- Before asking for a merge, rebase on `origin/main`. On a conflict: renumber a migration appended to `schemaMigrations` or an ADR another branch already took, regenerate generated files instead of merging them, then run the checks again.
+- One emulator per worktree when a task needs a device (`-d emulator-55xx`), and its own port for a fake server. The owner's phone stays out of reach.
+- The production release is signed with the owner's release key, read from `android/key.properties` (ignored by git) and only ever written by `.github/workflows/release.yml`. Without that file the production flavor signs with the debug key: Android refuses such an APK as an update of the owner's app; never uninstall his app to make room for it.
 
 ## Running without real accounts
 
@@ -108,8 +119,7 @@ Single-context: `GLOSSARY.md` and `docs/adr/` at the root. See `docs/agents/doma
 - Code, file names, docs, issues and commits are in English; French appears only in `lib/l10n/app_fr.arb` and in verbatim quotes of the app copy ([ADR 0016](docs/adr/0016-english-in-code-and-tokens.md)). If you find French anywhere else, tell the owner and let him decide; do not rename on your own.
 - Never call the real MyFitnessPal or Ekklo accounts. When a question needs the real APIs, write a read-only probe and let the owner run it and paste the output.
 - Never print, log, commit or paste credentials, tokens or cookies.
-- Commit only when asked. Conventional Commits, no emoji, no AI attribution.
-- Commit hooks block commit, push and rebase Monday to Friday, 09:30 to 18:30. Never bypass a hook with `--no-verify`.
-- The pre-commit hook runs a local overlap check; reword anything it flags in text you wrote.
+- Commit, push and open a pull request only when asked. Conventional Commits, no emoji, no AI attribution.
+- The pre-commit hook runs a local overlap check; reword anything it flags in text you wrote. Never bypass it with `--no-verify`.
 - Scratch files go in `/tmp`, never in the repo.
 - Update `GLOSSARY.md` when a domain word changes, and add an ADR in `docs/adr/` for a new decision.
