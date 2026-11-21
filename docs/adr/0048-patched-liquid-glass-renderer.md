@@ -4,7 +4,7 @@ Date: 2026-11-19
 
 ## Status
 
-Accepted. Amends [0041](0041-liquid-glass-renderer-1.0.md): the package is no longer pinned on pub.dev.
+Superseded by [0050](0050-liquid-glass-renderer-from-the-fork.md): the package comes from the owner's fork, no longer from `third_party`. Amended [0041](0041-liquid-glass-renderer-1.0.md): the package is no longer pinned on pub.dev.
 
 ## Context
 

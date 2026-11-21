@@ -4,7 +4,7 @@ Date: 2026-10-26
 
 ## Status
 
-Proposed, amended by [0048](0048-patched-liquid-glass-renderer.md) (the package is no longer pinned on pub.dev) (the owner signs off the look after a few days of Fūjin DEV next to production). Supersedes the glass settings of [0033](0033-liquid-glass-and-fade-through.md), the rims of [0033](0033-liquid-glass-and-fade-through.md), [0035](0035-dark-theme-and-appearance-setting.md) and [0036](0036-glass-on-buttons-search-and-filters.md), and how [0036](0036-glass-on-buttons-search-and-filters.md) lays a finish's fill over the glass and colours the text of a tinted control.
+Proposed, amended by [0048](0048-patched-liquid-glass-renderer.md) (the package is no longer pinned on pub.dev) and [0050](0050-liquid-glass-renderer-from-the-fork.md) (it comes from the owner's fork) (the owner signs off the look after a few days of Fūjin DEV next to production). Supersedes the glass settings of [0033](0033-liquid-glass-and-fade-through.md), the rims of [0033](0033-liquid-glass-and-fade-through.md), [0035](0035-dark-theme-and-appearance-setting.md) and [0036](0036-glass-on-buttons-search-and-filters.md), and how [0036](0036-glass-on-buttons-search-and-filters.md) lays a finish's fill over the glass and colours the text of a tinted control.
 
 ## Context
 

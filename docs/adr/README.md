@@ -44,12 +44,13 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0038](0038-bouncing-scroll-on-every-platform.md) | Bouncing scroll on every platform | Proposed |
 | [0039](0039-app-version.md) | App version | Accepted |
 | [0040](0040-flutter-sdk-per-project.md) | Flutter SDK per project | Accepted |
-| [0041](0041-liquid-glass-renderer-1.0.md) | Liquid glass on liquid_glass_renderer 1.0 | Proposed, amended by 0048 (pub.dev pin replaced by a patched copy in third_party) |
+| [0041](0041-liquid-glass-renderer-1.0.md) | Liquid glass on liquid_glass_renderer 1.0 | Proposed, amended by 0048 (pub.dev pin replaced by a patched copy in third_party) and 0050 (the patched package comes from the owner's fork) |
 | [0042](0042-text-contrast-on-tinted-surfaces.md) | Text contrast on tinted surfaces | Accepted |
 | [0043](0043-edit-and-delete-a-logged-food.md) | Edit and delete a logged food | Accepted (edit and delete saved first and written in the background, and offline edit and delete of known foods built, by 0044) |
 | [0044](0044-connector-model.md) | Connector model: Fūjin's entry at the centre | Accepted (steps 1 to 4 built, offline included, and the role setting, kept in shared preferences; foods without servings completed from MyFitnessPal after an online Journal read; Ekklo "to remove" and Ekklo two-way not built; chat and cache file built by 0045 to 0047) |
 | [0045](0045-ekklo-chat.md) | Ekklo chat: contract, sync, cache file, notifications, fake chat in dev | Accepted, amended by 0049 (built; screens drawn by 0047; seen mark added by 0049) |
 | [0046](0046-chat-media.md) | Chat media: processing, edits and background upload | Accepted (built on Android; screens drawn and background work amended by 0047) |
 | [0047](0047-chat-screens.md) | Chat screens: Messages tab, conversation, media tray and editors, voice, full screen, notification copy | Accepted (built) |
-| [0048](0048-patched-liquid-glass-renderer.md) | Patched liquid_glass_renderer in third_party | Accepted |
+| [0048](0048-patched-liquid-glass-renderer.md) | Patched liquid_glass_renderer in third_party | Superseded by 0050 |
 | [0049](0049-chat-motion.md) | Chat motion, shared-element flights and haptics | Accepted |
+| [0050](0050-liquid-glass-renderer-from-the-fork.md) | liquid_glass_renderer from the owner's fork | Accepted |
