@@ -52,6 +52,7 @@ final class FujinDatabase<T extends DatabaseTable> {
   static const _walSuffix = '-wal';
   static const _sharedMemorySuffix = '-shm';
   static const _absent = 0;
+  static const _lockRetryPause = Duration(milliseconds: 10);
 
   static String cachePathIn(Directory directory) =>
       '${directory.path}/$_cacheFileName';
@@ -62,14 +63,14 @@ final class FujinDatabase<T extends DatabaseTable> {
   int get schemaVersion => _db.userVersion;
 
   ResultSet select(String sql, [List<Object?> parameters = const []]) =>
-      _db.select(sql, parameters);
+      _waitingForLock(() => _db.select(sql, parameters));
 
   void execute(String sql, [List<Object?> parameters = const []]) =>
-      _db.execute(sql, parameters);
+      _waitingForLock(() => _db.execute(sql, parameters));
 
   void insert(T table, Map<String, Object?> row) {
     final columns = _columnsFor(table, row);
-    _db.execute(
+    execute(
       'INSERT INTO ${table.sqlName} (${columns.join(', ')}) '
       'VALUES (${_placeholders(columns.length)})',
       [for (final column in columns) row[column]],
@@ -90,7 +91,7 @@ final class FujinDatabase<T extends DatabaseTable> {
       [] => 'DO NOTHING',
       _ => 'DO UPDATE SET ${updated.join(', ')}',
     };
-    _db.execute(
+    execute(
       'INSERT INTO ${table.sqlName} (${columns.join(', ')}) '
       'VALUES (${_placeholders(columns.length)}) '
       'ON CONFLICT (${key.join(', ')}) $conflict',
@@ -105,7 +106,7 @@ final class FujinDatabase<T extends DatabaseTable> {
     DateTime now,
   ) {
     final at = now.toIso8601String();
-    _db.execute(
+    execute(
       'UPDATE ${table.sqlName} SET deleted_at = ?, updated_at = ? '
       'WHERE deleted_at IS NULL AND $where',
       [at, at, ...parameters],
@@ -114,7 +115,7 @@ final class FujinDatabase<T extends DatabaseTable> {
 
   R transaction<R>(R Function() body) {
     if (!_db.autocommit) return body();
-    _db.execute('BEGIN IMMEDIATE');
+    execute('BEGIN IMMEDIATE');
     try {
       final result = body();
       _db.execute('COMMIT');
@@ -126,6 +127,23 @@ final class FujinDatabase<T extends DatabaseTable> {
   }
 
   void close() => _db.close();
+
+  R _waitingForLock<R>(R Function() statement) {
+    final waited = Stopwatch()..start();
+    while (true) {
+      try {
+        return statement();
+      } on SqliteException catch (error) {
+        if (!_mayRetry(error, waited.elapsed)) rethrow;
+        sleep(_lockRetryPause);
+      }
+    }
+  }
+
+  bool _mayRetry(SqliteException error, Duration waited) =>
+      error.resultCode == SqlError.SQLITE_BUSY &&
+      _db.autocommit &&
+      waited < busyTimeout;
 
   static FujinDatabase<FujinTable> _journal(Database db) {
     final database = FujinDatabase<FujinTable>._(

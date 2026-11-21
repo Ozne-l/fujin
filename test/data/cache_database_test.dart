@@ -5,10 +5,13 @@ import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart' show addTearDown, group, test;
 import 'package:fujin/data/chat/cached_conversation.dart';
 import 'package:fujin/data/chat/chat_repository.dart';
+import 'package:fujin/data/chat/foreground_stamp_repository.dart';
 import 'package:fujin/data/database/cache_opening.dart';
 import 'package:fujin/data/database/cache_schema.dart';
 import 'package:fujin/data/database/cache_table.dart';
 import 'package:fujin/data/database/fujin_database.dart';
+
+import '../support/fixtures.dart';
 
 const int _otherVersion = cacheVersion + 1;
 const _held = 'held';
@@ -134,6 +137,21 @@ void main() {
       check(
         ChatRepository(database).conversations(),
       ).deepEquals([_conversation('c-app'), _conversation('c-held')]);
+    });
+
+    test('lets a single write outside a transaction wait while another '
+        'isolate holds a write transaction', () async {
+      final path = _cachePath();
+      final database = FujinDatabase.openCacheInApp(path);
+      addTearDown(database.close);
+      final port = ReceivePort();
+      addTearDown(port.close);
+
+      await Isolate.spawn(_holdWriteLock, (path, port.sendPort));
+      check(await port.first).equals(_held);
+      ForegroundStampRepository(database).record(now);
+
+      check(ForegroundStampRepository(database).last()).equals(now);
     });
 
     test('is deleted with its -wal and -shm files', () {
