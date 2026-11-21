@@ -54,3 +54,4 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0048](0048-patched-liquid-glass-renderer.md) | Patched liquid_glass_renderer in third_party | Superseded by 0050 |
 | [0049](0049-chat-motion.md) | Chat motion, shared-element flights and haptics | Accepted |
 | [0050](0050-liquid-glass-renderer-from-the-fork.md) | liquid_glass_renderer from the owner's fork | Accepted |
+| [0051](0051-worktrees-pull-requests-and-releases.md) | Worktrees, pull requests with CI, and signed releases installed by Obtainium | Accepted (script and workflows built; ruleset, release key and first release not done) |

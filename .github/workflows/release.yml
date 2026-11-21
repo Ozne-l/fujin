@@ -1,0 +1,95 @@
+name: release
+
+on:
+  push:
+    branches: [main]
+    paths: [pubspec.yaml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GIT_LFS_SKIP_SMUDGE: "1"
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Version
+        id: version
+        run: |
+          version=$(sed -n 's/^version: \([0-9.]*\)+[0-9]*$/\1/p' pubspec.yaml)
+          test -n "$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if gh release view "v$version" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "new=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "new=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.version.outputs.new == 'true'
+        uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+      - if: steps.version.outputs.new == 'true'
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version-file: .fvmrc
+          cache: true
+      - name: Release key
+        if: steps.version.outputs.new == 'true'
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_RELEASE_KEYSTORE }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+        run: |
+          test -n "$KEYSTORE" -a -n "$STORE_PASSWORD" -a -n "$KEY_ALIAS" -a -n "$KEY_PASSWORD"
+          printf '%s' "$KEYSTORE" | base64 --decode > "$RUNNER_TEMP/release.jks"
+          {
+            echo "storeFile=$RUNNER_TEMP/release.jks"
+            echo "storePassword=$STORE_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "keyPassword=$KEY_PASSWORD"
+          } > android/key.properties
+      - if: steps.version.outputs.new == 'true'
+        run: flutter pub get --enforce-lockfile
+      - if: steps.version.outputs.new == 'true'
+        run: flutter build apk --release --flavor production
+      - name: Signed with the release key
+        if: steps.version.outputs.new == 'true'
+        env:
+          EXPECTED: ${{ vars.ANDROID_RELEASE_CERT_SHA256 }}
+        run: |
+          test -n "$EXPECTED"
+          apksigner=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -n 1)
+          actual=$("$apksigner" verify --print-certs build/app/outputs/flutter-apk/app-production-release.apk \
+            | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+          test "$actual" = "$(echo "$EXPECTED" | tr -d ':' | tr '[:upper:]' '[:lower:]')"
+      - name: Publish
+        if: steps.version.outputs.new == 'true'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          cp build/app/outputs/flutter-apk/app-production-release.apk "fujin-$VERSION.apk"
+          gh release create "v$VERSION" "fujin-$VERSION.apk" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Fūjin $VERSION" \
+            --generate-notes
+      - if: always()
+        run: rm -f "$RUNNER_TEMP/release.jks" android/key.properties
