@@ -75,11 +75,14 @@ jobs:
         env:
           EXPECTED: ${{ vars.ANDROID_RELEASE_CERT_SHA256 }}
         run: |
+          set -o pipefail
           test -n "$EXPECTED"
           apksigner=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -n 1)
-          actual=$("$apksigner" verify --print-certs build/app/outputs/flutter-apk/app-production-release.apk \
-            | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
-          test "$actual" = "$(echo "$EXPECTED" | tr -d ':' | tr '[:upper:]' '[:lower:]')"
+          actual=$("$apksigner" verify --print-certs -v build/app/outputs/flutter-apk/app-production-release.apk \
+            | sed -n 's/^.*certificate SHA-256 digest: //p' | sort -u)
+          expected=$(echo "$EXPECTED" | tr -d ':' | tr '[:upper:]' '[:lower:]')
+          echo "APK certificate SHA-256: ${actual:-none}"
+          test "$actual" = "$expected"
       - name: Publish
         if: steps.version.outputs.new == 'true'
         env:
