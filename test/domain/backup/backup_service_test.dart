@@ -9,6 +9,7 @@ import 'package:fujin/data/backup/backup_repository.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
+import 'package:fujin/data/goals/goal_period.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/goals/goals_repository.dart';
 import 'package:fujin/data/links/sent_link_repository.dart';
@@ -31,6 +32,12 @@ const _fileName = 'fujin-backup-2026-10-07.json';
 const _skyrBarcode = '3033490004521';
 const _barcodeLinks = 'barcode_links';
 const _goals = Goals(kilocalories: 3000, protein: 160, fat: 70);
+const _cut = Goals(kilocalories: 2500, protein: 150);
+final _periods = [
+  GoalPeriod(startsOn: DateTime.utc(2026, 9, 2), goals: _goals),
+  GoalPeriod(startsOn: day, goals: _cut),
+];
+final _goalsSinceExport = [GoalPeriod(startsOn: day, goals: _goals)];
 const _ownCopy = OwnCopy(
   mfpFoodId: skyr,
   mfpDescription: skyr,
@@ -62,7 +69,7 @@ final _recentOil = RecentFood(
 Map<String, Object?> _fileOfRelease040(int version) => {
   'format': Backup.formatName,
   'version': version,
-  'exported_at': '2026-10-07T20:00:00.000Z',
+  'exported_at': '2026-10-07T12:00:00.000Z',
   'matches': [
     {
       'kind': 'ekklo',
@@ -186,7 +193,7 @@ void main() {
       ..expect({'e-1': expectation()});
     storeEntry(database, entry('M-2', food: rice), 'e-2');
     entries.remove('e-2');
-    goals = goalsOf(database)..save(_goals);
+    goals = goalsOf(database)..replaceAll(_periods);
     files = FakeBackupFiles();
     backups = BackupService(
       backups: _backupsOf(database),
@@ -221,12 +228,12 @@ void main() {
     };
   }
 
-  test('exports the foods, meals, entries, links and goals in a version 4 '
+  test('exports the foods, meals, entries, links and goals in a version 5 '
       'file named after the day', () async {
     final file = await exported();
 
-    check(file).isA<BackupV4>()
-      ..has((file) => file.version, 'version').equals(BackupV4.currentVersion)
+    check(file).isA<BackupV5>()
+      ..has((file) => file.version, 'version').equals(BackupV5.currentVersion)
       ..has((file) => file.entries, 'entries').deepEquals(entries.entries())
       ..has((file) => file.entries.length, 'entry count').equals(2)
       ..has((file) => file.mfpLinks, 'mfpLinks').deepEquals(entries.mfpLinks())
@@ -246,13 +253,13 @@ void main() {
       ).deepEquals(mealsOf(database).connectorMeals());
     check(file?.links).isNotNull().deepEquals([link('E-3', 'I-3')]);
     check(file?.linkCount).equals(2);
-    check(file?.goals).equals(_goals);
+    check(file?.goalPeriods).isNotNull().deepEquals(_periods);
     check(file?.foodCount).equals(memory.matches.length + 1);
     check(file?.mealCount).equals(memory.meals.length);
   });
 
-  test('reads a version 4 file whose foods store verified as a number, '
-      'as written by an earlier build', () async {
+  test('reads a file whose foods store verified as a number, as written by '
+      'an earlier build', () async {
     await backups.export();
     final json = exportedJson();
     final foods = switch (json['foods']) {
@@ -269,7 +276,7 @@ void main() {
     final file = backups.read(_json(json));
 
     check(file)
-        .isA<BackupV4>()
+        .isA<BackupV5>()
         .has(
           (file) => file.foods.first.verified,
           'verified',
@@ -277,7 +284,7 @@ void main() {
         .equals(true);
   });
 
-  test('imports a version 4 file in place of everything recorded '
+  test('imports a version 5 file in place of everything recorded '
       'since', () async {
     final file = await exported();
     final before = memories.load();
@@ -289,7 +296,7 @@ void main() {
     storeEntry(database, entry('M-9', food: skyr), 'e-9');
     memories.clear();
     links.replaceAll([link('E-9', 'I-9')]);
-    goals.replace(null);
+    goals.replaceAll(const []);
 
     backups.restore(file ?? (throw StateError('export is unreadable')));
 
@@ -299,7 +306,25 @@ void main() {
     check(entries.mfpLinks()).deepEquals(mfpLinksBefore);
     check(entries.ekkloLinks()).deepEquals(ekkloLinksBefore);
     check(links.all()).deepEquals([link('E-3', 'I-3')]);
-    check(goals.load()).equals(_goals);
+    check(goals.periods()).deepEquals(_periods);
+  });
+
+  test('imports a version 4 file, its one set of goals holding from the day '
+      'it was exported', () async {
+    await backups.export();
+    final versionFour = exportedJson()..remove('goal_periods');
+
+    final file = backups.read(
+      _json({
+        ...versionFour,
+        'version': BackupV5.versionWithOneGoal,
+        'goals': _goals.toMap(),
+      }),
+    );
+    backups.restore(file ?? (throw StateError('version 4 is unreadable')));
+
+    check(file).isA<BackupV5>();
+    check(goals.periods()).deepEquals(_goalsSinceExport);
   });
 
   test('imports a version 3 file, which leaves no entry and its links '
@@ -308,7 +333,8 @@ void main() {
     final versionThree = exportedJson()
       ..remove('entries')
       ..remove('mfp_links')
-      ..remove('ekklo_links');
+      ..remove('ekklo_links')
+      ..remove('goal_periods');
     final foodsBefore = foodsOf(database).foods();
     links.replaceAll(const []);
 
@@ -317,6 +343,7 @@ void main() {
         ...versionThree,
         'version': BackupV3.foodsVersion,
         'links': [link('E-1', 'I-1').toMap()],
+        'goals': _goals.toMap(),
       }),
     );
     backups.restore(file ?? (throw StateError('version 3 is unreadable')));
@@ -327,7 +354,7 @@ void main() {
     check(entries.entries()).isEmpty();
     check(entries.ekkloLinks()).isEmpty();
     check(links.all()).deepEquals([link('E-1', 'I-1')]);
-    check(goals.load()).equals(_goals);
+    check(goals.periods()).deepEquals(_goalsSinceExport);
 
     final backends = FakeBackends(
       entries: [entry('E-1')],
@@ -379,7 +406,7 @@ void main() {
     ]).unorderedEquals([(0, breakfast), (1, lunch)]);
     check(recents.latest()).deepEquals([_recentOats]);
     check(links.all()).deepEquals([link('E-1', 'I-1')]);
-    check(goals.load()).equals(_goals);
+    check(goals.periods()).deepEquals(_goalsSinceExport);
   });
 
   test('imports a version 1 file, which has no barcode link', () {
@@ -404,7 +431,7 @@ void main() {
 
       for (final changed in [
         {...file, 'format': 'other-backup'},
-        {...file, 'version': BackupV4.currentVersion + 1},
+        {...file, 'version': BackupV5.currentVersion + 1},
         {...file}..remove('entries'),
         {...file}..remove('links'),
         {...file}..remove('food_references'),
@@ -448,8 +475,8 @@ void main() {
       final ekkloLinksBefore = entries.ekkloLinks();
       final file = await exported();
       final rice = switch (file) {
-        BackupV4(:final entries) => entries.last,
-        _ => throw StateError('export is not version 4'),
+        BackupV5(:final entries) => entries.last,
+        _ => throw StateError('export is not version 5'),
       };
       final broken = file.copyWith(
         ekkloLinks: [
@@ -468,7 +495,7 @@ void main() {
       check(entries.entries()).deepEquals(entriesBefore);
       check(entries.ekkloLinks()).deepEquals(ekkloLinksBefore);
       check(links.all()).deepEquals([link('E-3', 'I-3')]);
-      check(goals.load()).equals(_goals);
+      check(goals.periods()).deepEquals(_periods);
     });
   });
 }

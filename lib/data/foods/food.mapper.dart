@@ -74,7 +74,7 @@ class FoodMapper extends ClassMapperBase<Food> {
   final bool ignoreNull = true;
 
   @override
-  final MappingHook hook = const FlatNutrientsHook();
+  final MappingHook hook = const FlatFieldHook(Food._nutrients);
   static Food _instantiate(DecodingData data) {
     return Food(
       id: data.dec(_f$id),

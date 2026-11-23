@@ -10,6 +10,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/hints/hint.dart';
 import 'package:fujin/domain/goals/day_goal_state.dart';
+import 'package:fujin/domain/goals/goal_timeline.dart';
 import 'package:fujin/domain/journal/calendar_week.dart';
 import 'package:fujin/domain/journal/fetch.dart';
 import 'package:fujin/domain/journal/logged_kilocalories.dart';
@@ -41,7 +42,7 @@ class WeekBand extends HookConsumerWidget {
 
   final DateTime selected;
   final DateTime today;
-  final Goals? goals;
+  final GoalTimeline goals;
   final ValueChanged<DateTime> onSelect;
 
   @override
@@ -201,7 +202,7 @@ class _Week extends ConsumerWidget {
   final List<DateTime> days;
   final DateTime selected;
   final DateTime today;
-  final Goals? goals;
+  final GoalTimeline goals;
   final ValueChanged<DateTime> onSelect;
 
   @override
@@ -222,11 +223,12 @@ class _Week extends ConsumerWidget {
       Fetched(value: final diary) => loggedKilocalories(diary),
       null => null,
     };
+    final dayGoals = goals.on(day);
     return _Day(
       day: day,
       selected: day == selected,
-      state: _state(day, diary, eaten),
-      progress: switch ((goals, eaten)) {
+      state: _state(day, diary, eaten, dayGoals),
+      progress: switch ((dayGoals, eaten)) {
         (final goals?, final eaten?) => eaten / goals.kilocalories,
         _ => 0,
       },
@@ -241,16 +243,17 @@ class _Week extends ConsumerWidget {
     DateTime day,
     AsyncValue<Fetched<MfpDiaryDay>>? diary,
     double? eaten,
+    Goals? dayGoals,
   ) => switch (diary) {
     _ when day.isAfter(today) => DayGoalState.upcoming,
     AsyncValue(hasValue: true) => DayGoalState.of(
       day: day,
       today: today,
-      goals: goals,
+      goals: dayGoals,
       kilocalories: eaten,
     ),
     AsyncError() => DayGoalState.noGoal,
-    _ => switch (goals) {
+    _ => switch (dayGoals) {
       null => DayGoalState.noGoal,
       Goals() => DayGoalState.inProgress,
     },

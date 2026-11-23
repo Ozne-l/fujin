@@ -1031,10 +1031,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsGoals => 'OBJECTIFS';
 
   @override
-  String get goalsEveryDay => 'Tous les jours';
+  String goalsSince(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Depuis le $dateString';
+  }
 
   @override
   String get goalsNone => 'Aucun objectif';
+
+  @override
+  String get goalsToSet => 'À définir';
 
   @override
   String goalsSummaryPart(String nutrient, String value) {
@@ -1240,10 +1248,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get goalsSubtitle =>
-      'Les mêmes chaque jour. Fūjin les compare\nà ton journal MyFitnessPal.';
+      'Les jours passés gardent leurs objectifs.\nFūjin les compare à ton journal MyFitnessPal.';
 
   @override
-  String get goalsSection => 'TOUS LES JOURS';
+  String get goalsSection => 'À PARTIR D’AUJOURD’HUI';
 
   @override
   String get goalKilocalories => 'Calories';

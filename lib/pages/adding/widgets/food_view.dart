@@ -102,8 +102,8 @@ class FoodView extends HookConsumerWidget {
       null => null,
     };
     final today = ref.watch(todayProvider);
-    final goals = ref.watch(goalsProvider);
     final draft = form.draft;
+    final goals = ref.watch(goalsProvider).on(draft.date);
     final entry = draft.entry;
     final planned = form.planned;
     final waiting = form.planProblem == ReadProblem.offline;

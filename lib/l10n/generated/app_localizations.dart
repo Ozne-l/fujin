@@ -1424,17 +1424,23 @@ abstract class AppLocalizations {
   /// **'OBJECTIFS'**
   String get settingsGoals;
 
-  /// No description provided for @goalsEveryDay.
+  /// No description provided for @goalsSince.
   ///
   /// In fr, this message translates to:
-  /// **'Tous les jours'**
-  String get goalsEveryDay;
+  /// **'Depuis le {date}'**
+  String goalsSince(DateTime date);
 
   /// No description provided for @goalsNone.
   ///
   /// In fr, this message translates to:
   /// **'Aucun objectif'**
   String get goalsNone;
+
+  /// No description provided for @goalsToSet.
+  ///
+  /// In fr, this message translates to:
+  /// **'À définir'**
+  String get goalsToSet;
 
   /// No description provided for @goalsSummaryPart.
   ///
@@ -1745,13 +1751,13 @@ abstract class AppLocalizations {
   /// No description provided for @goalsSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'Les mêmes chaque jour. Fūjin les compare\nà ton journal MyFitnessPal.'**
+  /// **'Les jours passés gardent leurs objectifs.\nFūjin les compare à ton journal MyFitnessPal.'**
   String get goalsSubtitle;
 
   /// No description provided for @goalsSection.
   ///
   /// In fr, this message translates to:
-  /// **'TOUS LES JOURS'**
+  /// **'À PARTIR D’AUJOURD’HUI'**
   String get goalsSection;
 
   /// No description provided for @goalKilocalories.

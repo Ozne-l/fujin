@@ -419,4 +419,24 @@ const schemaMigrations = [
   '''
   ALTER TABLE food ADD COLUMN verified INTEGER CHECK (verified IN (0, 1));
   ''',
+  '''
+  CREATE TABLE goals_by_day (
+    starts_on TEXT PRIMARY KEY,
+    kilocalories REAL NOT NULL CHECK (kilocalories > 0),
+    protein REAL CHECK (protein > 0),
+    carbohydrates REAL CHECK (carbohydrates > 0),
+    fat REAL CHECK (fat > 0),
+    fiber REAL CHECK (fiber > 0),
+    updated_at TEXT NOT NULL
+  );
+  INSERT INTO goals_by_day (
+    starts_on, kilocalories, protein, carbohydrates, fat, fiber, updated_at
+  )
+    SELECT
+      date(updated_at), kilocalories, protein, carbohydrates, fat, fiber,
+      updated_at
+    FROM goals;
+  DROP TABLE goals;
+  ALTER TABLE goals_by_day RENAME TO goals;
+  ''',
 ];

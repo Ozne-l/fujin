@@ -10,6 +10,7 @@ import 'package:fujin/data/entries/day_changes.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/foods/food_nutrients.dart';
 import 'package:fujin/data/foods/food_reference.dart';
+import 'package:fujin/data/goals/goal_period.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/goals/goals_repository.dart';
 import 'package:fujin/data/links/sent_link.dart';
@@ -33,6 +34,7 @@ const _versionWithOneCopyPerFood = 2;
 const _versionBeforeGoals = 3;
 const _oilSpoonGrams = 14.0;
 const _versionOfRelease040 = 7;
+const _versionBeforeDatedGoals = 9;
 const _riceBarcode = '3017620422003';
 const _skyrBarcode = '3033490004521';
 const _chips = 'mfp-chips';
@@ -383,9 +385,9 @@ void main() {
       check(
         UnattendedItemRepository(migrated).forDate(day),
       ).deepEquals([unattendedItem('E-2')]);
-      check(
-        goalsOf(migrated).load(),
-      ).equals(const Goals(kilocalories: 3000, protein: 160, fat: 70));
+      check(goalsOf(migrated).periods().single.goals).equals(
+        const Goals(kilocalories: 3000, protein: 160, fat: 70),
+      );
       check(
         migrated.select('SELECT updated_at FROM goals').single.columnAt(0),
       ).isA<String>().isNotEmpty();
@@ -1021,7 +1023,7 @@ void main() {
     check(migrated.schemaVersion).equals(schemaMigrations.length);
     check(memoryOf(migrated).load()).equals(memory);
     check(SentLinkRepository(migrated).all()).deepEquals([link('E-1', 'I-1')]);
-    check(goalsOf(migrated).load()).isNull();
+    check(goalsOf(migrated).periods()).isEmpty();
   });
 
   group('meals arranged from the diary', () {
@@ -1091,6 +1093,7 @@ void main() {
   group('goals', () {
     late FujinDatabase<FujinTable> database;
     late GoalsRepository goals;
+    final nextDay = DateTime.utc(2026, 10, 8);
     const complete = Goals(
       kilocalories: 3000,
       protein: 160,
@@ -1098,38 +1101,81 @@ void main() {
       fat: 70,
       fiber: 40,
     );
+    const cut = Goals(kilocalories: 2500, protein: 150);
 
     setUp(() {
       database = FujinDatabase.inMemory();
-      goals = goalsOf(database);
+      goals = GoalsRepository(database, () => now);
     });
 
     tearDown(() => database.close());
 
-    test('are read back as saved, one row for every day', () {
-      goals.save(complete);
+    test('start on the day they are saved and keep the earlier days', () {
+      goals
+        ..saveFrom(day, complete)
+        ..saveFrom(nextDay, cut);
 
-      check(goals.load()).equals(complete);
-      check(database.select('SELECT * FROM goals')).length.equals(1);
+      check(goals.periods()).deepEquals([
+        GoalPeriod(startsOn: day, goals: complete),
+        GoalPeriod(startsOn: nextDay, goals: cut),
+      ]);
     });
 
-    test('forget a macro left empty when saved again', () {
+    test('saved on a day drop the goals that started after it', () {
       goals
-        ..save(complete)
-        ..save(const Goals(kilocalories: 2500, protein: 150));
+        ..saveFrom(nextDay, complete)
+        ..saveFrom(day, cut);
 
       check(
-        goals.load(),
-      ).equals(const Goals(kilocalories: 2500, protein: 150));
+        goals.periods(),
+      ).deepEquals([GoalPeriod(startsOn: day, goals: cut)]);
     });
 
-    test('are gone after a replace with none', () {
+    test('saved twice on one day keep only the last, empty macros '
+        'forgotten', () {
       goals
-        ..save(complete)
-        ..replace(null);
+        ..saveFrom(day, complete)
+        ..saveFrom(day, cut);
 
-      check(goals.load()).isNull();
+      check(
+        goals.periods(),
+      ).deepEquals([GoalPeriod(startsOn: day, goals: cut)]);
     });
+
+    test('are replaced whole by a restore', () {
+      goals
+        ..saveFrom(day, complete)
+        ..replaceAll([
+          GoalPeriod(startsOn: DateTime.utc(2026, 9, 2), goals: cut),
+        ]);
+
+      check(
+        goals.periods(),
+      ).deepEquals([
+        GoalPeriod(startsOn: DateTime.utc(2026, 9, 2), goals: cut),
+      ]);
+    });
+  });
+
+  test('a version 9 database keeps its goals from the day they were last '
+      'saved', () {
+    final (path, legacy) = _legacyDatabase(_versionBeforeDatedGoals);
+    legacy
+      ..execute(
+        'INSERT INTO goals (id, kilocalories, protein, updated_at) '
+        "VALUES (1, 2800, 150, '2026-09-14T21:30:00.000Z')",
+      )
+      ..close();
+
+    final migrated = FujinDatabase.open(path);
+    addTearDown(migrated.close);
+
+    check(goalsOf(migrated).periods()).deepEquals([
+      GoalPeriod(
+        startsOn: DateTime.utc(2026, 9, 14),
+        goals: const Goals(kilocalories: 2800, protein: 150),
+      ),
+    ]);
   });
 
   group('recent foods', () {

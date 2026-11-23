@@ -1,12 +1,12 @@
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:fujin/data/database/calendar_date_hook.dart';
-import 'package:fujin/data/foods/flat_nutrients_hook.dart';
+import 'package:fujin/data/database/flat_field_hook.dart';
 import 'package:fujin/data/foods/food_nutrients.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 part 'entry.mapper.dart';
 
-@MappableClass(hook: FlatNutrientsHook())
+@MappableClass(hook: FlatFieldHook(Entry._nutrients))
 final class Entry with EntryMappable {
   const Entry({
     required this.id,
@@ -40,6 +40,8 @@ final class Entry with EntryMappable {
     nutrients: FoodNutrients.ofMfp(entry.nutrients),
     updatedAt: updatedAt,
   );
+
+  static const _nutrients = 'nutrients';
 
   final String id;
   @MappableField(hook: CalendarDateHook())

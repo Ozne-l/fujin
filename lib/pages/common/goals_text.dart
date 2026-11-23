@@ -14,18 +14,15 @@ abstract final class GoalsText {
     Nutrient.fiber,
   ];
 
-  static String summary(AppLocalizations intl, Goals? goals) => switch (goals) {
-    final goals? => [
-      intl.kilocalories(goals.kilocalories),
-      for (final nutrient in _summarized)
-        if (goals.amount(nutrient) case final amount?)
-          intl.goalsSummaryPart(
-            SendText.nutrient(intl, nutrient),
-            intl.macroValue(amount),
-          ),
-    ].join(intl.summarySeparator),
-    null => intl.goalsNone,
-  };
+  static String summary(AppLocalizations intl, Goals goals) => [
+    intl.kilocalories(goals.kilocalories),
+    for (final nutrient in _summarized)
+      if (goals.amount(nutrient) case final amount?)
+        intl.goalsSummaryPart(
+          SendText.nutrient(intl, nutrient),
+          intl.macroValue(amount),
+        ),
+  ].join(intl.summarySeparator);
 
   static String label(AppLocalizations intl, Nutrient nutrient) =>
       switch (nutrient) {

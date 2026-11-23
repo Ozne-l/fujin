@@ -9,6 +9,7 @@ import 'package:fujin/app/providers.dart';
 import 'package:fujin/data/backup/backup_files.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_id.dart';
+import 'package:fujin/data/goals/goal_period.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/http/read_only_http_client.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
@@ -47,6 +48,8 @@ Future<void> pumpFujin(
   List<OwnCopy> ownCopies = const [],
   List<RememberedUnit> units = const [],
   Goals? goals,
+  List<GoalPeriod> goalPeriods = const [],
+  DateTime Function()? clock,
   BackupFiles? backupFiles,
   Future<void> Function()? clearWebCookies,
   SharedPreferencesWithCache? preferences,
@@ -87,7 +90,10 @@ Future<void> pumpFujin(
   for (final food in sent) {
     food.store(database, entryId: sentIds());
   }
-  goalsOf(database).replace(goals);
+  goalsOf(database).replaceAll([
+    if (goals case final goals?) GoalPeriod(startsOn: day, goals: goals),
+    ...goalPeriods,
+  ]);
   final httpClient = switch (environment) {
     AppEnvironment.production => backends.httpClient,
     AppEnvironment.dev => ReadOnlyHttpClient(
@@ -110,7 +116,7 @@ Future<void> pumpFujin(
       overrides: [
         appEnvironmentProvider.overrideWithValue(environment),
         databaseProvider.overrideWithValue(database),
-        clockProvider.overrideWithValue(() => now),
+        clockProvider.overrideWithValue(clock ?? () => now),
         connectivityProvider.overrideWith((ref) => connectivity),
         mfpClientProvider.overrideWithValue(signedInMfp),
         ekkloClientProvider.overrideWithValue(signedInEkklo),

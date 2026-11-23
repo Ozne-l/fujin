@@ -1,5 +1,7 @@
+import 'package:fujin/data/database/calendar_date_hook.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_table.dart';
+import 'package:fujin/data/goals/goal_period.dart';
 import 'package:fujin/data/goals/goals.dart';
 
 final class GoalsRepository {
@@ -8,30 +10,36 @@ final class GoalsRepository {
   final FujinDatabase<FujinTable> _database;
   final DateTime Function() _clock;
 
-  Goals? load() =>
-      switch (_database.select('SELECT * FROM goals WHERE id = ?', const [
-        _onlyRow,
-      ])) {
-        [final row] => GoalsMapper.fromMap(row),
-        _ => null,
-      };
+  List<GoalPeriod> periods() => [
+    for (final row in _database.select(
+      'SELECT * FROM goals ORDER BY starts_on',
+    ))
+      GoalPeriodMapper.fromMap(row),
+  ];
 
-  void save(Goals goals) => _database.upsert(
-    FujinTable.goals,
-    {
-      _id: _onlyRow,
-      ...goals.toMap(),
-      _updatedAt: _clock().toUtc().toIso8601String(),
-    },
-    key: const [_id],
-  );
+  void saveFrom(DateTime day, Goals goals) => _database.transaction(() {
+    final startsOn = CalendarDateHook.format(day);
+    _database
+      ..execute('DELETE FROM goals WHERE starts_on > ?', [startsOn])
+      ..upsert(
+        FujinTable.goals,
+        {_startsOn: startsOn, ...goals.toMap(), _updatedAt: _stamp()},
+        key: const [_startsOn],
+      );
+  });
 
-  void replace(Goals? goals) => switch (goals) {
-    final goals? => save(goals),
-    null => _database.execute('DELETE FROM goals'),
-  };
+  void replaceAll(Iterable<GoalPeriod> periods) => _database.transaction(() {
+    _database.execute('DELETE FROM goals');
+    for (final period in periods) {
+      _database.insert(FujinTable.goals, {
+        ...period.toMap(),
+        _updatedAt: _stamp(),
+      });
+    }
+  });
 
-  static const _id = 'id';
+  String _stamp() => _clock().toUtc().toIso8601String();
+
+  static const _startsOn = 'starts_on';
   static const _updatedAt = 'updated_at';
-  static const _onlyRow = 1;
 }

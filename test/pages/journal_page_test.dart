@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/data/connectors/connector.dart';
+import 'package:fujin/data/goals/goal_period.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/preferences/fujin_preferences.dart';
 import 'package:fujin/domain/goals/day_goal_state.dart';
@@ -512,6 +513,36 @@ void main() {
       check(_ring(tester, '8').state).equals(DayGoalState.upcoming);
       check(
         _rich('1${_space}898 / 3${_space}000 kcal').evaluate(),
+      ).length.equals(1);
+    });
+
+    testWidgets('rings a past day against the goals it had once today’s goal '
+        'is lowered', (tester) async {
+      await pumpFujin(
+        tester,
+        FakeBackends(
+          mealNames: [breakfast],
+          entries: [
+            entry('E-1', date: _yesterday, nutrients: nutrients(kcal: 2990)),
+            entry('E-2', nutrients: nutrients(kcal: 1898)),
+          ],
+        ),
+        goalPeriods: [
+          GoalPeriod(startsOn: _monday, goals: _goals),
+          GoalPeriod(startsOn: day, goals: const Goals(kilocalories: 2500)),
+        ],
+      );
+
+      check(_ring(tester, '6').state).equals(DayGoalState.reached);
+      check(
+        _rich('1${_space}898 / 2${_space}500 kcal').evaluate(),
+      ).length.equals(1);
+
+      await tester.tap(find.text('6'));
+      await tester.pumpAndSettle();
+
+      check(
+        _rich('2${_space}990 / 3${_space}000 kcal').evaluate(),
       ).length.equals(1);
     });
 

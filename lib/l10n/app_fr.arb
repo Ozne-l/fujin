@@ -587,8 +587,14 @@
   "settingsAccountActive": "Connecté · session active",
   "signOut": "Déconnecter",
   "settingsGoals": "OBJECTIFS",
-  "goalsEveryDay": "Tous les jours",
+  "goalsSince": "Depuis le {date}",
+  "@goalsSince": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "MMMd"}
+    }
+  },
   "goalsNone": "Aucun objectif",
+  "goalsToSet": "À définir",
   "goalsSummaryPart": "{nutrient} {value}",
   "@goalsSummaryPart": {
     "placeholders": {"nutrient": {"type": "String"}, "value": {"type": "String"}}
@@ -678,8 +684,8 @@
   "backupNotWritten": "Fichier non écrit, rien n’a changé",
   "goalsTitle": "Objectifs",
   "goalsHeading": "Tes objectifs",
-  "goalsSubtitle": "Les mêmes chaque jour. Fūjin les compare\nà ton journal MyFitnessPal.",
-  "goalsSection": "TOUS LES JOURS",
+  "goalsSubtitle": "Les jours passés gardent leurs objectifs.\nFūjin les compare à ton journal MyFitnessPal.",
+  "goalsSection": "À PARTIR D’AUJOURD’HUI",
   "goalKilocalories": "Calories",
   "goalProtein": "Protéines · P",
   "goalCarbohydrates": "Glucides · G",
