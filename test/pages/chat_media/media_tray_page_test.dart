@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:checks/checks.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart'
     show
         FakeAccessibilityFeatures,
@@ -39,6 +38,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../support/fake_backends.dart';
 import '../../support/fake_media_picker.dart';
 import '../../support/fake_media_processor.dart';
+import '../../support/haptic.dart';
 import '../../support/pump_fujin.dart';
 import '../../support/until.dart';
 
@@ -124,26 +124,6 @@ final class _Host {
 Future<void> _tap(WidgetTester tester, Finder finder) async {
   await tester.tap(finder);
   await tester.pumpAndSettle();
-}
-
-List<String> _haptics(WidgetTester tester) {
-  final calls = <String>[];
-  tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-    SystemChannels.platform,
-    (call) async {
-      if (call.method == 'HapticFeedback.vibrate') {
-        calls.add('${call.arguments}');
-      }
-      return null;
-    },
-  );
-  addTearDown(
-    () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      SystemChannels.platform,
-      null,
-    ),
-  );
-  return calls;
 }
 
 Rect _editedPhoto(WidgetTester tester) => tester.getRect(
@@ -519,7 +499,7 @@ void main() {
       await host.pump(tester);
       await host.pickFromGallery(tester, [_photo(1)]);
       await _tap(tester, find.text('Modifier'));
-      final haptics = _haptics(tester);
+      final haptics = Haptic.record(tester);
       final crop = tester.getRect(
         find.descendant(
           of: find.byType(CropStage),
@@ -537,7 +517,7 @@ void main() {
       await drag.up();
       await tester.pumpAndSettle();
 
-      check(haptics).deepEquals(['HapticFeedbackType.selectionClick']);
+      check(haptics).deepEquals([Haptic.select]);
     });
 
     testWidgets('drops its changes on Annuler', (tester) async {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fujin/app/theme/fujin_haptics.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
@@ -52,7 +53,10 @@ class TabPlate extends HookWidget {
           held.value = null;
           switch (slot) {
             case BranchSlot(:final tab):
-              if (tab != selected) landing.value = tab;
+              if (tab != selected) {
+                landing.value = tab;
+                FujinHaptics.select();
+              }
               onSelect(tab);
             case MessagesSlot(:final item):
               item.onOpen();

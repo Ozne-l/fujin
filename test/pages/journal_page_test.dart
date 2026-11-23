@@ -30,6 +30,7 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
+import '../support/haptic.dart';
 import '../support/in_memory_preferences.dart';
 import '../support/logged_journal.dart';
 import '../support/pump_fujin.dart';
@@ -310,6 +311,21 @@ void main() {
     gate.complete();
     await tester.pumpAndSettle();
     check(_souffleDisc.evaluate()).isEmpty();
+  });
+
+  testWidgets('ticks once when the pull arms the Souffle, not on a short '
+      'pull', (tester) async {
+    await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+    final haptics = Haptic.record(tester);
+
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, 20));
+    await tester.pumpAndSettle();
+
+    check(haptics).isEmpty();
+
+    await _pullToRefresh(tester);
+
+    check(haptics).deepEquals([Haptic.threshold]);
   });
 
   testWidgets('spins the Souffle disc until the refresh ends', (tester) async {
@@ -777,6 +793,23 @@ void main() {
 
       check(find.text('Septembre').evaluate()).length.equals(1);
       check(_ring(tester, '30').selected).isTrue();
+    });
+
+    testWidgets('ticks when a tap or a swipe picks another day, not on a tap '
+        'on the day shown', (tester) async {
+      await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+      final haptics = Haptic.record(tester);
+
+      await tester.tap(find.text('6'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('6'));
+      await tester.pumpAndSettle();
+
+      check(haptics).deepEquals([Haptic.select]);
+
+      await _swipeWeekBack(tester);
+
+      check(haptics).deepEquals([Haptic.select, Haptic.select]);
     });
 
     for (final (phone, features) in [
@@ -1378,6 +1411,23 @@ void main() {
   });
 
   group('adding a food', () {
+    testWidgets('buzzes a success once the food is added, and not when the '
+        'add is undone', (tester) async {
+      _tallView(tester);
+      await pumpFujin(tester, _basmatiBackends());
+      final haptics = Haptic.record(tester);
+
+      await _openBasmatiInLunch(tester);
+
+      check(haptics).isEmpty();
+
+      await _tap(tester, find.text('Ajouter à MFP et Ekklo'));
+      await tester.tap(find.text('Annuler'));
+      await tester.pumpAndSettle();
+
+      check(haptics).deepEquals([Haptic.success]);
+    });
+
     testWidgets('writes the food in the meal and day it was opened from, '
         'then says so with a way to undo it', (tester) async {
       _tallView(tester);

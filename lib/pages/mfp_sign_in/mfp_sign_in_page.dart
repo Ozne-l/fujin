@@ -6,6 +6,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fujin/app/config.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/failure_shake.dart';
 import 'package:fujin/pages/common/fujin_icon_button.dart';
 import 'package:fujin/pages/common/sign_in_failure.dart';
 import 'package:fujin/pages/mfp_sign_in/mfp_sign_in_notifier.dart';
@@ -135,7 +136,17 @@ class MfpSignInPage extends HookConsumerWidget {
                   child: SafeArea(
                     top: false,
                     minimum: const EdgeInsets.only(bottom: FujinSpace.s4),
-                    child: _Toast(dot: dot, message: message),
+                    child: FailureShake(
+                      failed: switch (state) {
+                        MfpSignInFailed(failure: SignInFailure.refused) => true,
+                        MfpSignInFailed(failure: SignInFailure.unreachable) ||
+                        MfpSignInIdle() ||
+                        MfpSignInRunning() ||
+                        MfpSignInDone() => false,
+                      },
+                      buzz: true,
+                      child: _Toast(dot: dot, message: message),
+                    ),
                   ),
                 ),
               ],

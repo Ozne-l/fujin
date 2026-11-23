@@ -6,6 +6,7 @@ import 'package:fujin/pages/tabs/tab_plate.dart';
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
 import '../support/gestures.dart';
+import '../support/haptic.dart';
 import '../support/pump_fujin.dart';
 
 const _scroll = 300.0;
@@ -36,6 +37,22 @@ void main() {
     await tester.pumpAndSettle();
 
     check(find.text('COMPTES').evaluate()).length.equals(1);
+  });
+
+  testWidgets('ticks when the tab changes, not when the open tab is tapped '
+      'again', (tester) async {
+    await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
+    final haptics = Haptic.record(tester);
+
+    await tester.tap(find.text('Journal'));
+    await tester.pumpAndSettle();
+
+    check(haptics).isEmpty();
+
+    await tester.tap(find.text('Réglages'));
+    await tester.pumpAndSettle();
+
+    check(haptics).deepEquals([Haptic.select]);
   });
 
   testWidgets('shrinks the bar while the journal scrolls down and brings it '

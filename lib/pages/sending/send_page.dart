@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:fujin/app/theme/fujin_haptics.dart';
 import 'package:fujin/domain/sending/send_mode.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/automatic_mode_notifier.dart';
@@ -34,6 +35,9 @@ class SendPage extends HookConsumerWidget {
               (ref.read(automaticModeProvider) && plan.sendCount > 0)) {
         unawaited(ref.read(sendProvider(date).notifier).send(plan));
       }
+    });
+    ref.listen(sendProvider(date), (previous, next) {
+      if (next is SendDone && previous is! SendDone) FujinHaptics.success();
     });
 
     return PopScope(

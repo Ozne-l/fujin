@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/providers.dart';
+import 'package:fujin/app/theme/fujin_haptics.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/goals/goals.dart';
@@ -228,7 +229,9 @@ class JournalPage extends HookConsumerWidget {
       final outcome = await context.push<EditOutcome>(
         FujinRoute.editFood.forEntry(day, entryId),
       );
-      if (outcome != null && context.mounted) settleEdit(outcome);
+      if (outcome == null || !context.mounted) return;
+      if (outcome is Edited) FujinHaptics.success();
+      settleEdit(outcome);
     }
 
     Future<void> add(String meal) async {

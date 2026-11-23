@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:fujin/app/theme/fujin_haptics.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/pages/common/row_action.dart';
 import 'package:fujin/pages/common/trash_icon.dart';
@@ -43,6 +44,25 @@ class SwipeRow extends HookWidget {
       ),
       [controller],
     );
+    final dismissible = DismissiblePane(
+      onDismissed: () {},
+      closeOnCancel: true,
+      confirmDismiss: () async {
+        onRemove();
+        return false;
+      },
+    );
+    final armed = useRef(false);
+    useEffect(() {
+      void cross() {
+        final past = controller.animation.value >= dismissible.dismissThreshold;
+        if (past && !armed.value) FujinHaptics.threshold();
+        armed.value = past;
+      }
+
+      controller.animation.addListener(cross);
+      return () => controller.animation.removeListener(cross);
+    }, [controller]);
 
     void close() {
       if (controller.ratio != _closed) unawaited(controller.close());
@@ -69,14 +89,7 @@ class SwipeRow extends HookWidget {
             endActionPane: ActionPane(
               motion: const StretchMotion(),
               extentRatio: _openShare,
-              dismissible: DismissiblePane(
-                onDismissed: () {},
-                closeOnCancel: true,
-                confirmDismiss: () async {
-                  onRemove();
-                  return false;
-                },
-              ),
+              dismissible: dismissible,
               children: [
                 Expanded(
                   child: Padding(

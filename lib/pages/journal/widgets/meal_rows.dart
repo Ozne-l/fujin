@@ -9,6 +9,7 @@ import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/connector_pill.dart';
+import 'package:fujin/pages/common/pressable.dart';
 import 'package:fujin/pages/common/swipe_row.dart';
 import 'package:fujin/pages/journal/widgets/entry_row.dart';
 import 'package:fujin/pages/journal/widgets/row_write.dart';
@@ -97,8 +98,7 @@ class MealRows<T extends Object> extends HookWidget {
                 enabled: removable,
                 label: context.intl.rowDelete,
                 onRemove: () => onRemove(entry),
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
+                child: Pressable.row(
                   onTap: () => onOpen(entry),
                   child: row,
                 ),

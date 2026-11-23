@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/providers.dart';
+import 'package:fujin/app/theme/fujin_haptics.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/goals/goals.dart';
@@ -78,7 +79,12 @@ class WeekBand extends HookConsumerWidget {
       return null;
     }, [selectedPage]);
 
-    void selectWeek(int weeksBack) => onSelect(
+    void choose(DateTime day) {
+      if (day != selected) FujinHaptics.select();
+      onSelect(day);
+    }
+
+    void selectWeek(int weeksBack) => choose(
       CalendarWeek.sameWeekday(selected, weeksBack: weeksBack, today: today),
     );
 
@@ -170,7 +176,7 @@ class WeekBand extends HookConsumerWidget {
                                       selected: selected,
                                       today: today,
                                       goals: goals,
-                                      onSelect: onSelect,
+                                      onSelect: choose,
                                     ),
                                   ),
                             ),

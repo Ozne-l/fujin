@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fujin/app/theme/fujin_haptics.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/goals/goal_amounts.dart';
@@ -47,6 +48,7 @@ class GoalsPage extends HookConsumerWidget {
       (final goals?, true, false) => () {
         FocusScope.of(context).unfocus();
         ref.read(goalsProvider.notifier).save(goals);
+        FujinHaptics.success();
         saved.value = true;
       },
       _ => null,

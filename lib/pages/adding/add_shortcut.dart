@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:fujin/app/providers.dart';
+import 'package:fujin/app/theme/fujin_haptics.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/adding/adding_possible.dart';
 import 'package:fujin/domain/adding/meal_of_the_hour.dart';
@@ -45,6 +46,7 @@ abstract final class AddShortcut {
   static void added(BuildContext context, WidgetRef ref, AddedFood added) {
     final day = SelectedDay.calendarDay(added.entry.entry.date);
     final remover = ref.read(removeEntryProvider.notifier);
+    FujinHaptics.success();
     ref
       ..invalidate(memoryProvider)
       ..invalidate(mfpDiaryProvider(day))

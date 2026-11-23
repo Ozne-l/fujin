@@ -149,6 +149,7 @@ abstract final class FujinMotion {
   );
   static const Curve flightDrop = Curves.easeInOut;
   static const double pressShrink = 0.85;
+  static const double cardShrink = 0.98;
   static const Motion _uploadSpin = LinearMotion(Duration(milliseconds: 2500));
   static const uploadSpinTurns = StepSequence<double>(
     [0, 1],
