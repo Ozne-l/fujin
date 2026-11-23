@@ -6,15 +6,15 @@
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
-part of 'settlement.dart';
+part of 'post_outcome.dart';
 
-class SettlementMapper extends ClassMapperBase<Settlement> {
-  SettlementMapper._();
+class PostOutcomeMapper extends ClassMapperBase<PostOutcome> {
+  PostOutcomeMapper._();
 
-  static SettlementMapper? _instance;
-  static SettlementMapper ensureInitialized() {
+  static PostOutcomeMapper? _instance;
+  static PostOutcomeMapper ensureInitialized() {
     if (_instance == null) {
-      MapperContainer.globals.use(_instance = SettlementMapper._());
+      MapperContainer.globals.use(_instance = PostOutcomeMapper._());
       MessagePostedMapper.ensureInitialized();
       MessageNotReadyMapper.ensureInitialized();
       MessageWaitingMapper.ensureInitialized();
@@ -25,43 +25,43 @@ class SettlementMapper extends ClassMapperBase<Settlement> {
   }
 
   @override
-  final String id = 'Settlement';
+  final String id = 'PostOutcome';
 
   @override
-  final MappableFields<Settlement> fields = const {};
+  final MappableFields<PostOutcome> fields = const {};
   @override
   final bool ignoreNull = true;
 
-  static Settlement _instantiate(DecodingData data) {
+  static PostOutcome _instantiate(DecodingData data) {
     throw MapperException.missingSubclass(
-      'Settlement',
-      'settlement',
-      '${data.value['settlement']}',
+      'PostOutcome',
+      'outcome',
+      '${data.value['outcome']}',
     );
   }
 
   @override
   final Function instantiate = _instantiate;
 
-  static Settlement fromMap(Map<String, dynamic> map) {
-    return ensureInitialized().decodeMap<Settlement>(map);
+  static PostOutcome fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<PostOutcome>(map);
   }
 
-  static Settlement fromJson(String json) {
-    return ensureInitialized().decodeJson<Settlement>(json);
+  static PostOutcome fromJson(String json) {
+    return ensureInitialized().decodeJson<PostOutcome>(json);
   }
 }
 
-mixin SettlementMappable {
+mixin PostOutcomeMappable {
   String toJson();
   Map<String, dynamic> toMap();
-  SettlementCopyWith<Settlement, Settlement, Settlement> get copyWith;
+  PostOutcomeCopyWith<PostOutcome, PostOutcome, PostOutcome> get copyWith;
 }
 
-abstract class SettlementCopyWith<$R, $In extends Settlement, $Out>
+abstract class PostOutcomeCopyWith<$R, $In extends PostOutcome, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call();
-  SettlementCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+  PostOutcomeCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
 class MessagePostedMapper extends SubClassMapperBase<MessagePosted> {
@@ -71,7 +71,7 @@ class MessagePostedMapper extends SubClassMapperBase<MessagePosted> {
   static MessagePostedMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = MessagePostedMapper._());
-      SettlementMapper.ensureInitialized().addSubMapper(_instance!);
+      PostOutcomeMapper.ensureInitialized().addSubMapper(_instance!);
       EkkloMessageMapper.ensureInitialized();
     }
     return _instance!;
@@ -92,11 +92,12 @@ class MessagePostedMapper extends SubClassMapperBase<MessagePosted> {
   final bool ignoreNull = true;
 
   @override
-  final String discriminatorKey = 'settlement';
+  final String discriminatorKey = 'outcome';
   @override
   final dynamic discriminatorValue = 'posted';
   @override
-  late final ClassMapperBase superMapper = SettlementMapper.ensureInitialized();
+  late final ClassMapperBase superMapper =
+      PostOutcomeMapper.ensureInitialized();
 
   static MessagePosted _instantiate(DecodingData data) {
     return MessagePosted(data.dec(_f$message));
@@ -163,7 +164,7 @@ extension MessagePostedValueCopy<$R, $Out>
 }
 
 abstract class MessagePostedCopyWith<$R, $In extends MessagePosted, $Out>
-    implements SettlementCopyWith<$R, $In, $Out> {
+    implements PostOutcomeCopyWith<$R, $In, $Out> {
   EkkloMessageCopyWith<$R, EkkloMessage, EkkloMessage> get message;
   @override
   $R call({EkkloMessage? message});
@@ -201,7 +202,7 @@ class MessageNotReadyMapper extends SubClassMapperBase<MessageNotReady> {
   static MessageNotReadyMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = MessageNotReadyMapper._());
-      SettlementMapper.ensureInitialized().addSubMapper(_instance!);
+      PostOutcomeMapper.ensureInitialized().addSubMapper(_instance!);
     }
     return _instance!;
   }
@@ -215,11 +216,12 @@ class MessageNotReadyMapper extends SubClassMapperBase<MessageNotReady> {
   final bool ignoreNull = true;
 
   @override
-  final String discriminatorKey = 'settlement';
+  final String discriminatorKey = 'outcome';
   @override
   final dynamic discriminatorValue = 'not_ready';
   @override
-  late final ClassMapperBase superMapper = SettlementMapper.ensureInitialized();
+  late final ClassMapperBase superMapper =
+      PostOutcomeMapper.ensureInitialized();
 
   static MessageNotReady _instantiate(DecodingData data) {
     return MessageNotReady();
@@ -286,7 +288,7 @@ extension MessageNotReadyValueCopy<$R, $Out>
 }
 
 abstract class MessageNotReadyCopyWith<$R, $In extends MessageNotReady, $Out>
-    implements SettlementCopyWith<$R, $In, $Out> {
+    implements PostOutcomeCopyWith<$R, $In, $Out> {
   @override
   $R call();
   MessageNotReadyCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
@@ -320,7 +322,7 @@ class MessageWaitingMapper extends SubClassMapperBase<MessageWaiting> {
   static MessageWaitingMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = MessageWaitingMapper._());
-      SettlementMapper.ensureInitialized().addSubMapper(_instance!);
+      PostOutcomeMapper.ensureInitialized().addSubMapper(_instance!);
     }
     return _instance!;
   }
@@ -334,11 +336,12 @@ class MessageWaitingMapper extends SubClassMapperBase<MessageWaiting> {
   final bool ignoreNull = true;
 
   @override
-  final String discriminatorKey = 'settlement';
+  final String discriminatorKey = 'outcome';
   @override
   final dynamic discriminatorValue = 'waiting';
   @override
-  late final ClassMapperBase superMapper = SettlementMapper.ensureInitialized();
+  late final ClassMapperBase superMapper =
+      PostOutcomeMapper.ensureInitialized();
 
   static MessageWaiting _instantiate(DecodingData data) {
     return MessageWaiting();
@@ -405,7 +408,7 @@ extension MessageWaitingValueCopy<$R, $Out>
 }
 
 abstract class MessageWaitingCopyWith<$R, $In extends MessageWaiting, $Out>
-    implements SettlementCopyWith<$R, $In, $Out> {
+    implements PostOutcomeCopyWith<$R, $In, $Out> {
   @override
   $R call();
   MessageWaitingCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
@@ -439,7 +442,7 @@ class MessageGivenUpMapper extends SubClassMapperBase<MessageGivenUp> {
   static MessageGivenUpMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = MessageGivenUpMapper._());
-      SettlementMapper.ensureInitialized().addSubMapper(_instance!);
+      PostOutcomeMapper.ensureInitialized().addSubMapper(_instance!);
     }
     return _instance!;
   }
@@ -453,11 +456,12 @@ class MessageGivenUpMapper extends SubClassMapperBase<MessageGivenUp> {
   final bool ignoreNull = true;
 
   @override
-  final String discriminatorKey = 'settlement';
+  final String discriminatorKey = 'outcome';
   @override
   final dynamic discriminatorValue = 'given_up';
   @override
-  late final ClassMapperBase superMapper = SettlementMapper.ensureInitialized();
+  late final ClassMapperBase superMapper =
+      PostOutcomeMapper.ensureInitialized();
 
   static MessageGivenUp _instantiate(DecodingData data) {
     return MessageGivenUp();
@@ -524,7 +528,7 @@ extension MessageGivenUpValueCopy<$R, $Out>
 }
 
 abstract class MessageGivenUpCopyWith<$R, $In extends MessageGivenUp, $Out>
-    implements SettlementCopyWith<$R, $In, $Out> {
+    implements PostOutcomeCopyWith<$R, $In, $Out> {
   @override
   $R call();
   MessageGivenUpCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
@@ -558,7 +562,7 @@ class MessageGoneMapper extends SubClassMapperBase<MessageGone> {
   static MessageGoneMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = MessageGoneMapper._());
-      SettlementMapper.ensureInitialized().addSubMapper(_instance!);
+      PostOutcomeMapper.ensureInitialized().addSubMapper(_instance!);
     }
     return _instance!;
   }
@@ -572,11 +576,12 @@ class MessageGoneMapper extends SubClassMapperBase<MessageGone> {
   final bool ignoreNull = true;
 
   @override
-  final String discriminatorKey = 'settlement';
+  final String discriminatorKey = 'outcome';
   @override
   final dynamic discriminatorValue = 'gone';
   @override
-  late final ClassMapperBase superMapper = SettlementMapper.ensureInitialized();
+  late final ClassMapperBase superMapper =
+      PostOutcomeMapper.ensureInitialized();
 
   static MessageGone _instantiate(DecodingData data) {
     return MessageGone();
@@ -641,7 +646,7 @@ extension MessageGoneValueCopy<$R, $Out>
 }
 
 abstract class MessageGoneCopyWith<$R, $In extends MessageGone, $Out>
-    implements SettlementCopyWith<$R, $In, $Out> {
+    implements PostOutcomeCopyWith<$R, $In, $Out> {
   @override
   $R call();
   MessageGoneCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
