@@ -64,7 +64,6 @@ import 'package:fujin/domain/chat/chat_state.dart';
 import 'package:fujin/domain/chat/conversation_state.dart';
 import 'package:fujin/domain/chat/upload/chat_upload_service.dart';
 import 'package:fujin/domain/editing/edit_entry_service.dart';
-import 'package:fujin/domain/editing/remove_entry_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/memory/memory_service.dart';
 import 'package:fujin/domain/sending/send_service.dart';
@@ -327,18 +326,10 @@ final addFoodServiceProvider = Provider<AddFoodService>(
   ),
 );
 
-final removeEntryServiceProvider = Provider<RemoveEntryService>(
-  (ref) => RemoveEntryService(
-    entries: ref.watch(entryRepositoryProvider),
-    background: ref.watch(backgroundWriterProvider),
-  ),
-);
-
 final editEntryServiceProvider = Provider<EditEntryService>(
   (ref) => EditEntryService(
     mfp: ref.watch(mfpClientProvider),
     sending: ref.watch(sendServiceProvider),
-    memory: ref.watch(memoryRepositoryProvider),
     foods: ref.watch(foodRepositoryProvider),
     entries: ref.watch(entryRepositoryProvider),
     writer: ref.watch(entryWriterProvider),

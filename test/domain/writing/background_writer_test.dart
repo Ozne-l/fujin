@@ -237,7 +237,7 @@ void main() {
     test('deletes in Ekklo then MyFitnessPal', () async {
       final (writing, food) = await written();
 
-      writing.removing.remove(food.entryId);
+      writing.editing.remove(food.entryId);
       await writing.settle();
 
       check(writing.writes()).deepEquals([
@@ -273,7 +273,7 @@ void main() {
       final food = await unwritten(writing, _draft());
       check(writing.background.state.failures).length.equals(1);
 
-      writing.removing.remove(food.entryId);
+      writing.editing.remove(food.entryId);
       await writing.settle();
 
       check(writing.background.state.failures).isEmpty();
@@ -291,7 +291,7 @@ void main() {
       await writing.settle();
 
       check(writing.writes()).deepEquals(['POST ${mfpApiUri.host}']);
-      check(writing.background.heldFor(food.entryId)).isNull();
+      check(writing.background.state.held[food.entryId]).isNull();
       check(ekkloQuantities()).isEmpty();
     });
 
@@ -311,7 +311,7 @@ void main() {
         );
         await writing.settle();
 
-        check(writing.background.heldFor(food.entryId)).isNull();
+        check(writing.background.state.held[food.entryId]).isNull();
         check(writing.background.state.failures).isEmpty();
         check(writing.writes()).deepEquals(['POST ${mfpApiUri.host}']);
       },
@@ -320,17 +320,12 @@ void main() {
     test('drops a held send when the entry was deleted', () async {
       final writing = await services();
       final food = await unwritten(writing, _draft());
-      writing.removing.remove(food.entryId);
-      await writing.settle();
-      backends.requests.clear();
+      check(writing.background.state.held[food.entryId]).isA<EkkloSend>();
 
-      writing.background.hold(
-        food.entryId,
-        EkkloSend(await writing.adding.plan(_draft())),
-      );
+      writing.entries.remove(food.entryId);
       await writing.settle();
 
-      check(writing.background.heldFor(food.entryId)).isNull();
+      check(writing.background.state.held[food.entryId]).isNull();
       check(writing.writes()).isEmpty();
       check(writing.background.state.failures).isEmpty();
     });
@@ -374,7 +369,7 @@ void main() {
         final food = await unwritten(await services(), _draft());
 
         final restarted = await services();
-        check(restarted.background.heldFor(food.entryId)).isNull();
+        check(restarted.background.state.held[food.entryId]).isNull();
         await restarted.settle();
 
         check(restarted.writes()).deepEquals([
@@ -400,7 +395,7 @@ void main() {
       check(
         backends.requests.where((request) => request.url.host == ekkloUri.host),
       ).isEmpty();
-      check(restarted.background.heldFor(food.entryId)).isNull();
+      check(restarted.background.state.held[food.entryId]).isNull();
       check((await restarted.find(food.entryId, day))?.status).isA<ToSend>();
     });
 
@@ -412,7 +407,7 @@ void main() {
       await restarted.settle();
 
       check(
-        restarted.background.heldFor(food.entryId),
+        restarted.background.state.held[food.entryId],
       ).isA<EkkloSend>();
       check(restarted.background.state.failures.single)
           .isA<EkkloNotWritten>()
@@ -422,7 +417,7 @@ void main() {
       backends.failingMeals.clear();
       await restarted.settle();
 
-      check(restarted.background.heldFor(food.entryId)).isNull();
+      check(restarted.background.state.held[food.entryId]).isNull();
       check(ekkloQuantities()).deepEquals([150]);
     });
   });
@@ -486,7 +481,7 @@ void main() {
         backends
           ..mfpReachable = false
           ..ekkloReachable = false;
-        writing.removing.remove(food.entryId);
+        writing.editing.remove(food.entryId);
         await writing.settle();
         backends
           ..mfpReachable = true
@@ -512,7 +507,7 @@ void main() {
       backends
         ..mfpReachable = false
         ..ekkloReachable = false;
-      writing.removing.remove(food.entryId);
+      writing.editing.remove(food.entryId);
       clock = clock.add(const Duration(seconds: 1));
       final added = await writing.add(_draft(meal: breakfast));
       await writing.settle();
@@ -544,14 +539,14 @@ void main() {
       backends
         ..mfpReachable = false
         ..ekkloReachable = false;
-      writing.removing.remove(food.entryId);
+      writing.editing.remove(food.entryId);
       await writing.settle();
       backends
         ..mfpReachable = true
         ..ekkloReachable = true;
 
       final restarted = await services();
-      check(restarted.background.heldFor(food.entryId)).isNull();
+      check(restarted.background.state.held[food.entryId]).isNull();
       await restarted.settle();
 
       check(ekkloQuantities()).isEmpty();
@@ -572,7 +567,7 @@ void main() {
       await writing.settle();
       backends.requests.clear();
 
-      writing.removing.remove(food.entryId);
+      writing.editing.remove(food.entryId);
       await writing.settle();
 
       check(writing.writes()).isEmpty();
@@ -928,7 +923,7 @@ void main() {
       () async {
         final (writing, food) = await written();
         backends.mfpRemoveFails = true;
-        writing.removing.remove(food.entryId);
+        writing.editing.remove(food.entryId);
         await writing.settle();
         check(ekkloQuantities()).isEmpty();
         backends
@@ -950,7 +945,7 @@ void main() {
       final food = await writing.add(_draft());
       await sent(1);
 
-      writing.removing.remove(food.entryId);
+      writing.editing.remove(food.entryId);
       gate.complete();
       await writing.settle();
 
@@ -996,7 +991,7 @@ void main() {
         holding.gate.complete();
         await writing.settle();
 
-        check(writing.background.heldFor(food.entryId)).isNull();
+        check(writing.background.state.held[food.entryId]).isNull();
         check(backends.entries.single.servings).equals(2);
         check(ekkloQuantities()).deepEquals([200]);
       },
@@ -1136,7 +1131,7 @@ void main() {
       await retried;
 
       check(backends.ekkloItems).length.equals(1);
-      check(writing.background.heldFor(food.entryId)).isNull();
+      check(writing.background.state.held[food.entryId]).isNull();
       check((await writing.find(food.entryId, day))?.status).isA<InEkklo>();
     });
 
@@ -1154,7 +1149,7 @@ void main() {
       await manual;
 
       check(backends.ekkloItems).length.equals(1);
-      check(writing.background.heldFor(food.entryId)).isNull();
+      check(writing.background.state.held[food.entryId]).isNull();
       check((await writing.find(food.entryId, day))?.status).isA<InEkklo>();
     });
   });

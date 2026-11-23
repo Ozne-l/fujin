@@ -147,7 +147,7 @@ void main() {
             .has((it) => ReadProblem.of(it.error), 'problem')
             .equals(ReadProblem.mfpUnavailable);
         check(
-          services.background.heldFor(added.entryId),
+          services.background.state.held[added.entryId],
         ).isA<EkkloSend>();
         check(backends.ekkloMeals).isEmpty();
         check(services.entries.find(added.entryId)?.mfpLink).isNull();
@@ -280,7 +280,7 @@ void main() {
         final services = await writeServices();
         final added = await services.add(_draft(_skyr));
         await services.settle();
-        check(services.background.heldFor(added.entryId)).isA<EkkloSend>();
+        check(services.background.state.held[added.entryId]).isA<EkkloSend>();
 
         backends.mfpWritesFail = false;
         final inPots = _draft(_skyr, serving: _onePot, servings: 1);
@@ -294,6 +294,23 @@ void main() {
         check(memoryRepository.load().gramsPerUnit(skyr, pot)).isNull();
       },
     );
+
+    test('holds no estimated unit weight for an add', () async {
+      backends.ekkloSearches = {
+        'skyr': [isey],
+      };
+      final services = await writeServices();
+      final inPots = _draft(_skyr, serving: _onePot, servings: 1);
+      final planned = await services.adding.plan(inPots);
+      check(EkkloSide.of(planned)).equals(EkkloSide.toChoose);
+
+      final added = services.adding.add(inPots, planned);
+      await services.settle();
+
+      check(services.background.state.held[added.entryId]).isNull();
+      check(backends.ekkloItems).isEmpty();
+      check(memoryRepository.load().gramsPerUnit(skyr, pot)).isNull();
+    });
   });
 
   group('the Ekklo side of the fiche', () {

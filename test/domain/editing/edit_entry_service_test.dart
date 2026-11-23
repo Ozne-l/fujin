@@ -3,11 +3,14 @@ import 'package:flutter_test/flutter_test.dart'
     show group, setUp, tearDown, test;
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_table.dart';
+import 'package:fujin/data/entries/ekklo_link.dart';
+import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/editing/edit_opening.dart';
 import 'package:fujin/domain/editing/edit_outcome.dart';
+import 'package:fujin/domain/writing/ekklo_job.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../../support/fake_backends.dart';
@@ -40,6 +43,9 @@ AddDraft _draft({
   mfpMealName: meal,
   date: date ?? day,
 );
+
+Iterable<EkkloLink> _liveEkkloLinks(WriteServices services) =>
+    services.entries.ekkloLinks().where((link) => link.deletedAt == null);
 
 void main() {
   late FujinDatabase<FujinTable> database;
@@ -382,6 +388,88 @@ void main() {
       await check(
         services.editing.open(loggedEntry(entry('e1', food: rice))),
       ).throws<MfpNetworkException>();
+    });
+  });
+
+  group('removing', () {
+    test('soft-deletes the entry and owes its MyFitnessPal deletion', () async {
+      final (services, food) = await added();
+
+      services.editing.remove(food.entryId);
+
+      check(services.entries.find(food.entryId)).isNull();
+      check(services.entries.pendingMfp().single).isA<MfpDeletion>();
+
+      await services.settle();
+
+      check(services.writes()).deepEquals([
+        'DELETE ${ekkloUri.host}',
+        'DELETE ${mfpApiUri.host}',
+      ]);
+      check(backends.entries).isEmpty();
+      check(backends.ekkloItems).isEmpty();
+      check(services.entries.pendingMfp()).isEmpty();
+      check(_liveEkkloLinks(services)).isEmpty();
+    });
+
+    test('holds the Ekklo removal of a linked item', () async {
+      final (services, food) = await added();
+      final item = services.entries.find(food.entryId)?.ekkloLink?.item;
+      backends.ekkloReachable = false;
+
+      services.editing.remove(food.entryId);
+      await services.settle();
+
+      check(
+        services.background.state.held[food.entryId],
+      ).isA<EkkloRemoval>().has((it) => it.link.item, 'item').equals(item);
+    });
+
+    test(
+      'removes only the MyFitnessPal entry of a food not in Ekklo',
+      () async {
+        backends.failingMeals.add(dejeuner);
+        final services = await WriteServices.over(backends, database);
+        final food = await services.add(_draft());
+        await services.settle();
+        backends.requests.clear();
+
+        services.editing.remove(food.entryId);
+        await services.settle();
+
+        check(services.writes()).deepEquals(['DELETE ${mfpApiUri.host}']);
+        check(backends.entries).isEmpty();
+      },
+    );
+
+    test('forgets an unwritten add entirely', () async {
+      backends.mfpWritesFail = true;
+      final services = await WriteServices.over(backends, database);
+      final food = await services.add(_draft());
+      await services.settle();
+      backends
+        ..mfpWritesFail = false
+        ..requests.clear();
+
+      services.editing.remove(food.entryId);
+      await services.settle();
+
+      check(services.entries.pendingMfp()).isEmpty();
+      check(services.background.state.held[food.entryId]).isNull();
+      check(services.background.state.failures).isEmpty();
+      check(services.writes()).isEmpty();
+      check(backends.entries).isEmpty();
+    });
+
+    test('returns nothing for an entry already gone', () async {
+      final (services, food) = await added();
+      services.editing.remove(food.entryId);
+      await services.settle();
+      backends.requests.clear();
+
+      check(services.editing.remove(food.entryId)).isNull();
+      await services.settle();
+      check(services.writes()).isEmpty();
     });
   });
 }

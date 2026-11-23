@@ -7,6 +7,7 @@ import 'package:fujin/data/entries/mfp_link.dart';
 import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
+import 'package:fujin/domain/adding/ekklo_side.dart';
 import 'package:fujin/domain/adding/entry_writer.dart';
 import 'package:fujin/domain/adding/rescale_planned.dart';
 import 'package:fujin/domain/comparison/replacement.dart';
@@ -52,14 +53,46 @@ final class BackgroundWriter {
 
   Stream<WriterState> get states => _states.stream;
 
-  void hold(String entryId, EkkloJob job) {
+  PlannedEntry? saved(
+    LoggedEntry stored,
+    PlannedEntry? planned, {
+    required bool added,
+  }) {
+    final id = stored.entry.id;
+    final current = switch (planned) {
+      final planned? => rescalePlanned(planned, stored, _memory.load()),
+      null => null,
+    };
+    final sendHeld = _held[id] is EkkloSend;
+    final follows = added || stored.ekkloLink?.item != null || sendHeld;
+    switch ((current, follows)) {
+      case (final current?, true)
+          when current.sends && EkkloSide.of(current) != EkkloSide.toChoose:
+        _hold(id, EkkloSend(current));
+      case (_, _) when sendHeld:
+        _drop(id);
+      case (_, _):
+        break;
+    }
+    unawaited(run());
+    return current;
+  }
+
+  void removed(LoggedEntry logged) {
+    final id = logged.entry.id;
+    _drop(id);
+    if (logged.ekkloLink case final link? when link.item != null) {
+      _hold(id, EkkloRemoval(link));
+    }
+    unawaited(run());
+  }
+
+  void _hold(String entryId, EkkloJob job) {
     _held[entryId] = job;
     _emit(_state);
   }
 
-  EkkloJob? heldFor(String entryId) => _held[entryId];
-
-  void drop(String entryId) {
+  void _drop(String entryId) {
     if (_held.remove(entryId) != null) _emit(_state);
   }
 
@@ -147,7 +180,7 @@ final class BackgroundWriter {
   };
 
   WriteFailure? _dropped(String id) {
-    drop(id);
+    _drop(id);
     return null;
   }
 
@@ -229,7 +262,7 @@ final class BackgroundWriter {
   void _derive(String id) {
     if ((_held[id], _entries.find(id)) case (null, final stored?)) {
       if (derivedSend(stored, _memory.load()) case final planned?) {
-        hold(id, EkkloSend(planned));
+        _hold(id, EkkloSend(planned));
       }
     }
   }
@@ -319,7 +352,7 @@ final class BackgroundWriter {
   }
 
   WriteFailure? _done(String id, EkkloJob job) {
-    if (identical(_held[id], job)) drop(id);
+    if (identical(_held[id], job)) _drop(id);
     return null;
   }
 

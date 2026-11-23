@@ -11,7 +11,6 @@ import 'package:fujin/domain/adding/entry_writer.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/compared_entry_lookup.dart';
 import 'package:fujin/domain/editing/edit_entry_service.dart';
-import 'package:fujin/domain/editing/remove_entry_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/sending/send_service.dart';
 import 'package:fujin/domain/writing/background_writer.dart';
@@ -29,7 +28,6 @@ final class WriteServices {
     this.journal,
     this.sending,
     this.adding,
-    this.removing,
     this.editing,
     this.background,
   );
@@ -92,11 +90,9 @@ final class WriteServices {
         background: background,
         clock: writeClock,
       ),
-      RemoveEntryService(entries: entries, background: background),
       EditEntryService(
         mfp: mfp,
         sending: sending,
-        memory: memoryRepository,
         foods: foods,
         entries: entries,
         writer: writer,
@@ -111,7 +107,6 @@ final class WriteServices {
   final JournalService journal;
   final SendService sending;
   final AddFoodService adding;
-  final RemoveEntryService removing;
   final EditEntryService editing;
   final BackgroundWriter background;
 

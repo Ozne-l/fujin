@@ -29,7 +29,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0023](0023-ui-flags-in-shared-preferences.md) | UI flags in shared preferences | Accepted (settings and `FujinPreferences.open` added by 0025; connector roles kept there by 0044) |
 | [0024](0024-splash-from-the-first-frame.md) | Splash from the first frame | Accepted |
 | [0025](0025-automatic-mode.md) | Automatic mode: unattended items instead of Memory, a setting in shared preferences | Accepted (unattended items kept on the Ekklo link, and in the backup file, by 0044) |
-| [0026](0026-adding-a-food.md) | Adding a food: one draft, the send flow's Ekklo half, undo | Accepted (scanner and 02d built by 0027; remembered foods added to the search, and "Ajouter" to screen 19, by 0034; undo moved to `RemoveEntryService` by 0043; fiche closing at once by 0044) |
+| [0026](0026-adding-a-food.md) | Adding a food: one draft, the send flow's Ekklo half, undo | Accepted (scanner and 02d built by 0027; remembered foods added to the search, and "Ajouter" to screen 19, by 0034; undo moved to `RemoveEntryService` by 0043, then to `EditEntryService.remove` by 0053; fiche closing at once by 0044) |
 | [0027](0027-barcode-scanner.md) | Barcode scanner: full-screen camera, barcode links in Memory, backup v2 | Accepted (built) |
 | [0028](0028-fujin-drawn-controls.md) | Fūjin-drawn controls instead of stock Material | Accepted (Android stretch under the pull replaced by the bounce in 0038) |
 | [0029](0029-journal-reads-held-for-display.md) | Journal reads held in memory for display, writes read live | Accepted (entries shown from Fūjin's database by 0044) |
@@ -46,7 +46,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0040](0040-flutter-sdk-per-project.md) | Flutter SDK per project | Accepted |
 | [0041](0041-liquid-glass-renderer-1.0.md) | Liquid glass on liquid_glass_renderer 1.0 | Proposed, amended by 0048 (pub.dev pin replaced by a patched copy in third_party) and 0050 (the patched package comes from the owner's fork) |
 | [0042](0042-text-contrast-on-tinted-surfaces.md) | Text contrast on tinted surfaces | Accepted |
-| [0043](0043-edit-and-delete-a-logged-food.md) | Edit and delete a logged food | Accepted (edit and delete saved first and written in the background, and offline edit and delete of known foods built, by 0044) |
+| [0043](0043-edit-and-delete-a-logged-food.md) | Edit and delete a logged food | Accepted (edit and delete saved first and written in the background, and offline edit and delete of known foods built, by 0044; delete moved to `EditEntryService.remove` by 0053) |
 | [0044](0044-connector-model.md) | Connector model: Fūjin's entry at the centre | Accepted (steps 1 to 4 built, offline included, and the role setting, kept in shared preferences; foods without servings completed from MyFitnessPal after an online Journal read; Ekklo "to remove" and Ekklo two-way not built; chat and cache file built by 0045 to 0047) |
 | [0045](0045-ekklo-chat.md) | Ekklo chat: contract, sync, cache file, notifications, fake chat in dev | Accepted, amended by 0049 (built; screens drawn by 0047; seen mark added by 0049) |
 | [0046](0046-chat-media.md) | Chat media: processing, edits and background upload | Accepted (built on Android; screens drawn and background work amended by 0047) |
@@ -56,3 +56,4 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0050](0050-liquid-glass-renderer-from-the-fork.md) | liquid_glass_renderer from the owner's fork | Accepted |
 | [0051](0051-worktrees-pull-requests-and-releases.md) | Worktrees, pull requests with CI, and signed releases installed by Obtainium | Accepted (built; first release v0.6.1, Pixel moved to the release key) |
 | [0052](0052-dated-goals.md) | Dated goals: each set holds from the day it is saved, backup version 5 | Accepted |
+| [0053](0053-one-rule-for-the-held-ekklo-job.md) | One rule for the held Ekklo job, in the background writer | Accepted |
