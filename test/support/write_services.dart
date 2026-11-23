@@ -8,9 +8,11 @@ import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_food_service.dart';
 import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/adding/entry_writer.dart';
+import 'package:fujin/domain/adding/food_completion_service.dart';
 import 'package:fujin/domain/comparison/compared_entry.dart';
 import 'package:fujin/domain/comparison/compared_entry_lookup.dart';
 import 'package:fujin/domain/editing/edit_entry_service.dart';
+import 'package:fujin/domain/journal/fresh_read_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/sending/send_service.dart';
 import 'package:fujin/domain/writing/background_writer.dart';
@@ -30,6 +32,7 @@ final class WriteServices {
     this.adding,
     this.editing,
     this.background,
+    this.freshReads,
   );
 
   static Future<WriteServices> over(
@@ -99,6 +102,11 @@ final class WriteServices {
         background: background,
       ),
       background,
+      FreshReadService(
+        journal: journal,
+        completion: FoodCompletionService(mfp: mfp, foods: foods),
+        writer: background,
+      ),
     );
   }
 
@@ -109,6 +117,7 @@ final class WriteServices {
   final AddFoodService adding;
   final EditEntryService editing;
   final BackgroundWriter background;
+  final FreshReadService freshReads;
 
   Future<AddedFood> add(AddDraft draft) async =>
       adding.add(draft, await adding.plan(draft));

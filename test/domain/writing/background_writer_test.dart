@@ -634,12 +634,12 @@ void main() {
         backends.entries = [row('mfp-written'), entry('app-row', version: '1')];
 
         final restarted = await services();
-        final (:replaced, :adopted) = restarted.journal.settleDay(
+        await restarted.freshReads.settle(
           day,
-          diary: await restarted.journal.fetchDiary(day),
-          meals: await restarted.journal.fetchEkkloMeals(day),
+          diary: restarted.journal.fetchDiary(day),
+          meals: restarted.journal.fetchEkkloMeals(day),
+          thenWrite: false,
         );
-        restarted.background.settled(adopted: adopted, replaced: replaced);
         await restarted.settle();
 
         check(restarted.writes()).deepEquals(['POST ${ekkloUri.host}']);

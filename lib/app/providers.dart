@@ -64,6 +64,7 @@ import 'package:fujin/domain/chat/chat_state.dart';
 import 'package:fujin/domain/chat/conversation_state.dart';
 import 'package:fujin/domain/chat/upload/chat_upload_service.dart';
 import 'package:fujin/domain/editing/edit_entry_service.dart';
+import 'package:fujin/domain/journal/fresh_read_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/memory/memory_service.dart';
 import 'package:fujin/domain/sending/send_service.dart';
@@ -310,6 +311,14 @@ final foodCompletionServiceProvider = Provider<FoodCompletionService>(
   (ref) => FoodCompletionService(
     mfp: ref.watch(mfpClientProvider),
     foods: ref.watch(foodRepositoryProvider),
+  ),
+);
+
+final freshReadServiceProvider = Provider<FreshReadService>(
+  (ref) => FreshReadService(
+    journal: ref.watch(journalServiceProvider),
+    completion: ref.watch(foodCompletionServiceProvider),
+    writer: ref.watch(backgroundWriterProvider),
   ),
 );
 

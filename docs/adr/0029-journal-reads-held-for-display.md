@@ -4,7 +4,7 @@ Date: 2026-10-13
 
 ## Status
 
-Accepted. [0044](0044-connector-model.md) shows the Journal's entries from Fūjin's database; held reads keep serving the comparison with each app. Since its step 2 (2026-10-30) the notifier stores a day's entries and links only from reads just made or waited for (`JournalService.settleDay`, replacing `settleLinks`: both sides from a fresh pair, the MyFitnessPal side alone when Ekklo failed), and a day composed from held reads shows the entries it would copy in as rows without a Fūjin id.
+Accepted. [0044](0044-connector-model.md) shows the Journal's entries from Fūjin's database; held reads keep serving the comparison with each app. Since its step 2 (2026-10-30) the notifier stores a day's entries and links only from reads just made or waited for (`JournalService.settleDay`, replacing `settleLinks`: both sides from a fresh pair, the MyFitnessPal side alone when Ekklo failed), and a day composed from held reads shows the entries it would copy in as rows without a Fūjin id. Since 2026-11-23 the notifier hands those reads, still in flight, to `FreshReadService` (`lib/domain/journal/fresh_read_service.dart`), which stores the day, hands its adoptions and replacements to the background writer, completes the foods, runs the writer when asked or owed, and composes the first read; it takes futures, never a held read, so storing only from a fresh read no longer rests on the notifier's call sites.
 
 ## Context
 
