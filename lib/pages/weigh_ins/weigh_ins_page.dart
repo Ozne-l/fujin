@@ -18,7 +18,6 @@ import 'package:fujin/pages/common/text_inset.dart';
 import 'package:fujin/pages/common/top_bar.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:fujin/pages/weigh_ins/weigh_in_snack_bar.dart';
-import 'package:fujin/pages/weigh_ins/weigh_in_stopped.dart';
 import 'package:fujin/pages/weigh_ins/weigh_in_write_notifier.dart';
 import 'package:fujin/pages/weigh_ins/weigh_ins_notifier.dart';
 import 'package:fujin/pages/weigh_ins/widgets/remove_weigh_in_sheet.dart';
@@ -36,7 +35,7 @@ class WeighInsPage extends ConsumerWidget {
     final today = ref.watch(todayProvider);
     final environment = ref.watch(appEnvironmentProvider);
     final listed = ref.watch(weighInsProvider);
-    final stopped = ref.watch(weighInWriteProvider).stoppedKeys(environment);
+    final stopped = ref.watch(weighInWriteProvider).stoppedKeys;
     ref.listen(weighInWriteProvider, (previous, next) {
       if ((previous, next) case (
         WeighInWriterRunning(),
