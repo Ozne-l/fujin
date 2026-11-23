@@ -197,7 +197,6 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
         diary: diary,
         meals: meals,
         mealNames: mealNames,
-        thenWrite: true,
       )
       .whenComplete(() => _firstReading = null);
 
