@@ -63,6 +63,7 @@ class JournalPage extends HookConsumerWidget {
     final day = ref.watch(selectedDayProvider);
     final today = ref.watch(todayProvider);
     final goals = ref.watch(goalsProvider);
+    final dayGoals = goals.on(day);
     final journal = ref.watch(journalProvider(day));
     final notifier = ref.read(journalProvider(day).notifier);
     final removed = useState<String?>(null);
@@ -275,7 +276,7 @@ class JournalPage extends HookConsumerWidget {
         SliverToBoxAdapter(
           child: DaySummaryCard(
             read: read,
-            goals: goals,
+            goals: dayGoals,
             stale: stale,
             onSend: () => unawaited(send()),
             onDetail: () {
@@ -301,7 +302,7 @@ class JournalPage extends HookConsumerWidget {
               day: day,
               today: today,
               scrolled: scrolled,
-              link: switch ((day == today, goals)) {
+              link: switch ((day == today, dayGoals)) {
                 (false, _) => (
                   context.intl.backToToday,
                   () => select(today),

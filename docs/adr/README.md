@@ -23,8 +23,8 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0017](0017-read-only-dev-environment.md) | Read-only dev environment | Accepted (barcode lookup let through by 0027; Ekklo chat blocked and replaced by a fake chat by 0045) |
 | [0018](0018-send-flow.md) | Send flow: matching, review and execution | Accepted (automatic sends amended by 0025) |
 | [0019](0019-tab-shell.md) | Tab shell: Journal and Mémoire tabs, Scanner disabled | Accepted (Scanner enabled by 0027; amended by 0033 and 0037; Messages bar item added by 0047, not a branch) |
-| [0020](0020-goals.md) | Goals: one row in Fūjin's SQLite | Accepted |
-| [0021](0021-backup-file.md) | Backup file: fujin-backup v1 behind the BackupFiles seam | Accepted (version 2 by 0027; version 4 by 0044) |
+| [0020](0020-goals.md) | Goals: one row in Fūjin's SQLite | Accepted (dated goals by 0052) |
+| [0021](0021-backup-file.md) | Backup file: fujin-backup v1 behind the BackupFiles seam | Accepted (version 2 by 0027; version 4 by 0044; version 5 by 0052) |
 | [0022](0022-journal-states-and-goal-rings.md) | Journal states and goal rings | Accepted (band reads held and neighbour weeks prefetched by 0029; MyFitnessPal foods shown with Ekklo missing and offline by 0030) |
 | [0023](0023-ui-flags-in-shared-preferences.md) | UI flags in shared preferences | Accepted (settings and `FujinPreferences.open` added by 0025; connector roles kept there by 0044) |
 | [0024](0024-splash-from-the-first-frame.md) | Splash from the first frame | Accepted |
@@ -55,3 +55,4 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0049](0049-chat-motion.md) | Chat motion, shared-element flights and haptics | Accepted |
 | [0050](0050-liquid-glass-renderer-from-the-fork.md) | liquid_glass_renderer from the owner's fork | Accepted |
 | [0051](0051-worktrees-pull-requests-and-releases.md) | Worktrees, pull requests with CI, and signed releases installed by Obtainium | Accepted (built; first release v0.6.1, Pixel moved to the release key) |
+| [0052](0052-dated-goals.md) | Dated goals: each set holds from the day it is saved, backup version 5 | Accepted |

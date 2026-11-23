@@ -4,7 +4,7 @@ Date: 2026-10-10
 
 ## Status
 
-Accepted.
+Accepted. [0052](0052-dated-goals.md) replaces the single row with dated goals: each set holds from the day it is saved, and past days keep theirs.
 
 ## Context
 

@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/backup/backup.dart';
 import 'package:fujin/data/connectors/role.dart';
+import 'package:fujin/data/goals/goal_period.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/preferences/fujin_preferences.dart';
 import 'package:fujin/pages/common/fujin_switch.dart';
@@ -27,6 +28,7 @@ const _space = '\u202f';
 const _scrolledPast = 120.0;
 const _width = 800.0;
 const _shortHeight = 900.0;
+const _pastMidnight = Duration(hours: 6);
 
 Future<void> _tap(WidgetTester tester, String text) async {
   final target = find.text(text).last;
@@ -334,7 +336,7 @@ void main() {
   ) async {
     await pumpFujin(tester, FakeBackends(mealNames: [breakfast]));
     await _tap(tester, 'Réglages');
-    await _tap(tester, 'Tous les jours');
+    await _tap(tester, 'Aucun objectif');
 
     await _fill(tester, ['3000', '160', '', '70', '']);
     check(_count('P et L font 1${_space}270 kcal.')).equals(1);
@@ -354,9 +356,31 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.chevron_left));
     await tester.pumpAndSettle();
+    check(_count('Depuis le 7 oct.')).equals(1);
     check(
       _count('3${_space}000 kcal · P 160 · G 400 · L 70 · F 40'),
     ).equals(1);
+  });
+
+  testWidgets('starts the goals on the day Fūjin shows when midnight passed '
+      'since it opened', (tester) async {
+    var moment = now;
+    await pumpFujin(
+      tester,
+      FakeBackends(mealNames: [breakfast]),
+      clock: () => moment,
+    );
+    await _tap(tester, 'Réglages');
+    await _tap(tester, 'Aucun objectif');
+    moment = now.add(_pastMidnight);
+
+    await _fill(tester, ['2500']);
+    await _tap(tester, 'Enregistrer');
+    await tester.tap(find.byIcon(Icons.chevron_left));
+    await tester.pumpAndSettle();
+
+    check(_count('Depuis le 7 oct.')).equals(1);
+    check(_count('2${_space}500 kcal')).equals(1);
   });
 
   testWidgets('clears the memory but keeps the Ekklo links, so the Journal '
@@ -431,7 +455,12 @@ void main() {
           meals: [memory.meals.first],
           links: [link('E-1', 'I-1')],
           barcodeLinks: const [],
-          goals: const Goals(kilocalories: 2500),
+          goalPeriods: [
+            GoalPeriod(
+              startsOn: day,
+              goals: const Goals(kilocalories: 2500),
+            ),
+          ],
         ).toJson(),
       );
     await pumpFujin(

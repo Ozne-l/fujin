@@ -103,7 +103,7 @@ class EntryMapper extends ClassMapperBase<Entry> {
   final bool ignoreNull = true;
 
   @override
-  final MappingHook hook = const FlatNutrientsHook();
+  final MappingHook hook = const FlatFieldHook(Entry._nutrients);
   static Entry _instantiate(DecodingData data) {
     return Entry(
       id: data.dec(_f$id),

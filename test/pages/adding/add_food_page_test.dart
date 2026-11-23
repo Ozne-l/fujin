@@ -8,6 +8,7 @@ import 'package:fujin/app/fujin_app.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/router.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
+import 'package:fujin/data/goals/goal_period.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/domain/adding/added_food.dart';
@@ -43,13 +44,16 @@ FakeBackends _backends({List<MfpFood>? stored}) => FakeBackends(
   },
 );
 
-Future<Future<AddedFood?>> _openAdd(WidgetTester tester) async {
+Future<Future<AddedFood?>> _openAdd(
+  WidgetTester tester, [
+  DateTime? on,
+]) async {
   final container = ProviderScope.containerOf(
     tester.element(find.byType(FujinApp)),
   );
   final result = container
       .read(routerProvider)
-      .push<AddedFood>(FujinRoute.addFood.forMeal(day, breakfast));
+      .push<AddedFood>(FujinRoute.addFood.forMeal(on ?? day, breakfast));
   await tester.pumpAndSettle();
   return result;
 }
@@ -664,6 +668,26 @@ void main() {
       goals: const Goals(kilocalories: 300),
     );
     await _openAdd(tester);
+    await _openOats(tester);
+
+    _sees('Dépassera de 70 kcal');
+  });
+
+  testWidgets('measures a past day against the goals it had then', (
+    tester,
+  ) async {
+    await pumpFujin(
+      tester,
+      _backends(),
+      goalPeriods: [
+        GoalPeriod(
+          startsOn: DateTime.utc(2026, 9, 2),
+          goals: const Goals(kilocalories: 300),
+        ),
+        GoalPeriod(startsOn: day, goals: const Goals(kilocalories: 2500)),
+      ],
+    );
+    await _openAdd(tester, DateTime.utc(2026, 10, 6));
     await _openOats(tester);
 
     _sees('Dépassera de 70 kcal');

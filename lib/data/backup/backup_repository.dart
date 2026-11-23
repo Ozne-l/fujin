@@ -30,7 +30,7 @@ final class BackupRepository {
   final SentLinkRepository _links;
   final GoalsRepository _goals;
 
-  BackupV4 snapshot(DateTime exportedAt) => BackupV4(
+  BackupV5 snapshot(DateTime exportedAt) => BackupV5(
     exportedAt: exportedAt,
     foods: _foods.foods(),
     foodServings: _foods.servings(),
@@ -43,7 +43,7 @@ final class BackupRepository {
     mfpLinks: _entries.mfpLinks(),
     ekkloLinks: _entries.ekkloLinks(),
     links: _links.all(),
-    goals: _goals.load(),
+    goalPeriods: _goals.periods(),
   );
 
   void restore(Backup backup) => _database.transaction(() {
@@ -51,7 +51,7 @@ final class BackupRepository {
     _foods.deleteAll();
     _meals.deleteAll();
     switch (backup) {
-      case BackupV4(
+      case BackupV5(
             :final foods,
             :final foodServings,
             :final foodUnits,
@@ -80,7 +80,7 @@ final class BackupRepository {
       case BackupV2():
         _memory.restore(backup.memory);
     }
-    if (backup case BackupV4(
+    if (backup case BackupV5(
       :final entries,
       :final mfpLinks,
       :final ekkloLinks,
@@ -93,6 +93,6 @@ final class BackupRepository {
     }
     recents.forEach(_recents.record);
     _links.replaceAll(backup.links);
-    _goals.replace(backup.goals);
+    _goals.replaceAll(backup.goalPeriods);
   });
 }

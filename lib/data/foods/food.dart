@@ -1,10 +1,10 @@
 import 'package:dart_mappable/dart_mappable.dart';
-import 'package:fujin/data/foods/flat_nutrients_hook.dart';
+import 'package:fujin/data/database/flat_field_hook.dart';
 import 'package:fujin/data/foods/food_nutrients.dart';
 
 part 'food.mapper.dart';
 
-@MappableClass(hook: FlatNutrientsHook())
+@MappableClass(hook: FlatFieldHook(Food._nutrients))
 final class Food with FoodMappable {
   const Food({
     required this.id,
@@ -15,6 +15,8 @@ final class Food with FoodMappable {
     this.verified,
     this.deletedAt,
   });
+
+  static const _nutrients = 'nutrients';
 
   final String id;
   final String? name;

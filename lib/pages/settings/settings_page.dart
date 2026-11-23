@@ -29,6 +29,7 @@ import 'package:fujin/pages/common/scroll_extent_listener.dart';
 import 'package:fujin/pages/common/text_inset.dart';
 import 'package:fujin/pages/common/theme_reveal.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
+import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:fujin/pages/memory/memory_notifier.dart';
 import 'package:fujin/pages/settings/backup_failure.dart';
 import 'package:fujin/pages/settings/backup_notifier.dart';
@@ -59,7 +60,7 @@ class SettingsPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final memory = ref.watch(memoryProvider);
-    final goals = ref.watch(goalsProvider);
+    final current = ref.watch(goalsProvider).periodOn(ref.watch(todayProvider));
     final colors = context.colors;
     final automaticMode = ref.watch(automaticModeProvider);
     final appearance = ref.watch(appearanceProvider);
@@ -252,8 +253,19 @@ class SettingsPage extends HookConsumerWidget {
                       label: context.intl.settingsGoals,
                       rows: [
                         SettingsRow(
-                          title: context.intl.goalsEveryDay,
-                          detail: GoalsText.summary(context.intl, goals),
+                          title: switch (current) {
+                            final current? => context.intl.goalsSince(
+                              current.startsOn,
+                            ),
+                            null => context.intl.goalsNone,
+                          },
+                          detail: switch (current) {
+                            final current? => GoalsText.summary(
+                              context.intl,
+                              current.goals,
+                            ),
+                            null => context.intl.goalsToSet,
+                          },
                           onTap: () => unawaited(
                             context.push<void>(FujinRoute.goals.path),
                           ),

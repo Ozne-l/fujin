@@ -76,7 +76,7 @@ Adding a food goes the other way: the entry is saved in Fūjin first, with or wi
 | **Add a food** | MyFitnessPal search, foods recently added through Fūjin, serving, meal, date and nutrients against the day's goals, with the send flow's Ekklo sheets. Each failure has its own screen. | [0026](docs/adr/0026-adding-a-food.md) |
 | **Scanner** | Full-screen camera from the tab bar or the search, a keypad for a typed code, the meal of the hour preselected. A confirmed barcode is remembered. | [0027](docs/adr/0027-barcode-scanner.md) |
 | **Memory** | Remembered foods, unit weights, meal mappings and barcode links. The Mémoire tab changes a food's Ekklo match, edits unit weights and meal mappings, or forgets a food so the next send asks again. | [GLOSSARY](GLOSSARY.md) |
-| **Goals** | Daily kilocalories, protein, carbohydrates, fat and fibre. | [0020](docs/adr/0020-goals.md) |
+| **Goals** | Daily kilocalories, protein, carbohydrates, fat and fibre, from the day they are saved; past days keep theirs. | [0020](docs/adr/0020-goals.md), [0052](docs/adr/0052-dated-goals.md) |
 | **Backup** | Android Auto Backup limited to `fujin.db`, plus a JSON backup file to export and import. | [0005](docs/adr/0005-backup.md), [0021](docs/adr/0021-backup-file.md) |
 | **Dev app** | "Fūjin DEV" installs next to the real app and runs on real accounts in read-only mode. | [0017](docs/adr/0017-read-only-dev-environment.md) |
 

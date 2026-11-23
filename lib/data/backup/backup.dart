@@ -8,7 +8,7 @@ import 'package:fujin/data/foods/food_barcode.dart';
 import 'package:fujin/data/foods/food_reference.dart';
 import 'package:fujin/data/foods/food_serving.dart';
 import 'package:fujin/data/foods/food_unit.dart';
-import 'package:fujin/data/goals/goals.dart';
+import 'package:fujin/data/goals/goal_period.dart';
 import 'package:fujin/data/links/sent_link.dart';
 import 'package:fujin/data/meals/connector_meal.dart';
 import 'package:fujin/data/meals/meal.dart';
@@ -26,7 +26,7 @@ sealed class Backup with BackupMappable {
     required this.exportedAt,
     required this.links,
     required this.version,
-    this.goals,
+    this.goalPeriods = const [],
     this.format = formatName,
   });
 
@@ -37,7 +37,7 @@ sealed class Backup with BackupMappable {
   final int version;
   final DateTime exportedAt;
   final List<SentLink> links;
-  final Goals? goals;
+  final List<GoalPeriod> goalPeriods;
 
   int get foodCount;
 
@@ -46,9 +46,9 @@ sealed class Backup with BackupMappable {
   int get linkCount => links.length;
 }
 
-@MappableClass(discriminatorValue: BackupV4.currentVersion)
-final class BackupV4 extends Backup with BackupV4Mappable {
-  const BackupV4({
+@MappableClass(discriminatorValue: BackupV5.isEntriesFile)
+final class BackupV5 extends Backup with BackupV5Mappable {
+  const BackupV5({
     required super.exportedAt,
     required super.links,
     required this.foods,
@@ -61,12 +61,18 @@ final class BackupV4 extends Backup with BackupV4Mappable {
     required this.entries,
     required this.mfpLinks,
     required this.ekkloLinks,
-    super.goals,
+    super.goalPeriods,
     super.format = Backup.formatName,
     super.version = currentVersion,
   });
 
-  static const currentVersion = 4;
+  static const currentVersion = 5;
+  static const versionWithOneGoal = 4;
+
+  static bool isEntriesFile(Map<String, dynamic> file) => switch (file) {
+    {Backup.versionKey: currentVersion || versionWithOneGoal} => true,
+    _ => false,
+  };
 
   final List<Food> foods;
   final List<FoodServing> foodServings;
@@ -105,7 +111,7 @@ final class BackupV3 extends Backup with BackupV3Mappable {
     required this.barcodeLinks,
     required this.meals,
     required this.mealMappings,
-    super.goals,
+    super.goalPeriods,
     super.format = Backup.formatName,
     super.version = foodsVersion,
   });
@@ -156,7 +162,7 @@ final class BackupV2 extends Backup with BackupV2Mappable {
     required this.units,
     required this.meals,
     required this.barcodeLinks,
-    super.goals,
+    super.goalPeriods,
     super.format = Backup.formatName,
   });
 
