@@ -52,7 +52,6 @@ import 'package:fujin/pages/journal/remove_entry_notifier.dart';
 import 'package:fujin/pages/journal/remove_entry_state.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:fujin/pages/journal/widgets/remove_sheet.dart';
-import 'package:fujin/pages/journal/writer_state_ids.dart';
 import 'package:fujin/pages/sending/entry_choices.dart';
 import 'package:fujin/pages/sending/send_text.dart';
 import 'package:fujin/pages/sending/sheets/match_sheet.dart';

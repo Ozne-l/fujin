@@ -3,9 +3,9 @@ import 'package:fujin/data/http/read_only_http_client.dart';
 import 'package:fujin/domain/sending/send_interruption.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
-bool networkDown(Object error) => switch (error) {
-  SendInterruption(:final cause) => networkDown(cause),
-  MfpNetworkException(:final method) ||
-  EkkloNetworkException(:final method) => ReadOnlyHttpClient.reads(method),
+bool networkDown(Object error, {required bool readOnly}) => switch (error) {
+  SendInterruption(:final cause) => networkDown(cause, readOnly: readOnly),
+  MfpNetworkException(:final method) || EkkloNetworkException(:final method) =>
+    !readOnly || ReadOnlyHttpClient.reads(method),
   _ => false,
 };

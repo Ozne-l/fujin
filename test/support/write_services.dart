@@ -4,6 +4,7 @@ import 'package:fujin/data/connectors/connector_roles.dart';
 import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
+import 'package:fujin/data/http/read_only_http_client.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_food_service.dart';
 import 'package:fujin/domain/adding/added_food.dart';
@@ -76,6 +77,7 @@ final class WriteServices {
       memory: memoryRepository,
       entries: entries,
       writer: writer,
+      readOnly: httpClient is ReadOnlyHttpClient,
     );
     addTearDown(background.run);
     return WriteServices._(

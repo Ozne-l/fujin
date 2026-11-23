@@ -7,7 +7,6 @@ import 'package:fujin/pages/journal/widgets/meal_card_frame.dart';
 import 'package:fujin/pages/journal/widgets/meal_rows.dart';
 import 'package:fujin/pages/journal/widgets/meal_title.dart';
 import 'package:fujin/pages/journal/widgets/stored_row.dart';
-import 'package:fujin/pages/journal/writer_state_ids.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class StoredMealCard extends ConsumerWidget {

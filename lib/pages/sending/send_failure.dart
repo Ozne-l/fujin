@@ -21,8 +21,8 @@ enum SendFailure {
   static SendFailure of(Object error, AppEnvironment environment) =>
       switch ((error, environment)) {
         (SendInterruption(:final cause), _) => of(cause, environment),
-        (EkkloNetworkException() || MfpNetworkException(), AppEnvironment.dev)
-            when !networkDown(error) =>
+        (EkkloNetworkException() || MfpNetworkException(), _)
+            when !networkDown(error, readOnly: environment.readOnly) =>
           blockedInDev,
         (EkkloNetworkException() || MfpNetworkException(), _) => network,
         (EkkloAuthException(), _) => ekkloSession,

@@ -33,6 +33,7 @@ final class BackgroundWriter {
     required this._memory,
     required this._entries,
     required this._writer,
+    required this._readOnly,
   });
 
   final MyFitnessPalClient _mfp;
@@ -40,6 +41,7 @@ final class BackgroundWriter {
   final MemoryRepository _memory;
   final EntryRepository _entries;
   final EntryWriter _writer;
+  final bool _readOnly;
 
   final _states = StreamController<WriterState>.broadcast();
   final Map<String, EkkloJob> _held = {};
@@ -143,8 +145,9 @@ final class BackgroundWriter {
         final logged = _entries.findAny(id);
         _emit(WriterRunning(current: logged, failures: [...failures.values]));
         switch (await _write(id, logged, added: adds.contains(id))) {
-          case final failure? when networkDown(failure.error):
-            failures[id] = failure;
+          case final failure?
+              when networkDown(failure.error, readOnly: _readOnly):
+            failures.remove(id);
             return;
           case final failure?:
             failures[id] = failure;
