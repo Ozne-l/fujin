@@ -24,7 +24,6 @@ final class FreshReadService {
     required Future<Fetched<MfpDiaryDay>> diary,
     required Future<Fetched<List<EkkloDailyMeal>>> meals,
     required Future<List<String>> mealNames,
-    required bool thenWrite,
   }) async {
     final diaryRead = Fetch.of(diary);
     final mealsRead = Fetch.of(meals);
@@ -32,7 +31,7 @@ final class FreshReadService {
       (Object error) => const <String>[],
     );
     final (diaryFetch, mealsFetch) = (await diaryRead, await mealsRead);
-    _settle(date, diaryFetch, mealsFetch, thenWrite: thenWrite);
+    _settle(date, diaryFetch, mealsFetch, thenWrite: true);
     return _journal.journalOf(
       date,
       diary: diaryFetch,
