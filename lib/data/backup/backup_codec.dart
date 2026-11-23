@@ -4,8 +4,6 @@ import 'dart:typed_data';
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:fujin/data/backup/backup.dart';
 import 'package:fujin/data/database/calendar_date_hook.dart';
-import 'package:fujin/data/memory/remembered_food.dart';
-import 'package:fujin/data/memory/remembered_unit.dart';
 
 abstract final class BackupCodec {
   static const _format = 'format';
@@ -20,9 +18,7 @@ abstract final class BackupCodec {
   static Backup? decode(Uint8List bytes) {
     try {
       return switch (_read(jsonDecode(utf8.decode(bytes)))) {
-        BackupV2(:final matches, :final units)
-            when !_unitsMatched(matches, units) =>
-          null,
+        final BackupV2 memory when !_importable(memory) => null,
         final backup => backup,
       };
     } on FormatException {
@@ -62,11 +58,11 @@ abstract final class BackupCodec {
       ],
   };
 
-  static bool _unitsMatched(
-    List<MatchedFood> matches,
-    List<RememberedUnit> units,
-  ) {
-    final matched = {for (final match in matches) match.mfpFoodId};
-    return units.every((unit) => matched.contains(unit.mfpFoodId));
+  static bool _importable(BackupV2 memory) {
+    final matched = {for (final match in memory.matches) match.mfpFoodId};
+    return memory.ownCopies.every(
+          (copy) => !matched.contains(copy.mfpFoodId),
+        ) &&
+        memory.units.every((unit) => matched.contains(unit.mfpFoodId));
   }
 }
