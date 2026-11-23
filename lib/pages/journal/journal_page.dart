@@ -12,7 +12,6 @@ import 'package:fujin/domain/comparison/entry_status.dart';
 import 'package:fujin/domain/editing/edit_outcome.dart';
 import 'package:fujin/domain/journal/journal_read.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
-import 'package:fujin/domain/writing/writer_state.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/adding/add_shortcut.dart';
 import 'package:fujin/pages/common/appearance_corner.dart';
@@ -169,16 +168,13 @@ class JournalPage extends HookConsumerWidget {
         }
       })
       ..listen(backgroundWriteProvider, (previous, next) {
-        if ((previous, next) case (
-          WriterRunning(current: final written?),
-          _,
-        ) when next is! WriterRunning || next.current != written) {
+        if (next.writtenSince(previous) case final written?) {
           rereadDaysOf([
             written.entry.date,
             if (written.mfpLink case final link?) link.date,
           ], written: true);
         }
-        if ((previous, next) case (WriterRunning(), final WriterIdle idle)) {
+        if (next.runEndedSince(previous) case final idle?) {
           JournalSnackBar.written(
             context,
             idle,
