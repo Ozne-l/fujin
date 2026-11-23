@@ -15,6 +15,7 @@ import 'package:fujin/data/meals/meal_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/recents/recent_food_repository.dart';
 import 'package:fujin/data/unattended/unattended_item_repository.dart';
+import 'package:fujin/data/weigh_ins/weigh_in_repository.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/sending/send_service.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
@@ -39,6 +40,9 @@ RecentFoodRepository recentsOf(FujinDatabase<FujinTable> database) =>
 
 GoalsRepository goalsOf(FujinDatabase<FujinTable> database) =>
     GoalsRepository(database, () => now);
+
+WeighInRepository weighInsOf(FujinDatabase<FujinTable> database) =>
+    WeighInRepository(database: database, clock: () => now);
 
 EntryRepository entriesOf(
   FujinDatabase<FujinTable> database, {

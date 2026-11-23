@@ -2870,4 +2870,153 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get writeBlockedInDev =>
       'Fūjin DEV n’écrit ni dans MyFitnessPal ni dans Ekklo : rien n’a changé.';
+
+  @override
+  String get settingsWeighIns => 'POIDS';
+
+  @override
+  String settingsWeighInToday(String kilograms) {
+    return 'Aujourd’hui · $kilograms';
+  }
+
+  @override
+  String get settingsWeighInNone => 'Pas encore de pesée aujourd’hui';
+
+  @override
+  String get settingsWeighInDetail => 'Nouvelle pesée et historique';
+
+  @override
+  String get weighInsTitle => 'Poids';
+
+  @override
+  String get weighInsSection => 'PESÉES';
+
+  @override
+  String get weighInsEmptyTitle => 'Pas encore de pesée';
+
+  @override
+  String get weighInsEmptyDetail =>
+      'Fūjin garde ta pesée, puis l’écrit dans Ekklo et MyFitnessPal.';
+
+  @override
+  String get weighInNew => 'Nouvelle pesée';
+
+  @override
+  String weighInKilograms(double kilograms) {
+    final intl.NumberFormat kilogramsNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 1,
+        );
+    final String kilogramsString = kilogramsNumberFormat.format(kilograms);
+
+    return '$kilogramsString kg';
+  }
+
+  @override
+  String get kilogramsSuffix => 'kg';
+
+  @override
+  String weighInRange(int lightest, int heaviest) {
+    return 'Entre $lightest et $heaviest kg';
+  }
+
+  @override
+  String weighInReplaceTitle(String kilograms) {
+    return 'Ce jour a déjà une pesée : $kilograms.';
+  }
+
+  @override
+  String get weighInReplaceDetail =>
+      'La nouvelle la remplace, dans Fūjin puis dans Ekklo et MyFitnessPal.';
+
+  @override
+  String get weighInReplace => 'Remplacer la pesée';
+
+  @override
+  String weighInToday(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMEd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Aujourd’hui, $dateString';
+  }
+
+  @override
+  String weighInYesterday(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMEd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Hier, $dateString';
+  }
+
+  @override
+  String get weighInDayToday => 'aujourd’hui';
+
+  @override
+  String get weighInDayYesterday => 'hier';
+
+  @override
+  String get weighInSaved => 'Pesée enregistrée';
+
+  @override
+  String weighInSavedDetail(String kilograms, String day) {
+    return '$kilograms · $day';
+  }
+
+  @override
+  String get weighInEdit => 'Modifier la pesée';
+
+  @override
+  String get weighInDelete => 'Supprimer la pesée';
+
+  @override
+  String weighInDeleteTitle(String kilograms) {
+    return 'Supprimer $kilograms ?';
+  }
+
+  @override
+  String weighInDeleteDetail(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMEEEEd(
+      localeName,
+    );
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Pesée du $dateString. Fūjin la retire de MyFitnessPal ; Ekklo ne sait pas supprimer une pesée, elle y reste.';
+  }
+
+  @override
+  String get weighInDeleteFromMfp => 'Supprimer de MFP';
+
+  @override
+  String get weighInDeletedInFujin => 'Supprimé dans Fūjin · reste dans Ekklo';
+
+  @override
+  String get weighInDeleted => 'Pesée supprimée';
+
+  @override
+  String weighInDeletedDetail(String day) {
+    return '$day · reste dans Ekklo';
+  }
+
+  @override
+  String get weighInStillPendingToday =>
+      'La pesée d’aujourd’hui reste en attente';
+
+  @override
+  String weighInStillPending(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMEd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'La pesée du $dateString reste en attente';
+  }
+
+  @override
+  String weighInsStillPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pesées restent en attente',
+    );
+    return '$_temp0';
+  }
 }

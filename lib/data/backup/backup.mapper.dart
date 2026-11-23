@@ -15,6 +15,7 @@ class BackupMapper extends ClassMapperBase<Backup> {
   static BackupMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = BackupMapper._());
+      BackupV6Mapper.ensureInitialized();
       BackupV5Mapper.ensureInitialized();
       BackupV3Mapper.ensureInitialized();
       BackupV2Mapper.ensureInitialized();
@@ -104,6 +105,538 @@ abstract class BackupCopyWith<$R, $In extends Backup, $Out>
     String? format,
   });
   BackupCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class BackupV6Mapper extends SubClassMapperBase<BackupV6> {
+  BackupV6Mapper._();
+
+  static BackupV6Mapper? _instance;
+  static BackupV6Mapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = BackupV6Mapper._());
+      BackupMapper.ensureInitialized().addSubMapper(_instance!);
+      SentLinkMapper.ensureInitialized();
+      FoodMapper.ensureInitialized();
+      FoodServingMapper.ensureInitialized();
+      FoodUnitMapper.ensureInitialized();
+      FoodReferenceMapper.ensureInitialized();
+      FoodBarcodeMapper.ensureInitialized();
+      MealMapper.ensureInitialized();
+      ConnectorMealMapper.ensureInitialized();
+      EntryMapper.ensureInitialized();
+      MfpLinkMapper.ensureInitialized();
+      EkkloLinkMapper.ensureInitialized();
+      WeighInMapper.ensureInitialized();
+      EkkloWeighInLinkMapper.ensureInitialized();
+      MfpWeighInLinkMapper.ensureInitialized();
+      GoalPeriodMapper.ensureInitialized();
+    }
+    return _instance!;
+  }
+
+  @override
+  final String id = 'BackupV6';
+
+  static DateTime _$exportedAt(BackupV6 v) => v.exportedAt;
+  static const Field<BackupV6, DateTime> _f$exportedAt = Field(
+    'exportedAt',
+    _$exportedAt,
+    key: r'exported_at',
+  );
+  static List<SentLink> _$links(BackupV6 v) => v.links;
+  static const Field<BackupV6, List<SentLink>> _f$links = Field(
+    'links',
+    _$links,
+  );
+  static List<Food> _$foods(BackupV6 v) => v.foods;
+  static const Field<BackupV6, List<Food>> _f$foods = Field('foods', _$foods);
+  static List<FoodServing> _$foodServings(BackupV6 v) => v.foodServings;
+  static const Field<BackupV6, List<FoodServing>> _f$foodServings = Field(
+    'foodServings',
+    _$foodServings,
+    key: r'food_servings',
+  );
+  static List<FoodUnit> _$foodUnits(BackupV6 v) => v.foodUnits;
+  static const Field<BackupV6, List<FoodUnit>> _f$foodUnits = Field(
+    'foodUnits',
+    _$foodUnits,
+    key: r'food_units',
+  );
+  static List<FoodReference> _$foodReferences(BackupV6 v) => v.foodReferences;
+  static const Field<BackupV6, List<FoodReference>> _f$foodReferences = Field(
+    'foodReferences',
+    _$foodReferences,
+    key: r'food_references',
+  );
+  static List<FoodBarcode> _$barcodeLinks(BackupV6 v) => v.barcodeLinks;
+  static const Field<BackupV6, List<FoodBarcode>> _f$barcodeLinks = Field(
+    'barcodeLinks',
+    _$barcodeLinks,
+    key: r'barcode_links',
+  );
+  static List<Meal> _$meals(BackupV6 v) => v.meals;
+  static const Field<BackupV6, List<Meal>> _f$meals = Field('meals', _$meals);
+  static List<ConnectorMeal> _$mealMappings(BackupV6 v) => v.mealMappings;
+  static const Field<BackupV6, List<ConnectorMeal>> _f$mealMappings = Field(
+    'mealMappings',
+    _$mealMappings,
+    key: r'meal_mappings',
+  );
+  static List<Entry> _$entries(BackupV6 v) => v.entries;
+  static const Field<BackupV6, List<Entry>> _f$entries = Field(
+    'entries',
+    _$entries,
+  );
+  static List<MfpLink> _$mfpLinks(BackupV6 v) => v.mfpLinks;
+  static const Field<BackupV6, List<MfpLink>> _f$mfpLinks = Field(
+    'mfpLinks',
+    _$mfpLinks,
+    key: r'mfp_links',
+  );
+  static List<EkkloLink> _$ekkloLinks(BackupV6 v) => v.ekkloLinks;
+  static const Field<BackupV6, List<EkkloLink>> _f$ekkloLinks = Field(
+    'ekkloLinks',
+    _$ekkloLinks,
+    key: r'ekklo_links',
+  );
+  static List<WeighIn> _$weighIns(BackupV6 v) => v.weighIns;
+  static const Field<BackupV6, List<WeighIn>> _f$weighIns = Field(
+    'weighIns',
+    _$weighIns,
+    key: r'weigh_ins',
+  );
+  static List<EkkloWeighInLink> _$ekkloWeighInLinks(BackupV6 v) =>
+      v.ekkloWeighInLinks;
+  static const Field<BackupV6, List<EkkloWeighInLink>> _f$ekkloWeighInLinks =
+      Field(
+        'ekkloWeighInLinks',
+        _$ekkloWeighInLinks,
+        key: r'ekklo_weigh_in_links',
+      );
+  static List<MfpWeighInLink> _$mfpWeighInLinks(BackupV6 v) =>
+      v.mfpWeighInLinks;
+  static const Field<BackupV6, List<MfpWeighInLink>> _f$mfpWeighInLinks = Field(
+    'mfpWeighInLinks',
+    _$mfpWeighInLinks,
+    key: r'mfp_weigh_in_links',
+  );
+  static List<GoalPeriod> _$goalPeriods(BackupV6 v) => v.goalPeriods;
+  static const Field<BackupV6, List<GoalPeriod>> _f$goalPeriods = Field(
+    'goalPeriods',
+    _$goalPeriods,
+    key: r'goal_periods',
+    opt: true,
+    def: const [],
+  );
+  static String _$format(BackupV6 v) => v.format;
+  static const Field<BackupV6, String> _f$format = Field(
+    'format',
+    _$format,
+    opt: true,
+    def: Backup.formatName,
+  );
+  static int _$version(BackupV6 v) => v.version;
+  static const Field<BackupV6, int> _f$version = Field(
+    'version',
+    _$version,
+    opt: true,
+    def: BackupV6.currentVersion,
+  );
+
+  @override
+  final MappableFields<BackupV6> fields = const {
+    #exportedAt: _f$exportedAt,
+    #links: _f$links,
+    #foods: _f$foods,
+    #foodServings: _f$foodServings,
+    #foodUnits: _f$foodUnits,
+    #foodReferences: _f$foodReferences,
+    #barcodeLinks: _f$barcodeLinks,
+    #meals: _f$meals,
+    #mealMappings: _f$mealMappings,
+    #entries: _f$entries,
+    #mfpLinks: _f$mfpLinks,
+    #ekkloLinks: _f$ekkloLinks,
+    #weighIns: _f$weighIns,
+    #ekkloWeighInLinks: _f$ekkloWeighInLinks,
+    #mfpWeighInLinks: _f$mfpWeighInLinks,
+    #goalPeriods: _f$goalPeriods,
+    #format: _f$format,
+    #version: _f$version,
+  };
+  @override
+  final bool ignoreNull = true;
+
+  @override
+  final String discriminatorKey = 'version';
+  @override
+  final dynamic discriminatorValue = BackupV6.currentVersion;
+  @override
+  late final ClassMapperBase superMapper = BackupMapper.ensureInitialized();
+
+  static BackupV6 _instantiate(DecodingData data) {
+    return BackupV6(
+      exportedAt: data.dec(_f$exportedAt),
+      links: data.dec(_f$links),
+      foods: data.dec(_f$foods),
+      foodServings: data.dec(_f$foodServings),
+      foodUnits: data.dec(_f$foodUnits),
+      foodReferences: data.dec(_f$foodReferences),
+      barcodeLinks: data.dec(_f$barcodeLinks),
+      meals: data.dec(_f$meals),
+      mealMappings: data.dec(_f$mealMappings),
+      entries: data.dec(_f$entries),
+      mfpLinks: data.dec(_f$mfpLinks),
+      ekkloLinks: data.dec(_f$ekkloLinks),
+      weighIns: data.dec(_f$weighIns),
+      ekkloWeighInLinks: data.dec(_f$ekkloWeighInLinks),
+      mfpWeighInLinks: data.dec(_f$mfpWeighInLinks),
+      goalPeriods: data.dec(_f$goalPeriods),
+      format: data.dec(_f$format),
+      version: data.dec(_f$version),
+    );
+  }
+
+  @override
+  final Function instantiate = _instantiate;
+
+  static BackupV6 fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<BackupV6>(map);
+  }
+
+  static BackupV6 fromJson(String json) {
+    return ensureInitialized().decodeJson<BackupV6>(json);
+  }
+}
+
+mixin BackupV6Mappable {
+  String toJson() {
+    return BackupV6Mapper.ensureInitialized().encodeJson<BackupV6>(
+      this as BackupV6,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return BackupV6Mapper.ensureInitialized().encodeMap<BackupV6>(
+      this as BackupV6,
+    );
+  }
+
+  BackupV6CopyWith<BackupV6, BackupV6, BackupV6> get copyWith =>
+      _BackupV6CopyWithImpl<BackupV6, BackupV6>(
+        this as BackupV6,
+        $identity,
+        $identity,
+      );
+  @override
+  String toString() {
+    return BackupV6Mapper.ensureInitialized().stringifyValue(this as BackupV6);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return BackupV6Mapper.ensureInitialized().equalsValue(
+      this as BackupV6,
+      other,
+    );
+  }
+
+  @override
+  int get hashCode {
+    return BackupV6Mapper.ensureInitialized().hashValue(this as BackupV6);
+  }
+}
+
+extension BackupV6ValueCopy<$R, $Out> on ObjectCopyWith<$R, BackupV6, $Out> {
+  BackupV6CopyWith<$R, BackupV6, $Out> get $asBackupV6 =>
+      $base.as((v, t, t2) => _BackupV6CopyWithImpl<$R, $Out>(v, t, t2));
+}
+
+abstract class BackupV6CopyWith<$R, $In extends BackupV6, $Out>
+    implements BackupCopyWith<$R, $In, $Out> {
+  @override
+  ListCopyWith<$R, SentLink, SentLinkCopyWith<$R, SentLink, SentLink>>
+  get links;
+  ListCopyWith<$R, Food, FoodCopyWith<$R, Food, Food>> get foods;
+  ListCopyWith<
+    $R,
+    FoodServing,
+    FoodServingCopyWith<$R, FoodServing, FoodServing>
+  >
+  get foodServings;
+  ListCopyWith<$R, FoodUnit, FoodUnitCopyWith<$R, FoodUnit, FoodUnit>>
+  get foodUnits;
+  ListCopyWith<
+    $R,
+    FoodReference,
+    FoodReferenceCopyWith<$R, FoodReference, FoodReference>
+  >
+  get foodReferences;
+  ListCopyWith<
+    $R,
+    FoodBarcode,
+    FoodBarcodeCopyWith<$R, FoodBarcode, FoodBarcode>
+  >
+  get barcodeLinks;
+  ListCopyWith<$R, Meal, MealCopyWith<$R, Meal, Meal>> get meals;
+  ListCopyWith<
+    $R,
+    ConnectorMeal,
+    ConnectorMealCopyWith<$R, ConnectorMeal, ConnectorMeal>
+  >
+  get mealMappings;
+  ListCopyWith<$R, Entry, EntryCopyWith<$R, Entry, Entry>> get entries;
+  ListCopyWith<$R, MfpLink, MfpLinkCopyWith<$R, MfpLink, MfpLink>> get mfpLinks;
+  ListCopyWith<$R, EkkloLink, EkkloLinkCopyWith<$R, EkkloLink, EkkloLink>>
+  get ekkloLinks;
+  ListCopyWith<$R, WeighIn, WeighInCopyWith<$R, WeighIn, WeighIn>> get weighIns;
+  ListCopyWith<
+    $R,
+    EkkloWeighInLink,
+    EkkloWeighInLinkCopyWith<$R, EkkloWeighInLink, EkkloWeighInLink>
+  >
+  get ekkloWeighInLinks;
+  ListCopyWith<
+    $R,
+    MfpWeighInLink,
+    MfpWeighInLinkCopyWith<$R, MfpWeighInLink, MfpWeighInLink>
+  >
+  get mfpWeighInLinks;
+  @override
+  ListCopyWith<$R, GoalPeriod, GoalPeriodCopyWith<$R, GoalPeriod, GoalPeriod>>
+  get goalPeriods;
+  @override
+  $R call({
+    DateTime? exportedAt,
+    List<SentLink>? links,
+    List<Food>? foods,
+    List<FoodServing>? foodServings,
+    List<FoodUnit>? foodUnits,
+    List<FoodReference>? foodReferences,
+    List<FoodBarcode>? barcodeLinks,
+    List<Meal>? meals,
+    List<ConnectorMeal>? mealMappings,
+    List<Entry>? entries,
+    List<MfpLink>? mfpLinks,
+    List<EkkloLink>? ekkloLinks,
+    List<WeighIn>? weighIns,
+    List<EkkloWeighInLink>? ekkloWeighInLinks,
+    List<MfpWeighInLink>? mfpWeighInLinks,
+    List<GoalPeriod>? goalPeriods,
+    String? format,
+    int? version,
+  });
+  BackupV6CopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+}
+
+class _BackupV6CopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, BackupV6, $Out>
+    implements BackupV6CopyWith<$R, BackupV6, $Out> {
+  _BackupV6CopyWithImpl(super.value, super.then, super.then2);
+
+  @override
+  late final ClassMapperBase<BackupV6> $mapper =
+      BackupV6Mapper.ensureInitialized();
+  @override
+  ListCopyWith<$R, SentLink, SentLinkCopyWith<$R, SentLink, SentLink>>
+  get links => ListCopyWith(
+    $value.links,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(links: v),
+  );
+  @override
+  ListCopyWith<$R, Food, FoodCopyWith<$R, Food, Food>> get foods =>
+      ListCopyWith(
+        $value.foods,
+        (v, t) => v.copyWith.$chain(t),
+        (v) => call(foods: v),
+      );
+  @override
+  ListCopyWith<
+    $R,
+    FoodServing,
+    FoodServingCopyWith<$R, FoodServing, FoodServing>
+  >
+  get foodServings => ListCopyWith(
+    $value.foodServings,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(foodServings: v),
+  );
+  @override
+  ListCopyWith<$R, FoodUnit, FoodUnitCopyWith<$R, FoodUnit, FoodUnit>>
+  get foodUnits => ListCopyWith(
+    $value.foodUnits,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(foodUnits: v),
+  );
+  @override
+  ListCopyWith<
+    $R,
+    FoodReference,
+    FoodReferenceCopyWith<$R, FoodReference, FoodReference>
+  >
+  get foodReferences => ListCopyWith(
+    $value.foodReferences,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(foodReferences: v),
+  );
+  @override
+  ListCopyWith<
+    $R,
+    FoodBarcode,
+    FoodBarcodeCopyWith<$R, FoodBarcode, FoodBarcode>
+  >
+  get barcodeLinks => ListCopyWith(
+    $value.barcodeLinks,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(barcodeLinks: v),
+  );
+  @override
+  ListCopyWith<$R, Meal, MealCopyWith<$R, Meal, Meal>> get meals =>
+      ListCopyWith(
+        $value.meals,
+        (v, t) => v.copyWith.$chain(t),
+        (v) => call(meals: v),
+      );
+  @override
+  ListCopyWith<
+    $R,
+    ConnectorMeal,
+    ConnectorMealCopyWith<$R, ConnectorMeal, ConnectorMeal>
+  >
+  get mealMappings => ListCopyWith(
+    $value.mealMappings,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(mealMappings: v),
+  );
+  @override
+  ListCopyWith<$R, Entry, EntryCopyWith<$R, Entry, Entry>> get entries =>
+      ListCopyWith(
+        $value.entries,
+        (v, t) => v.copyWith.$chain(t),
+        (v) => call(entries: v),
+      );
+  @override
+  ListCopyWith<$R, MfpLink, MfpLinkCopyWith<$R, MfpLink, MfpLink>>
+  get mfpLinks => ListCopyWith(
+    $value.mfpLinks,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(mfpLinks: v),
+  );
+  @override
+  ListCopyWith<$R, EkkloLink, EkkloLinkCopyWith<$R, EkkloLink, EkkloLink>>
+  get ekkloLinks => ListCopyWith(
+    $value.ekkloLinks,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(ekkloLinks: v),
+  );
+  @override
+  ListCopyWith<$R, WeighIn, WeighInCopyWith<$R, WeighIn, WeighIn>>
+  get weighIns => ListCopyWith(
+    $value.weighIns,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(weighIns: v),
+  );
+  @override
+  ListCopyWith<
+    $R,
+    EkkloWeighInLink,
+    EkkloWeighInLinkCopyWith<$R, EkkloWeighInLink, EkkloWeighInLink>
+  >
+  get ekkloWeighInLinks => ListCopyWith(
+    $value.ekkloWeighInLinks,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(ekkloWeighInLinks: v),
+  );
+  @override
+  ListCopyWith<
+    $R,
+    MfpWeighInLink,
+    MfpWeighInLinkCopyWith<$R, MfpWeighInLink, MfpWeighInLink>
+  >
+  get mfpWeighInLinks => ListCopyWith(
+    $value.mfpWeighInLinks,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(mfpWeighInLinks: v),
+  );
+  @override
+  ListCopyWith<$R, GoalPeriod, GoalPeriodCopyWith<$R, GoalPeriod, GoalPeriod>>
+  get goalPeriods => ListCopyWith(
+    $value.goalPeriods,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(goalPeriods: v),
+  );
+  @override
+  $R call({
+    DateTime? exportedAt,
+    List<SentLink>? links,
+    List<Food>? foods,
+    List<FoodServing>? foodServings,
+    List<FoodUnit>? foodUnits,
+    List<FoodReference>? foodReferences,
+    List<FoodBarcode>? barcodeLinks,
+    List<Meal>? meals,
+    List<ConnectorMeal>? mealMappings,
+    List<Entry>? entries,
+    List<MfpLink>? mfpLinks,
+    List<EkkloLink>? ekkloLinks,
+    List<WeighIn>? weighIns,
+    List<EkkloWeighInLink>? ekkloWeighInLinks,
+    List<MfpWeighInLink>? mfpWeighInLinks,
+    List<GoalPeriod>? goalPeriods,
+    String? format,
+    int? version,
+  }) => $apply(
+    FieldCopyWithData({
+      if (exportedAt != null) #exportedAt: exportedAt,
+      if (links != null) #links: links,
+      if (foods != null) #foods: foods,
+      if (foodServings != null) #foodServings: foodServings,
+      if (foodUnits != null) #foodUnits: foodUnits,
+      if (foodReferences != null) #foodReferences: foodReferences,
+      if (barcodeLinks != null) #barcodeLinks: barcodeLinks,
+      if (meals != null) #meals: meals,
+      if (mealMappings != null) #mealMappings: mealMappings,
+      if (entries != null) #entries: entries,
+      if (mfpLinks != null) #mfpLinks: mfpLinks,
+      if (ekkloLinks != null) #ekkloLinks: ekkloLinks,
+      if (weighIns != null) #weighIns: weighIns,
+      if (ekkloWeighInLinks != null) #ekkloWeighInLinks: ekkloWeighInLinks,
+      if (mfpWeighInLinks != null) #mfpWeighInLinks: mfpWeighInLinks,
+      if (goalPeriods != null) #goalPeriods: goalPeriods,
+      if (format != null) #format: format,
+      if (version != null) #version: version,
+    }),
+  );
+  @override
+  BackupV6 $make(CopyWithData data) => BackupV6(
+    exportedAt: data.get(#exportedAt, or: $value.exportedAt),
+    links: data.get(#links, or: $value.links),
+    foods: data.get(#foods, or: $value.foods),
+    foodServings: data.get(#foodServings, or: $value.foodServings),
+    foodUnits: data.get(#foodUnits, or: $value.foodUnits),
+    foodReferences: data.get(#foodReferences, or: $value.foodReferences),
+    barcodeLinks: data.get(#barcodeLinks, or: $value.barcodeLinks),
+    meals: data.get(#meals, or: $value.meals),
+    mealMappings: data.get(#mealMappings, or: $value.mealMappings),
+    entries: data.get(#entries, or: $value.entries),
+    mfpLinks: data.get(#mfpLinks, or: $value.mfpLinks),
+    ekkloLinks: data.get(#ekkloLinks, or: $value.ekkloLinks),
+    weighIns: data.get(#weighIns, or: $value.weighIns),
+    ekkloWeighInLinks: data.get(
+      #ekkloWeighInLinks,
+      or: $value.ekkloWeighInLinks,
+    ),
+    mfpWeighInLinks: data.get(#mfpWeighInLinks, or: $value.mfpWeighInLinks),
+    goalPeriods: data.get(#goalPeriods, or: $value.goalPeriods),
+    format: data.get(#format, or: $value.format),
+    version: data.get(#version, or: $value.version),
+  );
+
+  @override
+  BackupV6CopyWith<$R2, BackupV6, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _BackupV6CopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class BackupV5Mapper extends SubClassMapperBase<BackupV5> {
@@ -215,7 +748,7 @@ class BackupV5Mapper extends SubClassMapperBase<BackupV5> {
     'version',
     _$version,
     opt: true,
-    def: BackupV5.currentVersion,
+    def: BackupV5.goalPeriodsVersion,
   );
 
   @override

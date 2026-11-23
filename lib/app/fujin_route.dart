@@ -15,6 +15,7 @@ enum FujinRoute {
   ),
   settings('/settings'),
   goals('/settings/${FujinRoute.goalsSegment}'),
+  weighIns('/settings/${FujinRoute.weighInsSegment}'),
   welcome('/welcome'),
   mfpSignIn('/mfp-sign-in'),
   ekkloSignIn('/ekklo-sign-in'),
@@ -34,6 +35,7 @@ enum FujinRoute {
   static const unitParameter = 'unit';
   static const entryParameter = 'entry';
   static const goalsSegment = 'goals';
+  static const weighInsSegment = 'weigh-ins';
   static const conversationParameter = 'conversation';
   static const messageParameter = 'message';
   static const mediaParameter = 'media';

@@ -3849,6 +3849,198 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Fūjin DEV n’écrit ni dans MyFitnessPal ni dans Ekklo : rien n’a changé.'**
   String get writeBlockedInDev;
+
+  /// No description provided for @settingsWeighIns.
+  ///
+  /// In fr, this message translates to:
+  /// **'POIDS'**
+  String get settingsWeighIns;
+
+  /// No description provided for @settingsWeighInToday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aujourd’hui · {kilograms}'**
+  String settingsWeighInToday(String kilograms);
+
+  /// No description provided for @settingsWeighInNone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas encore de pesée aujourd’hui'**
+  String get settingsWeighInNone;
+
+  /// No description provided for @settingsWeighInDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle pesée et historique'**
+  String get settingsWeighInDetail;
+
+  /// No description provided for @weighInsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Poids'**
+  String get weighInsTitle;
+
+  /// No description provided for @weighInsSection.
+  ///
+  /// In fr, this message translates to:
+  /// **'PESÉES'**
+  String get weighInsSection;
+
+  /// No description provided for @weighInsEmptyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas encore de pesée'**
+  String get weighInsEmptyTitle;
+
+  /// No description provided for @weighInsEmptyDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fūjin garde ta pesée, puis l’écrit dans Ekklo et MyFitnessPal.'**
+  String get weighInsEmptyDetail;
+
+  /// No description provided for @weighInNew.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle pesée'**
+  String get weighInNew;
+
+  /// No description provided for @weighInKilograms.
+  ///
+  /// In fr, this message translates to:
+  /// **'{kilograms} kg'**
+  String weighInKilograms(double kilograms);
+
+  /// No description provided for @kilogramsSuffix.
+  ///
+  /// In fr, this message translates to:
+  /// **'kg'**
+  String get kilogramsSuffix;
+
+  /// No description provided for @weighInRange.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entre {lightest} et {heaviest} kg'**
+  String weighInRange(int lightest, int heaviest);
+
+  /// No description provided for @weighInReplaceTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce jour a déjà une pesée : {kilograms}.'**
+  String weighInReplaceTitle(String kilograms);
+
+  /// No description provided for @weighInReplaceDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'La nouvelle la remplace, dans Fūjin puis dans Ekklo et MyFitnessPal.'**
+  String get weighInReplaceDetail;
+
+  /// No description provided for @weighInReplace.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remplacer la pesée'**
+  String get weighInReplace;
+
+  /// No description provided for @weighInToday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aujourd’hui, {date}'**
+  String weighInToday(DateTime date);
+
+  /// No description provided for @weighInYesterday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Hier, {date}'**
+  String weighInYesterday(DateTime date);
+
+  /// No description provided for @weighInDayToday.
+  ///
+  /// In fr, this message translates to:
+  /// **'aujourd’hui'**
+  String get weighInDayToday;
+
+  /// No description provided for @weighInDayYesterday.
+  ///
+  /// In fr, this message translates to:
+  /// **'hier'**
+  String get weighInDayYesterday;
+
+  /// No description provided for @weighInSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pesée enregistrée'**
+  String get weighInSaved;
+
+  /// No description provided for @weighInSavedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'{kilograms} · {day}'**
+  String weighInSavedDetail(String kilograms, String day);
+
+  /// No description provided for @weighInEdit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier la pesée'**
+  String get weighInEdit;
+
+  /// No description provided for @weighInDelete.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer la pesée'**
+  String get weighInDelete;
+
+  /// No description provided for @weighInDeleteTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer {kilograms} ?'**
+  String weighInDeleteTitle(String kilograms);
+
+  /// No description provided for @weighInDeleteDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pesée du {date}. Fūjin la retire de MyFitnessPal ; Ekklo ne sait pas supprimer une pesée, elle y reste.'**
+  String weighInDeleteDetail(DateTime date);
+
+  /// No description provided for @weighInDeleteFromMfp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer de MFP'**
+  String get weighInDeleteFromMfp;
+
+  /// No description provided for @weighInDeletedInFujin.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimé dans Fūjin · reste dans Ekklo'**
+  String get weighInDeletedInFujin;
+
+  /// No description provided for @weighInDeleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pesée supprimée'**
+  String get weighInDeleted;
+
+  /// No description provided for @weighInDeletedDetail.
+  ///
+  /// In fr, this message translates to:
+  /// **'{day} · reste dans Ekklo'**
+  String weighInDeletedDetail(String day);
+
+  /// No description provided for @weighInStillPendingToday.
+  ///
+  /// In fr, this message translates to:
+  /// **'La pesée d’aujourd’hui reste en attente'**
+  String get weighInStillPendingToday;
+
+  /// No description provided for @weighInStillPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'La pesée du {date} reste en attente'**
+  String weighInStillPending(DateTime date);
+
+  /// No description provided for @weighInsStillPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, other{{count} pesées restent en attente}}'**
+  String weighInsStillPending(int count);
 }
 
 class _AppLocalizationsDelegate

@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/database/calendar_date_hook.dart';
 import 'package:fujin/data/dev_chat/fake_chat.dart';
+import 'package:fujin/domain/journal/same_day.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
@@ -39,6 +40,8 @@ final class FakeBackends {
     this.mfpFoods = const [],
     this.mfpSearches = const {},
     this.mfpBarcodes = const {},
+    this.ekkloWeights = const [],
+    this.mfpMeasurements = const [],
     FakeChat? chat,
   }) : chat = chat ?? FakeChat(origin: chatMediaUri, clock: () => now);
 
@@ -55,6 +58,10 @@ final class FakeBackends {
   List<MfpFood> mfpFoods;
   Map<String, List<MfpFood>> mfpSearches;
   Map<String, MfpFood> mfpBarcodes;
+  List<EkkloWeightEntry> ekkloWeights;
+  List<MfpMeasurement> mfpMeasurements;
+  bool ekkloWeightWritesFail = false;
+  bool mfpMeasurementWritesFail = false;
   bool mfpWritesFail = false;
   bool mfpRemoveFails = false;
   bool ekkloItemWritesFail = false;
@@ -188,6 +195,23 @@ final class FakeBackends {
             if (food.id == request.url.queryParameters['ids']) food.toMap(),
         ],
       }),
+      ('GET', final host, _measurements) when host == mfpApiUri.host => _json({
+        'items': [
+          ?mfpMeasurements
+              .where(
+                (measurement) =>
+                    CalendarDateHook.format(measurement.date) ==
+                    request.url.queryParameters[_entryDate],
+              )
+              .firstOrNull
+              ?.toMap(),
+        ],
+      }),
+      ('POST', final host, _measurements) when host == mfpApiUri.host =>
+        _addMeasurement(request),
+      ('DELETE', final host, final path)
+          when host == mfpApiUri.host && path.startsWith('$_measurements/') =>
+        _removeMeasurement(path.substring(_measurements.length + 1)),
       ('POST', final host, _syncPath) when host == mfpSyncUri.host =>
         switch (mfpSyncStatus) {
           final status? => http.Response('', status),
@@ -202,6 +226,10 @@ final class FakeBackends {
       ('GET', final host, dailyMealsPath) when host == ekkloUri.host => _json([
         for (final meal in ekkloMeals) meal.toMap(),
       ]),
+      ('GET', final host, _ekkloWeightHistory) when host == ekkloUri.host =>
+        _json([for (final weight in ekkloWeights) weight.toMap()]),
+      ('POST', final host, _ekkloWeightTracking) when host == ekkloUri.host =>
+        _logEkkloWeight(request),
       ('GET', final host, _mealHistory) when host == ekkloUri.host => _json(
         EkkloMealHistoryPage(
           currentPage: 1,
@@ -323,12 +351,78 @@ final class FakeBackends {
   static const _foodItems = '/api/v1/nutritions/food-items/';
   static const _foodSearch = '${_foodItems}search';
   static const _mealHistory = '$dailyMealsPath/history';
+  static const _measurements = '/v2/measurements';
+  static const _ekkloWeightTracking = '/api/v1/nutritions/weight-tracking';
+  static const _ekkloWeightHistory = '$_ekkloWeightTracking/all';
 
   List<EkkloDailyMealItem> get ekkloItems => [
     for (final meal in ekkloMeals) ...meal.items,
   ];
 
   String _id(String prefix) => '$prefix-${++_nextId}';
+
+  http.Response _addMeasurement(http.Request request) {
+    if (mfpMeasurementWritesFail) return http.Response('', 500);
+    if (jsonDecode(request.body) case {
+      'items': [
+        {
+          'type': final String type,
+          'value': final num value,
+          'unit': final String unit,
+          'date': final String date,
+        },
+      ],
+    }) {
+      final added = MfpMeasurement(
+        id: '${++_nextId}',
+        type: type,
+        value: value.toDouble(),
+        unit: unit,
+        date: DateTime.parse(date),
+        updatedAt: now,
+      );
+      mfpMeasurements = [...mfpMeasurements, added];
+      return _json({
+        'items': [added.toMap()],
+      });
+    }
+    return http.Response('', 400);
+  }
+
+  http.Response _removeMeasurement(String id) {
+    if (mfpMeasurementWritesFail) return http.Response('', 500);
+    if (!mfpMeasurements.any((measurement) => measurement.id == id)) {
+      return http.Response('', 404);
+    }
+    mfpMeasurements = [
+      for (final measurement in mfpMeasurements)
+        if (measurement.id != id) measurement,
+    ];
+    return http.Response('', 204);
+  }
+
+  http.Response _logEkkloWeight(http.Request request) {
+    if (ekkloWeightWritesFail) return http.Response('', 500);
+    if (jsonDecode(request.body) case {
+      'date': final String date,
+      'weight': final num weight,
+    }) {
+      final logged = EkkloWeightEntry(
+        id: _id('weight'),
+        date: DateTime.parse(date),
+        kilograms: weight.toDouble(),
+        createdAt: now,
+        updatedAt: now,
+      );
+      ekkloWeights = [
+        for (final kept in ekkloWeights)
+          if (!sameDay(kept.date, logged.date)) kept,
+        logged,
+      ];
+      return _json(logged.toMap());
+    }
+    return http.Response('', 400);
+  }
 
   http.Response _addEntry(http.Request request) {
     if (mfpWritesFail) return http.Response('', 500);

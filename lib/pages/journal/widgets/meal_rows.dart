@@ -8,10 +8,10 @@ import 'package:fujin/data/connectors/connector.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/l10n/intl_context.dart';
-import 'package:fujin/pages/journal/widgets/connector_pill.dart';
+import 'package:fujin/pages/common/connector_pill.dart';
+import 'package:fujin/pages/common/swipe_row.dart';
 import 'package:fujin/pages/journal/widgets/entry_row.dart';
 import 'package:fujin/pages/journal/widgets/row_write.dart';
-import 'package:fujin/pages/journal/widgets/swipe_row.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:motor/motor.dart';
 

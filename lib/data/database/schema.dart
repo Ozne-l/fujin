@@ -439,4 +439,36 @@ const schemaMigrations = [
   DROP TABLE goals;
   ALTER TABLE goals_by_day RENAME TO goals;
   ''',
+  '''
+  CREATE TABLE weigh_in (
+    id TEXT PRIMARY KEY,
+    date TEXT NOT NULL,
+    kilograms REAL NOT NULL CHECK (kilograms > 0),
+    updated_at TEXT NOT NULL,
+    deleted_at TEXT
+  );
+  CREATE UNIQUE INDEX weigh_in_date
+    ON weigh_in (date) WHERE deleted_at IS NULL;
+  CREATE TABLE ekklo_weigh_in_link (
+    id TEXT PRIMARY KEY,
+    weigh_in_id TEXT NOT NULL REFERENCES weigh_in ON DELETE CASCADE,
+    date TEXT NOT NULL,
+    kilograms REAL NOT NULL,
+    updated_at TEXT NOT NULL,
+    deleted_at TEXT
+  );
+  CREATE UNIQUE INDEX ekklo_weigh_in_link_weigh_in
+    ON ekklo_weigh_in_link (weigh_in_id) WHERE deleted_at IS NULL;
+  CREATE TABLE mfp_weigh_in_link (
+    id TEXT PRIMARY KEY,
+    weigh_in_id TEXT NOT NULL REFERENCES weigh_in ON DELETE CASCADE,
+    measurement_id TEXT NOT NULL,
+    date TEXT NOT NULL,
+    kilograms REAL NOT NULL,
+    updated_at TEXT NOT NULL,
+    deleted_at TEXT
+  );
+  CREATE UNIQUE INDEX mfp_weigh_in_link_weigh_in
+    ON mfp_weigh_in_link (weigh_in_id) WHERE deleted_at IS NULL;
+  ''',
 ];

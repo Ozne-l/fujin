@@ -3,7 +3,12 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
 
 class CodeKeypad extends StatelessWidget {
-  const CodeKeypad({required this.onDigit, required this.onErase, super.key});
+  const CodeKeypad({
+    required this.onDigit,
+    required this.onErase,
+    this.separator,
+    super.key,
+  });
 
   static const _rows = [
     [1, 2, 3],
@@ -14,6 +19,7 @@ class CodeKeypad extends StatelessWidget {
 
   final ValueChanged<int> onDigit;
   final VoidCallback onErase;
+  final (String, VoidCallback)? separator;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +52,20 @@ class CodeKeypad extends StatelessWidget {
               Row(
                 spacing: FujinSpace.s2,
                 children: [
-                  const Spacer(),
+                  switch (separator) {
+                    (final label, final onTap) => Expanded(
+                      child: _Key(
+                        onTap: onTap,
+                        child: Text(
+                          label,
+                          style: FujinText.inter22Regular.copyWith(
+                            color: context.colors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ),
+                    null => const Spacer(),
+                  },
                   Expanded(child: digit(_zero)),
                   Expanded(
                     child: _Key(

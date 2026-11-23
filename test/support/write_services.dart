@@ -5,6 +5,7 @@ import 'package:fujin/data/database/fujin_database.dart';
 import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/entries/entry_repository.dart';
 import 'package:fujin/data/http/read_only_http_client.dart';
+import 'package:fujin/data/milestones/milestone_repository.dart';
 import 'package:fujin/domain/adding/add_draft.dart';
 import 'package:fujin/domain/adding/add_food_service.dart';
 import 'package:fujin/domain/adding/added_food.dart';
@@ -16,12 +17,15 @@ import 'package:fujin/domain/editing/edit_entry_service.dart';
 import 'package:fujin/domain/journal/fresh_read_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/sending/send_service.dart';
+import 'package:fujin/domain/weighing/weigh_in_import.dart';
+import 'package:fujin/domain/weighing/weigh_in_writer.dart';
 import 'package:fujin/domain/writing/background_writer.dart';
 import 'package:http/http.dart' as http;
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import 'fake_backends.dart';
 import 'fixtures.dart';
+import 'in_memory_preferences.dart';
 import 'repositories.dart';
 
 final class WriteServices {
@@ -56,6 +60,7 @@ final class WriteServices {
     final entries = entriesOf(database);
     final foods = foodsOf(database);
     final memoryRepository = memoryOf(database);
+    final weighIns = weighInsOf(database);
     final journal = journalOver(
       database,
       mfp: mfp,
@@ -109,6 +114,16 @@ final class WriteServices {
         journal: journal,
         completion: FoodCompletionService(mfp: mfp, foods: foods),
         writer: background,
+        weighIns: WeighInWriter(
+          ekklo: ekklo,
+          mfp: mfp,
+          weighIns: weighIns,
+          import: WeighInImport(
+            ekklo: ekklo,
+            weighIns: weighIns,
+            milestones: MilestoneRepository(await inMemoryPreferences()),
+          ),
+        ),
       ),
     );
   }

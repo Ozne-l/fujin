@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/adding/add_text.dart';
+import 'package:fujin/pages/common/code_keypad.dart';
+import 'package:fujin/pages/common/field_helper.dart';
+import 'package:fujin/pages/common/keypad_field.dart';
 import 'package:fujin/pages/common/sheet_card.dart';
-import 'package:fujin/pages/scanner/widgets/code_keypad.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 class CodeEntrySheet extends StatelessWidget {
@@ -23,18 +25,11 @@ class CodeEntrySheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final check = checkBarcode(code);
-    final value = FujinText.inter18Medium.copyWith(
-      color: context.colors.textPrimary,
-    );
-    final (border, borderWidth) = switch (check) {
-      MfpBarcodeWrongCheckDigit() => (
-        context.colors.textAlert,
-        FujinStroke.fieldError,
-      ),
-      MfpValidBarcode() || MfpBarcodeNotDigits() || MfpBarcodeWrongLength() => (
-        context.colors.textLink,
-        FujinStroke.fieldFocus,
-      ),
+    final error = switch (check) {
+      MfpBarcodeWrongCheckDigit() => true,
+      MfpValidBarcode() ||
+      MfpBarcodeNotDigits() ||
+      MfpBarcodeWrongLength() => false,
     };
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -51,37 +46,22 @@ class CodeEntrySheet extends StatelessWidget {
                 color: context.colors.textPrimary,
               ),
             ),
-            Container(
-              padding: const EdgeInsets.all(FujinSpace.s4),
-              decoration: BoxDecoration(
-                color: context.colors.backgroundCard,
-                borderRadius: BorderRadius.circular(FujinRadius.field),
-                border: Border.all(color: border, width: borderWidth),
-              ),
-              child: Row(
-                children: [
-                  Text(code, style: value),
-                  Container(
-                    width: FujinStroke.fieldFocus,
-                    height: value.fontSize,
-                    color: context.colors.textLink,
-                  ),
-                ],
-              ),
-            ),
+            KeypadField(value: code, error: error),
             ...switch (check) {
               MfpValidBarcode(:final format) => [
-                _helper(
-                  Icons.check_circle,
-                  context.intl.scannerCodeValid(AddText.barcodeFormat(format)),
-                  context.colors.textLink,
+                FieldHelper(
+                  icon: Icons.check_circle,
+                  text: context.intl.scannerCodeValid(
+                    AddText.barcodeFormat(format),
+                  ),
+                  color: context.colors.textLink,
                 ),
               ],
               MfpBarcodeWrongCheckDigit(:final actual, :final expected) => [
-                _helper(
-                  Icons.warning_amber_rounded,
-                  context.intl.scannerCheckDigit(actual, expected),
-                  context.colors.textAlert,
+                FieldHelper(
+                  icon: Icons.warning_amber_rounded,
+                  text: context.intl.scannerCheckDigit(actual, expected),
+                  color: context.colors.textAlert,
                 ),
                 Text(
                   context.intl.scannerCheckedOnPhone,
@@ -107,17 +87,4 @@ class CodeEntrySheet extends StatelessWidget {
       ],
     );
   }
-
-  static Widget _helper(IconData icon, String text, Color color) => Row(
-    spacing: FujinSpace.s2,
-    children: [
-      Icon(icon, size: FujinSize.tileIcon, color: color),
-      Flexible(
-        child: Text(
-          text,
-          style: FujinText.inter13Medium.copyWith(color: color),
-        ),
-      ),
-    ],
-  );
 }

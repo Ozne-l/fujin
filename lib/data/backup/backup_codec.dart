@@ -13,7 +13,7 @@ abstract final class BackupCodec {
   static const _startsOn = 'starts_on';
   static const _exportedAt = 'exported_at';
 
-  static Uint8List encode(BackupV5 backup) => utf8.encode(backup.toJson());
+  static Uint8List encode(BackupV6 backup) => utf8.encode(backup.toJson());
 
   static Backup? decode(Uint8List bytes) {
     try {
