@@ -86,6 +86,7 @@ void main() {
           await inMemoryPreferences(reached: reached),
         ),
       ),
+      readOnly: client is ReadOnlyHttpClient,
     );
     backends.requests.clear();
     return _Weighing(
@@ -314,6 +315,23 @@ void main() {
         writes().where((write) => write == 'POST $_measurements'),
       ).length.equals(1);
       check(backends.ekkloWeights).length.equals(2);
+    });
+
+    test('that dropped offline records no failure, stops its app and leaves '
+        'the other written', () async {
+      final weighing = await started();
+      backends.ekkloWeightWritesFail = true;
+      await weighing.save(dayBefore, 69.4);
+      check(weighing.writer.state.failures).single;
+
+      backends
+        ..ekkloWeightWritesFail = false
+        ..ekkloReachable = false;
+      await weighing.save(day, 68.9);
+
+      check(weighing.writer.state.failures).isEmpty();
+      check(backends.mfpMeasurements).length.equals(2);
+      check(weighing.weighIns.pending()).length.equals(2);
     });
 
     test('is written on the next run and its failure cleared', () async {

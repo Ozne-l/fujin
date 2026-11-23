@@ -7,7 +7,6 @@ import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/not_written_notice.dart';
 import 'package:fujin/pages/common/snack_bar_content.dart';
 import 'package:fujin/pages/common/snack_bar_glyph.dart';
-import 'package:fujin/pages/weigh_ins/weigh_in_stopped.dart';
 import 'package:fujin/pages/weigh_ins/weigh_in_text.dart';
 
 abstract final class WeighInSnackBar {
@@ -47,7 +46,7 @@ abstract final class WeighInSnackBar {
     final intl = context.intl;
     if (NotWrittenNotice.of(
           intl,
-          idle.stopped(environment),
+          idle.stopped,
           environment,
           pending: (reported) =>
               WeighInText.stillPending(intl, reported, today: today),

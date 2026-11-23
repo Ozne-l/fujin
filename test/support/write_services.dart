@@ -123,6 +123,7 @@ final class WriteServices {
             weighIns: weighIns,
             milestones: MilestoneRepository(await inMemoryPreferences()),
           ),
+          readOnly: httpClient is ReadOnlyHttpClient,
         ),
       ),
     );

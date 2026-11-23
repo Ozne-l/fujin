@@ -10,6 +10,7 @@ import 'package:fujin/domain/weighing/weigh_in_debt.dart';
 import 'package:fujin/domain/weighing/weigh_in_failure.dart';
 import 'package:fujin/domain/weighing/weigh_in_import.dart';
 import 'package:fujin/domain/weighing/weigh_in_writer_state.dart';
+import 'package:fujin/domain/writing/network_down.dart';
 import 'package:fujin/domain/writing/single_flight.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -19,6 +20,7 @@ final class WeighInWriter {
     required this._mfp,
     required this._weighIns,
     required this._import,
+    required this._readOnly,
   });
 
   static const _maxReadsPerDay = 10;
@@ -28,6 +30,7 @@ final class WeighInWriter {
   final MyFitnessPalClient _mfp;
   final WeighInRepository _weighIns;
   final WeighInImport _import;
+  final bool _readOnly;
 
   final _states = StreamController<WeighInWriterState>.broadcast();
   late final _flight = SingleFlight(_once);
@@ -64,6 +67,10 @@ final class WeighInWriter {
               ),
             );
             switch (await _write(debt)) {
+              case final failure?
+                  when networkDown(failure.error, readOnly: _readOnly):
+                failures.remove(key);
+                stopped.add(debt.connector);
               case final failure?:
                 failures[key] = failure;
                 stopped.add(debt.connector);

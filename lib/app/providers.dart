@@ -380,6 +380,7 @@ final weighInWriterProvider = Provider<WeighInWriter>(
     mfp: ref.watch(mfpClientProvider),
     weighIns: ref.watch(weighInRepositoryProvider),
     import: ref.watch(weighInImportProvider),
+    readOnly: ref.watch(appEnvironmentProvider).readOnly,
   ),
 );
 
