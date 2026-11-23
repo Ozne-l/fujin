@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/foods/food_repository.dart';
 import 'package:fujin/data/memory/barcode_link.dart';
@@ -19,7 +17,6 @@ import 'package:fujin/domain/memory/memory_rules.dart';
 import 'package:fujin/domain/sending/planned_entry.dart';
 import 'package:fujin/domain/sending/send_service.dart';
 import 'package:fujin/domain/writing/background_writer.dart';
-import 'package:fujin/domain/writing/ekklo_job.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 final class AddFoodService {
@@ -174,18 +171,10 @@ final class AddFoodService {
         }
       },
     );
-    final added = AddedFood(
+    return AddedFood(
       entry: stored,
-      planned: switch (planned) {
-        final planned? => rescalePlanned(planned, stored, _memory.load()),
-        null => null,
-      },
+      planned: _background.saved(stored, planned, added: true),
     );
-    if (added.planned case final planned? when planned.sends) {
-      _background.hold(added.entryId, EkkloSend(planned));
-    }
-    unawaited(_background.run());
-    return added;
   }
 
   static bool _sameServing(LoggedEntry before, LoggedEntry after) =>
