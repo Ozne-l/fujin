@@ -513,6 +513,38 @@ void main() {
     },
   );
 
+  test('announces a replacement that an Ekklo send of the run read at the end '
+      'of that run, not one run later', () async {
+    final writing = await services();
+    backends.failingMeals.add(dejeuner);
+    await writing.add(_draft());
+    clock = clock.add(const Duration(seconds: 1));
+    final later = await writing.add(_draft(meal: breakfast));
+    await writing.settle();
+    final laterRow = mfpEntryIdOf(writing, later.entryId);
+    backends.mfpReachable = false;
+    writing.editing.save(
+      _draft(meal: breakfast, servings: 2),
+      await writing.adding.plan(_draft(meal: breakfast, servings: 2)),
+      entryId: later.entryId,
+    );
+    await writing.settle();
+    backends
+      ..mfpReachable = true
+      ..failingMeals.clear()
+      ..entries = [
+        for (final row in backends.entries)
+          switch (row.id == laterRow) {
+            true => row.copyWith(id: 'mfp-app', servings: 3),
+            false => row,
+          },
+      ];
+
+    await writing.settle();
+
+    check(writing.background.state.replaced.single).isA<ReplacedEdit>();
+  });
+
   test(
     'removes the Ekklo item of a deletion made offline before its '
     'MyFitnessPal row, and sends an add of the same food as a new item',
@@ -721,12 +753,7 @@ void main() {
         final idle = <WriterIdle>[];
         WriterState? previous;
         final listening = writing.background.states.listen((state) {
-          if ((previous, state) case (
-            WriterRunning(),
-            final WriterIdle ended,
-          )) {
-            idle.add(ended);
-          }
+          if (state.runEndedSince(previous) case final ended?) idle.add(ended);
           previous = state;
         });
 

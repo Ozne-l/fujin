@@ -123,10 +123,7 @@ final class BackgroundWriter {
   }
 
   Future<void> _once() async {
-    _replaced
-      ..clear()
-      ..addAll(_readReplaced);
-    _readReplaced.clear();
+    _replaced.clear();
     final failures = {
       for (final failure in _state.failures) failure.entryId: failure,
     };
@@ -157,6 +154,8 @@ final class BackgroundWriter {
         }
       }
     } finally {
+      _replaced.addAll(_readReplaced);
+      _readReplaced.clear();
       _emit(
         WriterIdle(failures: [...failures.values], replaced: [..._replaced]),
       );
