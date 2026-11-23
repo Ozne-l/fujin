@@ -4,7 +4,6 @@ import 'package:fujin/data/memory/meal_mapping.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
-import 'package:fujin/domain/writing/writer_state.dart';
 import 'package:fujin/pages/journal/background_write_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
@@ -29,7 +28,7 @@ final class MemoryNotifier extends Notifier<Memory> {
   @override
   Memory build() {
     ref.listen(backgroundWriteProvider, (previous, next) {
-      if ((previous, next) case (WriterRunning(), WriterIdle())) reload();
+      if (next.runEndedSince(previous) case _?) reload();
     });
     return ref.watch(memoryServiceProvider).load();
   }

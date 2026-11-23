@@ -20,4 +20,4 @@ Two rules said what "offline" means for a background write. The writer stopped i
 
 - One definition of "offline is waiting" for the writer and the pages.
 - A write that times out on a flaky connection no longer lets the run go on with the next entries; they wait for the next run.
-- The pages still match the writer's `WriterRunning` → `WriterIdle` transition themselves (`JournalPage` to re-read the days written and show the snackbar, `MemoryNotifier` to reload).
+- The pages still listen to the writer's state with `ref.listen`, as fujin-state rule 12 asks, but the meaning of a transition is the domain's: `WriterState.writtenSince(previous)` names the entry whose write just ended (`JournalPage` re-reads its days), `WriterState.runEndedSince(previous)` the end of a run (`JournalPage` shows the snackbar, `MemoryNotifier` reloads).

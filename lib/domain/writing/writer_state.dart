@@ -17,6 +17,24 @@ sealed class WriterState {
 
   WriterState withHeld(Map<String, EkkloJob> held);
 
+  LoggedEntry? writtenSince(WriterState? previous) =>
+      switch ((previous, this)) {
+        (WriterRunning(current: final written?), WriterIdle()) => written,
+        (
+          WriterRunning(current: final written?),
+          WriterRunning(:final current),
+        )
+            when current != written =>
+          written,
+        _ => null,
+      };
+
+  WriterIdle? runEndedSince(WriterState? previous) =>
+      switch ((previous, this)) {
+        (WriterRunning(), final WriterIdle idle) => idle,
+        _ => null,
+      };
+
   String? get _currentId => switch (this) {
     WriterRunning(:final current?) => current.entry.id,
     WriterRunning() || WriterIdle() => null,
