@@ -57,7 +57,7 @@ class CropStage extends HookWidget {
         final acrossScale = across.width / math.max(1, shown.height);
         return SingleMotionBuilder(
           value: heading.value.toDouble(),
-          motion: FujinMotion.rotate,
+          motion: FujinMotion.spatial,
           active: !FujinMotion.reduced(context),
           builder: (context, value, child) {
             final remaining = value - heading.value;

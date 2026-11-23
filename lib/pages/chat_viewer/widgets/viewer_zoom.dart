@@ -58,7 +58,7 @@ class ViewerZoom extends HookWidget {
     final vsync = useSingleTickerProvider();
     final view = useMemoized(
       () => MotionController<Rect>(
-        motion: FujinMotion.release,
+        motion: FujinMotion.gesture,
         vsync: vsync,
         converter: MotionConverter.rect,
         initialValue: _whole,
@@ -134,14 +134,14 @@ class ViewerZoom extends HookWidget {
                     Offset(_projected(speed.dx), _projected(speed.dy)),
                   ),
                 ),
-                FujinMotion.release,
+                FujinMotion.gesture,
                 velocity: Rect.fromLTRB(speed.dx, speed.dy, speed.dx, speed.dy),
               );
             case false:
               final point = (focal.value - current.topLeft) / current.width;
               glide(
                 _settled(_view(focal.value - point * scale, scale)),
-                FujinMotion.release,
+                FujinMotion.gesture,
               );
           }
         }
@@ -149,12 +149,12 @@ class ViewerZoom extends HookWidget {
         void toggle() {
           switch (view.value.width > _zoomedFrom) {
             case true:
-              glide(_whole, FujinMotion.mediaFlight);
+              glide(_whole, FujinMotion.flight);
             case false:
               final point = unit(tapped.value);
               glide(
                 _settled(_view(point - point * maxScale, maxScale)),
-                FujinMotion.mediaFlight,
+                FujinMotion.flight,
               );
           }
         }

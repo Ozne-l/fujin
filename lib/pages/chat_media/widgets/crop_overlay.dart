@@ -49,7 +49,7 @@ class CropOverlay extends HookWidget {
             CropGeometry.turned(before, quarterTurns - turns),
           _ => null,
         },
-        motion: FujinMotion.grow,
+        motion: FujinMotion.spatialFast,
         converter: MotionConverter.rect,
         active: !held && !reduced,
         builder: (context, shownCrop, _) {

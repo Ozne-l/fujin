@@ -263,7 +263,7 @@ class MessageActions extends HookWidget {
     );
 
     Widget reveal(int index, Widget child) => SingleMotionBuilder(
-      motion: FujinMotion.of(context, FujinMotion.pop),
+      motion: FujinMotion.of(context, FujinMotion.emphasis),
       value: switch (index < revealed.value && !closed) {
         true => 1,
         false => 0,

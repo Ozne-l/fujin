@@ -66,7 +66,10 @@ class MediaStrip extends HookWidget {
                       true => 0,
                       false => null,
                     },
-                    motion: FujinMotion.dissolveOf(context, FujinMotion.grow),
+                    motion: FujinMotion.dissolveOf(
+                      context,
+                      FujinMotion.spatialFast,
+                    ),
                     onAnimationStatusChanged: (status) {
                       if (slot.leaving && !status.isAnimating) {
                         settle(

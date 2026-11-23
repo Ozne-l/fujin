@@ -29,7 +29,7 @@ class _Branch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SingleMotionBuilder(
-    motion: FujinMotion.of(context, FujinMotion.fadeThrough),
+    motion: FujinMotion.of(context, FujinMotion.effects),
     value: active ? _shown : _hidden,
     builder: (context, visibility, child) => Offstage(
       offstage: !active && visibility == _hidden,

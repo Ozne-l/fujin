@@ -78,7 +78,7 @@ class FujinSwitch extends HookWidget {
             child: SingleMotionBuilder(
               motion: FujinMotion.of(context, switch (dragged.value) {
                 null => FujinMotion.tabSlide,
-                _ => FujinMotion.lensFollow,
+                _ => FujinMotion.gesture,
               }),
               value: dragged.value ?? target,
               builder: (context, position, _) => LensSwell(

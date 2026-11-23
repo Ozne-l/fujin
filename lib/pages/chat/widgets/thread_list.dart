@@ -28,6 +28,7 @@ import 'package:fujin/pages/chat/widgets/message_time.dart';
 import 'package:fujin/pages/chat/widgets/older_messages_loader.dart';
 import 'package:fujin/pages/chat/widgets/reply_quote.dart';
 import 'package:fujin/pages/chat/widgets/send_flight.dart';
+import 'package:fujin/pages/common/arrival_highlight.dart';
 import 'package:go_router/go_router.dart';
 import 'package:motor/motor.dart';
 
@@ -174,14 +175,14 @@ class ThreadList extends HookWidget {
       key: bubble,
       duration: switch (FujinMotion.reduced(context)) {
         true => Duration.zero,
-        false => FujinMotion.grow.duration,
+        false => FujinMotion.spatialFast.duration,
       },
-      curve: FujinMotion.grow.curve,
+      curve: FujinMotion.spatialFast.curve,
       alignment: Alignment.topCenter,
       child: AnimatedSwitcher(
-        duration: FujinMotion.dissolve.duration,
-        switchInCurve: FujinMotion.dissolve.curve,
-        switchOutCurve: FujinMotion.dissolve.curve,
+        duration: FujinMotion.effectsFast.duration,
+        switchInCurve: FujinMotion.effectsFast.curve,
+        switchOutCurve: FujinMotion.effectsFast.curve,
         layoutBuilder: (current, previous) => Stack(
           alignment: AlignmentDirectional.topEnd,
           children: [...previous, ?current],
@@ -275,8 +276,8 @@ class ThreadList extends HookWidget {
           unawaited(
             position.animateTo(
               0,
-              duration: FujinMotion.scrollGlide.duration,
-              curve: FujinMotion.scrollGlide.curve,
+              duration: FujinMotion.spatialSlow.duration,
+              curve: FujinMotion.spatialSlow.curve,
             ),
           );
         case false:
@@ -284,8 +285,8 @@ class ThreadList extends HookWidget {
           unawaited(
             position.animateTo(
               0,
-              duration: FujinMotion.scrollSettle.duration,
-              curve: FujinMotion.scrollSettle.curve,
+              duration: FujinMotion.spatial.duration,
+              curve: FujinMotion.spatial.curve,
             ),
           );
       }
@@ -317,8 +318,8 @@ class ThreadList extends HookWidget {
             glided = true;
             await position.animateTo(
               target,
-              duration: FujinMotion.scrollGlide.duration,
-              curve: FujinMotion.scrollGlide.curve,
+              duration: FujinMotion.spatialSlow.duration,
+              curve: FujinMotion.spatialSlow.curve,
             );
         }
         await WidgetsBinding.instance.endOfFrame;
@@ -326,8 +327,8 @@ class ThreadList extends HookWidget {
       final row = stage.built(key);
       if (row == null || !row.mounted) return;
       final settle = switch (glided || far) {
-        true => FujinMotion.scrollSettle,
-        false => FujinMotion.scrollGlide,
+        true => FujinMotion.spatial,
+        false => FujinMotion.spatialSlow,
       };
       await Scrollable.ensureVisible(
         row,
@@ -799,12 +800,12 @@ class _Row extends HookWidget {
     final rise = entrance is _Rise;
     return SingleMotionBuilder(
       motion: switch ((leaving, entrance, flown.value)) {
-        (true, _, _) => FujinMotion.of(context, FujinMotion.rowRemoval),
+        (true, _, _) => FujinMotion.of(context, FujinMotion.spatial),
         (false, _Rise(), _) => FujinMotion.dissolveOf(
           context,
-          FujinMotion.messageIn,
+          FujinMotion.spatial,
         ),
-        (false, _, false) => FujinMotion.dissolve,
+        (false, _, false) => FujinMotion.effectsFast,
         _ => const InstantMotion(),
       },
       from: switch (entrance) {
@@ -859,28 +860,11 @@ class _Row extends HookWidget {
                 right: -FujinSize.screenMargin,
                 top: 0,
                 bottom: 0,
-                child: _Highlight(key: ValueKey(highlights)),
+                child: ArrivalHighlight(key: ValueKey(highlights)),
               ),
             KeyedSubtree(key: _content, child: child(bubble)),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _Highlight extends StatelessWidget {
-  const _Highlight({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final colour = context.colors.backgroundHighlight;
-    return SingleMotionBuilder(
-      motion: FujinMotion.highlight,
-      from: 1,
-      value: 0,
-      builder: (context, glow, _) => ColoredBox(
-        color: colour.withValues(alpha: colour.a * glow.clamp(0.0, 1.0)),
       ),
     );
   }

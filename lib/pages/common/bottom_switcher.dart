@@ -19,17 +19,17 @@ class BottomSwitcher extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final switcher = AnimatedSwitcher(
-      duration: FujinMotion.dissolve.duration,
-      switchInCurve: FujinMotion.dissolve.curve,
-      switchOutCurve: FujinMotion.dissolve.curve,
+      duration: FujinMotion.effectsFast.duration,
+      switchInCurve: FujinMotion.effectsFast.curve,
+      switchOutCurve: FujinMotion.effectsFast.curve,
       layoutBuilder: layout,
       child: KeyedSubtree(key: ValueKey(child.runtimeType), child: child),
     );
     return switch (FujinMotion.reduced(context)) {
       true => switcher,
       false => AnimatedSize(
-        duration: FujinMotion.grow.duration,
-        curve: FujinMotion.grow.curve,
+        duration: FujinMotion.spatialFast.duration,
+        curve: FujinMotion.spatialFast.curve,
         alignment: Alignment.bottomCenter,
         clipBehavior: Clip.none,
         child: switcher,

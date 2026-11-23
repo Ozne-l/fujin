@@ -101,9 +101,9 @@ class ChatComposer extends HookWidget {
             child: IconButton(
               onPressed: action,
               icon: AnimatedSwitcher(
-                duration: FujinMotion.dissolve.duration,
-                switchInCurve: FujinMotion.dissolve.curve,
-                switchOutCurve: FujinMotion.dissolve.curve,
+                duration: FujinMotion.effectsFast.duration,
+                switchInCurve: FujinMotion.effectsFast.curve,
+                switchOutCurve: FujinMotion.effectsFast.curve,
                 transitionBuilder: (child, animation) => FadeTransition(
                   opacity: animation,
                   child: switch (reduced) {

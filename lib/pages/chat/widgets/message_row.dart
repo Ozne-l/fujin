@@ -52,9 +52,9 @@ class MessageRow extends StatelessWidget {
             AnimatedPadding(
               duration: switch (FujinMotion.reduced(context)) {
                 true => Duration.zero,
-                false => FujinMotion.grow.duration,
+                false => FujinMotion.spatialFast.duration,
               },
-              curve: FujinMotion.grow.curve,
+              curve: FujinMotion.spatialFast.curve,
               padding: EdgeInsets.only(
                 bottom: switch (reactions) {
                   [] => 0,

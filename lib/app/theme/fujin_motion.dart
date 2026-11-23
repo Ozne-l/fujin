@@ -5,6 +5,43 @@ import 'package:fujin/app/theme/instant_motion.dart';
 import 'package:motor/motor.dart';
 
 abstract final class FujinMotion {
+  static const Curve _standard = Cubic(0.2, 0, 0, 1);
+
+  static const CurvedMotion effectsFast = CurvedMotion(
+    Duration(milliseconds: 150),
+    Curves.easeOut,
+  );
+  static const CurvedMotion effects = CurvedMotion(
+    Duration(milliseconds: 300),
+    Curves.easeOut,
+  );
+  static const CurvedMotion effectsSlow = CurvedMotion(
+    Duration(milliseconds: 600),
+    Curves.easeOut,
+  );
+  static const CurvedMotion spatialFast = CurvedMotion(
+    Duration(milliseconds: 200),
+    _standard,
+  );
+  static const CurvedMotion spatial = CurvedMotion(
+    Duration(milliseconds: 250),
+    _standard,
+  );
+  static const CurvedMotion spatialSlow = CurvedMotion(
+    Duration(milliseconds: 400),
+    _standard,
+  );
+  static const CurvedMotion flight = CurvedMotion(
+    Duration(milliseconds: 300),
+    Curves.fastOutSlowIn,
+  );
+  static const Motion gesture = CupertinoMotion.interactive(snapToEnd: true);
+  static const Motion emphasis = CupertinoMotion.bouncy(
+    duration: Duration(milliseconds: 350),
+    snapToEnd: true,
+  );
+  static const double emphasisSwell = 1.2;
+
   static const Motion progress = MaterialSpringMotion.standardSpatialDefault();
   static const Motion spin = LinearMotion(Duration(milliseconds: 1200));
   static const spinTurns = StepSequence<double>(
@@ -32,18 +69,6 @@ abstract final class FujinMotion {
   static double driftFade(double phase) =>
       math.sin(phase * math.pi).clamp(0, 1);
 
-  static const CurvedMotion pageTurn = CurvedMotion(
-    Duration(milliseconds: 350),
-    Curves.easeOutCubic,
-  );
-  static const CurvedMotion mealFold = CurvedMotion(
-    Duration(milliseconds: 250),
-    Curves.easeOutCubic,
-  );
-  static const CurvedMotion rowRemoval = CurvedMotion(
-    Duration(milliseconds: 250),
-    Curves.easeOutCubic,
-  );
   static const Duration rowRemovalStagger = Duration(milliseconds: 70);
   static const Motion bandNudge = CupertinoMotion(
     duration: Duration(milliseconds: 300),
@@ -67,9 +92,6 @@ abstract final class FujinMotion {
     snapToEnd: true,
   );
   static const double iconTurnAngle = math.pi / 2;
-  static const Motion lensFollow = CupertinoMotion.interactive(
-    snapToEnd: true,
-  );
   static const Motion lensSwell = CupertinoMotion.snappy(
     duration: Duration(milliseconds: 300),
     snapToEnd: true,
@@ -82,10 +104,6 @@ abstract final class FujinMotion {
     snapToEnd: true,
   );
   static const double minimizedBarScale = 0.86;
-  static const CurvedMotion fadeThrough = CurvedMotion(
-    Duration(milliseconds: 280),
-    Curves.easeOutCubic,
-  );
   static const double fadeThroughScale = 0.98;
   static const CurvedMotion themeReveal = CurvedMotion(
     Duration(milliseconds: 675),
@@ -108,55 +126,20 @@ abstract final class FujinMotion {
     reverseDuration: Duration(milliseconds: 250),
   );
 
-  static const Curve _standard = Cubic(0.2, 0, 0, 1);
   static const Curve easeOutQuint = Cubic(0.23, 1, 0.32, 1);
-  static const CurvedMotion dissolve = CurvedMotion(
-    Duration(milliseconds: 150),
-    Curves.easeOut,
-  );
   static const double swapScale = 0.1;
-  static const CurvedMotion grow = CurvedMotion(
-    Duration(milliseconds: 200),
-    _standard,
-  );
-  static const CurvedMotion messageIn = CurvedMotion(
-    Duration(milliseconds: 250),
-    _standard,
-  );
   static const CurvedMotion sendFlight = CurvedMotion(
     Duration(milliseconds: 250),
     easeOutQuint,
   );
-  static const CurvedMotion highlight = CurvedMotion(
-    Duration(milliseconds: 600),
-    Curves.easeOut,
-  );
-  static const CurvedMotion mediaFlight = CurvedMotion(
-    Duration(milliseconds: 300),
-    Curves.fastOutSlowIn,
-  );
-  static const Motion release = CupertinoMotion.interactive(snapToEnd: true);
   static const Motion lift = CupertinoMotion.snappy(
     duration: Duration(milliseconds: 250),
-    snapToEnd: true,
-  );
-  static const Motion pop = CupertinoMotion.bouncy(
-    duration: Duration(milliseconds: 350),
     snapToEnd: true,
   );
   static const double messageRise = 16;
   static const Motion sendFlightClock = LinearMotion(
     Duration(milliseconds: 250),
   );
-  static const CurvedMotion scrollGlide = CurvedMotion(
-    Duration(milliseconds: 400),
-    _standard,
-  );
-  static const CurvedMotion scrollSettle = CurvedMotion(
-    Duration(milliseconds: 250),
-    _standard,
-  );
-  static const double popSwell = 1.2;
   static const double liftScale = 1.03;
   static const Duration liftSettle = Duration(milliseconds: 300);
   static const Duration reactionStagger = Duration(milliseconds: 20);
@@ -186,10 +169,6 @@ abstract final class FujinMotion {
         (1 - progress);
   }
 
-  static const CurvedMotion rotate = CurvedMotion(
-    Duration(milliseconds: 250),
-    _standard,
-  );
   static const CurvedMotion gridFade = CurvedMotion(
     Duration(milliseconds: 400),
     Interval(0.5, 1, curve: Curves.easeOut),
@@ -219,7 +198,7 @@ abstract final class FujinMotion {
 
   static Motion dissolveOf(BuildContext context, Motion motion) =>
       switch (reduced(context)) {
-        true => dissolve,
+        true => effectsFast,
         false => motion,
       };
 
@@ -231,8 +210,8 @@ abstract final class FujinMotion {
     true => Future.sync(() => controller.jumpToPage(page)),
     false => controller.animateToPage(
       page,
-      duration: pageTurn.duration,
-      curve: pageTurn.curve,
+      duration: spatialSlow.duration,
+      curve: spatialSlow.curve,
     ),
   };
 }

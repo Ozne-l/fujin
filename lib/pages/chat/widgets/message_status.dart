@@ -5,10 +5,10 @@ import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
-import 'package:fujin/pages/chat/widgets/failure_shake.dart';
 import 'package:fujin/pages/chat_media/chat_media_icon.dart';
 import 'package:fujin/pages/chat_media/widgets/media_glyph.dart';
 import 'package:fujin/pages/common/clock_icon.dart';
+import 'package:fujin/pages/common/failure_shake.dart';
 import 'package:motor/motor.dart';
 
 class MessageStatus extends StatelessWidget {

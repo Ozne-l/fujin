@@ -53,7 +53,7 @@ class MessageGestures extends HookWidget {
   Widget build(BuildContext context) {
     final vsync = useSingleTickerProvider();
     final offset = useMemoized(
-      () => SingleMotionController(motion: FujinMotion.release, vsync: vsync),
+      () => SingleMotionController(motion: FujinMotion.gesture, vsync: vsync),
     );
     useEffect(() => offset.dispose, [offset]);
     final distance = useRef<double>(0);
@@ -184,9 +184,9 @@ class MessageGestures extends HookWidget {
                       child: Transform.scale(
                         scale: shown,
                         child: SingleMotionBuilder(
-                          motion: FujinMotion.of(context, FujinMotion.pop),
+                          motion: FujinMotion.of(context, FujinMotion.emphasis),
                           value: switch (armed.value) {
-                            true => FujinMotion.popSwell,
+                            true => FujinMotion.emphasisSwell,
                             false => 1,
                           },
                           builder: (context, swell, disc) =>

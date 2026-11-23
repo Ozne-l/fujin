@@ -103,7 +103,7 @@ class TabPlate extends HookWidget {
             converter: const SingleMotionConverter(),
             motion: FujinMotion.of(context, switch (held.value) {
               null => FujinMotion.tabSlide,
-              _ => FujinMotion.lensFollow,
+              _ => FujinMotion.gesture,
             }),
             value: held.value ?? at,
             builder: (context, position, velocity, _) {

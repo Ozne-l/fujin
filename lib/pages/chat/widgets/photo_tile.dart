@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fujin/pages/chat/chat_files.dart';
-import 'package:fujin/pages/chat/widgets/image_arrival.dart';
 import 'package:fujin/pages/chat/widgets/media_placeholder.dart';
+import 'package:fujin/pages/common/image_arrival.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class PhotoTile extends ConsumerWidget {

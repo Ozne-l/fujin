@@ -156,7 +156,7 @@ class MediaMenuAnchor extends HookConsumerWidget {
                   groupId: info.tapRegionGroupId,
                   onTapOutside: (event) => controller.close(),
                   child: SingleMotionBuilder(
-                    motion: FujinMotion.of(context, FujinMotion.mealFold),
+                    motion: FujinMotion.of(context, FujinMotion.spatial),
                     from: 0,
                     value: switch (expanded.value) {
                       true => 1,

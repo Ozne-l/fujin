@@ -95,13 +95,13 @@ class _Chip extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final reduced = FujinMotion.reduced(context);
-    const dissolve = FujinMotion.dissolve;
+    const dissolve = FujinMotion.effectsFast;
     final (background, border, count) = switch (reaction.mine) {
       true => (colors.backgroundSuccess, colors.borderFocus, colors.textLink),
       false => (colors.backgroundCard, colors.borderCard, colors.textSecondary),
     };
     return SingleMotionBuilder(
-      motion: FujinMotion.dissolveOf(context, FujinMotion.pop),
+      motion: FujinMotion.dissolveOf(context, FujinMotion.emphasis),
       from: switch (appear) {
         true => 0,
         false => null,

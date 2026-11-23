@@ -3,12 +3,12 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/chat/chat_files.dart';
 import 'package:fujin/pages/chat/chat_text.dart';
-import 'package:fujin/pages/chat/widgets/image_arrival.dart';
 import 'package:fujin/pages/chat/widgets/media_placeholder.dart';
 import 'package:fujin/pages/chat/widgets/photo_tile.dart';
 import 'package:fujin/pages/chat/widgets/video_duration_chip.dart';
 import 'package:fujin/pages/chat_media/chat_media_icon.dart';
 import 'package:fujin/pages/chat_media/widgets/media_glyph.dart';
+import 'package:fujin/pages/common/image_arrival.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class VideoTile extends ConsumerWidget {

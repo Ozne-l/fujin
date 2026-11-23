@@ -15,10 +15,10 @@ class FadeThrough extends StatelessWidget {
   Widget build(BuildContext context) => AnimatedSwitcher(
     duration: switch (FujinMotion.reduced(context)) {
       true => Duration.zero,
-      false => FujinMotion.fadeThrough.duration,
+      false => FujinMotion.effects.duration,
     },
-    switchInCurve: FujinMotion.fadeThrough.curve,
-    switchOutCurve: FujinMotion.fadeThrough.curve,
+    switchInCurve: FujinMotion.effects.curve,
+    switchOutCurve: FujinMotion.effects.curve,
     transitionBuilder: (child, animation) => FadeTransition(
       opacity: animation,
       child: ScaleTransition(
