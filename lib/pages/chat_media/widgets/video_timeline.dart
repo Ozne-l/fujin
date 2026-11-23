@@ -108,7 +108,7 @@ class VideoTimeline extends HookWidget {
                                             (true, _) || (_, _?) => 1,
                                             (false, null) => 0,
                                           },
-                                          motion: FujinMotion.dissolve,
+                                          motion: FujinMotion.effectsFast,
                                           builder: (context, opacity, child) =>
                                               Opacity(
                                                 opacity: opacity.clamp(0, 1),
@@ -321,7 +321,7 @@ class _PillAt extends StatelessWidget {
             false => 0,
           },
           from: 0,
-          motion: FujinMotion.dissolve,
+          motion: FujinMotion.effectsFast,
           onAnimationStatusChanged: (status) {
             if (!shown && !status.isAnimating) onGone();
           },

@@ -156,8 +156,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: FujinRoute.chatMedia.path,
         pageBuilder: (context, state) {
           final flight = switch (FujinMotion.reduced(context)) {
-            true => FujinMotion.dissolve,
-            false => FujinMotion.mediaFlight,
+            true => FujinMotion.effectsFast,
+            false => FujinMotion.flight,
           };
           return CustomTransitionPage<void>(
             key: state.pageKey,

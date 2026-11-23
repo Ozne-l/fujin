@@ -181,13 +181,13 @@ final class _Cascade {
 
   Duration get duration =>
       FujinMotion.rowRemovalStagger * (_last + 1) +
-      FujinMotion.rowRemoval.duration;
+      FujinMotion.spatial.duration;
 
   double _progress(int step, double progress) {
     final total = duration.inMicroseconds;
     final start = (FujinMotion.rowRemovalStagger * (step + 1)).inMicroseconds;
-    final end = start + FujinMotion.rowRemoval.duration.inMicroseconds;
-    return FujinMotion.rowRemoval.curve.transform(
+    final end = start + FujinMotion.spatial.duration.inMicroseconds;
+    return FujinMotion.spatial.curve.transform(
       Interval(start / total, end / total).transform(progress.clamp(0, 1)),
     );
   }

@@ -34,7 +34,7 @@ class ViewerDismiss extends HookWidget {
   Widget build(BuildContext context) {
     final vsync = useSingleTickerProvider();
     final spring = useMemoized(
-      () => SingleMotionController(motion: FujinMotion.release, vsync: vsync),
+      () => SingleMotionController(motion: FujinMotion.gesture, vsync: vsync),
       [vsync],
     );
     useEffect(() {
@@ -49,7 +49,7 @@ class ViewerDismiss extends HookWidget {
 
     void settle(double velocity) {
       onDragging(false);
-      spring.motion = FujinMotion.of(context, FujinMotion.release);
+      spring.motion = FujinMotion.of(context, FujinMotion.gesture);
       unawaited(
         spring.animateTo(0, from: travel.value, withVelocity: velocity),
       );

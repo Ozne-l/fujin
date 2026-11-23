@@ -75,7 +75,7 @@ class UploadTile extends HookWidget {
                     child: VideoDurationChip(duration: edit.keptDuration),
                   ),
                 SingleMotionBuilder(
-                  motion: FujinMotion.dissolve,
+                  motion: FujinMotion.effectsFast,
                   value: switch (percent) {
                     null => 0.0,
                     _ => _dimmed,
@@ -114,7 +114,7 @@ class _Tick extends HookWidget {
       return hide.cancel;
     }, const []);
     return SingleMotionBuilder(
-      motion: FujinMotion.dissolve,
+      motion: FujinMotion.effectsFast,
       from: 0,
       value: switch (gone.value) {
         true => 0.0,
@@ -123,7 +123,7 @@ class _Tick extends HookWidget {
       builder: (context, opacity, child) =>
           Opacity(opacity: opacity.clamp(0, 1), child: child),
       child: SingleMotionBuilder(
-        motion: FujinMotion.of(context, FujinMotion.pop),
+        motion: FujinMotion.of(context, FujinMotion.emphasis),
         from: 0,
         value: 1,
         builder: (context, scale, child) =>

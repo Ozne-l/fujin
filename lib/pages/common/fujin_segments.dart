@@ -84,7 +84,7 @@ class FujinSegments extends HookWidget {
               held.value,
               landing.value,
             )) {
-              (_?, _) => FujinMotion.lensFollow,
+              (_?, _) => FujinMotion.gesture,
               (null, _?) => FujinMotion.tabSlide,
               (null, null) => motion,
             }),

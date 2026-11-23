@@ -90,8 +90,8 @@ class VoiceComposer extends HookConsumerWidget {
     return switch (FujinMotion.reduced(context)) {
       true => swap,
       false => AnimatedSize(
-        duration: FujinMotion.grow.duration,
-        curve: FujinMotion.grow.curve,
+        duration: FujinMotion.spatialFast.duration,
+        curve: FujinMotion.spatialFast.curve,
         alignment: Alignment.bottomCenter,
         child: swap,
       ),

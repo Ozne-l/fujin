@@ -4,7 +4,7 @@ Date: 2026-11-20
 
 ## Status
 
-Accepted. Amends [0008](0008-theme-from-design-tokens.md) (Hero flights, a custom full-screen viewer route and framework implicit animations are allowed in the chat) and [0031](0031-reduced-motion.md) (iOS "Réduire les animations" is read; transitions that carry meaning dissolve instead of jumping), and the "no seen mark" bullet of [0045](0045-ekklo-chat.md).
+Accepted, amended by [0056](0056-app-wide-motion.md) (its rules hold on every screen; its presets are renamed into the scale of roles, its generic widgets moved to `lib/pages/common/`). Amends [0008](0008-theme-from-design-tokens.md) (Hero flights, a custom full-screen viewer route and framework implicit animations are allowed in the chat) and [0031](0031-reduced-motion.md) (iOS "Réduire les animations" is read; transitions that carry meaning dissolve instead of jumping), and the "no seen mark" bullet of [0045](0045-ekklo-chat.md).
 
 ## Context
 

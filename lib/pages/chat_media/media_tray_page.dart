@@ -78,8 +78,8 @@ class MediaTrayPage extends HookConsumerWidget {
     Future<void> open(int index) async {
       final media = tray.media[index];
       final flight = switch (FujinMotion.reduced(context)) {
-        true => FujinMotion.dissolve,
-        false => FujinMotion.mediaFlight,
+        true => FujinMotion.effectsFast,
+        false => FujinMotion.flight,
       };
       final edited = await navigator.push<EditedMedia>(
         PageRouteBuilder(

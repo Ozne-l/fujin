@@ -9,13 +9,13 @@ import 'package:fujin/pages/chat/chat_text.dart';
 import 'package:fujin/pages/chat/thread_item.dart';
 import 'package:fujin/pages/chat/upload/upload_tile.dart';
 import 'package:fujin/pages/chat/widgets/chat_bubble.dart';
-import 'package:fujin/pages/chat/widgets/failure_shake.dart';
 import 'package:fujin/pages/chat/widgets/media_gallery.dart';
 import 'package:fujin/pages/chat/widgets/message_row.dart';
 import 'package:fujin/pages/chat/widgets/message_status.dart';
 import 'package:fujin/pages/chat/widgets/reply_quote.dart';
 import 'package:fujin/pages/chat_media/chat_media_icon.dart';
 import 'package:fujin/pages/chat_media/widgets/media_glyph.dart';
+import 'package:fujin/pages/common/failure_shake.dart';
 
 class UploadBubble extends StatelessWidget {
   const UploadBubble({

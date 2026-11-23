@@ -76,8 +76,8 @@ class GlassTextField extends StatelessWidget {
                 child: switch (FujinMotion.reduced(context)) {
                   true => field,
                   false => AnimatedSize(
-                    duration: FujinMotion.grow.duration,
-                    curve: FujinMotion.grow.curve,
+                    duration: FujinMotion.spatialFast.duration,
+                    curve: FujinMotion.spatialFast.curve,
                     alignment: Alignment.bottomLeft,
                     child: field,
                   ),

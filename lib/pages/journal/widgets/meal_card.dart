@@ -144,8 +144,8 @@ class MealCard extends HookConsumerWidget {
         ),
       },
       body: AnimatedSize(
-        duration: FujinMotion.mealFold.duration,
-        curve: FujinMotion.mealFold.curve,
+        duration: FujinMotion.spatial.duration,
+        curve: FujinMotion.spatial.curve,
         alignment: Alignment.topCenter,
         child: switch ((open, [...meal.entries, ...leaving])) {
           (true, [_, ...]) => Padding(

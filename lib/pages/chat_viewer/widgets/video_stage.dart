@@ -165,7 +165,7 @@ class _SkipBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) => IgnorePointer(
     child: SingleMotionBuilder(
-      motion: FujinMotion.dissolve,
+      motion: FujinMotion.effectsFast,
       value: switch (shown) {
         true => 1.0,
         false => 0.0,

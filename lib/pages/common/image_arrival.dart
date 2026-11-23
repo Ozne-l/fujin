@@ -19,7 +19,7 @@ class ImageArrival extends HookWidget {
     return ColoredBox(
       color: context.colors.backgroundNeutral,
       child: SingleMotionBuilder(
-        motion: FujinMotion.dissolve,
+        motion: FujinMotion.effectsFast,
         value: switch (seen.value) {
           true => 1.0,
           false => 0.0,

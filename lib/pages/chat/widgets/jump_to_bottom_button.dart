@@ -54,7 +54,7 @@ class JumpToBottomButton extends HookWidget {
       ),
     );
     return SingleMotionBuilder(
-      motion: FujinMotion.dissolveOf(context, FujinMotion.pop),
+      motion: FujinMotion.dissolveOf(context, FujinMotion.emphasis),
       value: switch (visible) {
         true => 1,
         false => 0,

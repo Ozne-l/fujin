@@ -31,7 +31,7 @@ class ChatMediaHero extends StatelessWidget {
     enabled: !FujinMotion.reduced(context),
     child: Hero(
       tag: (ChatMediaHero, messageId, index),
-      curve: FujinMotion.mediaFlight.curve,
+      curve: FujinMotion.flight.curve,
       transitionOnUserGestures: true,
       createRectTween: (begin, end) => RectTween(begin: begin, end: end),
       flightShuttleBuilder: (context, flight, direction, from, to) => _Shuttle(

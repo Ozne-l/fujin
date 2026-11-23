@@ -23,7 +23,7 @@ class MessageTime extends StatelessWidget {
           style: FujinText.inter11Regular.copyWith(color: colors.textTertiary),
         ),
         SingleMotionBuilder(
-          motion: FujinMotion.dissolve,
+          motion: FujinMotion.effectsFast,
           value: switch (seen) {
             true => 1,
             false => 0,

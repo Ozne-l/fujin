@@ -327,7 +327,7 @@ class _Chrome extends StatelessWidget {
   Widget build(BuildContext context) => IgnorePointer(
     ignoring: !shown,
     child: SingleMotionBuilder(
-      motion: FujinMotion.dissolve,
+      motion: FujinMotion.effectsFast,
       value: switch (shown) {
         true => 1.0,
         false => 0.0,
