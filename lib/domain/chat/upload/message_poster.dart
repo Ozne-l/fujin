@@ -6,12 +6,12 @@ import 'package:fujin/data/chat/message_in_progress_repository.dart';
 import 'package:fujin/data/chat/message_in_progress_state.dart';
 import 'package:fujin/data/upload/upload_folder.dart';
 import 'package:fujin/data/upload/upload_notifications.dart';
+import 'package:fujin/domain/chat/upload/post_outcome.dart';
 import 'package:fujin/domain/chat/upload/posted_message.dart';
-import 'package:fujin/domain/chat/upload/settlement.dart';
 import 'package:fujin/domain/chat/upload/upload_deadline.dart';
 
-final class MessageSettler {
-  const MessageSettler({
+final class MessagePoster {
+  const MessagePoster({
     required this._messaging,
     required this._messages,
     required this._notifications,
@@ -25,7 +25,7 @@ final class MessageSettler {
   final UploadFolder _folder;
   final DateTime Function() _clock;
 
-  Future<Settlement> settle(String messageId) async {
+  Future<PostOutcome> post(String messageId) async {
     final message = _messages.message(messageId);
     if (message == null || message.state == MessageInProgressState.failed) {
       return const MessageGone();
@@ -39,7 +39,7 @@ final class MessageSettler {
     if (!ready) return const MessageNotReady();
     final EkkloMessage sent;
     try {
-      sent = await _post(message, files);
+      sent = await _send(message, files);
     } on EkkloException catch (error) {
       return switch (error) {
         EkkloNetworkException() => const MessageWaiting(),
@@ -56,7 +56,7 @@ final class MessageSettler {
     return MessagePosted(sent);
   }
 
-  Future<Settlement> giveUp(MessageInProgress message) async {
+  Future<PostOutcome> giveUp(MessageInProgress message) async {
     _messages.save(message.copyWith(state: MessageInProgressState.failed));
     await _notifications.showFailed(
       message.id,
@@ -65,7 +65,7 @@ final class MessageSettler {
     return const MessageGivenUp();
   }
 
-  Future<EkkloMessage> _post(
+  Future<EkkloMessage> _send(
     MessageInProgress message,
     List<FileInProgress> files,
   ) async {

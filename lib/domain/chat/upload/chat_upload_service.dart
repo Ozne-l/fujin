@@ -25,9 +25,9 @@ import 'package:fujin/data/upload/upload_update.dart';
 import 'package:fujin/domain/chat/edit/edited_media.dart';
 import 'package:fujin/domain/chat/edit/media_send.dart';
 import 'package:fujin/domain/chat/person_name.dart';
-import 'package:fujin/domain/chat/upload/message_settler.dart';
+import 'package:fujin/domain/chat/upload/message_poster.dart';
 import 'package:fujin/domain/chat/upload/message_upload.dart';
-import 'package:fujin/domain/chat/upload/settlement.dart';
+import 'package:fujin/domain/chat/upload/post_outcome.dart';
 import 'package:fujin/domain/chat/upload/upload_deadline.dart';
 import 'package:fujin/domain/chat/upload/upload_phase.dart';
 import 'package:fujin/domain/chat/upload/uploading_media.dart';
@@ -46,7 +46,7 @@ final class ChatUploadService {
     required this._cachePath,
     required this._accept,
     required this._clock,
-  }) : _settler = MessageSettler(
+  }) : _messagePoster = MessagePoster(
          messaging: messaging,
          messages: _messages,
          notifications: _notifications,
@@ -59,7 +59,7 @@ final class ChatUploadService {
   static const _full = 100;
 
   final EkkloMessaging _messaging;
-  final MessageSettler _settler;
+  final MessagePoster _messagePoster;
   final MessageInProgressRepository _messages;
   final ChatRepository _chats;
   final MediaProcessor _processor;
@@ -446,7 +446,7 @@ final class ChatUploadService {
     List<FileInProgress> files,
   ) async {
     await _relay.cancel(message.id);
-    switch (await _settler.settle(message.id)) {
+    switch (await _messagePoster.post(message.id)) {
       case MessagePosted(message: final sent):
         _forget(message.id, files);
         if (_disposed) return;
@@ -476,7 +476,7 @@ final class ChatUploadService {
   }
 
   Future<void> _fail(MessageInProgress message) async {
-    await _settler.giveUp(message);
+    await _messagePoster.giveUp(message);
     await _failed(message);
   }
 

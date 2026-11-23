@@ -3,9 +3,9 @@ import 'package:fujin/data/chat/message_in_progress_repository.dart';
 import 'package:fujin/data/upload/upload_completion.dart';
 import 'package:fujin/data/upload/upload_folder.dart';
 import 'package:fujin/data/upload/upload_notifications.dart';
-import 'package:fujin/domain/chat/upload/message_settler.dart';
+import 'package:fujin/domain/chat/upload/message_poster.dart';
+import 'package:fujin/domain/chat/upload/post_outcome.dart';
 import 'package:fujin/domain/chat/upload/relay_outcome.dart';
-import 'package:fujin/domain/chat/upload/settlement.dart';
 
 final class ChatRelay {
   ChatRelay({
@@ -15,7 +15,7 @@ final class ChatRelay {
     required UploadFolder folder,
     required this._cachePath,
     required DateTime Function() clock,
-  }) : _settler = MessageSettler(
+  }) : _messagePoster = MessagePoster(
          messaging: messaging,
          messages: _messages,
          notifications: notifications,
@@ -23,13 +23,13 @@ final class ChatRelay {
          clock: clock,
        );
 
-  final MessageSettler _settler;
+  final MessagePoster _messagePoster;
   final MessageInProgressRepository _messages;
   final String _cachePath;
 
   Future<RelayOutcome> relay(String messageId) async {
     UploadCompletion.sweep(_messages, cachePath: _cachePath);
-    return switch (await _settler.settle(messageId)) {
+    return switch (await _messagePoster.post(messageId)) {
       MessagePosted() => RelayOutcome.posted,
       MessageNotReady() || MessageWaiting() => RelayOutcome.later,
       MessageGivenUp() => RelayOutcome.gaveUp,
