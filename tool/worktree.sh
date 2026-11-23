@@ -38,6 +38,7 @@ new() {
   direnv allow "$dir"
   (cd "$dir" && direnv exec . flutter pub get)
   (cd "$dir/.omp/extensions/pair-programmer" && bun install --frozen-lockfile)
+  [[ ! -f $main_dir/.omp/mcp.json ]] || cp -p "$main_dir/.omp/mcp.json" "$dir/.omp/mcp.json"
 
   echo "$dir"
 }
