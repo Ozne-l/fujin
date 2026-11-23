@@ -96,11 +96,26 @@ Future<FakeVideoPlayer> _openVoiceNote(
 
 Future<void> _settleFiles(WidgetTester tester) async {
   for (var turn = 0; turn < 10; turn++) {
-    await tester.runAsync(
-      () => Future<void>.delayed(const Duration(milliseconds: 10)),
-    );
-    await tester.pump(const Duration(milliseconds: 100));
+    await _turn(tester);
   }
+}
+
+Future<void> _enqueued(
+  WidgetTester tester,
+  FakeMediaUploader uploader,
+  int orders,
+) async {
+  for (var turn = 0; turn < 40 && uploader.orders.length < orders; turn++) {
+    await _turn(tester);
+  }
+  await tester.pumpAndSettle();
+}
+
+Future<void> _turn(WidgetTester tester) async {
+  await tester.runAsync(
+    () => Future<void>.delayed(const Duration(milliseconds: 10)),
+  );
+  await tester.pump(const Duration(milliseconds: 100));
 }
 
 Finder _glyphs(String asset) => find.byWidgetPredicate(
@@ -572,13 +587,7 @@ void main() {
     await _record(tester);
     await tester.pump(const Duration(seconds: 2));
     await tester.tap(find.byTooltip(_send));
-    for (var turn = 0; turn < 40 && uploader.orders.isEmpty; turn++) {
-      await tester.runAsync(
-        () => Future<void>.delayed(const Duration(milliseconds: 10)),
-      );
-      await tester.pump(const Duration(milliseconds: 100));
-    }
-    await tester.pumpAndSettle();
+    await _enqueued(tester, uploader, 1);
     check(_shown(tester, find.byType(UploadBubble))).equals(1);
 
     uploader.completeAll();
@@ -596,6 +605,37 @@ void main() {
     check(errors).isEmpty();
     check(uploads.last).equals(0);
     check(uploads.where((shown) => shown > 0 && shown < 1)).isNotEmpty();
+  });
+
+  testWidgets('shows my first voice message once posted while my second one '
+      'is still sending', (tester) async {
+    final uploader = FakeMediaUploader();
+    var clock = now;
+    await pumpFujin(
+      tester,
+      _backends(),
+      voiceRecorder: FakeVoiceRecorder(),
+      fileVideo: FakeVideoPlayer(duration: const Duration(seconds: 2)),
+      mediaUploader: uploader,
+      clock: () => clock,
+    );
+    await _open(tester);
+
+    for (final sent in [1, 2]) {
+      await _record(tester);
+      await tester.pump(const Duration(seconds: 2));
+      await tester.tap(find.byTooltip(_send));
+      await _enqueued(tester, uploader, sent);
+      clock = clock.add(const Duration(minutes: 1));
+    }
+    check(find.byType(UploadBubble).evaluate()).length.equals(2);
+
+    uploader.finish(uploader.orders.first);
+    await _settleFiles(tester);
+    await tester.pumpAndSettle();
+
+    check(find.byType(VoiceBubble).evaluate()).length.equals(1);
+    check(find.byType(UploadBubble).evaluate()).length.equals(1);
   });
 
   testWidgets('keeps a voice message playing while the connection goes and '

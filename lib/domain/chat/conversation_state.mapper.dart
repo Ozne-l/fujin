@@ -93,6 +93,15 @@ class ConversationStateMapper extends ClassMapperBase<ConversationState> {
     opt: true,
     def: const {},
   );
+  static Map<String, String> _$postedFrom(ConversationState v) => v.postedFrom;
+  static const Field<ConversationState, Map<String, String>> _f$postedFrom =
+      Field(
+        'postedFrom',
+        _$postedFrom,
+        key: r'posted_from',
+        opt: true,
+        def: const {},
+      );
 
   @override
   final MappableFields<ConversationState> fields = const {
@@ -107,6 +116,7 @@ class ConversationStateMapper extends ClassMapperBase<ConversationState> {
     #protectsCapture: _f$protectsCapture,
     #pendingTexts: _f$pendingTexts,
     #deleting: _f$deleting,
+    #postedFrom: _f$postedFrom,
   };
   @override
   final bool ignoreNull = true;
@@ -124,6 +134,7 @@ class ConversationStateMapper extends ClassMapperBase<ConversationState> {
       protectsCapture: data.dec(_f$protectsCapture),
       pendingTexts: data.dec(_f$pendingTexts),
       deleting: data.dec(_f$deleting),
+      postedFrom: data.dec(_f$postedFrom),
     );
   }
 
@@ -212,6 +223,8 @@ abstract class ConversationStateCopyWith<
     PendingTextCopyWith<$R, PendingText, PendingText>
   >
   get pendingTexts;
+  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>>
+  get postedFrom;
   $R call({
     String? conversationId,
     String? ownerId,
@@ -224,6 +237,7 @@ abstract class ConversationStateCopyWith<
     bool? protectsCapture,
     List<PendingText>? pendingTexts,
     Set<String>? deleting,
+    Map<String, String>? postedFrom,
   });
   ConversationStateCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -265,6 +279,13 @@ class _ConversationStateCopyWithImpl<$R, $Out>
     (v) => call(pendingTexts: v),
   );
   @override
+  MapCopyWith<$R, String, String, ObjectCopyWith<$R, String, String>>
+  get postedFrom => MapCopyWith(
+    $value.postedFrom,
+    (v, t) => ObjectCopyWith(v, $identity, t),
+    (v) => call(postedFrom: v),
+  );
+  @override
   $R call({
     String? conversationId,
     Object? ownerId = $none,
@@ -277,6 +298,7 @@ class _ConversationStateCopyWithImpl<$R, $Out>
     bool? protectsCapture,
     List<PendingText>? pendingTexts,
     Set<String>? deleting,
+    Map<String, String>? postedFrom,
   }) => $apply(
     FieldCopyWithData({
       if (conversationId != null) #conversationId: conversationId,
@@ -290,6 +312,7 @@ class _ConversationStateCopyWithImpl<$R, $Out>
       if (protectsCapture != null) #protectsCapture: protectsCapture,
       if (pendingTexts != null) #pendingTexts: pendingTexts,
       if (deleting != null) #deleting: deleting,
+      if (postedFrom != null) #postedFrom: postedFrom,
     }),
   );
   @override
@@ -305,6 +328,7 @@ class _ConversationStateCopyWithImpl<$R, $Out>
     protectsCapture: data.get(#protectsCapture, or: $value.protectsCapture),
     pendingTexts: data.get(#pendingTexts, or: $value.pendingTexts),
     deleting: data.get(#deleting, or: $value.deleting),
+    postedFrom: data.get(#postedFrom, or: $value.postedFrom),
   );
 
   @override

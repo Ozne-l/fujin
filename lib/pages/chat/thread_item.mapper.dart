@@ -233,6 +233,13 @@ class ThreadMessageMapper extends SubClassMapperBase<ThreadMessage> {
     opt: true,
     def: false,
   );
+  static String? _$postedFrom(ThreadMessage v) => v.postedFrom;
+  static const Field<ThreadMessage, String> _f$postedFrom = Field(
+    'postedFrom',
+    _$postedFrom,
+    key: r'posted_from',
+    opt: true,
+  );
 
   @override
   final MappableFields<ThreadMessage> fields = const {
@@ -242,6 +249,7 @@ class ThreadMessageMapper extends SubClassMapperBase<ThreadMessage> {
     #quotesMine: _f$quotesMine,
     #delivery: _f$delivery,
     #seen: _f$seen,
+    #postedFrom: _f$postedFrom,
   };
   @override
   final bool ignoreNull = true;
@@ -261,6 +269,7 @@ class ThreadMessageMapper extends SubClassMapperBase<ThreadMessage> {
       quotesMine: data.dec(_f$quotesMine),
       delivery: data.dec(_f$delivery),
       seen: data.dec(_f$seen),
+      postedFrom: data.dec(_f$postedFrom),
     );
   }
 
@@ -336,6 +345,7 @@ abstract class ThreadMessageCopyWith<$R, $In extends ThreadMessage, $Out>
     bool? quotesMine,
     MessageDelivery? delivery,
     bool? seen,
+    String? postedFrom,
   });
   ThreadMessageCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -362,6 +372,7 @@ class _ThreadMessageCopyWithImpl<$R, $Out>
     bool? quotesMine,
     MessageDelivery? delivery,
     bool? seen,
+    Object? postedFrom = $none,
   }) => $apply(
     FieldCopyWithData({
       if (message != null) #message: message,
@@ -370,6 +381,7 @@ class _ThreadMessageCopyWithImpl<$R, $Out>
       if (quotesMine != null) #quotesMine: quotesMine,
       if (delivery != null) #delivery: delivery,
       if (seen != null) #seen: seen,
+      if (postedFrom != $none) #postedFrom: postedFrom,
     }),
   );
   @override
@@ -380,6 +392,7 @@ class _ThreadMessageCopyWithImpl<$R, $Out>
     quotesMine: data.get(#quotesMine, or: $value.quotesMine),
     delivery: data.get(#delivery, or: $value.delivery),
     seen: data.get(#seen, or: $value.seen),
+    postedFrom: data.get(#postedFrom, or: $value.postedFrom),
   );
 
   @override

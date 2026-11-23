@@ -467,15 +467,6 @@ final class _Stage {
     (media) => media.kind == ChatMediaKind.voice,
   );
 
-  static bool _becomes(MessageUpload upload, EkkloMessage message) =>
-      upload.phase is! UploadNotSent &&
-      switch ((message.kind, voice(upload))) {
-        (EkkloMessageKind.voice, true) => upload.media.length == 1,
-        (EkkloMessageKind.media, false) =>
-          message.media.length == upload.media.length,
-        _ => false,
-      };
-
   String messageKey(String id) => _aliases[id] ?? '$messagePrefix$id';
 
   String keyOf(ThreadItem item) => switch (item) {
@@ -604,7 +595,11 @@ final class _Stage {
     final current = {for (final item in items) keyOf(item)};
     final claimed = {..._held.values, ..._aliases.values};
     for (final item in items.reversed) {
-      if (item case ThreadMessage(mine: true, :final message)) {
+      if (item case ThreadMessage(
+        mine: true,
+        :final message,
+        :final postedFrom,
+      )) {
         final id = message.id;
         if (_aliases.containsKey(id) ||
             _held.containsKey(id) ||
@@ -638,10 +633,8 @@ final class _Stage {
           (entry) =>
               !entry.leaving &&
               !claimed.contains(entry.key) &&
-              switch (entry.item) {
-                ThreadUpload(:final upload) => _becomes(upload, message),
-                _ => false,
-              },
+              postedFrom != null &&
+              entry.key == '$uploadPrefix$postedFrom',
         );
         if (upload.firstOrNull case final upload?) {
           claimed.add(upload.key);

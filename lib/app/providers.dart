@@ -515,7 +515,8 @@ final chatUploadServiceProvider = Provider<ChatUploadService>((ref) {
     notifications: ref.watch(uploadNotificationsProvider),
     folder: UploadFolder(ref.watch(appCacheDirectoryProvider)),
     cachePath: ref.watch(chatCachePathProvider),
-    accept: (message) => ref.read(chatServiceProvider).accept(message),
+    accept: (message, {required postedFrom}) =>
+        ref.read(chatServiceProvider).accept(message, postedFrom: postedFrom),
     clock: ref.watch(clockProvider),
   );
   unawaited(service.start());
