@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:checks/checks.dart';
+import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_test/flutter_test.dart' show addTearDown, group, test;
 import 'package:fujin/data/chat/chat_media_kind.dart';
 import 'package:fujin/data/chat/file_in_progress.dart';
@@ -77,8 +78,11 @@ final class _Relay {
     folder.create(_messageId);
   }
 
-  Future<RelayOutcome> run() async => ChatRelay(
-    messaging: (await backends.ekklo()).messaging,
+  Future<RelayOutcome> run({bool signedIn = true}) async => ChatRelay(
+    messaging: switch (signedIn) {
+      true => await backends.ekklo(),
+      false => backends.ekkloWith(InMemoryEkkloTokenStore()),
+    }.messaging,
     messages: messages,
     notifications: notifications,
     folder: folder,
@@ -171,15 +175,29 @@ void main() {
       },
     );
 
-    test('tries again later when Ekklo answers with a server error', () async {
-      final relay = _Relay()..seed(completedAt: _start);
-      relay.backends.refusedChatCalls.add(_mediaCall);
+    test(
+      'gives up with a failure notice when Ekklo answers with a server error',
+      () async {
+        final relay = _Relay()..seed(completedAt: _start);
+        relay.backends.refusedChatCalls.add(_mediaCall);
 
-      check(await relay.run()).equals(RelayOutcome.later);
+        check(await relay.run()).equals(RelayOutcome.gaveUp);
+        check(
+          relay.messages.message(_messageId)?.state,
+        ).equals(MessageInProgressState.failed);
+        check(relay.notifications.failed).deepEquals({_messageId});
+      },
+    );
+
+    test('gives up with a failure notice without an Ekklo session', () async {
+      final relay = _Relay()..seed(completedAt: _start);
+
+      check(await relay.run(signedIn: false)).equals(RelayOutcome.gaveUp);
+      check(relay.calls).not((calls) => calls.contains(_mediaCall));
       check(
         relay.messages.message(_messageId)?.state,
-      ).equals(MessageInProgressState.uploading);
-      check(relay.notifications.failed).isEmpty();
+      ).equals(MessageInProgressState.failed);
+      check(relay.notifications.failed).deepEquals({_messageId});
     });
 
     test('gives up on a voice message saved without its duration', () async {
