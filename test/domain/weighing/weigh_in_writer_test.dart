@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:checks/checks.dart';
-import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_test/flutter_test.dart'
     show group, setUp, tearDown, test;
 import 'package:fujin/data/database/fujin_database.dart';
@@ -51,28 +50,6 @@ List<LoggedWeighIn> _live(WeighInRepository weighIns) => [
   for (final logged in weighIns.listed())
     if (logged.weighIn.deletedAt == null) logged,
 ];
-
-MfpMeasurement _measurement(String id, double value, {DateTime? date}) =>
-    MfpMeasurement(
-      id: id,
-      type: 'weight',
-      value: value,
-      unit: 'kilograms',
-      date: date ?? day,
-    );
-
-EkkloWeightEntry _ekkloWeight(
-  String id,
-  DateTime date,
-  double kilograms, {
-  Duration later = Duration.zero,
-}) => EkkloWeightEntry(
-  id: id,
-  date: date,
-  kilograms: kilograms,
-  createdAt: now,
-  updatedAt: now.add(later),
-);
 
 void main() {
   final dayBefore = day.subtract(const Duration(days: 1));
@@ -128,9 +105,9 @@ void main() {
     test('stores the latest weight of each day, linked to Ekklo, then '
         'writes the history to MyFitnessPal oldest day first', () async {
       backends.ekkloWeights = [
-        _ekkloWeight('w-1', day, 68.94),
-        _ekkloWeight('w-2', day, 69.1, later: const Duration(minutes: 1)),
-        _ekkloWeight('w-3', dayBefore, 69.4),
+        ekkloWeight('w-1', day, 68.94),
+        ekkloWeight('w-2', day, 69.1, later: const Duration(minutes: 1)),
+        ekkloWeight('w-3', dayBefore, 69.4),
       ];
       final weighing = await started(reached: const []);
 
@@ -151,8 +128,8 @@ void main() {
     test('leaves the days Fujin holds, deleted ones included, and runs '
         'only once', () async {
       backends.ekkloWeights = [
-        _ekkloWeight('w-1', day, 70.1),
-        _ekkloWeight('w-2', dayBefore, 70.4),
+        ekkloWeight('w-1', day, 70.1),
+        ekkloWeight('w-2', dayBefore, 70.4),
       ];
       final weighIns = weighInsOf(database)..save(date: day, kilograms: 68.9);
       weighIns.remove(weighIns.save(date: dayBefore, kilograms: 69).id);
@@ -161,7 +138,7 @@ void main() {
       await weighing.writer.run();
       backends.ekkloWeights = [
         ...backends.ekkloWeights,
-        _ekkloWeight('w-3', dayAfter, 70.8),
+        ekkloWeight('w-3', dayAfter, 70.8),
       ];
       await weighing.writer.run();
 
@@ -172,7 +149,7 @@ void main() {
 
     test('is tried again on the next run when Ekklo did not answer', () async {
       backends
-        ..ekkloWeights = [_ekkloWeight('w-1', day, 68.9)]
+        ..ekkloWeights = [ekkloWeight('w-1', day, 68.9)]
         ..ekkloReachable = false;
       final weighing = await started(reached: const []);
 
@@ -206,7 +183,7 @@ void main() {
 
     test('adopts an equal MyFitnessPal weight instead of posting it '
         'again', () async {
-      backends.mfpMeasurements = [_measurement('101', 68.92)];
+      backends.mfpMeasurements = [mfpWeight('101', 68.92)];
       final weighing = await started();
 
       await weighing.save(day, 68.9);
@@ -220,9 +197,9 @@ void main() {
     test('replaces every other MyFitnessPal weight of the day, the hidden '
         'ones too', () async {
       backends.mfpMeasurements = [
-        _measurement('101', 70),
-        _measurement('102', 71),
-        _measurement('103', 69, date: dayBefore),
+        mfpWeight('101', 70),
+        mfpWeight('102', 71),
+        mfpWeight('103', 69, date: dayBefore),
       ];
       final weighing = await started();
 
@@ -358,7 +335,7 @@ void main() {
 
     test('in Fujin DEV is a failure for each app, and the import still '
         'runs', () async {
-      backends.ekkloWeights = [_ekkloWeight('w-1', dayBefore, 69.4)];
+      backends.ekkloWeights = [ekkloWeight('w-1', dayBefore, 69.4)];
       final weighing = await started(
         reached: const [],
         client: ReadOnlyHttpClient(
@@ -436,7 +413,7 @@ void main() {
 
     test('stops writing a day to MyFitnessPal after ten reads that still '
         'hold another weight', () async {
-      backends.mfpMeasurements = [_measurement('101', 70)];
+      backends.mfpMeasurements = [mfpWeight('101', 70)];
       final weighing = await started(
         client: _Stepping(
           backends.httpClient,

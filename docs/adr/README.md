@@ -58,4 +58,4 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0052](0052-dated-goals.md) | Dated goals: each set holds from the day it is saved, backup version 5 | Accepted |
 | [0053](0053-one-rule-for-the-held-ekklo-job.md) | One rule for the held Ekklo job, in the background writer | Accepted |
 | [0054](0054-a-dropped-write-waits.md) | A dropped write waits, like a failed read | Accepted |
-| [0055](0055-body-weight.md) | Body weight: Fūjin's weigh-ins, written to Ekklo and MyFitnessPal | Accepted |
+| [0055](0055-body-weight.md) | Body weight: Fūjin's weigh-ins, written to Ekklo and MyFitnessPal | Accepted (built; curve left for later) |

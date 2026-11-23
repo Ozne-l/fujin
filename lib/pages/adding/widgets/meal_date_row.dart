@@ -18,9 +18,7 @@ class MealDateRow extends StatelessWidget {
     super.key,
   });
 
-  static const _pickerSpan = Duration(days: 365);
   static const _bookIcon = 'assets/icons/book.svg';
-  static const EdgeInsetsDirectional _padding = DayPickerButton.padding;
 
   final String meal;
   final List<String> meals;
@@ -44,16 +42,12 @@ class MealDateRow extends StatelessWidget {
               selected: meal,
               labelOf: (name) => name,
               onSelected: onMeal,
-              itemPadding: _padding,
+              itemPadding: FujinMenuButton.pillPadding,
               builder: (context, {required expanded, required toggle}) =>
-                  FujinMenuButton(
+                  FujinMenuButton.pill(
                     label: meal,
                     expanded: expanded,
                     onTap: toggle,
-                    height: FujinSize.buttonMedium,
-                    radius: FujinRadius.pill,
-                    padding: _padding,
-                    chevronSize: FujinSize.mealArrow,
                     leading: SvgPicture.asset(
                       _bookIcon,
                       width: FujinSize.mealArrow,
@@ -70,8 +64,8 @@ class MealDateRow extends StatelessWidget {
             child: DayPickerButton(
               label: TitleText.capitalized(context.intl.addMealDate(date)),
               selected: date,
-              first: date.subtract(_pickerSpan),
-              last: lastDay ?? date.add(_pickerSpan),
+              first: date.subtract(DayPickerButton.span),
+              last: lastDay ?? date.add(DayPickerButton.span),
               onPicked: onDate,
               iconColor: context.colors.textPrimary,
             ),

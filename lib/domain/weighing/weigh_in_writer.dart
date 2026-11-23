@@ -41,8 +41,7 @@ final class WeighInWriter {
 
   Future<void> _once() async {
     final failures = {
-      for (final failure in _state.failures)
-        (failure.connector, failure.weighIn.id): failure,
+      for (final failure in _state.failures) failure.key: failure,
     };
     _emit(WeighInWriterRunning(current: null, failures: [...failures.values]));
     try {

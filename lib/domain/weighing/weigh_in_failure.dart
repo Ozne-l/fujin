@@ -8,6 +8,8 @@ sealed class WeighInFailure implements ConnectorFailure {
   final WeighIn weighIn;
   @override
   final Object error;
+
+  (Connector, String) get key => (connector, weighIn.id);
 }
 
 final class MfpWeightNotWritten extends WeighInFailure {

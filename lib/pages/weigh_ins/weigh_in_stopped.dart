@@ -17,7 +17,6 @@ extension WeighInStopped on WeighInWriterState {
   ];
 
   Set<(Connector, String)> stoppedKeys(AppEnvironment environment) => {
-    for (final failure in stopped(environment))
-      (failure.connector, failure.weighIn.id),
+    for (final failure in stopped(environment)) failure.key,
   };
 }

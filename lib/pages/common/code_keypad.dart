@@ -63,7 +63,7 @@ class CodeKeypad extends StatelessWidget {
                   Expanded(
                     child: _Key(
                       onTap: onErase,
-                      label: context.intl.scannerErase,
+                      label: context.intl.keypadErase,
                       child: Icon(
                         Icons.backspace_outlined,
                         size: FujinSize.icon,

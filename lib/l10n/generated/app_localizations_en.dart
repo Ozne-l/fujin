@@ -2008,7 +2008,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scannerSearchCode => 'Look up this code';
 
   @override
-  String get scannerErase => 'Delete';
+  String get keypadErase => 'Delete';
 
   @override
   String get scannerFoundByBarcode => '· found by barcode';

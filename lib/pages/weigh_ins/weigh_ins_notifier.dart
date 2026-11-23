@@ -13,7 +13,7 @@ final class WeighInsNotifier extends Notifier<List<LoggedWeighIn>> {
   @override
   List<LoggedWeighIn> build() {
     ref.watch(weighInWriteProvider);
-    return _listed();
+    return ref.watch(weighInRepositoryProvider).listed();
   }
 
   WeighIn save({required DateTime date, required double kilograms}) {

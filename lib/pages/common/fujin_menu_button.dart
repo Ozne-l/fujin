@@ -22,6 +22,25 @@ class FujinMenuButton extends StatelessWidget {
     super.key,
   });
 
+  const FujinMenuButton.pill({
+    required this.label,
+    required this.expanded,
+    required this.onTap,
+    required Widget this.leading,
+    super.key,
+  }) : height = FujinSize.buttonMedium,
+       radius = FujinRadius.pill,
+       padding = pillPadding,
+       style = FujinText.inter14Medium,
+       chevronSize = FujinSize.mealArrow,
+       spacing = FujinSpace.s2,
+       width = null,
+       semanticsLabel = null;
+
+  static const pillPadding = EdgeInsetsDirectional.symmetric(
+    horizontal: FujinSpace.s4,
+  );
+
   static const double _halfTurn = math.pi;
 
   final String label;
