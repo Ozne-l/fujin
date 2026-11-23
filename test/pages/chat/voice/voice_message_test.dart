@@ -638,6 +638,48 @@ void main() {
     check(find.byType(UploadBubble).evaluate()).length.equals(1);
   });
 
+  testWidgets('shows my voice message that Ekklo posted although its send '
+      'failed', (tester) async {
+    final uploader = FakeMediaUploader();
+    final backends = _backends();
+    await pumpFujin(
+      tester,
+      backends,
+      voiceRecorder: FakeVoiceRecorder(),
+      fileVideo: FakeVideoPlayer(duration: const Duration(seconds: 2)),
+      mediaUploader: uploader,
+    );
+    await _open(tester);
+    await _record(tester);
+    await tester.pump(const Duration(seconds: 2));
+    await tester.tap(find.byTooltip(_send));
+    await _enqueued(tester, uploader, 1);
+    final order = uploader.orders.single;
+
+    backends.refusedChatCalls.add(
+      'POST /api/v1/messaging/conversations/${FakeChat.conversationId}'
+      '/voice-message',
+    );
+    uploader.finish(order);
+    await _settleFiles(tester);
+    await tester.pumpAndSettle();
+    check(find.byType(VoiceBubble).evaluate()).isEmpty();
+
+    backends.chat.deliver(
+      FakeChat.message(
+        id: 'posted',
+        createdAt: now.add(const Duration(minutes: 1)),
+        senderId: FakeChat.ownerId,
+        type: 'audio',
+        mediaUrls: [order.publicUrl],
+      ),
+    );
+    await _settleFiles(tester);
+    await tester.pumpAndSettle();
+
+    check(find.byType(VoiceBubble).evaluate()).length.equals(1);
+  });
+
   testWidgets('keeps a voice message playing while the connection goes and '
       'comes back', (tester) async {
     final network = StreamController<bool>.broadcast();

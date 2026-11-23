@@ -634,7 +634,11 @@ final class _Stage {
               !entry.leaving &&
               !claimed.contains(entry.key) &&
               postedFrom != null &&
-              entry.key == '$uploadPrefix$postedFrom',
+              entry.key == '$uploadPrefix$postedFrom' &&
+              switch (entry.item) {
+                ThreadUpload(:final upload) => upload.phase is! UploadNotSent,
+                _ => false,
+              },
         );
         if (upload.firstOrNull case final upload?) {
           claimed.add(upload.key);
