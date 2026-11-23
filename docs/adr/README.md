@@ -5,7 +5,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | # | Decision | Status |
 | --- | --- | --- |
 | [0001](0001-recompute-statuses-from-both-sides.md) | Recompute statuses from both sides, with a send-link registry and no queue | Accepted (own-copy expectation settled by 0018; unattended items added by 0025; updates reviewed on screen 10 by 0018; extended to every connector by 0044) |
-| [0002](0002-write-ordering.md) | Write ordering for add, undo, send and own copies | Accepted (sending implemented by 0018, add and undo by 0026, edit and delete by 0043; Fūjin's database written first, and sends run one at a time, by 0044) |
+| [0002](0002-write-ordering.md) | Write ordering for add, undo, send and own copies | Accepted (sending implemented by 0018, add and undo by 0026, edit and delete by 0043; Fūjin's database written first, and sends run one at a time, by 0044; undo and delete services folded into `EditEntryService` by 0053) |
 | [0003](0003-refresh-on-foreground-and-pull.md) | Refresh on foreground return and pull to refresh | Accepted (pull indicator drawn by 0028; selection re-read added by 0029) |
 | [0004](0004-one-sqlite-file.md) | One SQLite file, schema and migrations | Accepted (ids and stamps added by 0044; cache file planned by 0044 and amended by 0045: one class for both files, WAL cache recreated on change, busy timeout; built) |
 | [0005](0005-backup.md) | Backup: Auto Backup whitelist, manual JSON file | Accepted (B implemented, C implemented by 0021) |
@@ -47,9 +47,9 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0041](0041-liquid-glass-renderer-1.0.md) | Liquid glass on liquid_glass_renderer 1.0 | Proposed, amended by 0048 (pub.dev pin replaced by a patched copy in third_party) and 0050 (the patched package comes from the owner's fork) |
 | [0042](0042-text-contrast-on-tinted-surfaces.md) | Text contrast on tinted surfaces | Accepted |
 | [0043](0043-edit-and-delete-a-logged-food.md) | Edit and delete a logged food | Accepted (edit and delete saved first and written in the background, and offline edit and delete of known foods built, by 0044; delete moved to `EditEntryService.remove` by 0053) |
-| [0044](0044-connector-model.md) | Connector model: Fūjin's entry at the centre | Accepted (steps 1 to 4 built, offline included, and the role setting, kept in shared preferences; foods without servings completed from MyFitnessPal after an online Journal read; Ekklo "to remove" and Ekklo two-way not built; chat and cache file built by 0045 to 0047) |
+| [0044](0044-connector-model.md) | Connector model: Fūjin's entry at the centre | Accepted (steps 1 to 4 built, offline included, and the role setting, kept in shared preferences; foods without servings completed from MyFitnessPal after an online Journal read; Ekklo "to remove" and Ekklo two-way not built; chat and cache file built by 0045 to 0047; offline rule of the background writer amended by 0054) |
 | [0045](0045-ekklo-chat.md) | Ekklo chat: contract, sync, cache file, notifications, fake chat in dev | Accepted, amended by 0049 (built; screens drawn by 0047; seen mark added by 0049) |
-| [0046](0046-chat-media.md) | Chat media: processing, edits and background upload | Accepted (built on Android; screens drawn and background work amended by 0047) |
+| [0046](0046-chat-media.md) | Chat media: processing, edits and background upload | Accepted (built on Android; screens drawn and background work amended by 0047; one posting rule for the app and the relay, 2026-11-23) |
 | [0047](0047-chat-screens.md) | Chat screens: Messages tab, conversation, media tray and editors, voice, full screen, notification copy | Accepted (built) |
 | [0048](0048-patched-liquid-glass-renderer.md) | Patched liquid_glass_renderer in third_party | Superseded by 0050 |
 | [0049](0049-chat-motion.md) | Chat motion, shared-element flights and haptics | Accepted |
