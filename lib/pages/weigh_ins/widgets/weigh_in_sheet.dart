@@ -8,22 +8,22 @@ import 'package:fujin/data/weigh_ins/weigh_in.dart';
 import 'package:fujin/domain/weighing/kilograms.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/code_keypad.dart';
-import 'package:fujin/pages/common/day_picker_sheet.dart';
+import 'package:fujin/pages/common/day_picker_button.dart';
 import 'package:fujin/pages/common/field_helper.dart';
-import 'package:fujin/pages/common/fujin_menu_button.dart';
 import 'package:fujin/pages/common/glass_fill.dart';
 import 'package:fujin/pages/common/glass_finish.dart';
 import 'package:fujin/pages/common/keypad_field.dart';
+import 'package:fujin/pages/common/locale_numbers.dart';
 import 'package:fujin/pages/common/note_card.dart';
 import 'package:fujin/pages/common/sheet_card.dart';
 import 'package:fujin/pages/common/sheet_frame.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:fujin/pages/weigh_ins/kilograms_typing.dart';
+import 'package:fujin/pages/weigh_ins/live_weigh_in.dart';
 import 'package:fujin/pages/weigh_ins/weigh_in_snack_bar.dart';
 import 'package:fujin/pages/weigh_ins/weigh_in_text.dart';
 import 'package:fujin/pages/weigh_ins/weigh_ins_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
 
 class WeighInSheet extends HookConsumerWidget {
   const WeighInSheet({this.editing, this.onDelete, super.key});
@@ -47,9 +47,7 @@ class WeighInSheet extends HookConsumerWidget {
     final intl = context.intl;
     final colors = context.colors;
     final today = ref.watch(todayProvider);
-    final separator = NumberFormat.decimalPattern(
-      Localizations.localeOf(context).toString(),
-    ).symbols.DECIMAL_SEP;
+    final separator = LocaleNumbers.separator(context);
     final typing = useState(switch (editing) {
       final weighIn? => KilogramsTyping.of(
         weighIn.kilograms,
@@ -60,14 +58,7 @@ class WeighInSheet extends HookConsumerWidget {
     final day = useState(editing?.date ?? today);
     final replaced = switch (editing) {
       _? => null,
-      null => [
-        for (final logged in ref.watch(weighInsProvider))
-          if (logged.weighIn case WeighIn(
-            deletedAt: null,
-            :final date,
-          ) when date == day.value)
-            logged.weighIn,
-      ].firstOrNull,
+      null => ref.watch(weighInsProvider).liveOn(day.value),
     };
     final save = switch (typing.value.kilograms) {
       final kilograms? => () {
@@ -103,32 +94,14 @@ class WeighInSheet extends HookConsumerWidget {
                   color: colors.textSecondary,
                 ),
               ),
-              null => FujinMenuButton(
+              null => DayPickerButton(
                 label: WeighInText.day(intl, day.value, today: today),
-                expanded: false,
-                onTap: () => unawaited(
-                  SheetFrame.show(
-                    context,
-                    builder: (context) => DayPickerSheet(
-                      selected: day.value,
-                      first: today.subtract(_pickerSpan),
-                      last: today,
-                      onPicked: (picked) =>
-                          day.value = SelectedDay.calendarDay(picked),
-                    ),
-                  ),
-                ),
-                height: FujinSize.buttonMedium,
-                radius: FujinRadius.pill,
-                padding: const EdgeInsetsDirectional.symmetric(
-                  horizontal: FujinSpace.s4,
-                ),
-                chevronSize: FujinSize.mealArrow,
-                leading: Icon(
-                  Icons.calendar_today_outlined,
-                  size: FujinSize.mealArrow,
-                  color: colors.textSecondary,
-                ),
+                selected: day.value,
+                first: today.subtract(_pickerSpan),
+                last: today,
+                onPicked: (picked) =>
+                    day.value = SelectedDay.calendarDay(picked),
+                iconColor: colors.textSecondary,
               ),
             },
             KeypadField(
@@ -145,7 +118,7 @@ class WeighInSheet extends HookConsumerWidget {
             if (replaced case final replaced?)
               NoteCard(
                 title: intl.weighInReplaceTitle(
-                  WeighInText.kilograms(intl, replaced.kilograms),
+                  intl.weighInKilograms(replaced.kilograms),
                 ),
                 detail: intl.weighInReplaceDetail,
                 background: colors.backgroundInfo,

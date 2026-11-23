@@ -6,6 +6,8 @@ import 'package:fujin/pages/journal/journal_notifier.dart';
 import 'package:fujin/pages/memory/memory_notifier.dart';
 import 'package:fujin/pages/settings/backup_failure.dart';
 import 'package:fujin/pages/settings/backup_state.dart';
+import 'package:fujin/pages/weigh_ins/weigh_in_write_notifier.dart';
+import 'package:fujin/pages/weigh_ins/weigh_ins_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final NotifierProvider<BackupNotifier, BackupState> backupProvider =
@@ -39,7 +41,9 @@ final class BackupNotifier extends Notifier<BackupState> {
     ref
       ..invalidate(memoryProvider)
       ..invalidate(goalsProvider)
-      ..invalidate(journalProvider);
+      ..invalidate(journalProvider)
+      ..invalidate(weighInsProvider);
+    ref.read(weighInWriteProvider.notifier).run();
     state = const BackupImported();
   }
 

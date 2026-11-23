@@ -142,7 +142,10 @@ class WeighInsPage extends ConsumerWidget {
                     label: intl.weighInsSection,
                     rows: [
                       for (final logged in listed)
-                        row(logged.weighIn, WeighInDebt.of(logged)),
+                        row(logged.weighIn, [
+                          for (final debt in WeighInDebt.of(logged))
+                            debt.connector,
+                        ]),
                     ],
                   ),
                 ],

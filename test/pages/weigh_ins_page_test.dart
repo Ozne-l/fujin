@@ -6,6 +6,7 @@ import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/data/connectors/connector.dart';
 import 'package:fujin/pages/common/code_keypad.dart';
 import 'package:fujin/pages/common/connector_pill.dart';
+import 'package:fujin/pages/common/day_picker_sheet.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
@@ -15,6 +16,8 @@ import '../support/pump_fujin.dart';
 const _today = 'Aujourd’hui, mer. 7 oct.';
 const _mfpNotWritten = 'Pas écrit dans MyFitnessPal';
 const _range = 'Entre 20 et 300 kg';
+const _yesterday = 'Hier, mar. 6 oct.';
+final DateTime _dayBefore = day.subtract(const Duration(days: 1));
 
 Future<void> _frames(WidgetTester tester) async {
   for (var frame = 0; frame < 10; frame++) {
@@ -54,6 +57,27 @@ Future<void> _save(WidgetTester tester, String typed) async {
   await _tap(tester, find.text('Nouvelle pesée').last);
   await _type(tester, typed);
   await _tap(tester, find.text('Enregistrer'));
+}
+
+Future<void> _pickDay(WidgetTester tester, String dayOfMonth) async {
+  await _tap(tester, find.byIcon(Icons.calendar_today_outlined));
+  await _tap(
+    tester,
+    find.descendant(
+      of: find.byType(DayPickerSheet),
+      matching: find.text(dayOfMonth),
+    ),
+  );
+}
+
+Future<void> _swipe(WidgetTester tester, String row) async {
+  final width = tester.view.physicalSize.width / tester.view.devicePixelRatio;
+  await tester.timedDrag(
+    find.text(row),
+    Offset(-width * 0.8, 0),
+    const Duration(seconds: 1),
+  );
+  await _frames(tester);
 }
 
 bool _enabled(WidgetTester tester, String label) =>
@@ -263,5 +287,78 @@ void main() {
     check(_count('Pas écrit dans Ekklo')).equals(0);
     check(_turning(Connector.mfp).evaluate()).length.equals(1);
     check(_turning(Connector.ekklo).evaluate()).length.equals(1);
+  });
+
+  testWidgets('saves a weigh-in on the day picked, written to that day in '
+      'both apps', (tester) async {
+    final backends = FakeBackends();
+    await pumpFujin(tester, backends);
+    await _openWeighIns(tester);
+
+    await _tap(tester, find.text('Nouvelle pesée').last);
+    await _pickDay(tester, '6');
+    await _type(tester, '69,4');
+    await _tap(tester, find.text('Enregistrer'));
+
+    check(_count(_yesterday)).equals(1);
+    check([
+      for (final measurement in backends.mfpMeasurements)
+        (measurement.date.day, measurement.value),
+    ]).deepEquals([(_dayBefore.day, 69.4)]);
+    check([
+      for (final weight in backends.ekkloWeights)
+        (weight.date.day, weight.kilograms),
+    ]).deepEquals([(_dayBefore.day, 69.4)]);
+  });
+
+  testWidgets('deletes a weigh-in on a long swipe, and leaves a deleted one '
+      'still owed to MyFitnessPal unswipeable', (tester) async {
+    final backends = FakeBackends();
+    await pumpFujin(tester, backends);
+    await _openWeighIns(tester);
+    await _save(tester, '68,9');
+    backends.mfpMeasurementWritesFail = true;
+
+    await _swipe(tester, _today);
+    check(_count('Supprimer 68,9 kg ?')).equals(1);
+    await _tap(tester, find.text('Supprimer de MFP'));
+    check(_count('Supprimé dans Fūjin · reste dans Ekklo')).equals(1);
+
+    await _swipe(tester, _today);
+
+    check(_count('Supprimer 68,9 kg ?')).equals(0);
+    check(backends.mfpMeasurements).length.equals(1);
+  });
+
+  testWidgets('reports a weigh-in Ekklo did not take with only the Ekklo '
+      'clock, MyFitnessPal written', (tester) async {
+    final backends = FakeBackends()..ekkloWeightWritesFail = true;
+    await pumpFujin(tester, backends);
+    await _openWeighIns(tester);
+
+    await _save(tester, '68,9');
+
+    check(_count('Pas écrit dans Ekklo')).equals(1);
+    check(_count('La pesée d’aujourd’hui reste en attente')).equals(1);
+    check(_pill(Connector.ekklo).evaluate()).length.equals(1);
+    check(_pill(Connector.mfp).evaluate()).isEmpty();
+    check(backends.mfpMeasurements).length.equals(1);
+    check(backends.ekkloWeights).isEmpty();
+  });
+
+  testWidgets('counts the weigh-ins still owed to MyFitnessPal once there '
+      'are two', (tester) async {
+    final backends = FakeBackends()..mfpMeasurementWritesFail = true;
+    await pumpFujin(tester, backends);
+    await _openWeighIns(tester);
+    await _save(tester, '68,9');
+    check(_count('La pesée d’aujourd’hui reste en attente')).equals(1);
+
+    await _tap(tester, find.text('Nouvelle pesée').last);
+    await _pickDay(tester, '6');
+    await _type(tester, '69,4');
+    await _tap(tester, find.text('Enregistrer'));
+
+    check(_count('2 pesées restent en attente')).equals(1);
   });
 }

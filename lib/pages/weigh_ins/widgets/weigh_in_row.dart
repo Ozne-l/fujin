@@ -69,7 +69,7 @@ class WeighInRow extends StatelessWidget {
             ),
           ),
           Text(
-            WeighInText.kilograms(context.intl, weighIn.kilograms),
+            context.intl.weighInKilograms(weighIn.kilograms),
             style: FujinText.inter15Semibold.copyWith(color: main),
           ),
         ],

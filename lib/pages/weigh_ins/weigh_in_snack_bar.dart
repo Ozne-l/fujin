@@ -11,14 +11,12 @@ import 'package:fujin/pages/weigh_ins/weigh_in_stopped.dart';
 import 'package:fujin/pages/weigh_ins/weigh_in_text.dart';
 
 abstract final class WeighInSnackBar {
-  static const _settledDuration = Duration(seconds: 4);
-
   static void saved(
     BuildContext context,
     WeighIn weighIn, {
     required DateTime today,
   }) => ScaffoldMessenger.of(context).showNotice(
-    duration: _settledDuration,
+    duration: FujinSnackBar.settledDuration,
     SnackBarContent(
       glyph: SnackBarGlyph.done,
       title: context.intl.weighInSaved,
@@ -31,7 +29,7 @@ abstract final class WeighInSnackBar {
     WeighIn weighIn, {
     required DateTime today,
   }) => ScaffoldMessenger.of(context).showNotice(
-    duration: _settledDuration,
+    duration: FujinSnackBar.settledDuration,
     SnackBarContent(
       glyph: SnackBarGlyph.done,
       title: context.intl.weighInDeleted,

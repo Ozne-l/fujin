@@ -10,7 +10,7 @@ MfpMeasurement _measurement(String id, double value, String unit) =>
 
 void main() {
   test('posts on a day without weight', () {
-    check(MfpWeightStep.next(68.9, const [])).isA<PostWeight>();
+    check(MfpWeightStep.next(68.9, const [])).equals(const PostWeight());
   });
 
   test('adopts the first weight within 0.05 kg, in pounds too', () {
@@ -18,10 +18,9 @@ void main() {
       _measurement('m-1', 68.94, 'kilograms'),
       _measurement('m-1', 151.9, 'pounds'),
     ]) {
-      check(MfpWeightStep.next(68.9, [held]))
-          .isA<AdoptMeasurement>()
-          .has((step) => step.measurementId, 'measurementId')
-          .equals('m-1');
+      check(
+        MfpWeightStep.next(68.9, [held]),
+      ).equals(const AdoptMeasurement('m-1'));
     }
   });
 
@@ -30,10 +29,9 @@ void main() {
       _measurement('m-1', 69, 'kilograms'),
       _measurement('m-1', 68.9, 'stones'),
     ]) {
-      check(MfpWeightStep.next(68.9, [held]))
-          .isA<RemoveMeasurement>()
-          .has((step) => step.measurementId, 'measurementId')
-          .equals('m-1');
+      check(
+        MfpWeightStep.next(68.9, [held]),
+      ).equals(const RemoveMeasurement('m-1'));
     }
   });
 }

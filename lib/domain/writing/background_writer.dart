@@ -23,6 +23,7 @@ import 'package:fujin/domain/sending/send_service.dart';
 import 'package:fujin/domain/writing/derived_send.dart';
 import 'package:fujin/domain/writing/ekklo_job.dart';
 import 'package:fujin/domain/writing/network_down.dart';
+import 'package:fujin/domain/writing/single_flight.dart';
 import 'package:fujin/domain/writing/write_failure.dart';
 import 'package:fujin/domain/writing/writer_state.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
@@ -51,9 +52,8 @@ final class BackgroundWriter {
   final Map<String, EkkloJob> _held = {};
   final List<Replacement> _replaced = [];
   final List<Replacement> _readReplaced = [];
+  late final _flight = SingleFlight(_once);
   WriterState _state = const WriterIdle();
-  Future<void>? _running;
-  bool _again = false;
 
   WriterState get state => _state;
 
@@ -107,20 +107,7 @@ final class BackgroundWriter {
     _readReplaced.addAll(read.replaced);
   }
 
-  Future<void> run() {
-    if (_running case final running?) {
-      _again = true;
-      return running;
-    }
-    return _running = _runs().whenComplete(() => _running = null);
-  }
-
-  Future<void> _runs() async {
-    do {
-      _again = false;
-      await _once();
-    } while (_again);
-  }
+  Future<void> run() => _flight.run();
 
   Future<void> _once() async {
     _replaced.clear();

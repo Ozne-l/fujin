@@ -1,7 +1,11 @@
+import 'package:dart_mappable/dart_mappable.dart';
 import 'package:fujin/domain/weighing/kilograms.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
-sealed class MfpWeightStep {
+part 'mfp_weight_step.mapper.dart';
+
+@MappableClass(discriminatorKey: 'step')
+sealed class MfpWeightStep with MfpWeightStepMappable {
   const MfpWeightStep();
 
   static MfpWeightStep next(double kilograms, List<MfpMeasurement> day) =>
@@ -16,17 +20,22 @@ sealed class MfpWeightStep {
       };
 }
 
-final class PostWeight extends MfpWeightStep {
+@MappableClass(discriminatorValue: 'post')
+final class PostWeight extends MfpWeightStep with PostWeightMappable {
   const PostWeight();
 }
 
-final class AdoptMeasurement extends MfpWeightStep {
+@MappableClass(discriminatorValue: 'adopt')
+final class AdoptMeasurement extends MfpWeightStep
+    with AdoptMeasurementMappable {
   const AdoptMeasurement(this.measurementId);
 
   final String measurementId;
 }
 
-final class RemoveMeasurement extends MfpWeightStep {
+@MappableClass(discriminatorValue: 'remove')
+final class RemoveMeasurement extends MfpWeightStep
+    with RemoveMeasurementMappable {
   const RemoveMeasurement(this.measurementId);
 
   final String measurementId;

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/connectors/connector.dart';
-import 'package:fujin/data/weigh_ins/logged_weigh_in.dart';
 import 'package:fujin/data/weigh_ins/mfp_weigh_in_link.dart';
 import 'package:fujin/data/weigh_ins/weigh_in.dart';
 import 'package:fujin/data/weigh_ins/weigh_in_repository.dart';
@@ -11,6 +10,7 @@ import 'package:fujin/domain/weighing/weigh_in_debt.dart';
 import 'package:fujin/domain/weighing/weigh_in_failure.dart';
 import 'package:fujin/domain/weighing/weigh_in_import.dart';
 import 'package:fujin/domain/weighing/weigh_in_writer_state.dart';
+import 'package:fujin/domain/writing/single_flight.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 final class WeighInWriter {
@@ -30,28 +30,14 @@ final class WeighInWriter {
   final WeighInImport _import;
 
   final _states = StreamController<WeighInWriterState>.broadcast();
+  late final _flight = SingleFlight(_once);
   WeighInWriterState _state = const WeighInWriterIdle();
-  Future<void>? _running;
-  bool _again = false;
 
   WeighInWriterState get state => _state;
 
   Stream<WeighInWriterState> get states => _states.stream;
 
-  Future<void> run() {
-    if (_running case final running?) {
-      _again = true;
-      return running;
-    }
-    return _running = _runs().whenComplete(() => _running = null);
-  }
-
-  Future<void> _runs() async {
-    do {
-      _again = false;
-      await _once();
-    } while (_again);
-  }
+  Future<void> run() => _flight.run();
 
   Future<void> _once() async {
     final failures = {
@@ -62,29 +48,29 @@ final class WeighInWriter {
     try {
       await _import.importOnce();
       final owed = [
-        for (final logged in _weighIns.pending())
-          for (final connector in WeighInDebt.of(logged))
-            (connector: connector, logged: logged),
+        for (final logged in _weighIns.pending()) ...WeighInDebt.of(logged),
       ];
-      final keys = {
-        for (final (:connector, :logged) in owed)
-          (connector, logged.weighIn.id),
-      };
+      final keys = {for (final debt in owed) debt.key};
       failures.removeWhere((key, _) => !keys.contains(key));
       final stopped = <Connector>{};
-      for (final (:connector, :logged) in owed) {
-        if (stopped.contains(connector)) continue;
-        final key = (connector, logged.weighIn.id);
-        _emit(
-          WeighInWriterRunning(
-            current: logged.weighIn,
-            failures: [...failures.values],
-          ),
-        );
-        switch (await _write(connector, logged)) {
-          case final failure?:
-            failures[key] = failure;
-            stopped.add(connector);
+      for (final planned in owed) {
+        if (stopped.contains(planned.connector)) continue;
+        final key = planned.key;
+        switch (_stillOwed(planned)) {
+          case final debt?:
+            _emit(
+              WeighInWriterRunning(
+                current: debt.weighIn,
+                failures: [...failures.values],
+              ),
+            );
+            switch (await _write(debt)) {
+              case final failure?:
+                failures[key] = failure;
+                stopped.add(debt.connector);
+              case null:
+                failures.remove(key);
+            }
           case null:
             failures.remove(key);
         }
@@ -94,37 +80,38 @@ final class WeighInWriter {
     }
   }
 
+  WeighInDebt? _stillOwed(WeighInDebt planned) =>
+      switch (_weighIns.find(planned.weighIn.id)) {
+        final logged? => WeighInDebt.of(
+          logged,
+        ).where((debt) => debt.connector == planned.connector).firstOrNull,
+        null => null,
+      };
+
   void _emit(WeighInWriterState state) {
     _state = state;
     _states.add(state);
   }
 
-  Future<WeighInFailure?> _write(
-    Connector connector,
-    LoggedWeighIn logged,
-  ) async {
-    final weighIn = logged.weighIn;
+  Future<WeighInFailure?> _write(WeighInDebt debt) async {
     try {
-      switch ((connector, logged)) {
-        case (Connector.ekklo, _):
+      switch (debt) {
+        case EkkloWeighInWrite(:final weighIn):
           await _ekklo.measurements.logWeight(
             kilograms: weighIn.kilograms,
             date: weighIn.date,
           );
           _weighIns.linkEkklo(weighIn);
-        case (
-          Connector.mfp,
-          LoggedWeighIn(weighIn: WeighIn(deletedAt: _?), mfpLink: final link?),
-        ):
+        case MfpWeighInDeletion(:final link):
           await _removeFromMfp(link);
-        case (Connector.mfp, _):
+        case MfpWeighInWrite(:final weighIn):
           await _writeToMfp(weighIn);
       }
       return null;
     } on Object catch (error) {
-      return switch (connector) {
-        Connector.ekklo => EkkloWeightNotWritten(weighIn, error),
-        Connector.mfp => MfpWeightNotWritten(weighIn, error),
+      return switch (debt.connector) {
+        Connector.ekklo => EkkloWeightNotWritten(debt.weighIn, error),
+        Connector.mfp => MfpWeightNotWritten(debt.weighIn, error),
       };
     }
   }

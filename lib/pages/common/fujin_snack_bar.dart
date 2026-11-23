@@ -9,6 +9,7 @@ import 'package:fujin/pages/sending/send_failure.dart';
 
 extension FujinSnackBar on ScaffoldMessengerState {
   static const alertDuration = Duration(seconds: 4);
+  static const settledDuration = Duration(seconds: 4);
   static const _noticePadding = EdgeInsetsDirectional.fromSTEB(
     FujinSpace.s3,
     FujinSpace.s2,

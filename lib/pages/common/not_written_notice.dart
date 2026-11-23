@@ -8,7 +8,7 @@ import 'package:fujin/pages/common/snack_bar_glyph.dart';
 import 'package:fujin/pages/sending/send_failure.dart';
 
 abstract final class NotWrittenNotice {
-  static const duration = Duration(seconds: 8);
+  static const _duration = Duration(seconds: 8);
 
   static (Widget, Duration)? of<F extends ConnectorFailure>(
     AppLocalizations intl,
@@ -17,11 +17,14 @@ abstract final class NotWrittenNotice {
     required String Function(List<F> reported) pending,
     required VoidCallback onRetry,
   }) {
-    List<F> of(Connector connector) => [
+    List<F> failedIn(Connector connector) => [
       for (final failure in failures)
         if (failure.connector == connector) failure,
     ];
-    final notice = switch ((of(Connector.mfp), of(Connector.ekklo))) {
+    final notice = switch ((
+      failedIn(Connector.mfp),
+      failedIn(Connector.ekklo),
+    )) {
       ([_, ...] && final mfp, _) => (intl.mfpNotWritten, mfp),
       (_, [_, ...] && final ekklo) => (intl.ekkloNotWritten, ekklo),
       _ => null,
@@ -45,7 +48,7 @@ abstract final class NotWrittenNotice {
             false => (intl.tryAgain, onRetry),
           },
         ),
-        duration,
+        _duration,
       );
     }
     return null;

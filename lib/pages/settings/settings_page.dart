@@ -10,7 +10,6 @@ import 'package:fujin/data/connectors/connector.dart';
 import 'package:fujin/data/connectors/connector_domain.dart';
 import 'package:fujin/data/connectors/connector_roles.dart';
 import 'package:fujin/data/connectors/role.dart';
-import 'package:fujin/data/weigh_ins/weigh_in.dart';
 import 'package:fujin/domain/accounts/account.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/alert_pictogram.dart';
@@ -42,7 +41,7 @@ import 'package:fujin/pages/settings/widgets/appearance_row.dart';
 import 'package:fujin/pages/settings/widgets/role_row.dart';
 import 'package:fujin/pages/settings/widgets/settings_row.dart';
 import 'package:fujin/pages/settings/widgets/settings_switch_row.dart';
-import 'package:fujin/pages/weigh_ins/weigh_in_text.dart';
+import 'package:fujin/pages/weigh_ins/live_weigh_in.dart';
 import 'package:fujin/pages/weigh_ins/weigh_ins_notifier.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -65,15 +64,7 @@ class SettingsPage extends HookConsumerWidget {
     final memory = ref.watch(memoryProvider);
     final today = ref.watch(todayProvider);
     final current = ref.watch(goalsProvider).periodOn(today);
-    final weighedToday = [
-      for (final logged in ref.watch(weighInsProvider))
-        if (logged.weighIn case WeighIn(
-          deletedAt: null,
-          :final date,
-          :final kilograms,
-        ) when date == today)
-          kilograms,
-    ].firstOrNull;
+    final weighedToday = ref.watch(weighInsProvider).liveOn(today)?.kilograms;
     final colors = context.colors;
     final automaticMode = ref.watch(automaticModeProvider);
     final appearance = ref.watch(appearanceProvider);
@@ -292,10 +283,7 @@ class SettingsPage extends HookConsumerWidget {
                           title: switch (weighedToday) {
                             final kilograms? =>
                               context.intl.settingsWeighInToday(
-                                WeighInText.kilograms(
-                                  context.intl,
-                                  kilograms,
-                                ),
+                                context.intl.weighInKilograms(kilograms),
                               ),
                             null => context.intl.settingsWeighInNone,
                           },

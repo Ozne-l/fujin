@@ -19,7 +19,6 @@ import 'package:fujin/pages/journal/selected_day.dart';
 
 abstract final class JournalSnackBar {
   static const undoWindow = Duration(seconds: 8);
-  static const _settledDuration = Duration(seconds: 4);
 
   static void added(
     BuildContext context,
@@ -56,7 +55,7 @@ abstract final class JournalSnackBar {
       ),
     };
     ScaffoldMessenger.of(context).showNotice(
-      duration: _settledDuration,
+      duration: FujinSnackBar.settledDuration,
       SnackBarContent(glyph: glyph, title: title, detail: detail),
     );
   }
@@ -164,7 +163,7 @@ abstract final class JournalSnackBar {
           title: intl.replacedTitle,
           detail: detail,
         ),
-        _settledDuration,
+        FujinSnackBar.settledDuration,
       ),
       null => null,
     };

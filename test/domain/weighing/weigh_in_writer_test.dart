@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:checks/checks.dart';
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter_test/flutter_test.dart'
@@ -7,6 +9,7 @@ import 'package:fujin/data/database/fujin_table.dart';
 import 'package:fujin/data/http/read_only_http_client.dart';
 import 'package:fujin/data/milestones/milestone.dart';
 import 'package:fujin/data/milestones/milestone_repository.dart';
+import 'package:fujin/data/weigh_ins/logged_weigh_in.dart';
 import 'package:fujin/data/weigh_ins/weigh_in_repository.dart';
 import 'package:fujin/domain/weighing/weigh_in_failure.dart';
 import 'package:fujin/domain/weighing/weigh_in_import.dart';
@@ -36,13 +39,18 @@ final class _Weighing {
   }
 
   Future<void> remove(DateTime date) async {
-    final logged = weighIns.history().where((logged) {
+    final logged = _live(weighIns).where((logged) {
       return logged.weighIn.date == date;
     }).single;
     weighIns.remove(logged.weighIn.id);
     await writer.run();
   }
 }
+
+List<LoggedWeighIn> _live(WeighInRepository weighIns) => [
+  for (final logged in weighIns.listed())
+    if (logged.weighIn.deletedAt == null) logged,
+];
 
 MfpMeasurement _measurement(String id, double value, {DateTime? date}) =>
     MfpMeasurement(
@@ -129,7 +137,7 @@ void main() {
       await weighing.writer.run();
 
       check([
-        for (final logged in weighing.weighIns.history())
+        for (final logged in _live(weighing.weighIns))
           (logged.weighIn.kilograms, logged.ekkloLink?.kilograms),
       ]).deepEquals([(69.1, 69.1), (69.4, 69.4)]);
       check([
@@ -158,8 +166,7 @@ void main() {
       await weighing.writer.run();
 
       check([
-        for (final logged in weighing.weighIns.history())
-          logged.weighIn.kilograms,
+        for (final logged in _live(weighing.weighIns)) logged.weighIn.kilograms,
       ]).deepEquals([68.9]);
     });
 
@@ -173,7 +180,7 @@ void main() {
       backends.ekkloReachable = true;
       await weighing.writer.run();
 
-      check(weighing.weighIns.history()).length.equals(1);
+      check(_live(weighing.weighIns)).length.equals(1);
     });
   });
 
@@ -185,7 +192,7 @@ void main() {
       weighing.service.save(date: day, kilograms: 68.94);
       await weighing.writer.run();
 
-      final logged = weighing.weighIns.history().single;
+      final logged = _live(weighing.weighIns).single;
       check(logged.weighIn.kilograms).equals(68.9);
       check(logged.ekkloLink?.kilograms).equals(68.9);
       check(logged.mfpLink?.measurementId).equals(
@@ -205,7 +212,7 @@ void main() {
       await weighing.save(day, 68.9);
 
       check(
-        weighing.weighIns.history().single.mfpLink?.measurementId,
+        _live(weighing.weighIns).single.mfpLink?.measurementId,
       ).equals('101');
       check(writes()).not((it) => it.contains('POST $_measurements'));
     });
@@ -226,7 +233,7 @@ void main() {
           (measurement.id, measurement.value),
       ]).deepEquals([
         ('103', 69),
-        (weighing.weighIns.history().single.mfpLink?.measurementId ?? '', 68.9),
+        (_live(weighing.weighIns).single.mfpLink?.measurementId ?? '', 68.9),
       ]);
     });
 
@@ -237,7 +244,7 @@ void main() {
 
       await weighing.save(day, 69.3);
 
-      final logged = weighing.weighIns.history().single;
+      final logged = _live(weighing.weighIns).single;
       check(backends.mfpMeasurements.single)
         ..has((it) => it.value, 'value').equals(69.3)
         ..has((it) => it.id, 'id').not((it) => it.equals(first));
@@ -262,6 +269,23 @@ void main() {
       check(weighing.weighIns.pending()).isEmpty();
     });
 
+    test('keeps its MyFitnessPal link when the deletion fails for another '
+        'reason than a missing weight', () async {
+      final weighing = await started();
+      await weighing.save(day, 68.9);
+      backends.mfpMeasurementWritesFail = true;
+
+      await weighing.remove(day);
+
+      check(
+        weighing.writer.state.failures,
+      ).single.isA<MfpWeightNotWritten>();
+      check(
+        weighing.weighIns.pending(),
+      ).single.has((logged) => logged.mfpLink, 'mfpLink').isNotNull();
+      check(backends.mfpMeasurements).length.equals(1);
+    });
+
     test('is unlinked when its MyFitnessPal weight is already gone', () async {
       final weighing = await started();
       await weighing.save(day, 68.9);
@@ -277,13 +301,13 @@ void main() {
         'new one', () async {
       final weighing = await started();
       await weighing.save(day, 68.9);
-      weighing.weighIns.remove(weighing.weighIns.history().single.weighIn.id);
+      weighing.weighIns.remove(_live(weighing.weighIns).single.weighIn.id);
 
       await weighing.save(day, 68.9);
 
       check(backends.mfpMeasurements).length.equals(1);
       check(
-        weighing.weighIns.history().single.mfpLink?.measurementId,
+        _live(weighing.weighIns).single.mfpLink?.measurementId,
       ).equals(backends.mfpMeasurements.single.id);
       check(weighing.weighIns.pending()).length.equals(1);
     });
@@ -328,7 +352,7 @@ void main() {
 
       check(weighing.writer.state.failures).isEmpty();
       check(
-        weighing.weighIns.history().single.ekkloLink?.kilograms,
+        _live(weighing.weighIns).single.ekkloLink?.kilograms,
       ).equals(68.9);
     });
 
@@ -346,7 +370,7 @@ void main() {
 
       await weighing.save(day, 68.9);
 
-      check(weighing.weighIns.history()).length.equals(2);
+      check(_live(weighing.weighIns)).length.equals(2);
       check({
         for (final failure in weighing.writer.state.failures) failure.connector,
       }).length.equals(2);
@@ -354,4 +378,125 @@ void main() {
       check(backends.ekkloWeights).length.equals(1);
     });
   });
+
+  group('a run', () {
+    test('reads each weigh-in again before writing it: one deleted meanwhile '
+        'reaches neither app, one corrected meanwhile is written with its '
+        'new value only', () async {
+      late _Weighing weighing;
+      weighing = await started(
+        client: _Stepping(backends.httpClient, (request) async {
+          if (request case http.Request(
+            method: 'POST',
+            url: Uri(path: _ekkloWeights),
+          ) when backends.ekkloWeights.isEmpty) {
+            final removed = _live(
+              weighing.weighIns,
+            ).singleWhere((logged) => logged.weighIn.date == day);
+            weighing.weighIns
+              ..remove(removed.weighIn.id)
+              ..save(date: dayAfter, kilograms: 68.2);
+          }
+          return null;
+        }),
+      );
+      weighing.weighIns
+        ..save(date: dayBefore, kilograms: 69.4)
+        ..save(date: day, kilograms: 68.9)
+        ..save(date: dayAfter, kilograms: 68.5);
+
+      await weighing.writer.run();
+
+      check([
+        for (final weight in backends.ekkloWeights) weight.kilograms,
+      ]).unorderedEquals([69.4, 68.2]);
+      check([
+        for (final measurement in backends.mfpMeasurements) measurement.value,
+      ]).unorderedEquals([69.4, 68.2]);
+      check(writes().where((write) => write.startsWith('DELETE'))).isEmpty();
+      check(weighing.writer.state.failures).isEmpty();
+    });
+
+    test('asked while one is running runs once more and writes what was '
+        'saved meanwhile', () async {
+      final held = _HeldEkkloWeight(backends.httpClient);
+      final weighing = await started(client: held);
+      weighing.weighIns.save(date: day, kilograms: 68.9);
+
+      final first = weighing.writer.run();
+      await held.reached.future;
+      weighing.weighIns.save(date: dayAfter, kilograms: 68.5);
+      final second = weighing.writer.run();
+      held.gate.complete();
+      await Future.wait([first, second]);
+
+      check(backends.ekkloWeights).length.equals(2);
+      check(backends.mfpMeasurements).length.equals(2);
+    });
+
+    test('stops writing a day to MyFitnessPal after ten reads that still '
+        'hold another weight', () async {
+      backends.mfpMeasurements = [_measurement('101', 70)];
+      final weighing = await started(
+        client: _Stepping(
+          backends.httpClient,
+          (request) async => switch (request) {
+            http.Request(method: 'DELETE') => http.StreamedResponse(
+              const Stream.empty(),
+              204,
+            ),
+            _ => null,
+          },
+        ),
+      );
+
+      await weighing.save(day, 68.9);
+
+      check(weighing.writer.state.failures).single
+          .isA<MfpWeightNotWritten>()
+          .has((failure) => failure.error, 'error')
+          .isA<StateError>();
+      check(
+        backends.requests.where(
+          (request) =>
+              request.method == 'GET' && request.url.path == _measurements,
+        ),
+      ).length.equals(10);
+      check(
+        _live(weighing.weighIns).single.ekkloLink?.kilograms,
+      ).equals(68.9);
+    });
+  });
+}
+
+final class _Stepping extends http.BaseClient {
+  _Stepping(this._inner, this._step);
+
+  final http.Client _inner;
+  final Future<http.StreamedResponse?> Function(http.BaseRequest request) _step;
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async =>
+      await _step(request) ?? await _inner.send(request);
+}
+
+final class _HeldEkkloWeight extends http.BaseClient {
+  _HeldEkkloWeight(this._inner);
+
+  final http.Client _inner;
+  final reached = Completer<void>();
+  final gate = Completer<void>();
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    if ((request.method, request.url.path, reached.isCompleted) case (
+      'POST',
+      _ekkloWeights,
+      false,
+    )) {
+      reached.complete();
+      await gate.future;
+    }
+    return _inner.send(request);
+  }
 }
