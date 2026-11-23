@@ -1,13 +1,10 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
-import 'package:fujin/pages/common/day_picker_sheet.dart';
+import 'package:fujin/pages/common/day_picker_button.dart';
 import 'package:fujin/pages/common/fujin_menu.dart';
 import 'package:fujin/pages/common/fujin_menu_button.dart';
-import 'package:fujin/pages/common/sheet_frame.dart';
 import 'package:fujin/pages/common/title_text.dart';
 
 class MealDateRow extends StatelessWidget {
@@ -23,9 +20,7 @@ class MealDateRow extends StatelessWidget {
 
   static const _pickerSpan = Duration(days: 365);
   static const _bookIcon = 'assets/icons/book.svg';
-  static const _padding = EdgeInsetsDirectional.symmetric(
-    horizontal: FujinSpace.s4,
-  );
+  static const EdgeInsetsDirectional _padding = DayPickerButton.padding;
 
   final String meal;
   final List<String> meals;
@@ -50,62 +45,39 @@ class MealDateRow extends StatelessWidget {
               labelOf: (name) => name,
               onSelected: onMeal,
               itemPadding: _padding,
-              builder: (context, {required expanded, required toggle}) => _pill(
-                label: meal,
-                expanded: expanded,
-                onTap: toggle,
-                leading: SvgPicture.asset(
-                  _bookIcon,
-                  width: FujinSize.mealArrow,
-                  height: FujinSize.mealArrow,
-                  theme: SvgTheme(
-                    currentColor: context.colors.textPrimary,
+              builder: (context, {required expanded, required toggle}) =>
+                  FujinMenuButton(
+                    label: meal,
+                    expanded: expanded,
+                    onTap: toggle,
+                    height: FujinSize.buttonMedium,
+                    radius: FujinRadius.pill,
+                    padding: _padding,
+                    chevronSize: FujinSize.mealArrow,
+                    leading: SvgPicture.asset(
+                      _bookIcon,
+                      width: FujinSize.mealArrow,
+                      height: FujinSize.mealArrow,
+                      theme: SvgTheme(
+                        currentColor: context.colors.textPrimary,
+                      ),
+                      excludeFromSemantics: true,
+                    ),
                   ),
-                  excludeFromSemantics: true,
-                ),
-              ),
             ),
           ),
           Expanded(
-            child: _pill(
+            child: DayPickerButton(
               label: TitleText.capitalized(context.intl.addMealDate(date)),
-              expanded: false,
-              onTap: () => unawaited(
-                SheetFrame.show(
-                  context,
-                  builder: (context) => DayPickerSheet(
-                    selected: date,
-                    first: date.subtract(_pickerSpan),
-                    last: lastDay ?? date.add(_pickerSpan),
-                    onPicked: onDate,
-                  ),
-                ),
-              ),
-              leading: Icon(
-                Icons.calendar_today_outlined,
-                size: FujinSize.mealArrow,
-                color: context.colors.textPrimary,
-              ),
+              selected: date,
+              first: date.subtract(_pickerSpan),
+              last: lastDay ?? date.add(_pickerSpan),
+              onPicked: onDate,
+              iconColor: context.colors.textPrimary,
             ),
           ),
         ],
       ),
     );
   }
-
-  static Widget _pill({
-    required String label,
-    required bool expanded,
-    required VoidCallback onTap,
-    required Widget leading,
-  }) => FujinMenuButton(
-    label: label,
-    expanded: expanded,
-    onTap: onTap,
-    height: FujinSize.buttonMedium,
-    radius: FujinRadius.pill,
-    padding: _padding,
-    chevronSize: FujinSize.mealArrow,
-    leading: leading,
-  );
 }

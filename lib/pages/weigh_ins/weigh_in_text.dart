@@ -7,9 +7,6 @@ abstract final class WeighInText {
   static const _today = 0;
   static const _yesterday = 1;
 
-  static String kilograms(AppLocalizations intl, double kilograms) =>
-      intl.weighInKilograms(kilograms);
-
   static String day(
     AppLocalizations intl,
     DateTime date, {
@@ -38,7 +35,7 @@ abstract final class WeighInText {
     WeighIn weighIn, {
     required DateTime today,
   }) => intl.weighInSavedDetail(
-    kilograms(intl, weighIn.kilograms),
+    intl.weighInKilograms(weighIn.kilograms),
     dayWord(intl, weighIn.date, today: today),
   );
 

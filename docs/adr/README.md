@@ -26,7 +26,7 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0020](0020-goals.md) | Goals: one row in Fūjin's SQLite | Accepted (dated goals by 0052) |
 | [0021](0021-backup-file.md) | Backup file: fujin-backup v1 behind the BackupFiles seam | Accepted (version 2 by 0027; version 4 by 0044; version 5 by 0052; version 6 by 0055) |
 | [0022](0022-journal-states-and-goal-rings.md) | Journal states and goal rings | Accepted (band reads held and neighbour weeks prefetched by 0029; MyFitnessPal foods shown with Ekklo missing and offline by 0030) |
-| [0023](0023-ui-flags-in-shared-preferences.md) | UI flags in shared preferences | Accepted (settings and `FujinPreferences.open` added by 0025; connector roles kept there by 0044) |
+| [0023](0023-ui-flags-in-shared-preferences.md) | UI flags in shared preferences | Accepted (settings and `FujinPreferences.open` added by 0025; connector roles kept there by 0044; milestones added by 0055) |
 | [0024](0024-splash-from-the-first-frame.md) | Splash from the first frame | Accepted |
 | [0025](0025-automatic-mode.md) | Automatic mode: unattended items instead of Memory, a setting in shared preferences | Accepted (unattended items kept on the Ekklo link, and in the backup file, by 0044) |
 | [0026](0026-adding-a-food.md) | Adding a food: one draft, the send flow's Ekklo half, undo | Accepted (scanner and 02d built by 0027; remembered foods added to the search, and "Ajouter" to screen 19, by 0034; undo moved to `RemoveEntryService` by 0043, then to `EditEntryService.remove` by 0053; fiche closing at once by 0044) |

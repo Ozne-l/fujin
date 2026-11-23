@@ -19,9 +19,6 @@ final class WeighInRepository {
   final FujinDatabase<FujinTable> _database;
   final DateTime Function() _clock;
 
-  List<LoggedWeighIn> history() =>
-      _logged('deleted_at IS NULL', const [], order: 'date DESC');
-
   LoggedWeighIn? find(String weighInId) =>
       switch (_logged('id = ?', [weighInId], order: _id)) {
         [final logged] => logged,
@@ -140,10 +137,7 @@ final class WeighInRepository {
     required List<EkkloWeighInLink> ekkloLinks,
     required List<MfpWeighInLink> mfpLinks,
   }) => _database.transaction(() {
-    _database
-      ..execute('DELETE FROM mfp_weigh_in_link')
-      ..execute('DELETE FROM ekklo_weigh_in_link')
-      ..execute('DELETE FROM weigh_in');
+    _database.execute('DELETE FROM weigh_in');
     for (final weighIn in weighIns) {
       _database.insert(FujinTable.weighIn, weighIn.toMap());
     }

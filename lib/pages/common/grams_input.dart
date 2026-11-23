@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:fujin/pages/common/locale_numbers.dart';
 import 'package:intl/intl.dart';
 
 abstract final class GramsInput {
@@ -16,7 +17,7 @@ abstract final class GramsInput {
   }
 
   static NumberFormat _numbers(BuildContext context) =>
-      NumberFormat.decimalPattern(Localizations.localeOf(context).toString())
+      LocaleNumbers.decimal(context)
         ..maximumFractionDigits = _decimals
         ..turnOffGrouping();
 }

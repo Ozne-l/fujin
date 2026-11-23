@@ -20,6 +20,7 @@ final class KilogramsTyping {
   final String text;
 
   KilogramsTyping pressed(int digit) => switch (text.split(separator)) {
+    [_zero] => this,
     [final whole] when whole.length >= _wholeDigits => this,
     [_, final decimals] when decimals.length >= _decimals => this,
     _ => _typed('$text$digit'),

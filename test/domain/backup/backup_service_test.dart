@@ -591,5 +591,34 @@ void main() {
       check(links.all()).deepEquals([link('E-3', 'I-3')]);
       check(goals.periods()).deepEquals(_periods);
     });
+
+    test('a version 6 file with two live weigh-ins on one day and keeps the '
+        'weigh-ins there', () async {
+      final file = switch (await exported()) {
+        final BackupV6 backup => backup,
+        _ => throw StateError('export is not version 6'),
+      };
+      final kept = file.weighIns.firstWhere(
+        (weighIn) => weighIn.deletedAt == null,
+      );
+      final broken = file.copyWith(
+        weighIns: [
+          ...file.weighIns,
+          kept.copyWith(id: 'w-twin'),
+        ],
+      );
+      weighIns.save(date: day.add(const Duration(days: 1)), kilograms: 70.4);
+      final weighInsBefore = weighIns.weighIns();
+      final ekkloLinksBefore = weighIns.ekkloLinks();
+      final mfpLinksBefore = weighIns.mfpLinks();
+      final entriesBefore = entries.entries();
+
+      check(() => backups.restore(broken)).throws<Exception>();
+
+      check(weighIns.weighIns()).deepEquals(weighInsBefore);
+      check(weighIns.ekkloLinks()).deepEquals(ekkloLinksBefore);
+      check(weighIns.mfpLinks()).deepEquals(mfpLinksBefore);
+      check(entries.entries()).deepEquals(entriesBefore);
+    });
   });
 }

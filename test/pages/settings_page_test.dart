@@ -11,6 +11,7 @@ import 'package:fujin/data/connectors/role.dart';
 import 'package:fujin/data/goals/goal_period.dart';
 import 'package:fujin/data/goals/goals.dart';
 import 'package:fujin/data/preferences/fujin_preferences.dart';
+import 'package:fujin/data/weigh_ins/weigh_in.dart';
 import 'package:fujin/pages/common/fujin_switch.dart';
 import 'package:fujin/pages/common/switch_lens.dart';
 import 'package:fujin/pages/settings/widgets/role_row.dart';
@@ -485,6 +486,47 @@ void main() {
     check(_count('Sauvegarde importée')).equals(1);
     check(_count('1 aliment et 1 repas')).equals(1);
     check(_count('2${_space}500 kcal')).equals(1);
+  });
+
+  testWidgets('shows the weigh-in of a version 6 backup on the POIDS card '
+      'once imported, and writes it to both apps', (tester) async {
+    final backends = FakeBackends(mealNames: [breakfast]);
+    final files = FakeBackupFiles()
+      ..picked = utf8.encode(
+        BackupV6(
+          exportedAt: DateTime(day.year, day.month, day.day, 12),
+          links: const [],
+          foods: const [],
+          foodServings: const [],
+          foodUnits: const [],
+          foodReferences: const [],
+          barcodeLinks: const [],
+          meals: const [],
+          mealMappings: const [],
+          entries: const [],
+          mfpLinks: const [],
+          ekkloLinks: const [],
+          weighIns: [
+            WeighIn(id: 'w-1', date: day, kilograms: 68.9, updatedAt: now),
+          ],
+          ekkloWeighInLinks: const [],
+          mfpWeighInLinks: const [],
+        ).toJson(),
+      );
+    await pumpFujin(tester, backends, backupFiles: files);
+    await _tap(tester, 'Réglages');
+    check(_count('Pas encore de pesée aujourd’hui')).equals(1);
+
+    await _tap(tester, 'Importer une sauvegarde');
+    await _tap(tester, 'Importer et remplacer');
+
+    check(_count('Aujourd’hui · 68,9 kg')).equals(1);
+    check([
+      for (final measurement in backends.mfpMeasurements) measurement.value,
+    ]).deepEquals([68.9]);
+    check([
+      for (final weight in backends.ekkloWeights) weight.kilograms,
+    ]).deepEquals([68.9]);
   });
 
   testWidgets('refuses an unreadable file and changes nothing', (

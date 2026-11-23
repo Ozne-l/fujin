@@ -4,13 +4,13 @@ Date: 2026-11-22
 
 ## Status
 
-Accepted; built. The client resources (`client.measurements` in `ekklo_client` and `myfitnesspal_client`), the tables, the import, the writer, backup version 6 and the screens W01 to W06 (Figma "Expérience 7 · Poids (ADR 0052)" in the file "App") are built; the curve is left for later.
+Accepted; built. The client resources (`client.measurements` in `ekklo_client` and `myfitnesspal_client`), the tables, the import, the writer, backup version 6 and the screens W01 to W06 (Figma "Expérience 7 · Poids (ADR 0052)" in the file "App", named while this record was still numbered 52) are built; the curve is left for later. Adds backup file version 6 to [0021](0021-backup-file.md) and the milestones to the shared preferences of [0023](0023-ui-flags-in-shared-preferences.md).
 
 ## Context
 
 The owner weighs himself and logs the value in the Ekklo app (86 entries from 2026-02-02 to 2026-11-22 on 2026-11-22), and wants Fūjin to keep his body weight and write it to both apps, as it does for food ([0044](0044-connector-model.md)). Entry is by hand; no scale, no Health Connect for now. Coach-assigned measurements (Ekklo "Mensurations"), weight goals and units other than kilograms are out of scope.
 
-What each app exposes was read statically (Ekklo 2.2.0 Hermes bundle, MyFitnessPal 26.39.0 APK and website bundle; `doc/measurements.md` in each client package), then checked by two probes the owner ran on 2026-11-22 (`~/Dev/bridge_poc/bin/ekklo_weight_probe.dart`, `mfp_weight_probe.dart`):
+What each app exposes was read statically (Ekklo 2.2.0 Hermes bundle, MyFitnessPal 26.39.0 APK and website bundle; notes kept on the owner's machine, untracked, in `doc/measurements.md` of each client package), then checked by two probes the owner ran on 2026-11-22 (`~/Dev/bridge_poc/bin/ekklo_weight_probe.dart`, `mfp_weight_probe.dart`):
 
 - Ekklo, `/api/v1/nutritions/weight-tracking`: `GET /all` returns every entry as a bare list (`id`, `date` at midnight UTC, `weight` in kilograms, `note`, `created_at`, `updated_at`); 6 of the 80 days held more than one entry. `GET ?date=` returns one entry, `{}` for a day with none. `POST {date, weight}` replaces the day's entry: two posts left one row, `updated_at` moved. There is no update or delete.
 - MyFitnessPal, `/v2/measurements` with the bearer token the client already holds: `POST` creates a measurement and returns it with its id (a numeric string); `GET ?entry_date=&types=weight` returns only the first weight saved that day, so a second `POST` stays hidden; `DELETE /{id}` removes one. The website's own routes (`PUT /api/services/incubator/measurements/upsert`, range reads, delete), called with the session cookies, also work and replace in place; a weight written there showed in the MyFitnessPal app, and `/v2` and the website see each other's rows.
@@ -29,13 +29,13 @@ Import, once:
 - The imported weigh-ins have no MyFitnessPal link, so the weigh-in writer writes the whole history to MyFitnessPal, oldest day first, by the rule below.
 - Neither the import nor that first write has a screen of its own: no message when the import ends, no progress while MyFitnessPal is written. The Poids page shows each waiting weigh-in with its MyFitnessPal pill, as for any other write. A script copying Ekklo's history to MyFitnessPal before Fūjin's first run was considered and dropped: it would only save the phone those requests, at the cost of a second copy of the MyFitnessPal write rule.
 
-Writes, by a weigh-in writer of their own beside the food's background writer, started by each Journal read that reached either app and after each save or deletion: one weigh-in at a time, oldest day first, a deletion before a new weigh-in of the same day. The two apps are independent: either may fail alone, and its first failure stops that app for the rest of the run, since a session, network or Fūjin DEV refusal would fail every following write too. The failures are kept in the writer's state for the screens, with "Réessayer":
+Writes, by a weigh-in writer of their own beside the food's background writer, started by each Journal read that reached either app and after each save or deletion: one weigh-in at a time, oldest day first, a deletion before a new weigh-in of the same day. The two apps are independent: either may fail alone, and its first failure stops that app for the rest of the run, since a session, network or Fūjin DEV refusal would fail every following write too. Each write reads its weigh-in again just before it is sent, so a weigh-in deleted or corrected while the run is under way is written as it now stands, or not at all. A run asked for while one is going runs once more when it ends (`SingleFlight`, `lib/domain/writing/single_flight.dart`, shared with the background writer). The failures are kept in the writer's state for the screens, with "Réessayer":
 
 - Ekklo: `POST {date, weight}`, which replaces the day's entry; the link then takes the values written. A deletion in Fūjin is not written: Ekklo cannot delete, so the weight stays there and the screen says so.
-- MyFitnessPal, through `/v2/measurements` rather than the website's routes, which are undocumented and could change without notice: read the day first. A weight equal to the weigh-in's (within 0.05 kg) is adopted, the link taking its id. Any other weight, written by Fūjin or not, is deleted, and the day read again until it holds none, since a deletion can reveal the next hidden weight; then the weigh-in is posted and the link takes the new id. A deletion in Fūjin deletes the linked measurement (a 404 means it is already gone), then the link is soft-deleted.
+- MyFitnessPal, through `/v2/measurements` rather than the website's routes, which are undocumented and could change without notice: read the day first. A weight equal to the weigh-in's (within 0.05 kg) is adopted, the link taking its id. Any other weight, written by Fūjin or not, is deleted, and the day read again until it holds none, since a deletion can reveal the next hidden weight, at most 10 reads a day, after which the write fails for this run; then the weigh-in is posted and the link takes the new id. A deletion in Fūjin deletes the linked measurement (a 404 means it is already gone), then the link is soft-deleted.
 - Values are rounded to 0.1 kg before they are stored or sent.
 
-Backup file version 6 adds the weigh-ins and their links, which its import replaces; versions 1 to 5 still import and leave the weigh-ins as they are, since they do not describe them and the import from Ekklo would not run again to refill them ([0021](0021-backup-file.md); version 5 is [0052](0052-dated-goals.md)'s dated goals).
+Backup file version 6 adds the weigh-ins and their links, which its import replaces; versions 1 to 5 still import and leave the weigh-ins as they are, since they do not describe them and the import from Ekklo would not run again to refill them ([0021](0021-backup-file.md); version 5 is [0052](0052-dated-goals.md)'s dated goals). After an import, `BackupNotifier` also invalidates `weighInsProvider` and runs the weigh-in writer, so the POIDS card and the Poids page show the file's weigh-ins and the apps receive what they owe.
 
 Screens, in French app copy, the feature named "Poids" and one weigh-in "Pesée":
 
@@ -49,9 +49,9 @@ Screens, in French app copy, the feature named "Poids" and one weigh-in "Pesée"
 ## Consequences
 
 - Fūjin holds the weight history from Ekklo's first entry, and both apps follow Fūjin's values from then on.
-- The first run after the import writes about 80 weigh-ins to MyFitnessPal, three requests each at most, and replaces any MyFitnessPal weight of those days that differs from Ekklo's: a weight logged in the MyFitnessPal app on such a day is lost, on purpose.
+- The first run after the import writes about 80 weigh-ins to MyFitnessPal, two requests for a day without a weight (a read and a creation), four for a day holding another one (a read, a deletion, a second read and a creation), two more for each hidden weight, and replaces any MyFitnessPal weight of those days that differs from Ekklo's: a weight logged in the MyFitnessPal app on such a day is lost, on purpose.
 - A weight logged in the Ekklo or MyFitnessPal app after the import never reaches Fūjin, and the next write of that day replaces it in both.
 - A weigh-in deleted in Fūjin stays in Ekklo.
-- A correction costs MyFitnessPal a read, a deletion and a creation: the measurement gets a new id each time.
+- A correction costs MyFitnessPal four requests, a read, a deletion, a second read and a creation: the measurement gets a new id each time.
 - The import and the first write run unannounced: until MyFitnessPal has the history, the Poids page shows a MyFitnessPal pill on each waiting day, the most recent days last.
 - A weigh-in saved by mistake cannot be undone from the snackbar; deleting it from its row leaves it in Ekklo.

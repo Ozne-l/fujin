@@ -23,15 +23,16 @@ class CodeKeypad extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget digit(int value) => _Key(
-      onTap: () => onDigit(value),
+    Widget textKey(String text, VoidCallback onTap) => _Key(
+      onTap: onTap,
       child: Text(
-        '$value',
+        text,
         style: FujinText.inter22Regular.copyWith(
           color: context.colors.textPrimary,
         ),
       ),
     );
+    Widget digit(int value) => textKey('$value', () => onDigit(value));
     return ColoredBox(
       color: context.colors.borderCard,
       child: SafeArea(
@@ -54,15 +55,7 @@ class CodeKeypad extends StatelessWidget {
                 children: [
                   switch (separator) {
                     (final label, final onTap) => Expanded(
-                      child: _Key(
-                        onTap: onTap,
-                        child: Text(
-                          label,
-                          style: FujinText.inter22Regular.copyWith(
-                            color: context.colors.textPrimary,
-                          ),
-                        ),
-                      ),
+                      child: textKey(label, onTap),
                     ),
                     null => const Spacer(),
                   },
