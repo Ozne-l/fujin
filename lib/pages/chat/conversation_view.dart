@@ -4,6 +4,7 @@ import 'package:fujin/domain/chat/chat_link.dart';
 import 'package:fujin/domain/chat/conversation_state.dart';
 import 'package:fujin/domain/chat/pending_text_state.dart';
 import 'package:fujin/domain/chat/upload/message_upload.dart';
+import 'package:fujin/domain/chat/upload/posted_message.dart';
 import 'package:fujin/pages/chat/chat_text.dart';
 import 'package:fujin/pages/chat/message_delivery.dart';
 import 'package:fujin/pages/chat/thread_item.dart';
@@ -30,6 +31,13 @@ final class ConversationView with ConversationViewMappable {
     List<MessageUpload> uploads = const [],
   }) {
     final byId = {for (final message in state.messages) message.id: message};
+    final postedFrom = {
+      ...state.postedFrom,
+      for (final upload in uploads)
+        if (postedMessage(state.messages, upload.publicUrls)
+            case final message?)
+          message.id: upload.id,
+    };
     final seenId = state.messages
         .where((message) => state.isMine(message) && message.readByOther)
         .lastOrNull
@@ -75,6 +83,7 @@ final class ConversationView with ConversationViewMappable {
           quotesMine: message.replyTo?.senderId == state.ownerId,
           delivery: delivery,
           seen: message.id == seenId,
+          postedFrom: postedFrom[message.id],
         ),
       );
     }

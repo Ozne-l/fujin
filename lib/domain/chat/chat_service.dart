@@ -48,6 +48,7 @@ final class ChatService {
   final _pending = <String, List<PendingText>>{};
   final _claimed = <String>{};
   final _deleting = <String>{};
+  final _postedFrom = <String, String>{};
   final _reading = <String>{};
   int _pendingCount = 0;
   EkkloUser? _owner;
@@ -301,8 +302,9 @@ final class ChatService {
     }
   }
 
-  void accept(EkkloMessage message) {
+  void accept(EkkloMessage message, {String? postedFrom}) {
     if (_disposed) return;
+    if (postedFrom != null) _postedFrom[message.id] = postedFrom;
     _chats.saveMessages([_keptRead(message)]);
     _emitConversation(message.conversationId);
   }
@@ -771,6 +773,7 @@ final class ChatService {
       protectsCapture: present?.protectsCapture(conversationId) ?? false,
       pendingTexts: [...?_pending[conversationId]],
       deleting: {..._deleting},
+      postedFrom: {..._postedFrom},
     );
   }
 

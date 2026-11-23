@@ -19,6 +19,7 @@ final class ConversationState with ConversationStateMappable {
     required this.protectsCapture,
     this.pendingTexts = const [],
     this.deleting = const {},
+    this.postedFrom = const {},
   });
 
   final String conversationId;
@@ -32,6 +33,7 @@ final class ConversationState with ConversationStateMappable {
   final bool protectsCapture;
   final List<PendingText> pendingTexts;
   final Set<String> deleting;
+  final Map<String, String> postedFrom;
 
   bool get canSend => conversation?.canSend ?? false;
 

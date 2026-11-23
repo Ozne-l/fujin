@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart' show test;
 import 'package:fujin/data/dev_chat/fake_chat.dart';
 import 'package:fujin/domain/chat/chat_link.dart';
 import 'package:fujin/domain/chat/conversation_state.dart';
+import 'package:fujin/domain/chat/upload/message_upload.dart';
+import 'package:fujin/domain/chat/upload/upload_phase.dart';
 import 'package:fujin/pages/chat/conversation_view.dart';
 import 'package:fujin/pages/chat/thread_item.dart';
 
@@ -127,6 +129,45 @@ void main() {
     check(view.isMine(mine)).isTrue();
     check(view.isMine(coach)).isFalse();
   });
+
+  test('my posted message names the upload whose files it carries', () {
+    MessageUpload upload(String id, String url) => MessageUpload(
+      id: id,
+      conversationId: FakeChat.conversationId,
+      startedAt: DateTime(2026, 10, 7, 8),
+      phase: const UploadSending(percent: 100),
+      media: const [],
+      publicUrls: [url],
+    );
+    final posted = EkkloMessageMapper.fromMap(
+      FakeChat.message(
+        id: 'posted',
+        createdAt: DateTime(2026, 10, 7, 8, 1),
+        senderId: FakeChat.ownerId,
+        type: 'voice',
+        mediaUrls: ['https://cdn.test/second.m4a'],
+      ),
+    );
+    final accepted = _message(
+      'accepted',
+      DateTime(2026, 10, 7, 8, 2),
+      senderId: FakeChat.ownerId,
+    );
+
+    final view = ConversationView.of(
+      _state([
+        posted,
+        accepted,
+      ]).copyWith(postedFrom: {'accepted': 'third'}),
+      uploads: [
+        upload('first', 'https://cdn.test/first.m4a'),
+        upload('second', 'https://cdn.test/second.m4a'),
+      ],
+    );
+
+    check(view.postedFromOf('posted')).equals('second');
+    check(view.postedFromOf('accepted')).equals('third');
+  });
 }
 
 extension on ConversationView {
@@ -134,5 +175,14 @@ extension on ConversationView {
     for (final item in newestFirst)
       if (item case ThreadMessage(:final message) when message.id == id)
         message,
+  ].single;
+
+  String? postedFromOf(String id) => [
+    for (final item in newestFirst)
+      if (item case ThreadMessage(
+        :final message,
+        :final postedFrom,
+      ) when message.id == id)
+        postedFrom,
   ].single;
 }

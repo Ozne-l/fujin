@@ -61,7 +61,8 @@ final class ChatUploadService {
   final UploadNotifications _notifications;
   final UploadFolder _folder;
   final String? _cachePath;
-  final void Function(EkkloMessage message) _accept;
+  final void Function(EkkloMessage message, {required String postedFrom})
+  _accept;
   final DateTime Function() _clock;
 
   final _watchers = <String, Set<StreamController<List<MessageUpload>>>>{};
@@ -451,7 +452,7 @@ final class ChatUploadService {
       return;
     }
     if (_disposed) return;
-    _accept(sent);
+    _accept(sent, postedFrom: message.id);
     await _notifications.cancel(message.id);
     _forget(message.id);
     _messages.delete(message.id);
@@ -616,6 +617,7 @@ final class ChatUploadService {
       caption: message.caption ?? '',
       replyToId: message.replyToId,
       durationSeconds: message.durationSeconds,
+      publicUrls: [for (final file in files) ?file.publicUrl],
       media: media,
       phase: switch ((message.state, exporting)) {
         (MessageInProgressState.failed, _) => const UploadNotSent(),

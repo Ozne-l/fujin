@@ -69,6 +69,14 @@ class MessageUploadMapper extends ClassMapperBase<MessageUpload> {
     key: r'duration_seconds',
     opt: true,
   );
+  static List<String> _$publicUrls(MessageUpload v) => v.publicUrls;
+  static const Field<MessageUpload, List<String>> _f$publicUrls = Field(
+    'publicUrls',
+    _$publicUrls,
+    key: r'public_urls',
+    opt: true,
+    def: const [],
+  );
 
   @override
   final MappableFields<MessageUpload> fields = const {
@@ -80,6 +88,7 @@ class MessageUploadMapper extends ClassMapperBase<MessageUpload> {
     #caption: _f$caption,
     #replyToId: _f$replyToId,
     #durationSeconds: _f$durationSeconds,
+    #publicUrls: _f$publicUrls,
   };
   @override
   final bool ignoreNull = true;
@@ -94,6 +103,7 @@ class MessageUploadMapper extends ClassMapperBase<MessageUpload> {
       caption: data.dec(_f$caption),
       replyToId: data.dec(_f$replyToId),
       durationSeconds: data.dec(_f$durationSeconds),
+      publicUrls: data.dec(_f$publicUrls),
     );
   }
 
@@ -166,6 +176,7 @@ abstract class MessageUploadCopyWith<$R, $In extends MessageUpload, $Out>
     UploadingMediaCopyWith<$R, UploadingMedia, UploadingMedia>
   >
   get media;
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get publicUrls;
   $R call({
     String? id,
     String? conversationId,
@@ -175,6 +186,7 @@ abstract class MessageUploadCopyWith<$R, $In extends MessageUpload, $Out>
     String? caption,
     String? replyToId,
     int? durationSeconds,
+    List<String>? publicUrls,
   });
   MessageUploadCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -202,6 +214,13 @@ class _MessageUploadCopyWithImpl<$R, $Out>
     (v) => call(media: v),
   );
   @override
+  ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get publicUrls =>
+      ListCopyWith(
+        $value.publicUrls,
+        (v, t) => ObjectCopyWith(v, $identity, t),
+        (v) => call(publicUrls: v),
+      );
+  @override
   $R call({
     String? id,
     String? conversationId,
@@ -211,6 +230,7 @@ class _MessageUploadCopyWithImpl<$R, $Out>
     String? caption,
     Object? replyToId = $none,
     Object? durationSeconds = $none,
+    List<String>? publicUrls,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -221,6 +241,7 @@ class _MessageUploadCopyWithImpl<$R, $Out>
       if (caption != null) #caption: caption,
       if (replyToId != $none) #replyToId: replyToId,
       if (durationSeconds != $none) #durationSeconds: durationSeconds,
+      if (publicUrls != null) #publicUrls: publicUrls,
     }),
   );
   @override
@@ -233,6 +254,7 @@ class _MessageUploadCopyWithImpl<$R, $Out>
     caption: data.get(#caption, or: $value.caption),
     replyToId: data.get(#replyToId, or: $value.replyToId),
     durationSeconds: data.get(#durationSeconds, or: $value.durationSeconds),
+    publicUrls: data.get(#publicUrls, or: $value.publicUrls),
   );
 
   @override

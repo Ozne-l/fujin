@@ -97,7 +97,7 @@ final class _Upload {
       notifications: notifications,
       folder: folder,
       cachePath: null,
-      accept: accepted.add,
+      accept: (message, {required postedFrom}) => accepted.add(message),
       clock: () => now,
     );
     addTearDown(service.dispose);

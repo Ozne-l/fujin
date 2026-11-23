@@ -15,6 +15,7 @@ final class MessageUpload with MessageUploadMappable {
     this.caption = '',
     this.replyToId,
     this.durationSeconds,
+    this.publicUrls = const [],
   });
 
   final String id;
@@ -25,6 +26,7 @@ final class MessageUpload with MessageUploadMappable {
   final String caption;
   final String? replyToId;
   final int? durationSeconds;
+  final List<String> publicUrls;
 
   int? get originalBytes => media
       .map((item) => item.originalBytes)
