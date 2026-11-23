@@ -21,6 +21,7 @@ import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
 import 'package:fujin/data/recents/recent_food.dart';
 import 'package:fujin/data/recents/recent_food_repository.dart';
+import 'package:fujin/data/weigh_ins/weigh_in_repository.dart';
 import 'package:fujin/domain/backup/backup_service.dart';
 
 import '../../support/fake_backends.dart';
@@ -46,6 +47,8 @@ const _ownCopy = OwnCopy(
   mfpUnit: pot,
   mfpFoodVersion: 'v1',
 );
+const _measurementId = '101234567890123';
+final DateTime _dayBefore = day.subtract(const Duration(days: 1));
 const _oatsInRecents = 'Flocons d’avoine complète';
 final _recentOats = RecentFood(
   mfpFoodId: oats,
@@ -146,6 +149,17 @@ const _memoryOfRelease040 = Memory(
 
 Uint8List _json(Object value) => utf8.encode(jsonEncode(value));
 
+Map<String, Object?> _versionFive(Map<String, Object?> file) => {
+  ...file,
+  'version': BackupV5.goalPeriodsVersion,
+}..removeWhere((key, _) => _weighInKeys.contains(key));
+
+const _weighInKeys = {
+  'weigh_ins',
+  'ekklo_weigh_in_links',
+  'mfp_weigh_in_links',
+};
+
 BackupRepository _backupsOf(FujinDatabase<FujinTable> database) =>
     BackupRepository(
       database: database,
@@ -156,6 +170,7 @@ BackupRepository _backupsOf(FujinDatabase<FujinTable> database) =>
       recents: recentsOf(database),
       links: SentLinkRepository(database),
       goals: goalsOf(database),
+      weighIns: weighInsOf(database),
     );
 
 void main() {
@@ -165,6 +180,7 @@ void main() {
   late SentLinkRepository links;
   late EntryRepository entries;
   late GoalsRepository goals;
+  late WeighInRepository weighIns;
   late FakeBackupFiles files;
   late BackupService backups;
 
@@ -194,6 +210,15 @@ void main() {
     storeEntry(database, entry('M-2', food: rice), 'e-2');
     entries.remove('e-2');
     goals = goalsOf(database)..replaceAll(_periods);
+    weighIns = weighInsOf(database);
+    final kept = weighIns.save(date: day, kilograms: 68.9);
+    weighIns
+      ..linkEkklo(kept)
+      ..linkMfp(kept, measurementId: _measurementId);
+    final dropped = weighIns.save(date: _dayBefore, kilograms: 69.4);
+    weighIns
+      ..linkMfp(dropped, measurementId: '${_measurementId}0')
+      ..remove(dropped.id);
     files = FakeBackupFiles();
     backups = BackupService(
       backups: _backupsOf(database),
@@ -228,12 +253,22 @@ void main() {
     };
   }
 
-  test('exports the foods, meals, entries, links and goals in a version 5 '
-      'file named after the day', () async {
+  test('exports the foods, meals, entries, weigh-ins, links and goals in a '
+      'version 6 file named after the day', () async {
     final file = await exported();
 
-    check(file).isA<BackupV5>()
-      ..has((file) => file.version, 'version').equals(BackupV5.currentVersion)
+    check(file).isA<BackupV6>()
+      ..has((file) => file.version, 'version').equals(BackupV6.currentVersion)
+      ..has((file) => file.weighIns, 'weighIns').deepEquals(weighIns.weighIns())
+      ..has((file) => file.weighIns.length, 'weigh-in count').equals(2)
+      ..has(
+        (file) => file.ekkloWeighInLinks,
+        'ekkloWeighInLinks',
+      ).deepEquals(weighIns.ekkloLinks())
+      ..has(
+        (file) => file.mfpWeighInLinks,
+        'mfpWeighInLinks',
+      ).deepEquals(weighIns.mfpLinks())
       ..has((file) => file.entries, 'entries').deepEquals(entries.entries())
       ..has((file) => file.entries.length, 'entry count').equals(2)
       ..has((file) => file.mfpLinks, 'mfpLinks').deepEquals(entries.mfpLinks())
@@ -261,7 +296,7 @@ void main() {
   test('reads a file whose foods store verified as a number, as written by '
       'an earlier build', () async {
     await backups.export();
-    final json = exportedJson();
+    final json = _versionFive(exportedJson());
     final foods = switch (json['foods']) {
       final List<Object?> foods => foods,
       _ => throw StateError('export has no foods'),
@@ -284,7 +319,7 @@ void main() {
         .equals(true);
   });
 
-  test('imports a version 5 file in place of everything recorded '
+  test('imports a version 6 file in place of everything recorded '
       'since', () async {
     final file = await exported();
     final before = memories.load();
@@ -292,6 +327,12 @@ void main() {
     final entriesBefore = entries.entries();
     final mfpLinksBefore = entries.mfpLinks();
     final ekkloLinksBefore = entries.ekkloLinks();
+    final weighInsBefore = weighIns.weighIns();
+    final ekkloWeighInLinksBefore = weighIns.ekkloLinks();
+    final mfpWeighInLinksBefore = weighIns.mfpLinks();
+    weighIns
+      ..save(date: day, kilograms: 70.2)
+      ..save(date: day.add(const Duration(days: 1)), kilograms: 70.4);
     entries.remove('e-1');
     storeEntry(database, entry('M-9', food: skyr), 'e-9');
     memories.clear();
@@ -305,6 +346,9 @@ void main() {
     check(entries.entries()).deepEquals(entriesBefore);
     check(entries.mfpLinks()).deepEquals(mfpLinksBefore);
     check(entries.ekkloLinks()).deepEquals(ekkloLinksBefore);
+    check(weighIns.weighIns()).deepEquals(weighInsBefore);
+    check(weighIns.ekkloLinks()).deepEquals(ekkloWeighInLinksBefore);
+    check(weighIns.mfpLinks()).deepEquals(mfpWeighInLinksBefore);
     check(links.all()).deepEquals([link('E-3', 'I-3')]);
     check(goals.periods()).deepEquals(_periods);
   });
@@ -312,7 +356,7 @@ void main() {
   test('imports a version 4 file, its one set of goals holding from the day '
       'it was exported', () async {
     await backups.export();
-    final versionFour = exportedJson()..remove('goal_periods');
+    final versionFour = _versionFive(exportedJson())..remove('goal_periods');
 
     final file = backups.read(
       _json({
@@ -327,10 +371,27 @@ void main() {
     check(goals.periods()).deepEquals(_goalsSinceExport);
   });
 
+  test('imports a version 5 file and keeps the weigh-ins, which it does '
+      'not describe', () async {
+    await backups.export();
+    final entriesBefore = entries.entries();
+    final weighInsBefore = weighIns.weighIns();
+    final mfpWeighInLinksBefore = weighIns.mfpLinks();
+
+    final file = backups.read(_json(_versionFive(exportedJson())));
+    entries.remove('e-1');
+    backups.restore(file ?? (throw StateError('version 5 is unreadable')));
+
+    check(file).isA<BackupV5>();
+    check(entries.entries()).deepEquals(entriesBefore);
+    check(weighIns.weighIns()).deepEquals(weighInsBefore);
+    check(weighIns.mfpLinks()).deepEquals(mfpWeighInLinksBefore);
+  });
+
   test('imports a version 3 file, which leaves no entry and its links '
       'waiting for the next read of their day', () async {
     await backups.export();
-    final versionThree = exportedJson()
+    final versionThree = _versionFive(exportedJson())
       ..remove('entries')
       ..remove('mfp_links')
       ..remove('ekklo_links')
@@ -431,8 +492,10 @@ void main() {
 
       for (final changed in [
         {...file, 'format': 'other-backup'},
-        {...file, 'version': BackupV5.currentVersion + 1},
+        {...file, 'version': BackupV6.currentVersion + 1},
         {...file}..remove('entries'),
+        {...file}..remove('weigh_ins'),
+        {...file}..remove('mfp_weigh_in_links'),
         {...file}..remove('links'),
         {...file}..remove('food_references'),
         {...file}..remove(_barcodeLinks),
@@ -506,8 +569,8 @@ void main() {
       final ekkloLinksBefore = entries.ekkloLinks();
       final file = await exported();
       final rice = switch (file) {
-        BackupV5(:final entries) => entries.last,
-        _ => throw StateError('export is not version 5'),
+        BackupV6(:final entries) => entries.last,
+        _ => throw StateError('export is not version 6'),
       };
       final broken = file.copyWith(
         ekkloLinks: [

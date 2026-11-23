@@ -17,6 +17,9 @@ import 'package:fujin/data/memory/meal_mapping.dart';
 import 'package:fujin/data/memory/memory.dart';
 import 'package:fujin/data/memory/remembered_food.dart';
 import 'package:fujin/data/memory/remembered_unit.dart';
+import 'package:fujin/data/weigh_ins/ekklo_weigh_in_link.dart';
+import 'package:fujin/data/weigh_ins/mfp_weigh_in_link.dart';
+import 'package:fujin/data/weigh_ins/weigh_in.dart';
 
 part 'backup.mapper.dart';
 
@@ -46,6 +49,55 @@ sealed class Backup with BackupMappable {
   int get linkCount => links.length;
 }
 
+@MappableClass(discriminatorValue: BackupV6.currentVersion)
+final class BackupV6 extends Backup with BackupV6Mappable {
+  const BackupV6({
+    required super.exportedAt,
+    required super.links,
+    required this.foods,
+    required this.foodServings,
+    required this.foodUnits,
+    required this.foodReferences,
+    required this.barcodeLinks,
+    required this.meals,
+    required this.mealMappings,
+    required this.entries,
+    required this.mfpLinks,
+    required this.ekkloLinks,
+    required this.weighIns,
+    required this.ekkloWeighInLinks,
+    required this.mfpWeighInLinks,
+    super.goalPeriods,
+    super.format = Backup.formatName,
+    super.version = currentVersion,
+  });
+
+  static const currentVersion = 6;
+
+  final List<Food> foods;
+  final List<FoodServing> foodServings;
+  final List<FoodUnit> foodUnits;
+  final List<FoodReference> foodReferences;
+  final List<FoodBarcode> barcodeLinks;
+  final List<Meal> meals;
+  final List<ConnectorMeal> mealMappings;
+  final List<Entry> entries;
+  final List<MfpLink> mfpLinks;
+  final List<EkkloLink> ekkloLinks;
+  final List<WeighIn> weighIns;
+  final List<EkkloWeighInLink> ekkloWeighInLinks;
+  final List<MfpWeighInLink> mfpWeighInLinks;
+
+  @override
+  int get foodCount => _ownedFoodCount(foodReferences);
+
+  @override
+  int get mealCount => _ekkloMealCount(mealMappings);
+
+  @override
+  int get linkCount => _sentItemCount(ekkloLinks) + links.length;
+}
+
 @MappableClass(discriminatorValue: BackupV5.isEntriesFile)
 final class BackupV5 extends Backup with BackupV5Mappable {
   const BackupV5({
@@ -63,14 +115,14 @@ final class BackupV5 extends Backup with BackupV5Mappable {
     required this.ekkloLinks,
     super.goalPeriods,
     super.format = Backup.formatName,
-    super.version = currentVersion,
+    super.version = goalPeriodsVersion,
   });
 
-  static const currentVersion = 5;
+  static const goalPeriodsVersion = 5;
   static const versionWithOneGoal = 4;
 
   static bool isEntriesFile(Map<String, dynamic> file) => switch (file) {
-    {Backup.versionKey: currentVersion || versionWithOneGoal} => true,
+    {Backup.versionKey: goalPeriodsVersion || versionWithOneGoal} => true,
     _ => false,
   };
 
@@ -92,11 +144,7 @@ final class BackupV5 extends Backup with BackupV5Mappable {
   int get mealCount => _ekkloMealCount(mealMappings);
 
   @override
-  int get linkCount =>
-      ekkloLinks
-          .where((link) => link.deletedAt == null && link.item != null)
-          .length +
-      links.length;
+  int get linkCount => _sentItemCount(ekkloLinks) + links.length;
 }
 
 @MappableClass(discriminatorValue: BackupV3.foodsVersion)
@@ -132,6 +180,9 @@ final class BackupV3 extends Backup with BackupV3Mappable {
   @override
   int get mealCount => _ekkloMealCount(mealMappings);
 }
+
+int _sentItemCount(List<EkkloLink> links) =>
+    links.where((link) => link.deletedAt == null && link.item != null).length;
 
 int _ownedFoodCount(List<FoodReference> references) => references
     .where(

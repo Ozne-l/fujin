@@ -7,8 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/pages/adding/add_search_notifier.dart';
+import 'package:fujin/pages/common/connector_pill.dart';
 import 'package:fujin/pages/common/day_picker_sheet.dart';
-import 'package:fujin/pages/journal/widgets/connector_pill.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 

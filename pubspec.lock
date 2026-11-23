@@ -262,7 +262,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: d85408ec43a0c454689ee105d4dc500d5ef67df3
+      resolved-ref: "45a3e30bd2c89bf785686397d077d231cc3a8a81"
       url: "https://github.com/Ozne-l/ekklo_client.git"
     source: git
     version: "0.1.0"
@@ -936,7 +936,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: b4355ef62d748d9cf73553f6989b1c029c9b86c2
+      resolved-ref: edec31f7da3640e9cf7b1dae4d4df181648c00a9
       url: "https://github.com/Ozne-l/myfitnesspal_client.git"
     source: git
     version: "0.1.0"

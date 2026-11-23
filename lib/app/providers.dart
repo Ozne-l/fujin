@@ -39,6 +39,7 @@ import 'package:fujin/data/media/image_media_picker.dart';
 import 'package:fujin/data/media/media_picker.dart';
 import 'package:fujin/data/media/media_processor.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
+import 'package:fujin/data/milestones/milestone_repository.dart';
 import 'package:fujin/data/notifications/chat_notifications.dart';
 import 'package:fujin/data/recents/recent_food_repository.dart';
 import 'package:fujin/data/sessions/secure_ekklo_token_store.dart';
@@ -54,6 +55,7 @@ import 'package:fujin/data/upload/upload_notifications.dart';
 import 'package:fujin/data/upload/workmanager_relay_scheduler.dart';
 import 'package:fujin/data/voice/record_voice_recorder.dart';
 import 'package:fujin/data/voice/voice_recorder.dart';
+import 'package:fujin/data/weigh_ins/weigh_in_repository.dart';
 import 'package:fujin/domain/accounts/accounts_service.dart';
 import 'package:fujin/domain/adding/add_food_service.dart';
 import 'package:fujin/domain/adding/entry_writer.dart';
@@ -68,6 +70,9 @@ import 'package:fujin/domain/journal/fresh_read_service.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/memory/memory_service.dart';
 import 'package:fujin/domain/sending/send_service.dart';
+import 'package:fujin/domain/weighing/weigh_in_import.dart';
+import 'package:fujin/domain/weighing/weigh_in_service.dart';
+import 'package:fujin/domain/weighing/weigh_in_writer.dart';
 import 'package:fujin/domain/writing/background_writer.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hooks_riverpod/misc.dart';
@@ -211,6 +216,17 @@ final settingsRepositoryProvider = Provider<SettingsRepository>(
   (ref) => SettingsRepository(ref.watch(preferencesProvider)),
 );
 
+final milestoneRepositoryProvider = Provider<MilestoneRepository>(
+  (ref) => MilestoneRepository(ref.watch(preferencesProvider)),
+);
+
+final weighInRepositoryProvider = Provider<WeighInRepository>(
+  (ref) => WeighInRepository(
+    database: ref.watch(databaseProvider),
+    clock: ref.watch(clockProvider),
+  ),
+);
+
 final entryRepositoryProvider = Provider<EntryRepository>(
   (ref) => EntryRepository(
     database: ref.watch(databaseProvider),
@@ -232,6 +248,7 @@ final backupRepositoryProvider = Provider<BackupRepository>(
     recents: ref.watch(recentFoodRepositoryProvider),
     links: ref.watch(sentLinkRepositoryProvider),
     goals: ref.watch(goalsRepositoryProvider),
+    weighIns: ref.watch(weighInRepositoryProvider),
   ),
 );
 
@@ -321,6 +338,7 @@ final freshReadServiceProvider = Provider<FreshReadService>(
     journal: ref.watch(journalServiceProvider),
     completion: ref.watch(foodCompletionServiceProvider),
     writer: ref.watch(backgroundWriterProvider),
+    weighIns: ref.watch(weighInWriterProvider),
   ),
 );
 
@@ -345,6 +363,30 @@ final editEntryServiceProvider = Provider<EditEntryService>(
     entries: ref.watch(entryRepositoryProvider),
     writer: ref.watch(entryWriterProvider),
     background: ref.watch(backgroundWriterProvider),
+  ),
+);
+
+final weighInImportProvider = Provider<WeighInImport>(
+  (ref) => WeighInImport(
+    ekklo: ref.watch(ekkloClientProvider),
+    weighIns: ref.watch(weighInRepositoryProvider),
+    milestones: ref.watch(milestoneRepositoryProvider),
+  ),
+);
+
+final weighInWriterProvider = Provider<WeighInWriter>(
+  (ref) => WeighInWriter(
+    ekklo: ref.watch(ekkloClientProvider),
+    mfp: ref.watch(mfpClientProvider),
+    weighIns: ref.watch(weighInRepositoryProvider),
+    import: ref.watch(weighInImportProvider),
+  ),
+);
+
+final weighInServiceProvider = Provider<WeighInService>(
+  (ref) => WeighInService(
+    weighIns: ref.watch(weighInRepositoryProvider),
+    writer: ref.watch(weighInWriterProvider),
   ),
 );
 

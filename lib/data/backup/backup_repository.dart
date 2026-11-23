@@ -8,6 +8,7 @@ import 'package:fujin/data/links/sent_link_repository.dart';
 import 'package:fujin/data/meals/meal_repository.dart';
 import 'package:fujin/data/memory/memory_repository.dart';
 import 'package:fujin/data/recents/recent_food_repository.dart';
+import 'package:fujin/data/weigh_ins/weigh_in_repository.dart';
 
 final class BackupRepository {
   const BackupRepository({
@@ -19,6 +20,7 @@ final class BackupRepository {
     required this._recents,
     required this._links,
     required this._goals,
+    required this._weighIns,
   });
 
   final FujinDatabase<FujinTable> _database;
@@ -29,8 +31,9 @@ final class BackupRepository {
   final RecentFoodRepository _recents;
   final SentLinkRepository _links;
   final GoalsRepository _goals;
+  final WeighInRepository _weighIns;
 
-  BackupV5 snapshot(DateTime exportedAt) => BackupV5(
+  BackupV6 snapshot(DateTime exportedAt) => BackupV6(
     exportedAt: exportedAt,
     foods: _foods.foods(),
     foodServings: _foods.servings(),
@@ -42,6 +45,9 @@ final class BackupRepository {
     entries: _entries.entries(),
     mfpLinks: _entries.mfpLinks(),
     ekkloLinks: _entries.ekkloLinks(),
+    weighIns: _weighIns.weighIns(),
+    ekkloWeighInLinks: _weighIns.ekkloLinks(),
+    mfpWeighInLinks: _weighIns.mfpLinks(),
     links: _links.all(),
     goalPeriods: _goals.periods(),
   );
@@ -51,7 +57,16 @@ final class BackupRepository {
     _foods.deleteAll();
     _meals.deleteAll();
     switch (backup) {
-      case BackupV5(
+      case BackupV6(
+            :final foods,
+            :final foodServings,
+            :final foodUnits,
+            :final foodReferences,
+            :final barcodeLinks,
+            :final meals,
+            :final mealMappings,
+          ) ||
+          BackupV5(
             :final foods,
             :final foodServings,
             :final foodUnits,
@@ -80,15 +95,28 @@ final class BackupRepository {
       case BackupV2():
         _memory.restore(backup.memory);
     }
-    if (backup case BackupV5(
-      :final entries,
-      :final mfpLinks,
-      :final ekkloLinks,
-    )) {
+    if (backup
+        case BackupV6(
+              :final entries,
+              :final mfpLinks,
+              :final ekkloLinks,
+            ) ||
+            BackupV5(:final entries, :final mfpLinks, :final ekkloLinks)) {
       _entries.restore(
         entries: entries,
         mfpLinks: mfpLinks,
         ekkloLinks: ekkloLinks,
+      );
+    }
+    if (backup case BackupV6(
+      :final weighIns,
+      :final ekkloWeighInLinks,
+      :final mfpWeighInLinks,
+    )) {
+      _weighIns.replaceAll(
+        weighIns: weighIns,
+        ekkloLinks: ekkloWeighInLinks,
+        mfpLinks: mfpWeighInLinks,
       );
     }
     recents.forEach(_recents.record);

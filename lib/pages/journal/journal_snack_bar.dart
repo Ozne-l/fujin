@@ -4,19 +4,18 @@ import 'package:fujin/domain/adding/added_food.dart';
 import 'package:fujin/domain/comparison/replacement.dart';
 import 'package:fujin/domain/editing/edited_food.dart';
 import 'package:fujin/domain/sending/food_words.dart';
-import 'package:fujin/domain/writing/write_failure.dart';
 import 'package:fujin/domain/writing/writer_state.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/entry_text.dart';
 import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
+import 'package:fujin/pages/common/not_written_notice.dart';
 import 'package:fujin/pages/common/snack_bar_content.dart';
 import 'package:fujin/pages/common/snack_bar_glyph.dart';
 import 'package:fujin/pages/journal/removal_reason.dart';
 import 'package:fujin/pages/journal/remove_entry_state.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
-import 'package:fujin/pages/sending/send_failure.dart';
 
 abstract final class JournalSnackBar {
   static const undoWindow = Duration(seconds: 8);
@@ -111,10 +110,16 @@ abstract final class JournalSnackBar {
   }) {
     final notices = [
       ?_replaced(context.intl, idle.replaced),
-      ?_notWritten(
+      ?NotWrittenNotice.of(
         context.intl,
         [...idle.stopped],
         environment,
+        pending: (reported) => switch (reported) {
+          [final failure] => context.intl.foodStillPending(
+            FoodText.name(context.intl, productName(failure.logged)),
+          ),
+          _ => context.intl.foodsStillPending(reported.length),
+        },
         onRetry: onRetry,
       ),
     ];
@@ -163,46 +168,5 @@ abstract final class JournalSnackBar {
       ),
       null => null,
     };
-  }
-
-  static (Widget, Duration)? _notWritten(
-    AppLocalizations intl,
-    List<WriteFailure> failures,
-    AppEnvironment environment, {
-    required VoidCallback onRetry,
-  }) {
-    final mfp = [...failures.whereType<MfpNotWritten>()];
-    final ekklo = [...failures.whereType<EkkloNotWritten>()];
-    final notice = switch ((mfp, ekklo)) {
-      ([_, ...], _) => (intl.mfpNotWritten, mfp),
-      (_, [_, ...]) => (intl.ekkloNotWritten, ekklo),
-      _ => null,
-    };
-    if (notice case (final title, final List<WriteFailure> reported)) {
-      final blocked = reported.every(
-        (failure) =>
-            SendFailure.of(failure.error, environment) ==
-            SendFailure.blockedInDev,
-      );
-      return (
-        SnackBarContent(
-          glyph: SnackBarGlyph.alert,
-          title: title,
-          detail: switch ((blocked, reported)) {
-            (true, _) => intl.writeBlockedInDev,
-            (false, [final failure]) => intl.foodStillPending(
-              FoodText.name(intl, productName(failure.logged)),
-            ),
-            (false, _) => intl.foodsStillPending(reported.length),
-          },
-          action: switch (blocked) {
-            true => null,
-            false => (intl.tryAgain, onRetry),
-          },
-        ),
-        undoWindow,
-      );
-    }
-    return null;
   }
 }

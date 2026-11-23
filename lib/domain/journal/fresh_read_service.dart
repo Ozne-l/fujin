@@ -5,6 +5,7 @@ import 'package:fujin/domain/adding/food_completion_service.dart';
 import 'package:fujin/domain/journal/fetch.dart';
 import 'package:fujin/domain/journal/journal_read.dart';
 import 'package:fujin/domain/journal/journal_service.dart';
+import 'package:fujin/domain/weighing/weigh_in_writer.dart';
 import 'package:fujin/domain/writing/background_writer.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -13,11 +14,13 @@ final class FreshReadService {
     required this._journal,
     required this._completion,
     required this._writer,
+    required this._weighIns,
   });
 
   final JournalService _journal;
   final FoodCompletionService _completion;
   final BackgroundWriter _writer;
+  final WeighInWriter _weighIns;
 
   Future<JournalRead> read(
     DateTime date, {
@@ -69,6 +72,9 @@ final class FreshReadService {
       if (thenWrite || adopted.isNotEmpty || replaced.isNotEmpty) {
         unawaited(_writer.run());
       }
+    }
+    if ((diary, meals) case (Fetched(), _) || (_, Fetched())) {
+      unawaited(_weighIns.run());
     }
   }
 }

@@ -9,11 +9,11 @@ import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
 import 'package:fujin/pages/common/goals_text.dart';
 import 'package:fujin/pages/common/grams_input.dart';
+import 'package:fujin/pages/common/note_card.dart';
 import 'package:fujin/pages/common/text_inset.dart';
 import 'package:fujin/pages/common/top_bar.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:fujin/pages/settings/widgets/goal_field.dart';
-import 'package:fujin/pages/settings/widgets/note_card.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class GoalsPage extends HookConsumerWidget {

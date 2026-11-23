@@ -1582,5 +1582,83 @@
       "percent": {"type": "int"}
     }
   },
-  "writeBlockedInDev": "Fūjin DEV n’écrit ni dans MyFitnessPal ni dans Ekklo : rien n’a changé."
+  "writeBlockedInDev": "Fūjin DEV n’écrit ni dans MyFitnessPal ni dans Ekklo : rien n’a changé.",
+  "settingsWeighIns": "POIDS",
+  "settingsWeighInToday": "Aujourd’hui · {kilograms}",
+  "@settingsWeighInToday": {
+    "placeholders": {"kilograms": {"type": "String"}}
+  },
+  "settingsWeighInNone": "Pas encore de pesée aujourd’hui",
+  "settingsWeighInDetail": "Nouvelle pesée et historique",
+  "weighInsTitle": "Poids",
+  "weighInsSection": "PESÉES",
+  "weighInsEmptyTitle": "Pas encore de pesée",
+  "weighInsEmptyDetail": "Fūjin garde ta pesée, puis l’écrit dans Ekklo et MyFitnessPal.",
+  "weighInNew": "Nouvelle pesée",
+  "weighInKilograms": "{kilograms} kg",
+  "@weighInKilograms": {
+    "placeholders": {
+      "kilograms": {"type": "double", "format": "decimalPatternDigits", "optionalParameters": {"decimalDigits": 1}}
+    }
+  },
+  "kilogramsSuffix": "kg",
+  "weighInRange": "Entre {lightest} et {heaviest} kg",
+  "@weighInRange": {
+    "placeholders": {"lightest": {"type": "int"}, "heaviest": {"type": "int"}}
+  },
+  "weighInReplaceTitle": "Ce jour a déjà une pesée : {kilograms}.",
+  "@weighInReplaceTitle": {
+    "placeholders": {"kilograms": {"type": "String"}}
+  },
+  "weighInReplaceDetail": "La nouvelle la remplace, dans Fūjin puis dans Ekklo et MyFitnessPal.",
+  "weighInReplace": "Remplacer la pesée",
+  "weighInToday": "Aujourd’hui, {date}",
+  "@weighInToday": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "MMMEd"}
+    }
+  },
+  "weighInYesterday": "Hier, {date}",
+  "@weighInYesterday": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "MMMEd"}
+    }
+  },
+  "weighInDayToday": "aujourd’hui",
+  "weighInDayYesterday": "hier",
+  "weighInSaved": "Pesée enregistrée",
+  "weighInSavedDetail": "{kilograms} · {day}",
+  "@weighInSavedDetail": {
+    "placeholders": {"kilograms": {"type": "String"}, "day": {"type": "String"}}
+  },
+  "weighInEdit": "Modifier la pesée",
+  "weighInDelete": "Supprimer la pesée",
+  "weighInDeleteTitle": "Supprimer {kilograms} ?",
+  "@weighInDeleteTitle": {
+    "placeholders": {"kilograms": {"type": "String"}}
+  },
+  "weighInDeleteDetail": "Pesée du {date}. Fūjin la retire de MyFitnessPal ; Ekklo ne sait pas supprimer une pesée, elle y reste.",
+  "@weighInDeleteDetail": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "MMMMEEEEd"}
+    }
+  },
+  "weighInDeleteFromMfp": "Supprimer de MFP",
+  "weighInDeletedInFujin": "Supprimé dans Fūjin · reste dans Ekklo",
+  "weighInDeleted": "Pesée supprimée",
+  "weighInDeletedDetail": "{day} · reste dans Ekklo",
+  "@weighInDeletedDetail": {
+    "placeholders": {"day": {"type": "String"}}
+  },
+  "weighInStillPendingToday": "La pesée d’aujourd’hui reste en attente",
+  "weighInStillPending": "La pesée du {date} reste en attente",
+  "@weighInStillPending": {
+    "placeholders": {
+      "date": {"type": "DateTime", "format": "MMMEd"}
+    }
+  },
+  "weighInsStillPending": "{count, plural, other{{count} pesées restent en attente}}",
+  "@weighInsStillPending": {
+    "placeholders": {"count": {"type": "int"}}
+  }
 }

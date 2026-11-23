@@ -14,7 +14,10 @@ enum FujinTable implements DatabaseTable {
   sentLink('sent_link'),
   goals('goals'),
   unattendedItem('unattended_item'),
-  recentFood('recent_food');
+  recentFood('recent_food'),
+  weighIn('weigh_in'),
+  ekkloWeighInLink('ekklo_weigh_in_link'),
+  mfpWeighInLink('mfp_weigh_in_link');
 
   const FujinTable(this.sqlName);
 

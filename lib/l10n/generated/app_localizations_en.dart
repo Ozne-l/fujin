@@ -2861,4 +2861,153 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get writeBlockedInDev =>
       'Fūjin DEV writes to neither MyFitnessPal nor Ekklo: nothing changed.';
+
+  @override
+  String get settingsWeighIns => 'WEIGHT';
+
+  @override
+  String settingsWeighInToday(String kilograms) {
+    return 'Today · $kilograms';
+  }
+
+  @override
+  String get settingsWeighInNone => 'No weigh-in today yet';
+
+  @override
+  String get settingsWeighInDetail => 'New weigh-in and history';
+
+  @override
+  String get weighInsTitle => 'Weight';
+
+  @override
+  String get weighInsSection => 'WEIGH-INS';
+
+  @override
+  String get weighInsEmptyTitle => 'No weigh-in yet';
+
+  @override
+  String get weighInsEmptyDetail =>
+      'Fūjin keeps your weigh-in, then writes it to Ekklo and MyFitnessPal.';
+
+  @override
+  String get weighInNew => 'New weigh-in';
+
+  @override
+  String weighInKilograms(double kilograms) {
+    final intl.NumberFormat kilogramsNumberFormat =
+        intl.NumberFormat.decimalPatternDigits(
+          locale: localeName,
+          decimalDigits: 1,
+        );
+    final String kilogramsString = kilogramsNumberFormat.format(kilograms);
+
+    return '$kilogramsString kg';
+  }
+
+  @override
+  String get kilogramsSuffix => 'kg';
+
+  @override
+  String weighInRange(int lightest, int heaviest) {
+    return 'Between $lightest and $heaviest kg';
+  }
+
+  @override
+  String weighInReplaceTitle(String kilograms) {
+    return 'This day already has a weigh-in: $kilograms.';
+  }
+
+  @override
+  String get weighInReplaceDetail =>
+      'The new one replaces it, in Fūjin then in Ekklo and MyFitnessPal.';
+
+  @override
+  String get weighInReplace => 'Replace the weigh-in';
+
+  @override
+  String weighInToday(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMEd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Today, $dateString';
+  }
+
+  @override
+  String weighInYesterday(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMEd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Yesterday, $dateString';
+  }
+
+  @override
+  String get weighInDayToday => 'today';
+
+  @override
+  String get weighInDayYesterday => 'yesterday';
+
+  @override
+  String get weighInSaved => 'Weigh-in saved';
+
+  @override
+  String weighInSavedDetail(String kilograms, String day) {
+    return '$kilograms · $day';
+  }
+
+  @override
+  String get weighInEdit => 'Edit the weigh-in';
+
+  @override
+  String get weighInDelete => 'Delete the weigh-in';
+
+  @override
+  String weighInDeleteTitle(String kilograms) {
+    return 'Delete $kilograms?';
+  }
+
+  @override
+  String weighInDeleteDetail(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMEEEEd(
+      localeName,
+    );
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Weigh-in of $dateString. Fūjin removes it from MyFitnessPal; Ekklo cannot delete a weigh-in, so it stays there.';
+  }
+
+  @override
+  String get weighInDeleteFromMfp => 'Delete from MFP';
+
+  @override
+  String get weighInDeletedInFujin => 'Deleted in Fūjin · stays in Ekklo';
+
+  @override
+  String get weighInDeleted => 'Weigh-in deleted';
+
+  @override
+  String weighInDeletedDetail(String day) {
+    return '$day · stays in Ekklo';
+  }
+
+  @override
+  String get weighInStillPendingToday => 'Today\'s weigh-in is still waiting';
+
+  @override
+  String weighInStillPending(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMEd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'The weigh-in of $dateString is still waiting';
+  }
+
+  @override
+  String weighInsStillPending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count weigh-ins are still waiting',
+      one: '$count weigh-in is still waiting',
+    );
+    return '$_temp0';
+  }
 }

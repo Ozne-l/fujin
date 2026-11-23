@@ -6,8 +6,8 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/connectors/connector.dart';
+import 'package:fujin/pages/common/connector_pill.dart';
 import 'package:fujin/pages/common/row_action.dart';
-import 'package:fujin/pages/journal/widgets/connector_pill.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';

@@ -24,6 +24,7 @@ import 'package:fujin/pages/splash/splash_page.dart';
 import 'package:fujin/pages/tabs/fujin_tab.dart';
 import 'package:fujin/pages/tabs/tab_shell.dart';
 import 'package:fujin/pages/tabs/tab_switcher.dart';
+import 'package:fujin/pages/weigh_ins/weigh_ins_page.dart';
 import 'package:fujin/pages/welcome/welcome_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -102,6 +103,11 @@ final routerProvider = Provider<GoRouter>((ref) {
                         path: FujinRoute.goalsSegment,
                         parentNavigatorKey: root,
                         builder: (context, state) => const GoalsPage(),
+                      ),
+                      GoRoute(
+                        path: FujinRoute.weighInsSegment,
+                        parentNavigatorKey: root,
+                        builder: (context, state) => const WeighInsPage(),
                       ),
                     ],
                   ),
