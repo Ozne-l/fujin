@@ -666,6 +666,24 @@ void main() {
     );
 
     test(
+      "sends the remembered Ekklo side of a row the send flow's read "
+      'adopted first',
+      () async {
+        final food = await unwritten(await services(), _draft());
+        backends.entries = [row('mfp-written')];
+
+        final restarted = await services();
+        await restarted.sending.plan(day, onProgress: (_) {});
+        await restarted.settle();
+
+        check(restarted.writes()).deepEquals(['POST ${ekkloUri.host}']);
+        check(
+          (await restarted.find(food.entryId, day))?.status,
+        ).isA<InEkklo>();
+      },
+    );
+
+    test(
       'sends the remembered Ekklo side of a row the read of an earlier '
       'Ekklo send adopted',
       () async {

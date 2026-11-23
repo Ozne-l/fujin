@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/data/connectors/connector_roles.dart';
 import 'package:fujin/data/database/fujin_database.dart';
@@ -30,7 +32,7 @@ import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 final class JournalService {
-  const JournalService({
+  JournalService({
     required this._mfp,
     required this._ekklo,
     required this._entries,
@@ -55,6 +57,13 @@ final class JournalService {
   final FujinDatabase<FujinTable> _database;
   final DateTime Function() _clock;
   final ConnectorRoles Function() _roles;
+  final _settlements =
+      StreamController<
+        ({List<Replacement> replaced, List<String> adopted})
+      >.broadcast(sync: true);
+
+  Stream<({List<Replacement> replaced, List<String> adopted})>
+  get settlements => _settlements.stream;
 
   Future<JournalDay> readDay(
     DateTime date, {
@@ -150,14 +159,14 @@ final class JournalService {
           adopted: adopted,
         ),
       },
-    (final Fetched<MfpDiaryDay> diary, FetchFailed()) => _database.transaction(
-      () {
+    (final Fetched<MfpDiaryDay> diary, FetchFailed()) => _published(
+      _database.transaction(() {
         final stored = _entries.forDate(date);
         final draft = _mfpDraft(date, stored, diary);
         final changes = draft.changes;
         _entries.store(changes);
         return (replaced: draft.replaced, adopted: _adopted(stored, changes));
-      },
+      }),
     ),
     (FetchFailed(), _) => (replaced: const [], adopted: const []),
   };
@@ -183,15 +192,31 @@ final class JournalService {
     DateTime date,
     Fetched<MfpDiaryDay> diary,
     List<EkkloDailyMeal> meals,
-  ) => _database.transaction(() {
-    final stored = _entries.forDate(date);
-    final comparison = _comparison(date, stored, diary, meals);
-    _entries.store(comparison.changes);
-    return (
-      comparison: comparison,
-      adopted: _adopted(stored, comparison.changes),
-    );
-  });
+  ) {
+    final stored = _database.transaction(() {
+      final stored = _entries.forDate(date);
+      final comparison = _comparison(date, stored, diary, meals);
+      _entries.store(comparison.changes);
+      return (
+        comparison: comparison,
+        adopted: _adopted(stored, comparison.changes),
+      );
+    });
+    _published((
+      replaced: stored.comparison.replaced,
+      adopted: stored.adopted,
+    ));
+    return stored;
+  }
+
+  ({List<Replacement> replaced, List<String> adopted}) _published(
+    ({List<Replacement> replaced, List<String> adopted}) settled,
+  ) {
+    if (settled.replaced.isNotEmpty || settled.adopted.isNotEmpty) {
+      _settlements.add(settled);
+    }
+    return settled;
+  }
 
   DayComparison _comparison(
     DateTime date,

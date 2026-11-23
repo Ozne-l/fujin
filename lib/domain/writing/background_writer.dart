@@ -13,6 +13,7 @@ import 'package:fujin/domain/adding/rescale_planned.dart';
 import 'package:fujin/domain/comparison/replacement.dart';
 import 'package:fujin/domain/comparison/replacing_row.dart';
 import 'package:fujin/domain/comparison/written_row.dart';
+import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/domain/journal/same_day.dart';
 import 'package:fujin/domain/sending/own_copy_renewal.dart';
 import 'package:fujin/domain/sending/plan_entry.dart';
@@ -34,7 +35,10 @@ final class BackgroundWriter {
     required this._entries,
     required this._writer,
     required this._readOnly,
-  });
+    required JournalService journal,
+  }) {
+    journal.settlements.listen(_settled);
+  }
 
   final MyFitnessPalClient _mfp;
   final SendService _sending;
@@ -98,12 +102,9 @@ final class BackgroundWriter {
     if (_held.remove(entryId) != null) _emit(_state);
   }
 
-  void settled({
-    required List<String> adopted,
-    required List<Replacement> replaced,
-  }) {
-    adopted.forEach(_derive);
-    _readReplaced.addAll(replaced);
+  void _settled(({List<Replacement> replaced, List<String> adopted}) read) {
+    read.adopted.forEach(_derive);
+    _readReplaced.addAll(read.replaced);
   }
 
   Future<void> run() {
