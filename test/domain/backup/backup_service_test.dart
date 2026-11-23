@@ -468,6 +468,38 @@ void main() {
       check(memories.load()).equals(before);
     });
 
+    test('a version 1 or 2 file that both matches a food and keeps an own '
+        'copy of it', () {
+      for (final version in [
+        BackupV2.versionWithoutBarcodeLinks,
+        BackupV2.memoryVersion,
+      ]) {
+        final file = _fileOfRelease040(version);
+        check(
+          backups.read(
+            _json({
+              ...file,
+              'own_copies': [
+                ...?switch (file['own_copies']) {
+                  final List<Object?> copies => copies,
+                  _ => null,
+                },
+                {
+                  'kind': 'own_copy',
+                  'mfp_food_id': rice,
+                  'mfp_description': 'Riz basmati',
+                  'ekklo_food_id': 'own-rice',
+                  'ekklo_food_name': 'Riz basmati',
+                  'mfp_unit': cup,
+                  'mfp_food_version': 'v1',
+                },
+              ],
+            }),
+          ),
+        ).isNull();
+      }
+    });
+
     test('a whole file with two Ekklo links on one item and keeps what was '
         'there', () async {
       final before = memories.load();
