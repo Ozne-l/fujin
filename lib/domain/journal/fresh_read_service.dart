@@ -65,7 +65,6 @@ final class FreshReadService {
       diary: diary,
       meals: meals,
     );
-    _writer.settled(adopted: adopted, replaced: replaced);
     if (diary case Fetched()) {
       unawaited(_completion.complete());
       if (thenWrite || adopted.isNotEmpty || replaced.isNotEmpty) {

@@ -78,6 +78,7 @@ final class WriteServices {
       entries: entries,
       writer: writer,
       readOnly: httpClient is ReadOnlyHttpClient,
+      journal: journal,
     );
     addTearDown(background.run);
     return WriteServices._(

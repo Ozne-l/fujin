@@ -305,6 +305,7 @@ final backgroundWriterProvider = Provider<BackgroundWriter>(
     entries: ref.watch(entryRepositoryProvider),
     writer: ref.watch(entryWriterProvider),
     readOnly: ref.watch(appEnvironmentProvider).readOnly,
+    journal: ref.watch(journalServiceProvider),
   ),
 );
 
