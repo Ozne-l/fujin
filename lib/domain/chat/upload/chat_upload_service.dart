@@ -25,8 +25,9 @@ import 'package:fujin/data/upload/upload_update.dart';
 import 'package:fujin/domain/chat/edit/edited_media.dart';
 import 'package:fujin/domain/chat/edit/media_send.dart';
 import 'package:fujin/domain/chat/person_name.dart';
-import 'package:fujin/domain/chat/upload/message_poster.dart';
+import 'package:fujin/domain/chat/upload/message_settler.dart';
 import 'package:fujin/domain/chat/upload/message_upload.dart';
+import 'package:fujin/domain/chat/upload/settlement.dart';
 import 'package:fujin/domain/chat/upload/upload_deadline.dart';
 import 'package:fujin/domain/chat/upload/upload_phase.dart';
 import 'package:fujin/domain/chat/upload/uploading_media.dart';
@@ -45,14 +46,20 @@ final class ChatUploadService {
     required this._cachePath,
     required this._accept,
     required this._clock,
-  }) : _poster = MessagePoster(messaging),
+  }) : _settler = MessageSettler(
+         messaging: messaging,
+         messages: _messages,
+         notifications: _notifications,
+         folder: _folder,
+         clock: _clock,
+       ),
        _messaging = messaging;
 
   static const maximumRenewals = 3;
   static const _full = 100;
 
   final EkkloMessaging _messaging;
-  final MessagePoster _poster;
+  final MessageSettler _settler;
   final MessageInProgressRepository _messages;
   final ChatRepository _chats;
   final MediaProcessor _processor;
@@ -212,7 +219,7 @@ final class ChatUploadService {
     await _uploader.cancel(messageId);
     await _relay.cancel(messageId);
     await _notifications.cancel(messageId);
-    _forget(messageId);
+    _forget(messageId, _messages.files(messageId));
     _messages.delete(messageId);
     _folder.delete(messageId);
     _emit(message.conversationId);
@@ -439,25 +446,20 @@ final class ChatUploadService {
     List<FileInProgress> files,
   ) async {
     await _relay.cancel(message.id);
-    final EkkloMessage sent;
-    try {
-      sent = await _poster.post(message, files);
-    } on EkkloNetworkException {
-      await _relay.schedule(message.id);
-      await _wait(message);
-      return;
-    } on Object catch (error) {
-      if (error is! EkkloException && error is! FormatException) rethrow;
-      await _fail(message);
-      return;
+    switch (await _settler.settle(message.id)) {
+      case MessagePosted(message: final sent):
+        _forget(message.id, files);
+        if (_disposed) return;
+        _accept(sent, postedFrom: message.id);
+        _emit(message.conversationId);
+      case MessageWaiting():
+        await _relay.schedule(message.id);
+        await _wait(message);
+      case MessageGivenUp():
+        await _failed(message);
+      case MessageNotReady() || MessageGone():
+        return;
     }
-    if (_disposed) return;
-    _accept(sent, postedFrom: message.id);
-    await _notifications.cancel(message.id);
-    _forget(message.id);
-    _messages.delete(message.id);
-    _folder.delete(message.id);
-    _emit(message.conversationId);
   }
 
   Future<void> _wait(MessageInProgress message) async {
@@ -474,7 +476,11 @@ final class ChatUploadService {
   }
 
   Future<void> _fail(MessageInProgress message) async {
-    _messages.save(message.copyWith(state: MessageInProgressState.failed));
+    await _settler.giveUp(message);
+    await _failed(message);
+  }
+
+  Future<void> _failed(MessageInProgress message) async {
     for (final file in _messages.files(message.id)) {
       _exported.remove(file.id);
       _uploaded.remove(file.id);
@@ -484,10 +490,6 @@ final class ChatUploadService {
     _emit(message.conversationId);
     await _uploader.cancel(message.id);
     await _relay.cancel(message.id);
-    await _notifications.showFailed(
-      message.id,
-      conversationId: message.conversationId,
-    );
   }
 
   void _onUpdate(UploadUpdate update) {
@@ -554,8 +556,8 @@ final class ChatUploadService {
       if (_renewals.containsKey(file.id)) file.id,
   ];
 
-  void _forget(String messageId) {
-    for (final file in _messages.files(messageId)) {
+  void _forget(String messageId, List<FileInProgress> files) {
+    for (final file in files) {
       _messageOf.remove(file.id);
       _exported.remove(file.id);
       _uploaded.remove(file.id);
