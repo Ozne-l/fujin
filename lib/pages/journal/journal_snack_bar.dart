@@ -16,7 +16,6 @@ import 'package:fujin/pages/common/snack_bar_glyph.dart';
 import 'package:fujin/pages/journal/removal_reason.dart';
 import 'package:fujin/pages/journal/remove_entry_state.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
-import 'package:fujin/pages/journal/writer_state_ids.dart';
 import 'package:fujin/pages/sending/send_failure.dart';
 
 abstract final class JournalSnackBar {
@@ -114,7 +113,7 @@ abstract final class JournalSnackBar {
       ?_replaced(context.intl, idle.replaced),
       ?_notWritten(
         context.intl,
-        [...idle.stopped(environment)],
+        [...idle.stopped],
         environment,
         onRetry: onRetry,
       ),

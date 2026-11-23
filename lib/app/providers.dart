@@ -304,6 +304,7 @@ final backgroundWriterProvider = Provider<BackgroundWriter>(
     memory: ref.watch(memoryRepositoryProvider),
     entries: ref.watch(entryRepositoryProvider),
     writer: ref.watch(entryWriterProvider),
+    readOnly: ref.watch(appEnvironmentProvider).readOnly,
   ),
 );
 

@@ -16,7 +16,6 @@ import 'package:fujin/pages/journal/widgets/meal_card_frame.dart';
 import 'package:fujin/pages/journal/widgets/meal_rows.dart';
 import 'package:fujin/pages/journal/widgets/meal_title.dart';
 import 'package:fujin/pages/journal/widgets/split_line.dart';
-import 'package:fujin/pages/journal/writer_state_ids.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class MealCard extends HookConsumerWidget {

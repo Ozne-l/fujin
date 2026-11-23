@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart'
     show group, setUp, tearDown, test;
-import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/data/connectors/connector_roles.dart';
 import 'package:fujin/data/connectors/role.dart';
 import 'package:fujin/data/database/fujin_database.dart';
@@ -26,7 +25,6 @@ import 'package:fujin/domain/sending/send_report.dart';
 import 'package:fujin/domain/writing/ekklo_job.dart';
 import 'package:fujin/domain/writing/write_failure.dart';
 import 'package:fujin/domain/writing/writer_state.dart';
-import 'package:fujin/pages/sending/send_failure.dart';
 import 'package:http/http.dart' as http;
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
@@ -269,8 +267,11 @@ void main() {
     });
 
     test('drops a failure once its entry is no longer pending', () async {
+      backends.mfpWritesFail = true;
       final writing = await services();
-      final food = await unwritten(writing, _draft());
+      final food = await writing.add(_draft());
+      await writing.settle();
+      backends.mfpWritesFail = false;
       check(writing.background.state.failures).length.equals(1);
 
       writing.editing.remove(food.entryId);
@@ -342,7 +343,6 @@ void main() {
       final food = await writing.add(_draft());
       await writing.settle();
 
-      final error = writing.background.state.failures.single.error;
       check(
             writing.background.state.failures.single,
           )
@@ -351,9 +351,6 @@ void main() {
           .equals(
             food.entryId,
           );
-      check(
-        SendFailure.of(error, AppEnvironment.dev),
-      ).equals(SendFailure.blockedInDev);
       check(backends.entries).isEmpty();
       check(ekkloQuantities()).isEmpty();
     });
@@ -438,15 +435,33 @@ void main() {
         await writing.settle();
 
         check(backends.requests).length.equals(1);
-        check(writing.background.state.failures.single)
-          ..isA<MfpNotWritten>()
-          ..has((it) => it.entryId, 'entry').equals(first.entryId);
+        check(writing.background.state.failures).isEmpty();
         check([
           for (final write in writing.entries.pendingMfp())
             write.logged.entry.id,
         ]).unorderedEquals([first.entryId, second.entryId]);
       },
     );
+
+    test('waits, without a failure, when a MyFitnessPal write drops while '
+        'its reads went through', () async {
+      final writing = await services();
+      backends.mfpAddGate = Completer<void>();
+      final first = writing.adding.add(_draft(), null);
+      clock = clock.add(const Duration(seconds: 1));
+      final second = writing.adding.add(_draft(servings: 2), null);
+      await sent(1);
+
+      backends.mfpReachable = false;
+      backends.mfpAddGate?.complete();
+      await writing.settle();
+
+      check(mfpAdds()).length.equals(1);
+      check(writing.background.state.failures).isEmpty();
+      check([
+        for (final write in writing.entries.pendingMfp()) write.logged.entry.id,
+      ]).unorderedEquals([first.entryId, second.entryId]);
+    });
   });
 
   group(
@@ -574,11 +589,12 @@ void main() {
       check({
         for (final request in backends.requests) request.url.path,
       }).deepEquals({'/v2/diary'});
+      check(writing.background.state.failures).isEmpty();
       check(
-        writing.background.state.failures.firstWhere(
-          (failure) => failure.entryId == food.entryId,
+        writing.entries.pendingMfp().firstWhere(
+          (write) => write.logged.entry.id == food.entryId,
         ),
-      ).isA<MfpNotWritten>();
+      ).isA<MfpDeletion>();
     },
   );
 

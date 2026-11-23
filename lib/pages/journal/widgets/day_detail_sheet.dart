@@ -11,7 +11,6 @@ import 'package:fujin/pages/common/source_dot.dart';
 import 'package:fujin/pages/common/title_text.dart';
 import 'package:fujin/pages/journal/background_write_notifier.dart';
 import 'package:fujin/pages/journal/journal_text.dart';
-import 'package:fujin/pages/journal/writer_state_ids.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 Future<void> showDayDetailSheet(

@@ -57,3 +57,4 @@ Each record follows Michael Nygard's format: Title, Status, Context, Decision, C
 | [0051](0051-worktrees-pull-requests-and-releases.md) | Worktrees, pull requests with CI, and signed releases installed by Obtainium | Accepted (built; first release v0.6.1, Pixel moved to the release key) |
 | [0052](0052-dated-goals.md) | Dated goals: each set holds from the day it is saved, backup version 5 | Accepted |
 | [0053](0053-one-rule-for-the-held-ekklo-job.md) | One rule for the held Ekklo job, in the background writer | Accepted |
+| [0054](0054-a-dropped-write-waits.md) | A dropped write waits, like a failed read | Accepted |
