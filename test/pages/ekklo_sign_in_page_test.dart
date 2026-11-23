@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
+import '../support/haptic.dart';
 import '../support/pump_fujin.dart';
 
 Future<InMemoryEkkloTokenStore> _openSignIn(
@@ -110,6 +111,27 @@ void main() {
       ).length.equals(1);
     },
   );
+
+  testWidgets('buzzes at each refusal, and not when Ekklo cannot be reached', (
+    tester,
+  ) async {
+    final backends = FakeBackends(mealNames: [breakfast]);
+    await _openSignIn(tester, backends);
+    final haptics = Haptic.record(tester);
+
+    await _signIn(tester, password: 'wrong-password');
+    backends.ekkloReachable = false;
+    await tester.tap(find.text('Se connecter'));
+    await tester.pumpAndSettle();
+
+    check(haptics).deepEquals([Haptic.error]);
+
+    backends.ekkloReachable = true;
+    await tester.tap(find.text('Se connecter'));
+    await tester.pumpAndSettle();
+
+    check(haptics).deepEquals([Haptic.error, Haptic.error]);
+  });
 
   testWidgets('says Ekklo is not responding when it cannot be reached', (
     tester,

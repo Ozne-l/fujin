@@ -14,6 +14,7 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../../support/fake_backends.dart';
 import '../../support/fixtures.dart';
+import '../../support/haptic.dart';
 import '../../support/logged_journal.dart';
 import '../../support/pump_fujin.dart';
 
@@ -161,6 +162,18 @@ void main() {
       backends.entries.where((entry) => entry.food.id == rice).single.servings,
     ).equals(2);
     check(backends.ekkloItems.single.quantity).equals(200);
+  });
+
+  testWidgets('buzzes a success once the edit is saved, and not when it is '
+      'undone', (tester) async {
+    await _open(tester, LoggedJournal.backends(), LoggedJournal.basmati);
+    final haptics = Haptic.record(tester);
+    await _servings(tester, '2');
+
+    await _tap(tester, _saveBoth);
+    await _tap(tester, 'Annuler');
+
+    check(haptics).deepEquals([Haptic.success]);
   });
 
   testWidgets('puts the original quantity back on Annuler', (tester) async {

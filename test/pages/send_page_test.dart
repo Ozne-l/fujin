@@ -14,6 +14,7 @@ import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
+import '../support/haptic.dart';
 import '../support/in_memory_preferences.dart';
 import '../support/pump_fujin.dart';
 import '../support/sent_food.dart';
@@ -154,6 +155,31 @@ void main() {
     await _tap(tester, 'Envoyer l’aliment restant');
     _sees('Envoi terminé');
     check(backends.ekkloItems).length.equals(2);
+  });
+
+  testWidgets('buzzes a success when a send ends, not when it stops', (
+    tester,
+  ) async {
+    final backends = FakeBackends(
+      mealNames: [breakfast, lunch],
+      entries: [
+        entry('E-1'),
+        entry('E-2', meal: lunch),
+      ],
+    );
+    backends.failingMeals.add(dejeuner);
+    await pumpFujin(tester, backends);
+    final haptics = Haptic.record(tester);
+
+    await _tap(tester, 'Envoyer 2 aliments vers Ekklo');
+    await _tap(tester, 'Envoyer 2 aliments vers Ekklo');
+
+    check(haptics).isEmpty();
+
+    backends.failingMeals.clear();
+    await _tap(tester, 'Envoyer l’aliment restant');
+
+    check(haptics).deepEquals([Haptic.success]);
   });
 
   testWidgets('updates an entry changed in MyFitnessPal without review', (

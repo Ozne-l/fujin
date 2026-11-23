@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fujin/app/theme/fujin_haptics.dart';
 import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
@@ -68,7 +69,12 @@ class SouffleRefresh extends HookWidget {
 
     return RefreshIndicator.noSpinner(
       onRefresh: onRefresh,
-      onStatusChange: (next) => status.value = next,
+      onStatusChange: (next) {
+        if (next == RefreshIndicatorStatus.armed && status.value != next) {
+          FujinHaptics.threshold();
+        }
+        status.value = next;
+      },
       child: Stack(
         children: [
           NotificationListener<ScrollNotification>(

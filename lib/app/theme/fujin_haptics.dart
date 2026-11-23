@@ -9,5 +9,7 @@ abstract final class FujinHaptics {
 
   static void press() => unawaited(HapticFeedback.mediumImpact());
 
+  static void success() => unawaited(HapticFeedback.successNotification());
+
   static void error() => unawaited(HapticFeedback.errorNotification());
 }

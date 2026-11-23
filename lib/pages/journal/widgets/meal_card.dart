@@ -9,6 +9,7 @@ import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
+import 'package:fujin/pages/common/pressable.dart';
 import 'package:fujin/pages/common/status_pill.dart';
 import 'package:fujin/pages/journal/background_write_notifier.dart';
 import 'package:fujin/pages/journal/widgets/compared_row.dart';
@@ -137,8 +138,7 @@ class MealCard extends HookConsumerWidget {
     return MealCardFrame(
       header: switch (counts.total) {
         0 => header,
-        _ => GestureDetector(
-          behavior: HitTestBehavior.opaque,
+        _ => Pressable.card(
           onTap: () => toggled.value = (settled: settled, open: !open),
           child: header,
         ),

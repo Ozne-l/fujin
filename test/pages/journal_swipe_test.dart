@@ -11,6 +11,7 @@ import 'package:fujin/pages/common/row_action.dart';
 
 import '../support/fake_backends.dart';
 import '../support/fixtures.dart';
+import '../support/haptic.dart';
 import '../support/logged_journal.dart';
 
 const String _row = LoggedJournal.basmati;
@@ -126,6 +127,20 @@ void main() {
 
     check(find.text(_sheetTitle).evaluate()).length.equals(1);
     check(find.text(_action).hitTestable().evaluate()).isEmpty();
+  });
+
+  testWidgets('ticks once when the swipe passes the point where letting go '
+      'removes, and not on a swipe that only opens Supprimer', (tester) async {
+    await _pump(tester, _backends());
+    final haptics = Haptic.record(tester);
+
+    await _drag(tester, _row, 0.25);
+
+    check(haptics).isEmpty();
+
+    await _drag(tester, _otherRow, 0.8);
+
+    check(haptics).deepEquals([Haptic.threshold, Haptic.press]);
   });
 
   testWidgets('removes nothing on Garder', (tester) async {

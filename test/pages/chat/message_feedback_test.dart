@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:checks/checks.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/data/dev_chat/fake_chat.dart';
 import 'package:fujin/pages/tabs/tab_plate.dart';
 
 import '../../support/fake_backends.dart';
 import '../../support/fixtures.dart';
+import '../../support/haptic.dart';
 import '../../support/pump_fujin.dart';
 
 const _send = 'Envoyer';
@@ -17,7 +17,6 @@ const _notSent = 'Non envoyé.';
 const _seen = 'Vu';
 const _postText =
     'POST /api/v1/messaging/conversations/${FakeChat.conversationId}/messages';
-const _errorHaptic = 'HapticFeedbackType.errorNotification';
 
 FakeChatJson _text(String id, String senderId, Duration ago) =>
     FakeChat.message(
@@ -71,26 +70,6 @@ Future<void> _pumpUntil(WidgetTester tester, String text) async {
   }
 }
 
-List<String> _haptics(WidgetTester tester) {
-  final calls = <String>[];
-  tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-    SystemChannels.platform,
-    (call) async {
-      if (call.method == 'HapticFeedback.vibrate') {
-        calls.add('${call.arguments}');
-      }
-      return null;
-    },
-  );
-  addTearDown(
-    () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      SystemChannels.platform,
-      null,
-    ),
-  );
-  return calls;
-}
-
 void main() {
   testWidgets('reads « Vu » under my last message once the coach reads it', (
     tester,
@@ -118,7 +97,7 @@ void main() {
     ('after « Envoi… »', true),
   ]) {
     testWidgets('a text refused $moment buzzes once', (tester) async {
-      final haptics = _haptics(tester);
+      final haptics = Haptic.record(tester);
       final backends = _backends();
       await pumpFujin(tester, backends);
       await _open(tester);
@@ -129,7 +108,7 @@ void main() {
       await tester.pumpAndSettle();
 
       check(find.text(_notSent).evaluate()).length.equals(1);
-      check(haptics.where((type) => type == _errorHaptic)).length.equals(1);
+      check(haptics.where((type) => type == Haptic.error)).length.equals(1);
     });
   }
 
@@ -160,7 +139,7 @@ void main() {
     tester.platformDispatcher.accessibilityFeaturesTestValue =
         const FakeAccessibilityFeatures(disableAnimations: true);
     addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
-    final haptics = _haptics(tester);
+    final haptics = Haptic.record(tester);
     final backends = _backends();
     await pumpFujin(tester, backends);
     await _open(tester);
@@ -173,6 +152,6 @@ void main() {
     }
 
     check(positions).length.equals(1);
-    check(haptics.where((type) => type == _errorHaptic)).length.equals(1);
+    check(haptics.where((type) => type == Haptic.error)).length.equals(1);
   });
 }

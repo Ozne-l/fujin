@@ -7,6 +7,7 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/alert_banner.dart';
+import 'package:fujin/pages/common/failure_shake.dart';
 import 'package:fujin/pages/common/fujin_spinner.dart';
 import 'package:fujin/pages/common/sign_in_failure.dart';
 import 'package:fujin/pages/common/top_bar.dart';
@@ -87,34 +88,55 @@ class EkkloSignInPage extends HookConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: FujinSpace.s6),
-                    if (_banner(context.intl, state) case final banner?) ...[
-                      banner,
-                      const SizedBox(height: FujinSpace.s6),
-                    ],
-                    _Label(text: context.intl.emailLabel),
-                    TextField(
-                      controller: email,
-                      readOnly: running,
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      autocorrect: false,
-                      autofillHints: const [AutofillHints.email],
-                      cursorWidth: FujinTheme.cursorWidth,
-                      style: _fieldStyle(context.colors),
-                      onChanged: (_) => refused.value = false,
-                      decoration: InputDecoration(
-                        enabledBorder: fieldBorder,
-                        focusedBorder: fieldBorder,
+                    switch (_banner(context.intl, state)) {
+                      final banner? => Padding(
+                        padding: const EdgeInsets.only(bottom: FujinSpace.s6),
+                        child: banner,
                       ),
-                    ),
-                    const SizedBox(height: FujinSpace.s4),
-                    _Label(text: context.intl.passwordLabel),
-                    _PasswordField(
-                      controller: password,
-                      readOnly: running,
-                      border: fieldBorder,
-                      onChanged: (_) => refused.value = false,
-                      onSubmitted: submit,
+                      null => const SizedBox.shrink(),
+                    },
+                    FailureShake(
+                      failed: switch (state) {
+                        EkkloSignInFailed(failure: SignInFailure.refused) =>
+                          true,
+                        EkkloSignInFailed(
+                          failure: SignInFailure.unreachable,
+                        ) ||
+                        EkkloSignInIdle() ||
+                        EkkloSignInRunning() ||
+                        EkkloSignInDone() => false,
+                      },
+                      buzz: true,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _Label(text: context.intl.emailLabel),
+                          TextField(
+                            controller: email,
+                            readOnly: running,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            autocorrect: false,
+                            autofillHints: const [AutofillHints.email],
+                            cursorWidth: FujinTheme.cursorWidth,
+                            style: _fieldStyle(context.colors),
+                            onChanged: (_) => refused.value = false,
+                            decoration: InputDecoration(
+                              enabledBorder: fieldBorder,
+                              focusedBorder: fieldBorder,
+                            ),
+                          ),
+                          const SizedBox(height: FujinSpace.s4),
+                          _Label(text: context.intl.passwordLabel),
+                          _PasswordField(
+                            controller: password,
+                            readOnly: running,
+                            border: fieldBorder,
+                            onChanged: (_) => refused.value = false,
+                            onSubmitted: submit,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

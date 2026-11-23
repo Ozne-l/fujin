@@ -5,7 +5,6 @@ import 'package:checks/checks.dart';
 import 'package:flutter/gestures.dart'
     show kDoubleTapTimeout, kLongPressTimeout;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/data/dev_chat/fake_chat.dart';
 import 'package:fujin/pages/chat/widgets/emoji_sheet.dart';
@@ -14,6 +13,7 @@ import 'package:fujin/pages/tabs/tab_plate.dart';
 
 import '../../support/fake_backends.dart';
 import '../../support/fixtures.dart';
+import '../../support/haptic.dart';
 import '../../support/pump_fujin.dart';
 
 const _coach = 'Nora Lindqvist';
@@ -106,26 +106,6 @@ double _opacity(WidgetTester tester, String text) => tester
     )
     .opacity
     .value;
-
-List<String> _haptics(WidgetTester tester) {
-  final calls = <String>[];
-  tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-    SystemChannels.platform,
-    (call) async {
-      if (call.method == 'HapticFeedback.vibrate') {
-        calls.add('${call.arguments}');
-      }
-      return null;
-    },
-  );
-  addTearDown(
-    () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      SystemChannels.platform,
-      null,
-    ),
-  );
-  return calls;
-}
 
 void main() {
   group('a text', () {
@@ -248,7 +228,7 @@ void main() {
         'haptic tick', (tester) async {
       await pumpFujin(tester, _backends());
       await _open(tester);
-      final haptics = _haptics(tester);
+      final haptics = Haptic.record(tester);
       const below = MessageGestures.trigger - 14;
       const past = MessageGestures.trigger + 16;
 
@@ -264,7 +244,7 @@ void main() {
       await tester.drag(_bubble(_question), const Offset(past, 0));
       await tester.pumpAndSettle();
       check(find.text('Réponse à $_coach').evaluate()).length.equals(1);
-      check(haptics).deepEquals(['HapticFeedbackType.lightImpact']);
+      check(haptics).deepEquals([Haptic.threshold]);
       check(_draftFocused(tester)).isTrue();
 
       await tester.drag(_bubble(_answer), const Offset(-past, 0));
@@ -277,7 +257,7 @@ void main() {
     ) async {
       await pumpFujin(tester, _backends());
       await _open(tester);
-      final haptics = _haptics(tester);
+      final haptics = Haptic.record(tester);
 
       await tester.drag(
         _bubble(_question),
@@ -476,7 +456,7 @@ void main() {
     ) async {
       await pumpFujin(tester, _backends());
       await _open(tester);
-      final haptics = _haptics(tester);
+      final haptics = Haptic.record(tester);
 
       final finger = await tester.startGesture(
         tester.getCenter(find.text(_question)),
@@ -491,7 +471,7 @@ void main() {
       check(find.text('Répondre').evaluate()).isEmpty();
       check(find.text('😮').evaluate()).length.equals(1);
       check(find.text('1').evaluate()).length.equals(1);
-      check(haptics).contains('HapticFeedbackType.selectionClick');
+      check(haptics).contains(Haptic.select);
     });
 
     testWidgets('stays open when the finger lets go off the emojis', (

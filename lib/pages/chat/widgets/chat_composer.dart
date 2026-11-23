@@ -9,7 +9,7 @@ import 'package:fujin/pages/chat_media/widgets/media_glyph.dart';
 import 'package:fujin/pages/common/glass_fill.dart';
 import 'package:fujin/pages/common/glass_finish.dart';
 import 'package:fujin/pages/common/glass_text_field.dart';
-import 'package:motor/motor.dart';
+import 'package:fujin/pages/common/pressable.dart';
 
 class ChatComposer extends HookWidget {
   const ChatComposer({
@@ -142,48 +142,30 @@ class ChatComposer extends HookWidget {
   }
 }
 
-class _MediaButton extends HookWidget {
+class _MediaButton extends StatelessWidget {
   const _MediaButton({required this.onPressed});
 
   final VoidCallback? onPressed;
 
   @override
-  Widget build(BuildContext context) {
-    final pressed = useState(false);
-    final onPressed = this.onPressed;
-    final colors = context.colors;
-    return Semantics(
-      button: true,
-      enabled: onPressed != null,
-      label: context.intl.chatMedia,
-      excludeSemantics: true,
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    enabled: onPressed != null,
+    label: context.intl.chatMedia,
+    excludeSemantics: true,
+    onTap: onPressed,
+    child: Pressable.glass(
       onTap: onPressed,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onPressed,
-        onTapDown: (_) => pressed.value = onPressed != null,
-        onTapUp: (_) => pressed.value = false,
-        onTapCancel: () => pressed.value = false,
-        child: SingleMotionBuilder(
-          motion: FujinMotion.of(context, FujinMotion.lift),
-          value: switch (pressed.value) {
-            true => FujinMotion.pressShrink,
-            false => 1,
-          },
-          builder: (context, scale, glyph) =>
-              Transform.scale(scale: scale, child: glyph),
-          child: SizedBox.square(
-            dimension: FujinSize.searchField,
-            child: Center(
-              child: MediaGlyph(
-                ChatMediaIcon.image,
-                size: FujinSize.composerIcon,
-                color: GlassFinish.clear.foreground(colors),
-              ),
-            ),
+      child: SizedBox.square(
+        dimension: FujinSize.searchField,
+        child: Center(
+          child: MediaGlyph(
+            ChatMediaIcon.image,
+            size: FujinSize.composerIcon,
+            color: GlassFinish.clear.foreground(context.colors),
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
 }

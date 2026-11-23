@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fujin/app/theme/fujin_haptics.dart';
 import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/weigh_ins/weigh_in.dart';
@@ -66,6 +67,7 @@ class WeighInSheet extends HookConsumerWidget {
         final saved = ref
             .read(weighInsProvider.notifier)
             .save(date: day.value, kilograms: kilograms);
+        FujinHaptics.success();
         WeighInSnackBar.saved(context, saved, today: today);
         Navigator.of(context).pop();
       },

@@ -11,6 +11,7 @@ import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:fujin/l10n/generated/app_localizations.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/goals_text.dart';
+import 'package:fujin/pages/common/pressable.dart';
 import 'package:fujin/pages/common/progress_bar.dart';
 import 'package:fujin/pages/common/send_label.dart';
 import 'package:fujin/pages/common/source_dot.dart';
@@ -88,7 +89,7 @@ class DaySummaryCard extends ConsumerWidget {
       (null, _) => (context.intl.sendToEkklo, null),
     };
     final colors = context.colors;
-    return GestureDetector(
+    return Pressable.card(
       onTap: switch (fresh) {
         _? => onDetail,
         null => null,
