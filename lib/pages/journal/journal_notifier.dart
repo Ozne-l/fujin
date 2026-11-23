@@ -4,8 +4,8 @@ import 'package:ekklo_client/ekklo_client.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/domain/journal/calendar_week.dart';
 import 'package:fujin/domain/journal/fetch.dart';
+import 'package:fujin/domain/journal/fresh_read_service.dart';
 import 'package:fujin/domain/journal/journal_read.dart';
-import 'package:fujin/domain/journal/journal_service.dart';
 import 'package:fujin/pages/journal/refresh_outcome.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -115,8 +115,7 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
       ),
       (true, AsyncValue(:final value?), _, _, _) => value,
       _ => _sharedFirstRead(
-        service,
-        _settler(ref.watch, thenWrite: true),
+        ref.watch(freshReadServiceProvider),
         ref.watch(mfpDiaryProvider(date).future),
         ref.watch(ekkloMealsProvider(date).future),
         ref.watch(mealNamesProvider.future),
@@ -178,74 +177,29 @@ final class JournalNotifier extends AsyncNotifier<JournalRead> {
 
   Future<(Fetch<MfpDiaryDay>, Fetch<List<EkkloDailyMeal>>)> _readSides({
     required bool thenWrite,
-  }) async {
-    final settle = _settler(ref.read, thenWrite: thenWrite);
-    final diary = Fetch.of(ref.read(mfpDiaryProvider(date).future));
-    final meals = Fetch.of(ref.read(ekkloMealsProvider(date).future));
-    final (diaryRead, mealsRead) = (await diary, await meals);
-    settle(diaryRead, mealsRead);
-    return (diaryRead, mealsRead);
-  }
+  }) => ref
+      .read(freshReadServiceProvider)
+      .settle(
+        date,
+        diary: ref.read(mfpDiaryProvider(date).future),
+        meals: ref.read(ekkloMealsProvider(date).future),
+        thenWrite: thenWrite,
+      );
 
-  void Function(Fetch<MfpDiaryDay> diary, Fetch<List<EkkloDailyMeal>> meals)
-  _settler(
-    T Function<T>(ProviderListenable<T> provider) use, {
-    required bool thenWrite,
-  }) {
-    final service = use(journalServiceProvider);
-    final completion = use(foodCompletionServiceProvider);
-    final writer = use(backgroundWriterProvider);
-    return (diary, meals) {
-      final (:replaced, :adopted) = service.settleDay(
+  Future<JournalRead> _sharedFirstRead(
+    FreshReadService fresh,
+    Future<Fetched<MfpDiaryDay>> diary,
+    Future<Fetched<List<EkkloDailyMeal>>> meals,
+    Future<List<String>> mealNames,
+  ) => _firstReading ??= fresh
+      .read(
         date,
         diary: diary,
         meals: meals,
-      );
-      writer.settled(adopted: adopted, replaced: replaced);
-      if (diary case Fetched()) {
-        unawaited(completion.complete());
-        if (thenWrite || adopted.isNotEmpty || replaced.isNotEmpty) {
-          unawaited(writer.run());
-        }
-      }
-    };
-  }
-
-  Future<JournalRead> _sharedFirstRead(
-    JournalService service,
-    void Function(Fetch<MfpDiaryDay>, Fetch<List<EkkloDailyMeal>>) settle,
-    Future<Fetched<MfpDiaryDay>> diary,
-    Future<Fetched<List<EkkloDailyMeal>>> meals,
-    Future<List<String>> mealNames,
-  ) => _firstReading ??= _firstRead(
-    service,
-    settle,
-    diary,
-    meals,
-    mealNames,
-  ).whenComplete(() => _firstReading = null);
-
-  Future<JournalRead> _firstRead(
-    JournalService service,
-    void Function(Fetch<MfpDiaryDay>, Fetch<List<EkkloDailyMeal>>) settle,
-    Future<Fetched<MfpDiaryDay>> diary,
-    Future<Fetched<List<EkkloDailyMeal>>> meals,
-    Future<List<String>> mealNames,
-  ) async {
-    final diaryRead = Fetch.of(diary);
-    final mealsRead = Fetch.of(meals);
-    final names = await mealNames.catchError(
-      (Object error) => const <String>[],
-    );
-    final (diaryFetch, mealsFetch) = (await diaryRead, await mealsRead);
-    settle(diaryFetch, mealsFetch);
-    return service.journalOf(
-      date,
-      diary: diaryFetch,
-      meals: mealsFetch,
-      mealNames: names,
-    );
-  }
+        mealNames: mealNames,
+        thenWrite: true,
+      )
+      .whenComplete(() => _firstReading = null);
 
   static Fetch<T>? _held<T>(AsyncValue<Fetched<T>> side) => switch (side) {
     AsyncData(:final value) => value,
