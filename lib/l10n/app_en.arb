@@ -435,7 +435,7 @@
   "scannerTypeTitle": "Type the barcode",
   "scannerCodeValid": "{format}, check digit correct",
   "scannerSearchCode": "Look up this code",
-  "scannerErase": "Delete",
+  "keypadErase": "Delete",
   "scannerFoundByBarcode": "· found by barcode",
   "scannerFromMemory": "Memory · kept for this barcode",
   "scannerPer100Grams": "{energy} kcal / 100 g",

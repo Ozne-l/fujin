@@ -2013,7 +2013,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get scannerSearchCode => 'Chercher ce code';
 
   @override
-  String get scannerErase => 'Effacer';
+  String get keypadErase => 'Effacer';
 
   @override
   String get scannerFoundByBarcode => '· trouvé par code-barres';

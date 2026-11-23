@@ -100,10 +100,7 @@ class WeighInsPage extends ConsumerWidget {
         header: HeaderLayout.shield(
           Padding(
             padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [TopBar(title: intl.weighInsTitle)],
-            ),
+            child: TopBar(title: intl.weighInsTitle),
           ),
         ),
         body: (context, top, _) => ScrollEdgeBlur(

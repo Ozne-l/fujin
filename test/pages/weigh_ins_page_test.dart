@@ -1,5 +1,4 @@
 import 'package:checks/checks.dart';
-import 'package:ekklo_client/ekklo_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart' hide expect;
 import 'package:fujin/app/app_environment.dart';
@@ -144,6 +143,48 @@ void main() {
     check(_count('Aujourd’hui · 68,9 kg')).equals(1);
   });
 
+  testWidgets('keeps the new weigh-in sheet unchanged while it closes after '
+      'a save', (tester) async {
+    await pumpFujin(tester, FakeBackends());
+    await _openWeighIns(tester);
+    await _tap(tester, find.text('Nouvelle pesée').last);
+    await _type(tester, '68,9');
+
+    await tester.tap(find.text('Enregistrer'));
+    await tester.pump(const Duration(milliseconds: 16));
+
+    check(_count('Remplacer la pesée')).equals(0);
+    check(_count('Ce jour a déjà une pesée : 68,9 kg.')).equals(0);
+    await _frames(tester);
+  });
+
+  testWidgets('corrects a weigh-in from its row on the same day, in both '
+      'apps', (tester) async {
+    final backends = FakeBackends();
+    await pumpFujin(tester, backends);
+    await _openWeighIns(tester);
+    await _save(tester, '68,9');
+
+    await _tap(tester, find.text(_today));
+    check(_count('Modifier la pesée')).equals(1);
+    check(_count('Mercredi 7 octobre')).equals(1);
+    check(_count('68,9')).equals(1);
+    await _erase(tester, 1);
+    await _type(tester, '7');
+    await _tap(tester, find.text('Enregistrer'));
+
+    check(_count(_today)).equals(1);
+    check(_count('68,7 kg')).equals(1);
+    check(_count('68,9 kg')).equals(0);
+    check([
+      for (final measurement in backends.mfpMeasurements) measurement.value,
+    ]).deepEquals([68.7]);
+    check([
+      for (final weight in backends.ekkloWeights)
+        (weight.date.day, weight.kilograms),
+    ]).deepEquals([(day.day, 68.7)]);
+  });
+
   testWidgets('accepts 20 to 300 kg only, and waits for more digits before '
       'saying so', (tester) async {
     await pumpFujin(tester, FakeBackends());
@@ -179,13 +220,7 @@ void main() {
       'apps', (tester) async {
     final backends = FakeBackends(
       ekkloWeights: [
-        EkkloWeightEntry(
-          id: 'w-1',
-          date: day,
-          kilograms: 69.2,
-          createdAt: now,
-          updatedAt: now,
-        ),
+        ekkloWeight('w-1', day, 69.2),
       ],
     );
     await pumpFujin(

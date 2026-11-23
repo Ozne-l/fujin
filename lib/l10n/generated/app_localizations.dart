@@ -2708,11 +2708,11 @@ abstract class AppLocalizations {
   /// **'Chercher ce code'**
   String get scannerSearchCode;
 
-  /// No description provided for @scannerErase.
+  /// No description provided for @keypadErase.
   ///
   /// In fr, this message translates to:
   /// **'Effacer'**
-  String get scannerErase;
+  String get keypadErase;
 
   /// No description provided for @scannerFoundByBarcode.
   ///

@@ -28,8 +28,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class WeighInSheet extends HookConsumerWidget {
   const WeighInSheet({this.editing, this.onDelete, super.key});
 
-  static const _pickerSpan = Duration(days: 365);
-
   final WeighIn? editing;
   final VoidCallback? onDelete;
 
@@ -56,10 +54,13 @@ class WeighInSheet extends HookConsumerWidget {
       null => KilogramsTyping(separator: separator),
     });
     final day = useState(editing?.date ?? today);
-    final replaced = switch (editing) {
-      _? => null,
-      null => ref.watch(weighInsProvider).liveOn(day.value),
-    };
+    final replaced = useMemoized(
+      () => switch (editing) {
+        _? => null,
+        null => ref.read(weighInsProvider).liveOn(day.value),
+      },
+      [day.value],
+    );
     final save = switch (typing.value.kilograms) {
       final kilograms? => () {
         final saved = ref
@@ -97,7 +98,7 @@ class WeighInSheet extends HookConsumerWidget {
               null => DayPickerButton(
                 label: WeighInText.day(intl, day.value, today: today),
                 selected: day.value,
-                first: today.subtract(_pickerSpan),
+                first: today.subtract(DayPickerButton.span),
                 last: today,
                 onPicked: (picked) =>
                     day.value = SelectedDay.calendarDay(picked),

@@ -17,9 +17,7 @@ class DayPickerButton extends StatelessWidget {
     super.key,
   });
 
-  static const padding = EdgeInsetsDirectional.symmetric(
-    horizontal: FujinSpace.s4,
-  );
+  static const span = Duration(days: 365);
 
   final String label;
   final DateTime selected;
@@ -29,7 +27,7 @@ class DayPickerButton extends StatelessWidget {
   final Color iconColor;
 
   @override
-  Widget build(BuildContext context) => FujinMenuButton(
+  Widget build(BuildContext context) => FujinMenuButton.pill(
     label: label,
     expanded: false,
     onTap: () => unawaited(
@@ -43,10 +41,6 @@ class DayPickerButton extends StatelessWidget {
         ),
       ),
     ),
-    height: FujinSize.buttonMedium,
-    radius: FujinRadius.pill,
-    padding: padding,
-    chevronSize: FujinSize.mealArrow,
     leading: Icon(
       Icons.calendar_today_outlined,
       size: FujinSize.mealArrow,

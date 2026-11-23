@@ -1082,7 +1082,7 @@
     "placeholders": {"format": {"type": "String"}}
   },
   "scannerSearchCode": "Chercher ce code",
-  "scannerErase": "Effacer",
+  "keypadErase": "Effacer",
   "scannerFoundByBarcode": "· trouvé par code-barres",
   "scannerFromMemory": "Mémoire · retenu pour ce code-barres",
   "scannerPer100Grams": "{energy} kcal / 100 g",

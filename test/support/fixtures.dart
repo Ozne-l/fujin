@@ -414,3 +414,29 @@ LinkedItem sentItem(
   servingValue: servingValue,
   unit: unit,
 );
+
+MfpMeasurement mfpWeight(
+  String id,
+  double value, {
+  String unit = 'kilograms',
+  DateTime? date,
+}) => MfpMeasurement(
+  id: id,
+  type: 'weight',
+  value: value,
+  unit: unit,
+  date: date ?? day,
+);
+
+EkkloWeightEntry ekkloWeight(
+  String id,
+  DateTime date,
+  double kilograms, {
+  Duration later = Duration.zero,
+}) => EkkloWeightEntry(
+  id: id,
+  date: date,
+  kilograms: kilograms,
+  createdAt: now,
+  updatedAt: now.add(later),
+);
