@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fujin/app/app_environment.dart';
 import 'package:fujin/app/providers.dart';
+import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/data/connectors/connector.dart';
 import 'package:fujin/data/goals/goal_period.dart';
 import 'package:fujin/data/goals/goals.dart';
@@ -492,7 +493,7 @@ void main() {
   ) async {
     final gate = Completer<void>();
     final backends = FakeBackends(mealNames: [breakfast])..diaryGate = gate;
-    await pumpFujin(tester, backends, goals: _goals);
+    await pumpFujin(tester, backends, goals: _goals, settle: false);
 
     check(
       find.text('Lecture de MyFitnessPal\net d’Ekklo…').evaluate(),
@@ -638,6 +639,7 @@ void main() {
 
       await tester.tap(find.text('6'));
       await tester.pump();
+      await tester.pump(FujinMotion.spatialSlow.duration);
       check(
         _rich('3${_space}120 / 3${_space}000 kcal').evaluate(),
       ).length.equals(1);
@@ -1992,8 +1994,10 @@ void main() {
       ..diaryGate = diaryGate
       ..mealsGate = mealsGate
       ..entries = [entry('E-1', date: DateTime.utc(2026, 9, 23))];
-    await _swipeWeekBack(tester);
-    await _swipeWeekBack(tester);
+    for (var week = 0; week < 2; week++) {
+      await tester.fling(find.byType(PageView), const Offset(300, 0), 1000);
+      await _frames(tester);
+    }
     check(_ring(tester, '23').selected).isTrue();
 
     await tester.tap(find.text('22'));
@@ -2017,7 +2021,7 @@ void main() {
     final backends = FakeBackends(mealNames: [breakfast])
       ..diaryGate = diaryGate
       ..mealsGate = mealsGate;
-    await pumpFujin(tester, backends);
+    await pumpFujin(tester, backends, settle: false);
     final writer = ProviderScope.containerOf(
       tester.element(find.byType(JournalHeader)),
     ).read(backgroundWriterProvider);
@@ -2030,7 +2034,7 @@ void main() {
     addTearDown(states.cancel);
 
     diaryGate.complete();
-    await tester.pumpAndSettle();
+    await _frames(tester);
     mealsGate.complete();
     await tester.pumpAndSettle();
 

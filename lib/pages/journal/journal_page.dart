@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fujin/app/fujin_route.dart';
 import 'package:fujin/app/providers.dart';
 import 'package:fujin/app/theme/fujin_haptics.dart';
+import 'package:fujin/app/theme/fujin_motion.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/goals/goals.dart';
@@ -16,6 +17,7 @@ import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/adding/add_shortcut.dart';
 import 'package:fujin/pages/common/appearance_corner.dart';
+import 'package:fujin/pages/common/fade_through.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/goals_notifier.dart';
 import 'package:fujin/pages/common/gold_separator.dart';
@@ -26,6 +28,7 @@ import 'package:fujin/pages/common/snack_bar_content.dart';
 import 'package:fujin/pages/common/snack_bar_glyph.dart';
 import 'package:fujin/pages/common/souffle_refresh.dart';
 import 'package:fujin/pages/common/swipe_row.dart';
+import 'package:fujin/pages/journal/arrival_notifier.dart';
 import 'package:fujin/pages/journal/background_write_notifier.dart';
 import 'package:fujin/pages/journal/entry_removal.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
@@ -37,6 +40,7 @@ import 'package:fujin/pages/journal/remove_entry_state.dart';
 import 'package:fujin/pages/journal/selected_day.dart';
 import 'package:fujin/pages/journal/widgets/day_detail_sheet.dart';
 import 'package:fujin/pages/journal/widgets/day_summary_card.dart';
+import 'package:fujin/pages/journal/widgets/day_switcher.dart';
 import 'package:fujin/pages/journal/widgets/diary_meal_card.dart';
 import 'package:fujin/pages/journal/widgets/journal_brand.dart';
 import 'package:fujin/pages/journal/widgets/journal_header.dart';
@@ -230,7 +234,10 @@ class JournalPage extends HookConsumerWidget {
         FujinRoute.editFood.forEntry(day, entryId),
       );
       if (outcome == null || !context.mounted) return;
-      if (outcome is Edited) FujinHaptics.success();
+      if (outcome case Edited(:final edited)) {
+        FujinHaptics.success();
+        ref.read(arrivalProvider.notifier).arrive(edited.entry);
+      }
       settleEdit(outcome);
     }
 
@@ -259,38 +266,137 @@ class JournalPage extends HookConsumerWidget {
 
     final select = ref.read(selectedDayProvider.notifier).select;
 
-    List<Widget> problem(ReadProblem problem, {DateTime? readAt}) => [
-      SliverToBoxAdapter(
-        child: JournalProblemCard(
-          problem: problem,
-          readAt: readAt,
-          onSignIn: (route) => unawaited(signIn(route)),
-          onRetry: () => unawaited(notifier.reload()),
+    Widget problem(ReadProblem problem, {DateTime? readAt}) => Padding(
+      key: ValueKey((problem, readAt != null)),
+      padding: const EdgeInsets.only(bottom: FujinSpace.s3),
+      child: JournalProblemCard(
+        problem: problem,
+        readAt: readAt,
+        onSignIn: (route) => unawaited(signIn(route)),
+        onRetry: () => unawaited(notifier.reload()),
+      ),
+    );
+
+    Widget summary(JournalRead read, {required bool stale}) => DaySummaryCard(
+      read: read,
+      goals: dayGoals,
+      stale: stale,
+      onSend: () => unawaited(send()),
+      onDetail: () {
+        if (read case BothSides(:final day)) {
+          unawaited(
+            showDayDetailSheet(
+              context,
+              day: day,
+              onSend: () => unawaited(send()),
+            ),
+          );
+        }
+      },
+    );
+
+    final (shownProblem, shownSummary, shownMeals) = switch (journal) {
+      AsyncValue(value: final read?, error: final error?) => (
+        problem(ReadProblem.of(error), readAt: read.readAt),
+        summary(read, stale: true),
+        (
+          _MealsView.diary,
+          [
+            for (final meal in read.diaryMeals)
+              DiaryMealCard(key: ValueKey(meal.name), meal: meal),
+          ],
         ),
       ),
-      const SliverToBoxAdapter(child: SizedBox(height: FujinSpace.s3)),
-    ];
-
-    Widget summary(JournalRead read, {required bool stale}) =>
-        SliverToBoxAdapter(
-          child: DaySummaryCard(
-            read: read,
-            goals: dayGoals,
-            stale: stale,
-            onSend: () => unawaited(send()),
-            onDetail: () {
-              if (read case BothSides(:final day)) {
-                unawaited(
-                  showDayDetailSheet(
-                    context,
-                    day: day,
-                    onSend: () => unawaited(send()),
-                  ),
-                );
-              }
-            },
-          ),
-        );
+      AsyncValue(value: BothSides(:final day) && final read) => (
+        null,
+        summary(read, stale: false),
+        (
+          _MealsView.compared,
+          [
+            for (final meal in day.meals)
+              MealCard(
+                key: ValueKey((day.date, meal.name)),
+                meal: meal,
+                onAdd: () => unawaited(add(meal.name)),
+                groupTag: day.date,
+                removable: removable,
+                removedEntryId: removed.value,
+                onOpen: (compared) {
+                  if (compared.entryId case final entryId?) {
+                    unawaited(edit(entryId));
+                  }
+                },
+                onRemove: (compared) => remove(
+                  compared.logged,
+                  inEkklo: switch (compared.status) {
+                    InEkklo() || ToUpdate() => true,
+                    ToSend() => false,
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
+      AsyncValue(value: FujinOnly(meals: final stored) && final read) => (
+        problem(ReadProblem.offline),
+        summary(read, stale: false),
+        (
+          _MealsView.stored,
+          [
+            for (final meal in stored)
+              StoredMealCard(
+                key: ValueKey((day, meal.name)),
+                meal: meal,
+                onAdd: () => unawaited(add(meal.name)),
+                groupTag: day,
+                removable: removable,
+                removedEntryId: removed.value,
+                onOpen: (logged) => unawaited(edit(logged.entry.id)),
+                onRemove: (logged) => remove(
+                  logged,
+                  inEkklo: logged.ekkloLink?.item != null,
+                ),
+              ),
+          ],
+        ),
+      ),
+      AsyncValue(value: MfpOnly() && final read) => (
+        problem(read.ekkloProblem),
+        summary(read, stale: false),
+        (
+          _MealsView.diary,
+          [
+            for (final meal in read.diaryMeals)
+              DiaryMealCard(
+                key: ValueKey(meal.name),
+                meal: meal,
+                note: context.intl.ekkloUnavailable,
+              ),
+          ],
+        ),
+      ),
+      AsyncValue(value: EkkloOnly() && final read) => (
+        problem(read.mfpProblem),
+        summary(read, stale: false),
+        (_MealsView.diary, const <Widget>[]),
+      ),
+      AsyncError(:final error) => (
+        problem(ReadProblem.of(error)),
+        null,
+        (_MealsView.diary, const <Widget>[]),
+      ),
+      AsyncLoading() => (
+        null,
+        const LoadingSummaryCard(),
+        (
+          _MealsView.loading,
+          [
+            for (var index = 0; index < _loadingMeals; index++)
+              const LoadingMealCard(),
+          ],
+        ),
+      ),
+    };
 
     return Scaffold(
       body: AppearanceCorner(
@@ -339,91 +445,36 @@ class JournalPage extends HookConsumerWidget {
                           JournalBrand.extent(context),
                     ),
                   ),
-                  ...switch (journal) {
-                    AsyncValue(value: final read?, error: final error?) => [
-                      ...problem(ReadProblem.of(error), readAt: read.readAt),
-                      summary(read, stale: true),
-                      ...switch (read.diaryMeals) {
-                        [] => const <Widget>[],
-                        final meals => _meals(context, [
-                          for (final meal in meals)
-                            DiaryMealCard(key: ValueKey(meal.name), meal: meal),
-                        ]),
-                      },
-                    ],
-                    AsyncValue(value: BothSides(:final day) && final read) => [
-                      summary(read, stale: false),
-                      ..._meals(context, [
-                        for (final meal in day.meals)
-                          MealCard(
-                            key: ValueKey((day.date, meal.name)),
-                            meal: meal,
-                            onAdd: () => unawaited(add(meal.name)),
-                            groupTag: day.date,
-                            removable: removable,
-                            removedEntryId: removed.value,
-                            onOpen: (compared) {
-                              if (compared.entryId case final entryId?) {
-                                unawaited(edit(entryId));
-                              }
-                            },
-                            onRemove: (compared) => remove(
-                              compared.logged,
-                              inEkklo: switch (compared.status) {
-                                InEkklo() || ToUpdate() => true,
-                                ToSend() => false,
-                              },
+                  SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _ProblemSlot(child: shownProblem),
+                        FadeThrough(
+                          scale: 1,
+                          child: shownSummary ?? const SizedBox.shrink(),
+                        ),
+                        FadeThrough(
+                          scale: 1,
+                          child: switch (shownMeals) {
+                            (_, []) => const SizedBox.shrink(),
+                            _ => _mealsHeader(context),
+                          },
+                        ),
+                        DaySwitcher(
+                          day: day,
+                          child: switch (shownMeals) {
+                            (final view, final cards) => Column(
+                              key: ValueKey((view, day)),
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              spacing: FujinSpace.s3,
+                              children: cards,
                             ),
-                          ),
-                      ]),
-                    ],
-                    AsyncValue(value: FujinOnly(:final meals) && final read) =>
-                      [
-                        ...problem(ReadProblem.offline),
-                        summary(read, stale: false),
-                        ..._meals(context, [
-                          for (final meal in meals)
-                            StoredMealCard(
-                              key: ValueKey((day, meal.name)),
-                              meal: meal,
-                              onAdd: () => unawaited(add(meal.name)),
-                              groupTag: day,
-                              removable: removable,
-                              removedEntryId: removed.value,
-                              onOpen: (logged) =>
-                                  unawaited(edit(logged.entry.id)),
-                              onRemove: (logged) => remove(
-                                logged,
-                                inEkklo: logged.ekkloLink?.item != null,
-                              ),
-                            ),
-                        ]),
+                          },
+                        ),
                       ],
-                    AsyncValue(value: MfpOnly() && final read) => [
-                      ...problem(read.ekkloProblem),
-                      summary(read, stale: false),
-                      ..._meals(context, [
-                        for (final meal in read.diaryMeals)
-                          DiaryMealCard(
-                            key: ValueKey(meal.name),
-                            meal: meal,
-                            note: context.intl.ekkloUnavailable,
-                          ),
-                      ]),
-                    ],
-                    AsyncValue(value: EkkloOnly() && final read) => [
-                      ...problem(read.mfpProblem),
-                      summary(read, stale: false),
-                    ],
-                    AsyncError(:final error) => problem(ReadProblem.of(error)),
-                    AsyncLoading() => [
-                      const SliverToBoxAdapter(child: LoadingSummaryCard()),
-                      ..._meals(context, [
-                        for (var index = 0; index < _loadingMeals; index++)
-                          const LoadingMealCard(),
-                      ]),
-                    ],
-                  },
+                    ),
+                  ),
                   SliverToBoxAdapter(
                     child: SizedBox(
                       height:
@@ -439,22 +490,21 @@ class JournalPage extends HookConsumerWidget {
     );
   }
 
-  static List<Widget> _meals(BuildContext context, List<Widget> cards) => [
-    const SliverToBoxAdapter(
-      child: Padding(
+  static Widget _mealsHeader(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      const Padding(
         padding: EdgeInsets.symmetric(
           horizontal: FujinSize.screenMargin,
           vertical: FujinSpace.s4,
         ),
         child: GoldSeparator(volute: true),
       ),
-    ),
-    SliverPadding(
-      padding: const EdgeInsetsDirectional.only(
-        start: FujinSize.textInset,
-        bottom: FujinSpace.s3,
-      ),
-      sliver: SliverToBoxAdapter(
+      Padding(
+        padding: const EdgeInsetsDirectional.only(
+          start: FujinSize.textInset,
+          bottom: FujinSpace.s3,
+        ),
         child: Text(
           context.intl.mealsOfTheDay,
           style: FujinText.inter12Medium.copyWith(
@@ -462,14 +512,8 @@ class JournalPage extends HookConsumerWidget {
           ),
         ),
       ),
-    ),
-    SliverList.separated(
-      itemCount: cards.length,
-      itemBuilder: (context, index) => cards[index],
-      separatorBuilder: (context, index) =>
-          const SizedBox(height: FujinSpace.s3),
-    ),
-  ];
+    ],
+  );
 
   static void _showNothingNew(BuildContext context) {
     ScaffoldMessenger.of(context).showNotice(
@@ -480,5 +524,30 @@ class JournalPage extends HookConsumerWidget {
         detail: context.intl.nothingNewDetail,
       ),
     );
+  }
+}
+
+enum _MealsView { loading, compared, stored, diary }
+
+class _ProblemSlot extends StatelessWidget {
+  const _ProblemSlot({required this.child});
+
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    final switcher = FadeThrough(
+      scale: 1,
+      child: child ?? const SizedBox.shrink(),
+    );
+    return switch (FujinMotion.reduced(context)) {
+      true => switcher,
+      false => AnimatedSize(
+        duration: FujinMotion.spatial.duration,
+        curve: FujinMotion.spatial.curve,
+        alignment: Alignment.topCenter,
+        child: switcher,
+      ),
+    };
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/rolling_number.dart';
 import 'package:fujin/pages/journal/widgets/split_line.dart';
 
 class MealTitle extends StatelessWidget {
@@ -25,10 +26,13 @@ class MealTitle extends StatelessWidget {
   );
 
   static Widget kilocaloriesText(BuildContext context, double kilocalories) =>
-      Text(
-        context.intl.kilocalories(kilocalories),
-        style: FujinText.inter15Semibold.copyWith(
-          color: context.colors.textPrimary,
+      RollingNumber(
+        value: kilocalories,
+        builder: (context, kilocalories) => Text(
+          context.intl.kilocalories(kilocalories),
+          style: FujinText.inter15Semibold.copyWith(
+            color: context.colors.textPrimary,
+          ),
         ),
       );
 

@@ -11,6 +11,8 @@ import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/food_text.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
+import 'package:fujin/pages/common/snack_bar_content.dart';
+import 'package:fujin/pages/common/snack_bar_glyph.dart';
 import 'package:fujin/pages/common/status_pill.dart';
 import 'package:fujin/pages/common/text_inset.dart';
 import 'package:fujin/pages/sending/entry_choices.dart';
@@ -151,13 +153,14 @@ class _ChoiceRow extends ConsumerWidget {
     void keep(PlannedEntry planned) => unawaited(
       kept.keep(planned).then((failure) {
         if (failure case final failure?) {
-          messenger.showFujinSnackBar(
-            SnackBar(
-              content: Text(_failed(intl, failure)),
+          messenger.showNotice(
+            SnackBarContent(
+              glyph: SnackBarGlyph.alert,
+              title: _failed(intl, failure),
               action: switch (failure) {
-                SendFailure.ekkloSession => SnackBarAction(
-                  label: intl.ekkloReconnect,
-                  onPressed: () =>
+                SendFailure.ekkloSession => (
+                  intl.ekkloReconnect,
+                  () =>
                       unawaited(router.push<bool>(FujinRoute.ekkloSignIn.path)),
                 ),
                 SendFailure.network ||
@@ -167,6 +170,7 @@ class _ChoiceRow extends ConsumerWidget {
                 SendFailure.other => null,
               },
             ),
+            duration: FujinSnackBar.alertDuration,
           );
         }
       }),

@@ -6,6 +6,7 @@ import 'package:fujin/app/theme/fujin_theme.dart';
 import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/domain/accounts/connected_accounts.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/fade_through.dart';
 import 'package:fujin/pages/common/gold_volute.dart';
 import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/seigaiha_band.dart';
@@ -188,30 +189,37 @@ class _AccountCard extends StatelessWidget {
                       color: context.colors.textPrimary,
                     ),
                   ),
-                  Text(
-                    switch (connected) {
-                      true => context.intl.accountSessionActive,
-                      false || null => role,
-                    },
-                    style: FujinText.inter13Regular.copyWith(
-                      color: context.colors.textSecondary,
+                  FadeThrough(
+                    scale: 1,
+                    child: Text(
+                      key: ValueKey(connected == true),
+                      switch (connected) {
+                        true => context.intl.accountSessionActive,
+                        false || null => role,
+                      },
+                      style: FujinText.inter13Regular.copyWith(
+                        color: context.colors.textSecondary,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            switch (connected) {
-              true => StatusPill(
-                label: context.intl.accountConnected,
-                tone: PillTone.validated,
-                icon: Icons.check,
-              ),
-              false => OutlinedButton(
-                onPressed: onSignIn,
-                child: Text(context.intl.signIn),
-              ),
-              null => const SizedBox.shrink(),
-            },
+            FadeThrough(
+              scale: 1,
+              child: switch (connected) {
+                true => StatusPill(
+                  label: context.intl.accountConnected,
+                  tone: PillTone.validated,
+                  icon: Icons.check,
+                ),
+                false => OutlinedButton(
+                  onPressed: onSignIn,
+                  child: Text(context.intl.signIn),
+                ),
+                null => const SizedBox.shrink(),
+              },
+            ),
           ],
         ),
       ),

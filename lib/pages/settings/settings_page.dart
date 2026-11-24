@@ -27,6 +27,8 @@ import 'package:fujin/pages/common/pill_tone.dart';
 import 'package:fujin/pages/common/scroll_edge_blur.dart';
 import 'package:fujin/pages/common/scroll_extent_listener.dart';
 import 'package:fujin/pages/common/settings_section.dart';
+import 'package:fujin/pages/common/snack_bar_content.dart';
+import 'package:fujin/pages/common/snack_bar_glyph.dart';
 import 'package:fujin/pages/common/text_inset.dart';
 import 'package:fujin/pages/common/theme_reveal.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
@@ -105,13 +107,13 @@ class SettingsPage extends HookConsumerWidget {
             ).then((_) => backups.cancel()),
           );
         case BackupExported():
-          _tell(context, context.intl.backupExported);
+          _tell(context, SnackBarGlyph.done, context.intl.backupExported);
         case BackupImported():
-          _tell(context, context.intl.backupImported);
+          _tell(context, SnackBarGlyph.done, context.intl.backupImported);
         case BackupFailed(failure: BackupFailure.unreadable):
-          _tell(context, context.intl.backupUnreadable);
+          _tell(context, SnackBarGlyph.alert, context.intl.backupUnreadable);
         case BackupFailed(failure: BackupFailure.notWritten):
-          _tell(context, context.intl.backupNotWritten);
+          _tell(context, SnackBarGlyph.alert, context.intl.backupNotWritten);
         case BackupIdle() || BackupRunning():
           break;
       }
@@ -433,8 +435,9 @@ class SettingsPage extends HookConsumerWidget {
     );
   }
 
-  static void _tell(BuildContext context, String message) =>
-      ScaffoldMessenger.of(context).showFujinSnackBar(
-        SnackBar(content: Text(message)),
+  static void _tell(BuildContext context, SnackBarGlyph glyph, String title) =>
+      ScaffoldMessenger.of(context).showNotice(
+        SnackBarContent(glyph: glyph, title: title),
+        duration: FujinSnackBar.settledDuration,
       );
 }

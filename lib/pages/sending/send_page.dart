@@ -7,6 +7,8 @@ import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/automatic_mode_notifier.dart';
 import 'package:fujin/pages/common/fade_through.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
+import 'package:fujin/pages/common/snack_bar_content.dart';
+import 'package:fujin/pages/common/snack_bar_glyph.dart';
 import 'package:fujin/pages/sending/send_notifier.dart';
 import 'package:fujin/pages/sending/send_plan_notifier.dart';
 import 'package:fujin/pages/sending/send_plan_state.dart';
@@ -44,13 +46,13 @@ class SendPage extends HookConsumerWidget {
       canPop: sendState is! SendRunning,
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showFujinSnackBar(
-            SnackBar(
-              content: Text(context.intl.sendingStay),
-            ),
-          );
+        ScaffoldMessenger.of(context).showNotice(
+          SnackBarContent(
+            glyph: SnackBarGlyph.sending,
+            title: context.intl.sendingStay,
+          ),
+          duration: FujinSnackBar.settledDuration,
+        );
       },
       child: Scaffold(
         body: SafeArea(

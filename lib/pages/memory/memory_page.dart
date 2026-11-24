@@ -13,6 +13,7 @@ import 'package:fujin/domain/memory/memory_rules.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/appearance_corner.dart';
 import 'package:fujin/pages/common/appearance_header.dart';
+import 'package:fujin/pages/common/fade_through.dart';
 import 'package:fujin/pages/common/fujin_segments.dart';
 import 'package:fujin/pages/common/header_layout.dart';
 import 'package:fujin/pages/common/scroll_edge_blur.dart';
@@ -170,21 +171,28 @@ class MemoryPage extends HookConsumerWidget {
             controller: pages,
             children: [
               for (final segment in MemorySegment.values)
-                switch (_searches(segment, remembered)) {
-                  true => Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      page(segment, extent + _searchArea),
-                      PositionedDirectional(
-                        top: extent + FujinSpace.s3,
-                        start: FujinSize.screenMargin,
-                        end: FujinSize.screenMargin,
-                        child: MemorySearchField(controller: search),
-                      ),
-                    ],
-                  ),
-                  false => page(segment, extent + FujinSpace.s3),
-                },
+                FadeThrough(
+                  scale: 1,
+                  child: switch (_searches(segment, remembered)) {
+                    true => Stack(
+                      key: const ValueKey(true),
+                      fit: StackFit.expand,
+                      children: [
+                        page(segment, extent + _searchArea),
+                        PositionedDirectional(
+                          top: extent + FujinSpace.s3,
+                          start: FujinSize.screenMargin,
+                          end: FujinSize.screenMargin,
+                          child: MemorySearchField(controller: search),
+                        ),
+                      ],
+                    ),
+                    false => KeyedSubtree(
+                      key: const ValueKey(false),
+                      child: page(segment, extent + FujinSpace.s3),
+                    ),
+                  },
+                ),
             ],
           ),
         ),
@@ -217,21 +225,24 @@ class MemoryPage extends HookConsumerWidget {
     return [
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: FujinSize.screenMargin),
-        child: switch (foods) {
-          [] => TextInset(
-            child: Text(
-              context.intl.memorySearchEmpty,
-              style: FujinText.inter13Regular.copyWith(
-                color: context.colors.textSecondary,
+        child: FadeThrough(
+          scale: 1,
+          child: switch (foods) {
+            [] => TextInset(
+              child: Text(
+                context.intl.memorySearchEmpty,
+                style: FujinText.inter13Regular.copyWith(
+                  color: context.colors.textSecondary,
+                ),
               ),
             ),
-          ),
-          _ => RememberedFoodList(
-            foods: foods,
-            unitsOf: memory.unitsOf,
-            onOpen: onOpen,
-          ),
-        },
+            _ => RememberedFoodList(
+              foods: foods,
+              unitsOf: memory.unitsOf,
+              onOpen: onOpen,
+            ),
+          },
+        ),
       ),
     ];
   }
