@@ -1205,6 +1205,22 @@
       "$description": "Length of each arm of an aiming frame corner.",
       "$type": "dimension"
     },
+    "aim-code-width": {
+      "$value": {
+        "value": 240,
+        "unit": "px"
+      },
+      "$description": "Width of the barcode shape the aiming frame closes on when the camera gives no corners for the code read.",
+      "$type": "dimension"
+    },
+    "aim-code-height": {
+      "$value": {
+        "value": 110,
+        "unit": "px"
+      },
+      "$description": "Height of the barcode shape the aiming frame closes on when the camera gives no corners for the code read.",
+      "$type": "dimension"
+    },
     "floating-shadow-blur": {
       "$value": {
         "value": 20,

@@ -5,11 +5,13 @@ import 'package:fujin/app/theme/fujin_tokens.g.dart';
 import 'package:fujin/data/dev_chat/fake_chat.dart';
 import 'package:fujin/pages/chat/widgets/chat_composer.dart';
 import 'package:fujin/pages/common/fujin_switch.dart';
+import 'package:fujin/pages/common/scan_button.dart';
 import 'package:fujin/pages/tabs/tab_plate.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:myfitnesspal_client/myfitnesspal_client.dart';
 
 import '../test/support/fake_backends.dart';
+import '../test/support/fake_scan_camera.dart';
 import '../test/support/fake_video_player.dart';
 import '../test/support/fixtures.dart';
 import '../test/support/pump_fujin.dart';
@@ -20,6 +22,7 @@ enum _Scenario {
   journalScroll,
   settingsSwitch,
   chatThread,
+  scannerSheet,
 }
 
 const _rounds = 3;
@@ -37,6 +40,7 @@ const _squat = 'squat.mp4';
 const _frame = Duration(milliseconds: 16);
 const _settleFrames = 60;
 const _send = 'Envoyer';
+const _barcode = '3275760750398';
 
 final List<MfpFoodEntry> _day = [
   for (var index = 0; index < _entriesPerMeal; index++) ...[
@@ -121,6 +125,22 @@ Future<FakeBackends> _chatBackends() async {
     backends.chatMedia[name] = bytes.buffer.asUint8List();
   }
   return backends;
+}
+
+FakeBackends _scannerBackends() {
+  final food = mfpFood(oats);
+  return FakeBackends(
+    mealNames: [breakfast, lunch, snacks],
+    mfpFoods: [food],
+    mfpBarcodes: {_barcode: food},
+  );
+}
+
+Future<void> _scanRound(WidgetTester tester, FakeScanCamera camera) async {
+  camera.read(_barcode);
+  await _settle(tester);
+  await tester.binding.handlePopRoute();
+  await _settle(tester);
 }
 
 Future<void> _settle(WidgetTester tester) async {
@@ -263,5 +283,13 @@ void main() {
     await _openMessages(tester);
     var round = 0;
     await measure(_Scenario.chatThread, () => _chatRound(tester, round++));
+  });
+
+  testWidgets('raises and closes the sheet of a scanned food', (tester) async {
+    final camera = FakeScanCamera();
+    await pumpFujin(tester, _scannerBackends(), camera: camera);
+    await tester.tap(find.byType(ScanButton));
+    await _settle(tester);
+    await measure(_Scenario.scannerSheet, () => _scanRound(tester, camera));
   });
 }

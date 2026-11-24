@@ -696,6 +696,8 @@ abstract final class FujinStroke {
 
 abstract final class FujinSize {
   static const double addTileIcon = 22;
+  static const double aimCodeHeight = 110;
+  static const double aimCodeWidth = 240;
   static const double aimCorner = 30;
   static const double aimFrameHeight = 190;
   static const double aimFrameTop = 186;

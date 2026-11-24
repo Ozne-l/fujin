@@ -1,13 +1,14 @@
 import 'package:flutter/widgets.dart';
+import 'package:fujin/pages/scanner/scanned_code.dart';
 
 final class FakeScanCamera {
-  ValueChanged<String>? _onRead;
+  ValueChanged<ScannedCode>? _onRead;
   VoidCallback? _onRefused;
   bool torch = false;
 
   Widget build({
     required bool torch,
-    required ValueChanged<String> onRead,
+    required ValueChanged<ScannedCode> onRead,
     required VoidCallback onRefused,
   }) {
     this.torch = torch;
@@ -16,7 +17,8 @@ final class FakeScanCamera {
     return const SizedBox.expand();
   }
 
-  void read(String code) => _onRead?.call(code);
+  void read(String code, {Rect? bounds}) =>
+      _onRead?.call((code: code, bounds: bounds));
 
   void refuse() => _onRefused?.call();
 }
