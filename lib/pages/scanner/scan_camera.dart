@@ -1,11 +1,12 @@
 import 'package:flutter/widgets.dart';
+import 'package:fujin/pages/scanner/scanned_code.dart';
 import 'package:fujin/pages/scanner/widgets/mobile_scan_camera.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 typedef ScanCamera =
     Widget Function({
       required bool torch,
-      required ValueChanged<String> onRead,
+      required ValueChanged<ScannedCode> onRead,
       required VoidCallback onRefused,
     });
 

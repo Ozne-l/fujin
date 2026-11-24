@@ -76,6 +76,17 @@ abstract final class FujinMotion {
 
   static const double daySlide = 0.08;
 
+  static const aimSweep = StepSequence<double>(
+    [0, 1],
+    motion: CurvedMotion(Duration(milliseconds: 1100), Curves.easeInOut),
+    loop: LoopMode.pingPong,
+  );
+  static const badgePop = StepSequence<double>.withMotions([
+    (1, NoMotion()),
+    (emphasisSwell, spatialFast),
+    (1, emphasis),
+  ]);
+
   static const Duration rowRemovalStagger = Duration(milliseconds: 70);
   static const Motion bandNudge = CupertinoMotion(
     duration: Duration(milliseconds: 300),
@@ -122,11 +133,19 @@ abstract final class FujinMotion {
   static const Motion sheetOut = Motion.customSpring(
     SpringDescription(mass: 1, stiffness: 160, damping: 26),
   );
+  static final CurvedMotion sheetRise = CurvedMotion(
+    const Duration(milliseconds: 500),
+    sheetIn.toCurve,
+  );
+  static final CurvedMotion sheetFall = CurvedMotion(
+    const Duration(milliseconds: 300),
+    sheetOut.toCurve.flipped,
+  );
   static final AnimationStyle sheet = AnimationStyle(
-    curve: sheetIn.toCurve,
-    duration: const Duration(milliseconds: 500),
-    reverseCurve: sheetOut.toCurve.flipped,
-    reverseDuration: const Duration(milliseconds: 300),
+    curve: sheetRise.curve,
+    duration: sheetRise.duration,
+    reverseCurve: sheetFall.curve,
+    reverseDuration: sheetFall.duration,
   );
   static const AnimationStyle snackBar = AnimationStyle(
     duration: Duration(milliseconds: 400),

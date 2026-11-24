@@ -68,6 +68,10 @@ class TabPlate extends HookWidget {
           children: [
             for (final slot in items)
               Expanded(
+                key: switch (slot) {
+                  BranchSlot(:final tab) => ValueKey(tab),
+                  MessagesSlot() => const ValueKey(MessagesSlot),
+                },
                 child: switch (slot) {
                   BranchSlot(:final tab) => _TabButton(
                     icon: tab.icon,
@@ -82,7 +86,7 @@ class TabPlate extends HookWidget {
                       <= 0 => null,
                       _ => context.intl.chatTabUnread(unread),
                     },
-                    badge: ChatText.badge(context.intl, unread),
+                    badge: _Badge(unread: unread),
                     active: false,
                     onTap: () => land(slot),
                   ),
@@ -221,14 +225,9 @@ class _TabButton extends StatelessWidget {
   final String icon;
   final String label;
   final String? semanticsLabel;
-  final String? badge;
+  final Widget? badge;
   final bool active;
   final VoidCallback onTap;
-
-  static const EdgeInsets _badgePadding = EdgeInsets.symmetric(
-    horizontal: FujinSize.badgePaddingHorizontal,
-    vertical: FujinSize.badgePaddingVertical,
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -266,22 +265,7 @@ class _TabButton extends StatelessWidget {
                     Positioned(
                       left: FujinSize.icon / 2,
                       top: -FujinSize.badgeRise,
-                      child: DecoratedBox(
-                        decoration: ShapeDecoration(
-                          shape: const StadiumBorder(),
-                          color: context.colors.backgroundAccent,
-                        ),
-                        child: Padding(
-                          padding: _badgePadding,
-                          child: Text(
-                            badge,
-                            maxLines: 1,
-                            style: FujinText.inter11Semibold.copyWith(
-                              color: context.colors.textOnAccent,
-                            ),
-                          ),
-                        ),
-                      ),
+                      child: badge,
                     ),
                   ],
                 ),
@@ -296,5 +280,77 @@ class _TabButton extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _Badge extends HookWidget {
+  const _Badge({required this.unread});
+
+  static const EdgeInsets _padding = EdgeInsets.symmetric(
+    horizontal: FujinSize.badgePaddingHorizontal,
+    vertical: FujinSize.badgePaddingVertical,
+  );
+
+  final int unread;
+
+  @override
+  Widget build(BuildContext context) {
+    final (rises, appearing) =
+        useValueChanged<int, (int, bool)>(
+          unread,
+          (before, last) => switch (unread > before) {
+            true => ((last?.$1 ?? 0) + 1, before <= 0),
+            false => last,
+          },
+        ) ??
+        (0, false);
+    final text = ChatText.badge(context.intl, unread);
+    if (text == null) return const SizedBox.shrink();
+    final reduced = FujinMotion.reduced(context);
+    final pill = DecoratedBox(
+      decoration: ShapeDecoration(
+        shape: const StadiumBorder(),
+        color: context.colors.backgroundAccent,
+      ),
+      child: Padding(
+        padding: _padding,
+        child: Text(
+          text,
+          maxLines: 1,
+          style: FujinText.inter11Semibold.copyWith(
+            color: context.colors.textOnAccent,
+          ),
+        ),
+      ),
+    );
+    return switch ((appearing, reduced)) {
+      (true, _) => SingleMotionBuilder(
+        key: ValueKey(rises),
+        motion: FujinMotion.dissolveOf(context, FujinMotion.emphasis),
+        from: 0,
+        value: 1,
+        builder: (context, shown, child) => Opacity(
+          opacity: shown.clamp(0, 1),
+          child: Transform.scale(
+            scale: switch (reduced) {
+              true => 1,
+              false => shown,
+            },
+            child: child,
+          ),
+        ),
+        child: pill,
+      ),
+      (false, true) => pill,
+      (false, false) => SequenceMotionBuilder<int, double>(
+        key: ValueKey(rises),
+        sequence: FujinMotion.badgePop,
+        converter: MotionConverter.single,
+        playing: rises > 0,
+        builder: (context, scale, _, child) =>
+            Transform.scale(scale: scale, child: child),
+        child: pill,
+      ),
+    };
   }
 }

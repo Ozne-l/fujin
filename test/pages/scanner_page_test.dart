@@ -38,6 +38,8 @@ const _query = '$_oatsName $_brand';
 const _addToBoth = 'Ajouter à MFP et Ekklo';
 const _scannerTitle = 'Scanner un code-barres';
 const _journal = 'Journal';
+const _settleFrames = 20;
+const _frame = Duration(milliseconds: 100);
 final SystemUiOverlayStyle _lightBars = FujinSystemBars.of(
   FujinColors.light,
   Brightness.light,
@@ -90,11 +92,17 @@ FakeBackends _backends({Map<String, MfpFood> barcodes = const {}}) =>
 ProviderContainer _container(WidgetTester tester) =>
     ProviderScope.containerOf(tester.element(find.byType(FujinApp)));
 
+Future<void> _settle(WidgetTester tester) async {
+  for (var frame = 0; frame < _settleFrames; frame++) {
+    await tester.pump(_frame);
+  }
+}
+
 Future<void> _tap(WidgetTester tester, Finder target) async {
   await tester.ensureVisible(target);
-  await tester.pumpAndSettle();
+  await _settle(tester);
   await tester.tap(target);
-  await tester.pumpAndSettle();
+  await _settle(tester);
 }
 
 Future<void> _tapText(WidgetTester tester, String text) =>
@@ -109,7 +117,7 @@ Future<void> _read(
   String code,
 ) async {
   camera.read(code);
-  await tester.pumpAndSettle();
+  await _settle(tester);
 }
 
 Future<void> _type(WidgetTester tester, String code) async {
@@ -151,7 +159,7 @@ Future<void> _pullToRefresh(WidgetTester tester) async {
     const Offset(0, 1000),
     1000,
   );
-  await tester.pumpAndSettle();
+  await _settle(tester);
 }
 
 int _lookups(FakeBackends backends) => backends.requests
@@ -192,7 +200,7 @@ void main() {
             .read(routerProvider)
             .push<void>(FujinRoute.addFood.forMeal(day, lunch)),
       );
-      await tester.pumpAndSettle();
+      await _settle(tester);
 
       await _openScanner(tester);
 
@@ -248,7 +256,7 @@ void main() {
       camera.torch = false;
 
       await tester.binding.handlePopRoute();
-      await tester.pumpAndSettle();
+      await _settle(tester);
 
       _sees('Code lu : $_code');
       check(camera.torch).isTrue();
@@ -292,9 +300,9 @@ void main() {
       camera
         ..read(_code)
         ..read(_storeCode);
-      await tester.pumpAndSettle();
+      await _settle(tester);
       camera.read(_storeCode);
-      await tester.pumpAndSettle();
+      await _settle(tester);
 
       check(_lookups(backends)).equals(1);
       _sees(_oatsName);
@@ -425,7 +433,7 @@ void main() {
                 )
                 .read(routerProvider)
                 .push<Object>(FujinRoute.addFood.forMeal(day, lunch));
-        await tester.pumpAndSettle();
+        await _settle(tester);
         await _openScanner(tester);
 
         await _read(tester, camera, _code);
@@ -494,7 +502,7 @@ void main() {
         _seesNo(_unresolvedBanner);
         await tester.enterText(find.byType(TextField).first, _query);
         await tester.pump(AddSearchNotifier.typingPause);
-        await tester.pumpAndSettle();
+        await _settle(tester);
         await _tapText(tester, _oatsName);
         await _tapText(tester, _addToBoth);
 
@@ -605,7 +613,7 @@ void main() {
         tester.takeException();
         await store.write(FakeBackends.mfpSession);
         _container(tester).read(routerProvider).pop(true);
-        await tester.pumpAndSettle();
+        await _settle(tester);
 
         _sees(_oatsName);
       },
@@ -634,7 +642,7 @@ void main() {
       await _openScanner(tester);
 
       camera.refuse();
-      await tester.pumpAndSettle();
+      await _settle(tester);
 
       _sees('Pas d’accès à l’appareil photo');
       _sees(

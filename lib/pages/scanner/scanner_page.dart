@@ -42,8 +42,12 @@ class ScannerPage extends HookConsumerWidget {
     final camera = ref.watch(scanCameraProvider);
     final torch = useState(false);
     final opened = useState<({AddDraft draft, String barcode})?>(null);
+    final bounds = useState<Rect?>(null);
 
     ref.listen(scannerProvider, (previous, next) {
+      if (next case ScannerAiming() || ScannerRefused() || ScannerTyping()) {
+        bounds.value = null;
+      }
       if ((previous, next) case (
         ScannerAiming(),
         ScannerLooking() || ScannerTyping(code: String(isNotEmpty: true)),
@@ -178,7 +182,10 @@ class ScannerPage extends HookConsumerWidget {
             children: [
               camera(
                 torch: torch.value,
-                onRead: (code) => unawaited(notifier.read(code)),
+                onRead: (scanned) {
+                  if (state case ScannerAiming()) bounds.value = scanned.bounds;
+                  unawaited(notifier.read(scanned.code));
+                },
                 onRefused: notifier.refused,
               ),
               AimFrame(
@@ -188,6 +195,7 @@ class ScannerPage extends HookConsumerWidget {
                 },
                 read: code != null,
                 busy: state is ScannerLooking,
+                code: bounds.value,
               ),
               SafeArea(
                 child: Column(
@@ -258,8 +266,7 @@ class ScannerPage extends HookConsumerWidget {
                   ],
                 ),
               ),
-              if (sheet case final sheet?)
-                InPageSheet(onDismiss: notifier.aim, child: sheet),
+              InPageSheet(onDismiss: notifier.aim, child: sheet),
             ],
           ),
         ),
