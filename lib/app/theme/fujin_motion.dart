@@ -69,6 +69,13 @@ abstract final class FujinMotion {
   static double driftFade(double phase) =>
       math.sin(phase * math.pi).clamp(0, 1);
 
+  static const double _skeletonFloor = 0.45;
+
+  static double skeletonBreath(double cycle) =>
+      1 - (1 - _skeletonFloor) * (1 - math.cos(cycle * 2 * math.pi)) / 2;
+
+  static const double daySlide = 0.08;
+
   static const Duration rowRemovalStagger = Duration(milliseconds: 70);
   static const Motion bandNudge = CupertinoMotion(
     duration: Duration(milliseconds: 300),

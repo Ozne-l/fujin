@@ -9,6 +9,7 @@ import 'package:fujin/domain/adding/meal_of_the_hour.dart';
 import 'package:fujin/domain/journal/read_problem.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/fujin_snack_bar.dart';
+import 'package:fujin/pages/journal/arrival_notifier.dart';
 import 'package:fujin/pages/journal/entry_removal.dart';
 import 'package:fujin/pages/journal/journal_notifier.dart';
 import 'package:fujin/pages/journal/journal_snack_bar.dart';
@@ -47,6 +48,7 @@ abstract final class AddShortcut {
     final day = SelectedDay.calendarDay(added.entry.entry.date);
     final remover = ref.read(removeEntryProvider.notifier);
     FujinHaptics.success();
+    ref.read(arrivalProvider.notifier).arrive(added.entry);
     ref
       ..invalidate(memoryProvider)
       ..invalidate(mfpDiaryProvider(day))

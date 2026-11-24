@@ -10,6 +10,7 @@ import 'package:fujin/domain/weighing/weigh_in_debt.dart';
 import 'package:fujin/domain/weighing/weigh_in_writer_state.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/edge_blur.dart';
+import 'package:fujin/pages/common/fade_through.dart';
 import 'package:fujin/pages/common/header_layout.dart';
 import 'package:fujin/pages/common/scroll_edge_blur.dart';
 import 'package:fujin/pages/common/settings_section.dart';
@@ -112,40 +113,46 @@ class WeighInsPage extends ConsumerWidget {
                 FujinSize.screenMargin,
                 MediaQuery.paddingOf(context).bottom + FujinSpace.s4,
               ),
-              children: switch (listed) {
-                [] => [
-                  TextInset(
-                    top: FujinSpace.s6,
-                    bottom: FujinSpace.s2,
-                    child: Text(
-                      intl.weighInsEmptyTitle,
-                      style: FujinText.hina30.copyWith(
-                        color: colors.textPrimary,
-                      ),
+              children: [
+                FadeThrough(
+                  scale: 1,
+                  child: switch (listed) {
+                    [] => Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        TextInset(
+                          top: FujinSpace.s6,
+                          bottom: FujinSpace.s2,
+                          child: Text(
+                            intl.weighInsEmptyTitle,
+                            style: FujinText.hina30.copyWith(
+                              color: colors.textPrimary,
+                            ),
+                          ),
+                        ),
+                        TextInset(
+                          child: Text(
+                            intl.weighInsEmptyDetail,
+                            style: FujinText.inter15Regular.copyWith(
+                              color: colors.textSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  TextInset(
-                    child: Text(
-                      intl.weighInsEmptyDetail,
-                      style: FujinText.inter15Regular.copyWith(
-                        color: colors.textSecondary,
-                      ),
+                    _ => SettingsSection(
+                      label: intl.weighInsSection,
+                      rows: [
+                        for (final logged in listed)
+                          row(logged.weighIn, [
+                            for (final debt in WeighInDebt.of(logged))
+                              debt.connector,
+                          ]),
+                      ],
                     ),
-                  ),
-                ],
-                _ => [
-                  SettingsSection(
-                    label: intl.weighInsSection,
-                    rows: [
-                      for (final logged in listed)
-                        row(logged.weighIn, [
-                          for (final debt in WeighInDebt.of(logged))
-                            debt.connector,
-                        ]),
-                    ],
-                  ),
-                ],
-              },
+                  },
+                ),
+              ],
             ),
           ),
         ),

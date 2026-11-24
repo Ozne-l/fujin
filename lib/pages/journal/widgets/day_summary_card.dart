@@ -13,6 +13,7 @@ import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/goals_text.dart';
 import 'package:fujin/pages/common/pressable.dart';
 import 'package:fujin/pages/common/progress_bar.dart';
+import 'package:fujin/pages/common/rolling_number.dart';
 import 'package:fujin/pages/common/send_label.dart';
 import 'package:fujin/pages/common/source_dot.dart';
 import 'package:fujin/pages/journal/background_write_notifier.dart';
@@ -174,16 +175,19 @@ class DaySummaryCard extends ConsumerWidget {
     DayNutrients ekklo,
     StatusCounts counts,
   ) => [
-    _SourceLine(
-      dot: colors.sourceEkklo,
-      label: intl.sourceEkklo,
-      trailing: [
-        _strong(intl.kilocalories(ekklo.amount(Nutrient.kilocalories))),
-        _soft(colors, switch (counts.total) {
-          0 => ' ${intl.ekkloNoFood}',
-          final total => ' ${intl.ekkloProgress(counts.inEkklo, total)}',
-        }),
-      ],
+    RollingNumber(
+      value: ekklo.amount(Nutrient.kilocalories),
+      builder: (context, kilocalories) => _SourceLine(
+        dot: colors.sourceEkklo,
+        label: intl.sourceEkklo,
+        trailing: [
+          _strong(intl.kilocalories(kilocalories)),
+          _soft(colors, switch (counts.total) {
+            0 => ' ${intl.ekkloNoFood}',
+            final total => ' ${intl.ekkloProgress(counts.inEkklo, total)}',
+          }),
+        ],
+      ),
     ),
     ProgressBar(
       fraction: switch (counts.total) {
@@ -198,23 +202,22 @@ class DaySummaryCard extends ConsumerWidget {
     AppLocalizations intl,
     FujinColors colors,
     List<EkkloDailyMeal> meals,
-  ) => _SourceLine(
-    dot: colors.sourceEkklo,
-    label: intl.sourceEkklo,
-    trailing: [
-      _strong(
-        intl.kilocalories(
-          DayNutrients.ofEkklo(meals).amount(Nutrient.kilocalories),
-        ),
-      ),
-      _soft(colors, switch (meals.fold(
-        0,
-        (count, meal) => count + meal.items.length,
-      )) {
-        0 => ' ${intl.ekkloNoFood}',
-        final count => ' ${intl.ekkloFoodCount(count)}',
-      }),
-    ],
+  ) => RollingNumber(
+    value: DayNutrients.ofEkklo(meals).amount(Nutrient.kilocalories),
+    builder: (context, kilocalories) => _SourceLine(
+      dot: colors.sourceEkklo,
+      label: intl.sourceEkklo,
+      trailing: [
+        _strong(intl.kilocalories(kilocalories)),
+        _soft(colors, switch (meals.fold(
+          0,
+          (count, meal) => count + meal.items.length,
+        )) {
+          0 => ' ${intl.ekkloNoFood}',
+          final count => ' ${intl.ekkloFoodCount(count)}',
+        }),
+      ],
+    ),
   );
 }
 
@@ -231,19 +234,22 @@ class _MfpRings extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: FujinSpace.s3,
       children: [
-        _SourceLine(
-          dot: context.colors.sourceMfp,
-          label: context.intl.sourceMyFitnessPal,
-          trailing: [
-            TextSpan(
-              text: context.intl.kilocaloriesValue(eaten),
-              style: FujinText.inter15Semibold,
-            ),
-            _soft(
-              context.colors,
-              ' ${context.intl.kilocaloriesGoal(goals.kilocalories)}',
-            ),
-          ],
+        RollingNumber(
+          value: eaten,
+          builder: (context, eaten) => _SourceLine(
+            dot: context.colors.sourceMfp,
+            label: context.intl.sourceMyFitnessPal,
+            trailing: [
+              TextSpan(
+                text: context.intl.kilocaloriesValue(eaten),
+                style: FujinText.inter15Semibold,
+              ),
+              _soft(
+                context.colors,
+                ' ${context.intl.kilocaloriesGoal(goals.kilocalories)}',
+              ),
+            ],
+          ),
         ),
         ProgressBar(
           fraction: eaten / goals.kilocalories,
@@ -283,19 +289,21 @@ class _MfpCompact extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final eaten = nutrients.amount(Nutrient.kilocalories);
-    return _SourceBlock(
-      trailing: switch (readAt) {
-        final readAt? => _faint(
-          context.colors,
-          context.intl.kilocaloriesAt(eaten, readAt),
-        ),
-        null => TextSpan(
-          text: context.intl.kilocalories(eaten),
-          style: FujinText.inter15Semibold,
-        ),
-      },
-      detail: JournalText.macroLine(context.intl, nutrients),
+    return RollingNumber(
+      value: nutrients.amount(Nutrient.kilocalories),
+      builder: (context, eaten) => _SourceBlock(
+        trailing: switch (readAt) {
+          final readAt? => _faint(
+            context.colors,
+            context.intl.kilocaloriesAt(eaten, readAt),
+          ),
+          null => TextSpan(
+            text: context.intl.kilocalories(eaten),
+            style: FujinText.inter15Semibold,
+          ),
+        },
+        detail: JournalText.macroLine(context.intl, nutrients),
+      ),
     );
   }
 }

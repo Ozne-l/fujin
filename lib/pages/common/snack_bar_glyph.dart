@@ -9,19 +9,20 @@ enum SnackBarGlyph {
   done(CheckIcon.asset),
   undone('assets/icons/undo.svg'),
   alert(AlertIcon.asset),
-  refresh(RefreshIcon.asset);
+  refresh(RefreshIcon.asset),
+  sending('assets/icons/send.svg');
 
   const SnackBarGlyph(this.asset);
 
   final String asset;
 
   Color background(FujinColors colors) => switch (this) {
-    done || undone || refresh => colors.backgroundAccent,
+    done || undone || refresh || sending => colors.backgroundAccent,
     alert => colors.buttonAlertBackground,
   };
 
   Color foreground(FujinColors colors) => switch (this) {
-    done || undone || refresh => colors.textOnAccent,
+    done || undone || refresh || sending => colors.textOnAccent,
     alert => colors.buttonAlertText,
   };
 }

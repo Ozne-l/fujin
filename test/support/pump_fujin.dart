@@ -38,6 +38,8 @@ import 'sent_food.dart';
 
 const appVersion = '0.1.0';
 const _beforeTheReads = Duration(hours: 1);
+const _readingFrames = 10;
+const _readingFrame = Duration(milliseconds: 100);
 
 Future<void> pumpFujin(
   WidgetTester tester,
@@ -65,6 +67,7 @@ Future<void> pumpFujin(
   FakeVideoPlayer? urlVideo,
   FakeVoiceRecorder? voiceRecorder,
   FakeMediaUploader? mediaUploader,
+  bool settle = true,
 }) async {
   tester.platformDispatcher.localesTestValue = const [Locale('fr')];
   addTearDown(tester.platformDispatcher.clearLocalesTestValue);
@@ -168,5 +171,12 @@ Future<void> pumpFujin(
       child: const FujinApp(),
     ),
   );
-  await tester.pumpAndSettle();
+  switch (settle) {
+    case true:
+      await tester.pumpAndSettle();
+    case false:
+      for (var frame = 0; frame < _readingFrames; frame++) {
+        await tester.pump(_readingFrame);
+      }
+  }
 }

@@ -8,9 +8,12 @@ import 'package:fujin/data/connectors/connector.dart';
 import 'package:fujin/data/entries/logged_entry.dart';
 import 'package:fujin/data/entries/mfp_write.dart';
 import 'package:fujin/l10n/intl_context.dart';
+import 'package:fujin/pages/common/arrival_highlight.dart';
 import 'package:fujin/pages/common/connector_pill.dart';
 import 'package:fujin/pages/common/pressable.dart';
+import 'package:fujin/pages/common/rising_slot.dart';
 import 'package:fujin/pages/common/swipe_row.dart';
+import 'package:fujin/pages/journal/arrival_notifier.dart';
 import 'package:fujin/pages/journal/widgets/entry_row.dart';
 import 'package:fujin/pages/journal/widgets/row_write.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -100,7 +103,7 @@ class MealRows<T extends Object> extends HookWidget {
                 onRemove: () => onRemove(entry),
                 child: Pressable.row(
                   onTap: () => onOpen(entry),
-                  child: row,
+                  child: _Arrival(entryId: id, child: row),
                 ),
               ),
               _Live() || _Leaving() => row,
@@ -303,5 +306,43 @@ class _LeavingRow extends ConsumerWidget {
           ConnectorPill(connector: Connector.ekklo, failed: failed),
       ],
     );
+  }
+}
+
+class _Arrival extends HookConsumerWidget {
+  const _Arrival({required this.entryId, required this.child});
+
+  final String entryId;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final arriving = ref.watch(
+      arrivalProvider.select((arrived) => arrived == entryId),
+    );
+    final before = usePrevious(arriving);
+    final arrivals = useRef(0);
+    if (arriving && before != true) arrivals.value++;
+    useEffect(() {
+      if (arriving) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (context.mounted) {
+            ref.read(arrivalProvider.notifier).settle(entryId);
+          }
+        });
+      }
+      return null;
+    }, [arriving]);
+    return switch (arrivals.value) {
+      0 => child,
+      final arrival => Stack(
+        key: ValueKey(arrival),
+        fit: StackFit.passthrough,
+        children: [
+          const Positioned.fill(child: ArrivalHighlight()),
+          RisingSlot(appear: true, child: child),
+        ],
+      ),
+    };
   }
 }

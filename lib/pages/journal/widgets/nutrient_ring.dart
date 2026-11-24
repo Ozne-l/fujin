@@ -4,6 +4,7 @@ import 'package:fujin/domain/goals/goal_status.dart';
 import 'package:fujin/domain/sending/nutrient.dart';
 import 'package:fujin/l10n/intl_context.dart';
 import 'package:fujin/pages/common/progress_ring.dart';
+import 'package:fujin/pages/common/rolling_number.dart';
 
 class NutrientRing extends StatelessWidget {
   const NutrientRing({
@@ -23,7 +24,7 @@ class NutrientRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final value = switch (partial) {
+    String value(BuildContext context, double amount) => switch (partial) {
       true => context.intl.atLeast(context.intl.ringValue(amount)),
       false => context.intl.ringValue(amount),
     };
@@ -76,10 +77,13 @@ class NutrientRing extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                value,
-                style: FujinText.inter13Medium.copyWith(
-                  color: context.colors.textPrimary,
+              RollingNumber(
+                value: amount,
+                builder: (context, amount) => Text(
+                  value(context, amount),
+                  style: FujinText.inter13Medium.copyWith(
+                    color: context.colors.textPrimary,
+                  ),
                 ),
               ),
               if (goal case final goal?)
